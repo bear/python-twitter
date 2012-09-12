@@ -1,0 +1,2026 @@
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module twitter</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>twitter</strong></big></big> (version 0.8)</font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="twitter.py">twitter.py</a></font></td></tr></table>
+    <p><tt>A&nbsp;library&nbsp;that&nbsp;provides&nbsp;a&nbsp;Python&nbsp;interface&nbsp;to&nbsp;the&nbsp;Twitter&nbsp;API</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="StringIO.html">StringIO</a><br>
+<a href="base64.html">base64</a><br>
+<a href="calendar.html">calendar</a><br>
+<a href="datetime.html">datetime</a><br>
+<a href="gzip.html">gzip</a><br>
+</td><td width="25%" valign=top><a href="httplib.html">httplib</a><br>
+<a href="oauth2.html">oauth2</a><br>
+<a href="os.html">os</a><br>
+<a href="rfc822.html">rfc822</a><br>
+<a href="json.html">json</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+<a href="tempfile.html">tempfile</a><br>
+<a href="textwrap.html">textwrap</a><br>
+<a href="time.html">time</a><br>
+<a href="urllib.html">urllib</a><br>
+</td><td width="25%" valign=top><a href="urllib2.html">urllib2</a><br>
+<a href="urlparse.html">urlparse</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="twitter.html#Api">Api</a>
+</font></dt><dt><font face="helvetica, arial"><a href="twitter.html#DirectMessage">DirectMessage</a>
+</font></dt><dt><font face="helvetica, arial"><a href="twitter.html#Hashtag">Hashtag</a>
+</font></dt><dt><font face="helvetica, arial"><a href="twitter.html#List">List</a>
+</font></dt><dt><font face="helvetica, arial"><a href="twitter.html#Status">Status</a>
+</font></dt><dt><font face="helvetica, arial"><a href="twitter.html#Trend">Trend</a>
+</font></dt><dt><font face="helvetica, arial"><a href="twitter.html#Url">Url</a>
+</font></dt><dt><font face="helvetica, arial"><a href="twitter.html#User">User</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="exceptions.html#Exception">exceptions.Exception</a>(<a href="exceptions.html#BaseException">exceptions.BaseException</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="twitter.html#TwitterError">TwitterError</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Api">class <strong>Api</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;python&nbsp;interface&nbsp;into&nbsp;the&nbsp;Twitter&nbsp;API<br>
+&nbsp;<br>
+By&nbsp;default,&nbsp;the&nbsp;<a href="#Api">Api</a>&nbsp;caches&nbsp;results&nbsp;for&nbsp;1&nbsp;minute.<br>
+&nbsp;<br>
+Example&nbsp;usage:<br>
+&nbsp;<br>
+&nbsp;&nbsp;To&nbsp;create&nbsp;an&nbsp;instance&nbsp;of&nbsp;the&nbsp;twitter.<a href="#Api">Api</a>&nbsp;class,&nbsp;with&nbsp;no&nbsp;authentication:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;import&nbsp;twitter<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api&nbsp;=&nbsp;twitter.<a href="#Api">Api</a>()<br>
+&nbsp;<br>
+&nbsp;&nbsp;To&nbsp;fetch&nbsp;the&nbsp;most&nbsp;recently&nbsp;posted&nbsp;public&nbsp;twitter&nbsp;status&nbsp;messages:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;statuses&nbsp;=&nbsp;api.<a href="#Api-GetPublicTimeline">GetPublicTimeline</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;print&nbsp;[s.user.name&nbsp;for&nbsp;s&nbsp;in&nbsp;statuses]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[u'DeWitt',&nbsp;u'Kesuke&nbsp;Miyagi',&nbsp;u'ev',&nbsp;u'Buzz&nbsp;Andersen',&nbsp;u'Biz&nbsp;Stone']&nbsp;#...<br>
+&nbsp;<br>
+&nbsp;&nbsp;To&nbsp;fetch&nbsp;a&nbsp;single&nbsp;user's&nbsp;public&nbsp;status&nbsp;messages,&nbsp;where&nbsp;"user"&nbsp;is&nbsp;either<br>
+&nbsp;&nbsp;a&nbsp;Twitter&nbsp;"short&nbsp;name"&nbsp;or&nbsp;their&nbsp;user&nbsp;id.<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;statuses&nbsp;=&nbsp;api.<a href="#Api-GetUserTimeline">GetUserTimeline</a>(user)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;print&nbsp;[s.text&nbsp;for&nbsp;s&nbsp;in&nbsp;statuses]<br>
+&nbsp;<br>
+&nbsp;&nbsp;To&nbsp;use&nbsp;authentication,&nbsp;instantiate&nbsp;the&nbsp;twitter.<a href="#Api">Api</a>&nbsp;class&nbsp;with&nbsp;a<br>
+&nbsp;&nbsp;consumer&nbsp;key&nbsp;and&nbsp;secret;&nbsp;and&nbsp;the&nbsp;oAuth&nbsp;key&nbsp;and&nbsp;secret:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api&nbsp;=&nbsp;twitter.<a href="#Api">Api</a>(consumer_key='twitter&nbsp;consumer&nbsp;key',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;consumer_secret='twitter&nbsp;consumer&nbsp;secret',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;access_token_key='the_key_given',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;access_token_secret='the_key_secret')<br>
+&nbsp;<br>
+&nbsp;&nbsp;To&nbsp;fetch&nbsp;your&nbsp;friends&nbsp;(after&nbsp;being&nbsp;authenticated):<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;users&nbsp;=&nbsp;api.<a href="#Api-GetFriends">GetFriends</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;print&nbsp;[u.name&nbsp;for&nbsp;u&nbsp;in&nbsp;users]<br>
+&nbsp;<br>
+&nbsp;&nbsp;To&nbsp;post&nbsp;a&nbsp;twitter&nbsp;status&nbsp;message&nbsp;(after&nbsp;being&nbsp;authenticated):<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;status&nbsp;=&nbsp;api.<a href="#Api-PostUpdate">PostUpdate</a>('I&nbsp;love&nbsp;python-twitter!')<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;print&nbsp;status.text<br>
+&nbsp;&nbsp;&nbsp;&nbsp;I&nbsp;love&nbsp;python-twitter!<br>
+&nbsp;<br>
+&nbsp;&nbsp;There&nbsp;are&nbsp;many&nbsp;other&nbsp;methods,&nbsp;including:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-PostUpdates">PostUpdates</a>(status)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-PostDirectMessage">PostDirectMessage</a>(user,&nbsp;text)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetUser">GetUser</a>(user)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetReplies">GetReplies</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetUserTimeline">GetUserTimeline</a>(user)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetStatus">GetStatus</a>(id)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-DestroyStatus">DestroyStatus</a>(id)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetFriendsTimeline">GetFriendsTimeline</a>(user)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetFriends">GetFriends</a>(user)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetFollowers">GetFollowers</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetFeatured">GetFeatured</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetDirectMessages">GetDirectMessages</a>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-PostDirectMessage">PostDirectMessage</a>(user,&nbsp;text)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-DestroyDirectMessage">DestroyDirectMessage</a>(id)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-DestroyFriendship">DestroyFriendship</a>(user)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-CreateFriendship">CreateFriendship</a>(user)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetUserByEmail">GetUserByEmail</a>(email)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-VerifyCredentials">VerifyCredentials</a>()<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Api-ClearCredentials"><strong>ClearCredentials</strong></a>(self)</dt><dd><tt>Clear&nbsp;the&nbsp;any&nbsp;credentials&nbsp;for&nbsp;this&nbsp;instance</tt></dd></dl>
+
+<dl><dt><a name="Api-CreateFavorite"><strong>CreateFavorite</strong></a>(self, status)</dt><dd><tt>Favorites&nbsp;the&nbsp;status&nbsp;specified&nbsp;in&nbsp;the&nbsp;status&nbsp;parameter&nbsp;as&nbsp;the&nbsp;authenticating&nbsp;user.<br>
+Returns&nbsp;the&nbsp;favorite&nbsp;status&nbsp;when&nbsp;successful.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;The&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance&nbsp;to&nbsp;mark&nbsp;as&nbsp;a&nbsp;favorite.<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;newly-marked&nbsp;favorite.</tt></dd></dl>
+
+<dl><dt><a name="Api-CreateFriendship"><strong>CreateFriendship</strong></a>(self, user)</dt><dd><tt>Befriends&nbsp;the&nbsp;user&nbsp;specified&nbsp;in&nbsp;the&nbsp;user&nbsp;parameter&nbsp;as&nbsp;the&nbsp;authenticating&nbsp;user.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;The&nbsp;ID&nbsp;or&nbsp;screen&nbsp;name&nbsp;of&nbsp;the&nbsp;user&nbsp;to&nbsp;befriend.<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#User">User</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;befriended&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="Api-CreateList"><strong>CreateList</strong></a>(self, user, name, mode<font color="#909090">=None</font>, description<font color="#909090">=None</font>)</dt><dd><tt>Creates&nbsp;a&nbsp;new&nbsp;list&nbsp;with&nbsp;the&nbsp;give&nbsp;name<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Twitter&nbsp;name&nbsp;to&nbsp;create&nbsp;the&nbsp;list&nbsp;for<br>
+&nbsp;&nbsp;name:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;New&nbsp;name&nbsp;for&nbsp;the&nbsp;list<br>
+&nbsp;&nbsp;mode:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;'public'&nbsp;or&nbsp;'private'.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Defaults&nbsp;to&nbsp;'public'.&nbsp;[Optional]<br>
+&nbsp;&nbsp;description:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Description&nbsp;of&nbsp;the&nbsp;list.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#List">List</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;new&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="Api-CreateSubscription"><strong>CreateSubscription</strong></a>(self, owner, list)</dt><dd><tt>Creates&nbsp;a&nbsp;subscription&nbsp;to&nbsp;a&nbsp;list&nbsp;by&nbsp;the&nbsp;authenticated&nbsp;user<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;owner:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#User">User</a>&nbsp;name&nbsp;or&nbsp;id&nbsp;of&nbsp;the&nbsp;owner&nbsp;of&nbsp;the&nbsp;list&nbsp;being&nbsp;subscribed&nbsp;to.<br>
+&nbsp;&nbsp;list:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;slug&nbsp;or&nbsp;list&nbsp;id&nbsp;to&nbsp;subscribe&nbsp;the&nbsp;user&nbsp;to<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#List">List</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;list&nbsp;subscribed&nbsp;to</tt></dd></dl>
+
+<dl><dt><a name="Api-DestroyDirectMessage"><strong>DestroyDirectMessage</strong></a>(self, id)</dt><dd><tt>Destroys&nbsp;the&nbsp;direct&nbsp;message&nbsp;specified&nbsp;in&nbsp;the&nbsp;required&nbsp;ID&nbsp;parameter.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated,&nbsp;and&nbsp;the<br>
+authenticating&nbsp;user&nbsp;must&nbsp;be&nbsp;the&nbsp;recipient&nbsp;of&nbsp;the&nbsp;specified&nbsp;direct<br>
+message.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;id:&nbsp;The&nbsp;id&nbsp;of&nbsp;the&nbsp;direct&nbsp;message&nbsp;to&nbsp;be&nbsp;destroyed<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#DirectMessage">DirectMessage</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;message&nbsp;destroyed</tt></dd></dl>
+
+<dl><dt><a name="Api-DestroyFavorite"><strong>DestroyFavorite</strong></a>(self, status)</dt><dd><tt>Un-favorites&nbsp;the&nbsp;status&nbsp;specified&nbsp;in&nbsp;the&nbsp;ID&nbsp;parameter&nbsp;as&nbsp;the&nbsp;authenticating&nbsp;user.<br>
+Returns&nbsp;the&nbsp;un-favorited&nbsp;status&nbsp;in&nbsp;the&nbsp;requested&nbsp;format&nbsp;when&nbsp;successful.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;The&nbsp;twitter.<a href="#Status">Status</a>&nbsp;to&nbsp;unmark&nbsp;as&nbsp;a&nbsp;favorite.<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;newly-unmarked&nbsp;favorite.</tt></dd></dl>
+
+<dl><dt><a name="Api-DestroyFriendship"><strong>DestroyFriendship</strong></a>(self, user)</dt><dd><tt>Discontinues&nbsp;friendship&nbsp;with&nbsp;the&nbsp;user&nbsp;specified&nbsp;in&nbsp;the&nbsp;user&nbsp;parameter.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;The&nbsp;ID&nbsp;or&nbsp;screen&nbsp;name&nbsp;of&nbsp;the&nbsp;user&nbsp;&nbsp;with&nbsp;whom&nbsp;to&nbsp;discontinue&nbsp;friendship.<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#User">User</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;discontinued&nbsp;friend.</tt></dd></dl>
+
+<dl><dt><a name="Api-DestroyList"><strong>DestroyList</strong></a>(self, user, id)</dt><dd><tt>Destroys&nbsp;the&nbsp;list&nbsp;from&nbsp;the&nbsp;given&nbsp;user<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;user&nbsp;to&nbsp;remove&nbsp;the&nbsp;list&nbsp;from.<br>
+&nbsp;&nbsp;id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;slug&nbsp;or&nbsp;id&nbsp;of&nbsp;the&nbsp;list&nbsp;to&nbsp;remove.<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#List">List</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;removed&nbsp;list.</tt></dd></dl>
+
+<dl><dt><a name="Api-DestroyStatus"><strong>DestroyStatus</strong></a>(self, id)</dt><dd><tt>Destroys&nbsp;the&nbsp;status&nbsp;specified&nbsp;by&nbsp;the&nbsp;required&nbsp;ID&nbsp;parameter.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated&nbsp;and&nbsp;the<br>
+authenticating&nbsp;user&nbsp;must&nbsp;be&nbsp;the&nbsp;author&nbsp;of&nbsp;the&nbsp;specified&nbsp;status.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;numerical&nbsp;ID&nbsp;of&nbsp;the&nbsp;status&nbsp;you're&nbsp;trying&nbsp;to&nbsp;destroy.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;destroyed&nbsp;status&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="Api-DestroySubscription"><strong>DestroySubscription</strong></a>(self, owner, list)</dt><dd><tt>Destroys&nbsp;the&nbsp;subscription&nbsp;to&nbsp;a&nbsp;list&nbsp;for&nbsp;the&nbsp;authenticated&nbsp;user<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;owner:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;user&nbsp;id&nbsp;or&nbsp;screen&nbsp;name&nbsp;of&nbsp;the&nbsp;user&nbsp;that&nbsp;owns&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;that&nbsp;is&nbsp;to&nbsp;be&nbsp;unsubscribed&nbsp;from<br>
+&nbsp;&nbsp;list:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;slug&nbsp;or&nbsp;list&nbsp;id&nbsp;of&nbsp;the&nbsp;list&nbsp;to&nbsp;unsubscribe&nbsp;from<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#List">List</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;removed&nbsp;list.</tt></dd></dl>
+
+<dl><dt><a name="Api-FilterPublicTimeline"><strong>FilterPublicTimeline</strong></a>(self, term, since_id<font color="#909090">=None</font>)</dt><dd><tt>Filter&nbsp;the&nbsp;public&nbsp;twitter&nbsp;timeline&nbsp;by&nbsp;a&nbsp;given&nbsp;search&nbsp;term&nbsp;on<br>
+the&nbsp;local&nbsp;machine.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;term:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;term&nbsp;to&nbsp;search&nbsp;by.<br>
+&nbsp;&nbsp;since_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;results&nbsp;with&nbsp;an&nbsp;ID&nbsp;greater&nbsp;than&nbsp;(that&nbsp;is,&nbsp;more&nbsp;recent<br>
+&nbsp;&nbsp;&nbsp;&nbsp;than)&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;There&nbsp;are&nbsp;limits&nbsp;to&nbsp;the&nbsp;number&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;which&nbsp;can&nbsp;be&nbsp;accessed&nbsp;through&nbsp;the&nbsp;API.&nbsp;If&nbsp;the&nbsp;limit&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;has&nbsp;occured&nbsp;since&nbsp;the&nbsp;since_id,&nbsp;the&nbsp;since_id&nbsp;will&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;forced&nbsp;to&nbsp;the&nbsp;oldest&nbsp;ID&nbsp;available.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;message<br>
+&nbsp;&nbsp;containing&nbsp;the&nbsp;term</tt></dd></dl>
+
+<dl><dt><a name="Api-GetDirectMessages"><strong>GetDirectMessages</strong></a>(self, since<font color="#909090">=None</font>, since_id<font color="#909090">=None</font>, page<font color="#909090">=None</font>)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;the&nbsp;direct&nbsp;messages&nbsp;sent&nbsp;to&nbsp;the&nbsp;authenticating&nbsp;user.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;since:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Narrows&nbsp;the&nbsp;returned&nbsp;results&nbsp;to&nbsp;just&nbsp;those&nbsp;statuses&nbsp;created<br>
+&nbsp;&nbsp;&nbsp;&nbsp;after&nbsp;the&nbsp;specified&nbsp;HTTP-formatted&nbsp;date.&nbsp;[Optional]<br>
+&nbsp;&nbsp;since_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;results&nbsp;with&nbsp;an&nbsp;ID&nbsp;greater&nbsp;than&nbsp;(that&nbsp;is,&nbsp;more&nbsp;recent<br>
+&nbsp;&nbsp;&nbsp;&nbsp;than)&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;There&nbsp;are&nbsp;limits&nbsp;to&nbsp;the&nbsp;number&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;which&nbsp;can&nbsp;be&nbsp;accessed&nbsp;through&nbsp;the&nbsp;API.&nbsp;If&nbsp;the&nbsp;limit&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;has&nbsp;occured&nbsp;since&nbsp;the&nbsp;since_id,&nbsp;the&nbsp;since_id&nbsp;will&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;forced&nbsp;to&nbsp;the&nbsp;oldest&nbsp;ID&nbsp;available.&nbsp;[Optional]<br>
+&nbsp;&nbsp;page:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;page&nbsp;of&nbsp;results&nbsp;to&nbsp;retrieve.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Note:&nbsp;there&nbsp;are&nbsp;pagination&nbsp;limits.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#DirectMessage">DirectMessage</a>&nbsp;instances</tt></dd></dl>
+
+<dl><dt><a name="Api-GetFavorites"><strong>GetFavorites</strong></a>(self, user<font color="#909090">=None</font>, page<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;a&nbsp;list&nbsp;of&nbsp;<a href="#Status">Status</a>&nbsp;objects&nbsp;representing&nbsp;favorited&nbsp;tweets.<br>
+By&nbsp;default,&nbsp;returns&nbsp;the&nbsp;(up&nbsp;to)&nbsp;20&nbsp;most&nbsp;recent&nbsp;tweets&nbsp;for&nbsp;the<br>
+authenticated&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;twitter&nbsp;name&nbsp;or&nbsp;id&nbsp;of&nbsp;the&nbsp;user&nbsp;whose&nbsp;favorites&nbsp;you&nbsp;are&nbsp;fetching.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;not&nbsp;specified,&nbsp;defaults&nbsp;to&nbsp;the&nbsp;authenticated&nbsp;user.&nbsp;[Optional]<br>
+&nbsp;&nbsp;page:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;page&nbsp;of&nbsp;results&nbsp;to&nbsp;retrieve.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Note:&nbsp;there&nbsp;are&nbsp;pagination&nbsp;limits.&nbsp;[Optional]</tt></dd></dl>
+
+<dl><dt><a name="Api-GetFeatured"><strong>GetFeatured</strong></a>(self)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#User">User</a>&nbsp;instances&nbsp;featured&nbsp;on&nbsp;twitter.com<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#User">User</a>&nbsp;instances</tt></dd></dl>
+
+<dl><dt><a name="Api-GetFollowerIDs"><strong>GetFollowerIDs</strong></a>(self, userid<font color="#909090">=None</font>, cursor<font color="#909090">=-1</font>)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#User">User</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;follower<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#User">User</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;follower</tt></dd></dl>
+
+<dl><dt><a name="Api-GetFollowers"><strong>GetFollowers</strong></a>(self, page<font color="#909090">=None</font>)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#User">User</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;follower<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;page:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;page&nbsp;of&nbsp;results&nbsp;to&nbsp;retrieve.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Note:&nbsp;there&nbsp;are&nbsp;pagination&nbsp;limits.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#User">User</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;follower</tt></dd></dl>
+
+<dl><dt><a name="Api-GetFriendIDs"><strong>GetFriendIDs</strong></a>(self, user<font color="#909090">=None</font>, cursor<font color="#909090">=-1</font>)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;twitter&nbsp;user&nbsp;id's&nbsp;for&nbsp;every&nbsp;person<br>
+the&nbsp;specified&nbsp;user&nbsp;is&nbsp;following.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;id&nbsp;or&nbsp;screen_name&nbsp;of&nbsp;the&nbsp;user&nbsp;to&nbsp;retrieve&nbsp;the&nbsp;id&nbsp;list&nbsp;for<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;integers,&nbsp;one&nbsp;for&nbsp;each&nbsp;user&nbsp;id.</tt></dd></dl>
+
+<dl><dt><a name="Api-GetFriends"><strong>GetFriends</strong></a>(self, user<font color="#909090">=None</font>, cursor<font color="#909090">=-1</font>)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#User">User</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;friend.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;twitter&nbsp;name&nbsp;or&nbsp;id&nbsp;of&nbsp;the&nbsp;user&nbsp;whose&nbsp;friends&nbsp;you&nbsp;are&nbsp;fetching.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;not&nbsp;specified,&nbsp;defaults&nbsp;to&nbsp;the&nbsp;authenticated&nbsp;user.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#User">User</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;friend</tt></dd></dl>
+
+<dl><dt><a name="Api-GetFriendsTimeline"><strong>GetFriendsTimeline</strong></a>(self, user<font color="#909090">=None</font>, count<font color="#909090">=None</font>, page<font color="#909090">=None</font>, since_id<font color="#909090">=None</font>, retweets<font color="#909090">=None</font>, include_entities<font color="#909090">=None</font>)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;messages&nbsp;for&nbsp;a&nbsp;user's&nbsp;friends<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated&nbsp;if&nbsp;the&nbsp;user&nbsp;is&nbsp;private.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;ID&nbsp;or&nbsp;screen&nbsp;name&nbsp;of&nbsp;the&nbsp;user&nbsp;for&nbsp;whom&nbsp;to&nbsp;return<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;friends_timeline.&nbsp;&nbsp;If&nbsp;not&nbsp;specified&nbsp;then&nbsp;the&nbsp;authenticated<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user&nbsp;set&nbsp;in&nbsp;the&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;will&nbsp;be&nbsp;used.&nbsp;&nbsp;[Optional]<br>
+&nbsp;&nbsp;count:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;number&nbsp;of&nbsp;statuses&nbsp;to&nbsp;retrieve.&nbsp;May&nbsp;not&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;greater&nbsp;than&nbsp;100.&nbsp;[Optional]<br>
+&nbsp;&nbsp;page:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;page&nbsp;of&nbsp;results&nbsp;to&nbsp;retrieve.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Note:&nbsp;there&nbsp;are&nbsp;pagination&nbsp;limits.&nbsp;[Optional]<br>
+&nbsp;&nbsp;since_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;results&nbsp;with&nbsp;an&nbsp;ID&nbsp;greater&nbsp;than&nbsp;(that&nbsp;is,&nbsp;more&nbsp;recent<br>
+&nbsp;&nbsp;&nbsp;&nbsp;than)&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;There&nbsp;are&nbsp;limits&nbsp;to&nbsp;the&nbsp;number&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;which&nbsp;can&nbsp;be&nbsp;accessed&nbsp;through&nbsp;the&nbsp;API.&nbsp;If&nbsp;the&nbsp;limit&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;has&nbsp;occured&nbsp;since&nbsp;the&nbsp;since_id,&nbsp;the&nbsp;since_id&nbsp;will&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;forced&nbsp;to&nbsp;the&nbsp;oldest&nbsp;ID&nbsp;available.&nbsp;[Optional]<br>
+&nbsp;&nbsp;retweets:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;True,&nbsp;the&nbsp;timeline&nbsp;will&nbsp;contain&nbsp;native&nbsp;retweets.&nbsp;[Optional]<br>
+&nbsp;&nbsp;include_entities:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;True,&nbsp;each&nbsp;tweet&nbsp;will&nbsp;include&nbsp;a&nbsp;node&nbsp;called&nbsp;"entities,".<br>
+&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;node&nbsp;offers&nbsp;a&nbsp;variety&nbsp;of&nbsp;metadata&nbsp;about&nbsp;the&nbsp;tweet&nbsp;in&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;&nbsp;discreet&nbsp;structure,&nbsp;including:&nbsp;user_mentions,&nbsp;urls,&nbsp;and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hashtags.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="Api-GetLists"><strong>GetLists</strong></a>(self, user, cursor<font color="#909090">=-1</font>)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;lists&nbsp;for&nbsp;a&nbsp;user.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;twitter&nbsp;name&nbsp;or&nbsp;id&nbsp;of&nbsp;the&nbsp;user&nbsp;whose&nbsp;friends&nbsp;you&nbsp;are&nbsp;fetching.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;the&nbsp;passed&nbsp;in&nbsp;user&nbsp;is&nbsp;the&nbsp;same&nbsp;as&nbsp;the&nbsp;authenticated&nbsp;user<br>
+&nbsp;&nbsp;&nbsp;&nbsp;then&nbsp;you&nbsp;will&nbsp;also&nbsp;receive&nbsp;private&nbsp;list&nbsp;data.<br>
+&nbsp;&nbsp;cursor:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"page"&nbsp;value&nbsp;that&nbsp;Twitter&nbsp;will&nbsp;use&nbsp;to&nbsp;start&nbsp;building&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;sequence&nbsp;from.&nbsp;&nbsp;-1&nbsp;to&nbsp;start&nbsp;at&nbsp;the&nbsp;beginning.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Twitter&nbsp;will&nbsp;return&nbsp;in&nbsp;the&nbsp;result&nbsp;the&nbsp;values&nbsp;for&nbsp;next_cursor<br>
+&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;previous_cursor.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#List">List</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="Api-GetMentions"><strong>GetMentions</strong></a>(self, since_id<font color="#909090">=None</font>, max_id<font color="#909090">=None</font>, page<font color="#909090">=None</font>)</dt><dd><tt>Returns&nbsp;the&nbsp;20&nbsp;most&nbsp;recent&nbsp;mentions&nbsp;(status&nbsp;containing&nbsp;@twitterID)<br>
+for&nbsp;the&nbsp;authenticating&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;since_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;results&nbsp;with&nbsp;an&nbsp;ID&nbsp;greater&nbsp;than&nbsp;(that&nbsp;is,&nbsp;more&nbsp;recent<br>
+&nbsp;&nbsp;&nbsp;&nbsp;than)&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;There&nbsp;are&nbsp;limits&nbsp;to&nbsp;the&nbsp;number&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;which&nbsp;can&nbsp;be&nbsp;accessed&nbsp;through&nbsp;the&nbsp;API.&nbsp;If&nbsp;the&nbsp;limit&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;has&nbsp;occured&nbsp;since&nbsp;the&nbsp;since_id,&nbsp;the&nbsp;since_id&nbsp;will&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;forced&nbsp;to&nbsp;the&nbsp;oldest&nbsp;ID&nbsp;available.&nbsp;[Optional]<br>
+&nbsp;&nbsp;max_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;only&nbsp;statuses&nbsp;with&nbsp;an&nbsp;ID&nbsp;less&nbsp;than<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(that&nbsp;is,&nbsp;older&nbsp;than)&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;&nbsp;[Optional]<br>
+&nbsp;&nbsp;page:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;page&nbsp;of&nbsp;results&nbsp;to&nbsp;retrieve.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Note:&nbsp;there&nbsp;are&nbsp;pagination&nbsp;limits.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;mention&nbsp;of&nbsp;the&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="Api-GetPublicTimeline"><strong>GetPublicTimeline</strong></a>(self, since_id<font color="#909090">=None</font>, include_rts<font color="#909090">=None</font>, include_entities<font color="#909090">=None</font>)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;public&nbsp;twitter.<a href="#Status">Status</a>&nbsp;message&nbsp;for&nbsp;all&nbsp;users.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;since_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;results&nbsp;with&nbsp;an&nbsp;ID&nbsp;greater&nbsp;than&nbsp;(that&nbsp;is,&nbsp;more&nbsp;recent<br>
+&nbsp;&nbsp;&nbsp;&nbsp;than)&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;There&nbsp;are&nbsp;limits&nbsp;to&nbsp;the&nbsp;number&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;which&nbsp;can&nbsp;be&nbsp;accessed&nbsp;through&nbsp;the&nbsp;API.&nbsp;If&nbsp;the&nbsp;limit&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;has&nbsp;occured&nbsp;since&nbsp;the&nbsp;since_id,&nbsp;the&nbsp;since_id&nbsp;will&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;forced&nbsp;to&nbsp;the&nbsp;oldest&nbsp;ID&nbsp;available.&nbsp;[Optional]<br>
+&nbsp;&nbsp;include_rts:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;True,&nbsp;the&nbsp;timeline&nbsp;will&nbsp;contain&nbsp;native&nbsp;retweets&nbsp;(if&nbsp;they<br>
+&nbsp;&nbsp;&nbsp;&nbsp;exist)&nbsp;in&nbsp;addition&nbsp;to&nbsp;the&nbsp;standard&nbsp;stream&nbsp;of&nbsp;tweets.&nbsp;[Optional]<br>
+&nbsp;&nbsp;include_entities:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;True,&nbsp;each&nbsp;tweet&nbsp;will&nbsp;include&nbsp;a&nbsp;node&nbsp;called&nbsp;"entities,".<br>
+&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;node&nbsp;offers&nbsp;a&nbsp;variety&nbsp;of&nbsp;metadata&nbsp;about&nbsp;the&nbsp;tweet&nbsp;in&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;&nbsp;discreet&nbsp;structure,&nbsp;including:&nbsp;user_mentions,&nbsp;urls,&nbsp;and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hashtags.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;An&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="Api-GetRateLimitStatus"><strong>GetRateLimitStatus</strong></a>(self)</dt><dd><tt>Fetch&nbsp;the&nbsp;rate&nbsp;limit&nbsp;status&nbsp;for&nbsp;the&nbsp;currently&nbsp;authorized&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;dictionary&nbsp;containing&nbsp;the&nbsp;time&nbsp;the&nbsp;limit&nbsp;will&nbsp;reset&nbsp;(reset_time),<br>
+&nbsp;&nbsp;the&nbsp;number&nbsp;of&nbsp;remaining&nbsp;hits&nbsp;allowed&nbsp;before&nbsp;the&nbsp;reset&nbsp;(remaining_hits),<br>
+&nbsp;&nbsp;the&nbsp;number&nbsp;of&nbsp;hits&nbsp;allowed&nbsp;in&nbsp;a&nbsp;60-minute&nbsp;period&nbsp;(hourly_limit),&nbsp;and<br>
+&nbsp;&nbsp;the&nbsp;time&nbsp;of&nbsp;the&nbsp;reset&nbsp;in&nbsp;seconds&nbsp;since&nbsp;The&nbsp;Epoch&nbsp;(reset_time_in_seconds).</tt></dd></dl>
+
+<dl><dt><a name="Api-GetReplies"><strong>GetReplies</strong></a>(self, since<font color="#909090">=None</font>, since_id<font color="#909090">=None</font>, page<font color="#909090">=None</font>)</dt><dd><tt>Get&nbsp;a&nbsp;sequence&nbsp;of&nbsp;status&nbsp;messages&nbsp;representing&nbsp;the&nbsp;20&nbsp;most<br>
+recent&nbsp;replies&nbsp;(status&nbsp;updates&nbsp;prefixed&nbsp;with&nbsp;@twitterID)&nbsp;to&nbsp;the<br>
+authenticating&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;since_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;results&nbsp;with&nbsp;an&nbsp;ID&nbsp;greater&nbsp;than&nbsp;(that&nbsp;is,&nbsp;more&nbsp;recent<br>
+&nbsp;&nbsp;&nbsp;&nbsp;than)&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;There&nbsp;are&nbsp;limits&nbsp;to&nbsp;the&nbsp;number&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;which&nbsp;can&nbsp;be&nbsp;accessed&nbsp;through&nbsp;the&nbsp;API.&nbsp;If&nbsp;the&nbsp;limit&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;has&nbsp;occured&nbsp;since&nbsp;the&nbsp;since_id,&nbsp;the&nbsp;since_id&nbsp;will&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;forced&nbsp;to&nbsp;the&nbsp;oldest&nbsp;ID&nbsp;available.&nbsp;[Optional]<br>
+&nbsp;&nbsp;page:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;page&nbsp;of&nbsp;results&nbsp;to&nbsp;retrieve.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Note:&nbsp;there&nbsp;are&nbsp;pagination&nbsp;limits.&nbsp;[Optional]<br>
+&nbsp;&nbsp;since:<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;reply&nbsp;to&nbsp;the&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="Api-GetRetweets"><strong>GetRetweets</strong></a>(self, statusid)</dt><dd><tt>Returns&nbsp;up&nbsp;to&nbsp;100&nbsp;of&nbsp;the&nbsp;first&nbsp;retweets&nbsp;of&nbsp;the&nbsp;tweet&nbsp;identified<br>
+by&nbsp;statusid<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;statusid:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;ID&nbsp;of&nbsp;the&nbsp;tweet&nbsp;for&nbsp;which&nbsp;retweets&nbsp;should&nbsp;be&nbsp;searched&nbsp;for<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instances,&nbsp;which&nbsp;are&nbsp;retweets&nbsp;of&nbsp;statusid</tt></dd></dl>
+
+<dl><dt><a name="Api-GetSearch"><strong>GetSearch</strong></a>(self, term, geocode<font color="#909090">=None</font>, since_id<font color="#909090">=None</font>, per_page<font color="#909090">=15</font>, page<font color="#909090">=1</font>, lang<font color="#909090">='en'</font>, show_user<font color="#909090">='true'</font>, query_users<font color="#909090">=False</font>)</dt><dd><tt>Return&nbsp;twitter&nbsp;search&nbsp;results&nbsp;for&nbsp;a&nbsp;given&nbsp;term.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;term:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;term&nbsp;to&nbsp;search&nbsp;by.<br>
+&nbsp;&nbsp;since_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;results&nbsp;with&nbsp;an&nbsp;ID&nbsp;greater&nbsp;than&nbsp;(that&nbsp;is,&nbsp;more&nbsp;recent<br>
+&nbsp;&nbsp;&nbsp;&nbsp;than)&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;There&nbsp;are&nbsp;limits&nbsp;to&nbsp;the&nbsp;number&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;which&nbsp;can&nbsp;be&nbsp;accessed&nbsp;through&nbsp;the&nbsp;API.&nbsp;If&nbsp;the&nbsp;limit&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;has&nbsp;occured&nbsp;since&nbsp;the&nbsp;since_id,&nbsp;the&nbsp;since_id&nbsp;will&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;forced&nbsp;to&nbsp;the&nbsp;oldest&nbsp;ID&nbsp;available.&nbsp;[Optional]<br>
+&nbsp;&nbsp;geocode:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;geolocation&nbsp;information&nbsp;in&nbsp;the&nbsp;form&nbsp;(latitude,&nbsp;longitude,&nbsp;radius)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[Optional]<br>
+&nbsp;&nbsp;per_page:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;number&nbsp;of&nbsp;results&nbsp;to&nbsp;return.&nbsp;&nbsp;Default&nbsp;is&nbsp;15&nbsp;[Optional]<br>
+&nbsp;&nbsp;page:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;page&nbsp;of&nbsp;results&nbsp;to&nbsp;retrieve.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Note:&nbsp;there&nbsp;are&nbsp;pagination&nbsp;limits.&nbsp;[Optional]<br>
+&nbsp;&nbsp;lang:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;language&nbsp;for&nbsp;results.&nbsp;&nbsp;Default&nbsp;is&nbsp;English&nbsp;[Optional]<br>
+&nbsp;&nbsp;show_user:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;prefixes&nbsp;screen&nbsp;name&nbsp;in&nbsp;status<br>
+&nbsp;&nbsp;query_users:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;set&nbsp;to&nbsp;False,&nbsp;then&nbsp;all&nbsp;users&nbsp;only&nbsp;have&nbsp;screen_name&nbsp;and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;profile_image_url&nbsp;available.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;set&nbsp;to&nbsp;True,&nbsp;all&nbsp;information&nbsp;of&nbsp;users&nbsp;are&nbsp;available,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;but&nbsp;it&nbsp;uses&nbsp;lots&nbsp;of&nbsp;request&nbsp;quota,&nbsp;one&nbsp;per&nbsp;status.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;message&nbsp;containing<br>
+&nbsp;&nbsp;the&nbsp;term</tt></dd></dl>
+
+<dl><dt><a name="Api-GetStatus"><strong>GetStatus</strong></a>(self, id)</dt><dd><tt>Returns&nbsp;a&nbsp;single&nbsp;status&nbsp;message.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated&nbsp;if&nbsp;the<br>
+status&nbsp;message&nbsp;is&nbsp;private.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;numeric&nbsp;ID&nbsp;of&nbsp;the&nbsp;status&nbsp;you&nbsp;are&nbsp;trying&nbsp;to&nbsp;retrieve.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance&nbsp;representing&nbsp;that&nbsp;status&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="Api-GetSubscriptions"><strong>GetSubscriptions</strong></a>(self, user, cursor<font color="#909090">=-1</font>)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;Lists&nbsp;that&nbsp;the&nbsp;given&nbsp;user&nbsp;is&nbsp;subscribed&nbsp;to<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;twitter&nbsp;name&nbsp;or&nbsp;id&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;&nbsp;cursor:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"page"&nbsp;value&nbsp;that&nbsp;Twitter&nbsp;will&nbsp;use&nbsp;to&nbsp;start&nbsp;building&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;sequence&nbsp;from.&nbsp;&nbsp;-1&nbsp;to&nbsp;start&nbsp;at&nbsp;the&nbsp;beginning.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Twitter&nbsp;will&nbsp;return&nbsp;in&nbsp;the&nbsp;result&nbsp;the&nbsp;values&nbsp;for&nbsp;next_cursor<br>
+&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;previous_cursor.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#List">List</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="Api-GetTrendsCurrent"><strong>GetTrendsCurrent</strong></a>(self, exclude<font color="#909090">=None</font>)</dt><dd><tt>Get&nbsp;the&nbsp;current&nbsp;top&nbsp;trending&nbsp;topics<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;exclude:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Appends&nbsp;the&nbsp;exclude&nbsp;parameter&nbsp;as&nbsp;a&nbsp;request&nbsp;parameter.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Currently&nbsp;only&nbsp;exclude=hashtags&nbsp;is&nbsp;supported.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;list&nbsp;with&nbsp;10&nbsp;entries.&nbsp;Each&nbsp;entry&nbsp;contains&nbsp;the&nbsp;twitter.</tt></dd></dl>
+
+<dl><dt><a name="Api-GetTrendsDaily"><strong>GetTrendsDaily</strong></a>(self, exclude<font color="#909090">=None</font>, startdate<font color="#909090">=None</font>)</dt><dd><tt>Get&nbsp;the&nbsp;current&nbsp;top&nbsp;trending&nbsp;topics&nbsp;for&nbsp;each&nbsp;hour&nbsp;in&nbsp;a&nbsp;given&nbsp;day<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;startdate:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;start&nbsp;date&nbsp;for&nbsp;the&nbsp;report.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Should&nbsp;be&nbsp;in&nbsp;the&nbsp;format&nbsp;YYYY-MM-DD.&nbsp;[Optional]<br>
+&nbsp;&nbsp;exclude:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Appends&nbsp;the&nbsp;exclude&nbsp;parameter&nbsp;as&nbsp;a&nbsp;request&nbsp;parameter.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Currently&nbsp;only&nbsp;exclude=hashtags&nbsp;is&nbsp;supported.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;list&nbsp;with&nbsp;24&nbsp;entries.&nbsp;Each&nbsp;entry&nbsp;contains&nbsp;the&nbsp;twitter.<br>
+&nbsp;&nbsp;<a href="#Trend">Trend</a>&nbsp;elements&nbsp;that&nbsp;were&nbsp;trending&nbsp;at&nbsp;the&nbsp;corresponding&nbsp;hour&nbsp;of&nbsp;the&nbsp;day.</tt></dd></dl>
+
+<dl><dt><a name="Api-GetTrendsWeekly"><strong>GetTrendsWeekly</strong></a>(self, exclude<font color="#909090">=None</font>, startdate<font color="#909090">=None</font>)</dt><dd><tt>Get&nbsp;the&nbsp;top&nbsp;30&nbsp;trending&nbsp;topics&nbsp;for&nbsp;each&nbsp;day&nbsp;in&nbsp;a&nbsp;given&nbsp;week.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;startdate:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;start&nbsp;date&nbsp;for&nbsp;the&nbsp;report.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Should&nbsp;be&nbsp;in&nbsp;the&nbsp;format&nbsp;YYYY-MM-DD.&nbsp;[Optional]<br>
+&nbsp;&nbsp;exclude:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Appends&nbsp;the&nbsp;exclude&nbsp;parameter&nbsp;as&nbsp;a&nbsp;request&nbsp;parameter.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Currently&nbsp;only&nbsp;exclude=hashtags&nbsp;is&nbsp;supported.&nbsp;[Optional]<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;list&nbsp;with&nbsp;each&nbsp;entry&nbsp;contains&nbsp;the&nbsp;twitter.<br>
+&nbsp;&nbsp;<a href="#Trend">Trend</a>&nbsp;elements&nbsp;of&nbsp;trending&nbsp;topics&nbsp;for&nbsp;the&nbsp;corrsponding&nbsp;day&nbsp;of&nbsp;the&nbsp;week</tt></dd></dl>
+
+<dl><dt><a name="Api-GetUser"><strong>GetUser</strong></a>(self, user)</dt><dd><tt>Returns&nbsp;a&nbsp;single&nbsp;user.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user:&nbsp;The&nbsp;twitter&nbsp;name&nbsp;or&nbsp;id&nbsp;of&nbsp;the&nbsp;user&nbsp;to&nbsp;retrieve.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#User">User</a>&nbsp;instance&nbsp;representing&nbsp;that&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="Api-GetUserByEmail"><strong>GetUserByEmail</strong></a>(self, email)</dt><dd><tt>Returns&nbsp;a&nbsp;single&nbsp;user&nbsp;by&nbsp;email&nbsp;address.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;email:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;email&nbsp;of&nbsp;the&nbsp;user&nbsp;to&nbsp;retrieve.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#User">User</a>&nbsp;instance&nbsp;representing&nbsp;that&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="Api-GetUserRetweets"><strong>GetUserRetweets</strong></a>(self, count<font color="#909090">=None</font>, since_id<font color="#909090">=None</font>, max_id<font color="#909090">=None</font>, include_entities<font color="#909090">=False</font>)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;retweets&nbsp;made&nbsp;by&nbsp;a&nbsp;single&nbsp;user.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;count:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;status&nbsp;messages&nbsp;to&nbsp;retrieve.&nbsp;[Optional]<br>
+&nbsp;&nbsp;since_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;results&nbsp;with&nbsp;an&nbsp;ID&nbsp;greater&nbsp;than&nbsp;(that&nbsp;is,&nbsp;more&nbsp;recent<br>
+&nbsp;&nbsp;&nbsp;&nbsp;than)&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;There&nbsp;are&nbsp;limits&nbsp;to&nbsp;the&nbsp;number&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;which&nbsp;can&nbsp;be&nbsp;accessed&nbsp;through&nbsp;the&nbsp;API.&nbsp;If&nbsp;the&nbsp;limit&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;has&nbsp;occured&nbsp;since&nbsp;the&nbsp;since_id,&nbsp;the&nbsp;since_id&nbsp;will&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;forced&nbsp;to&nbsp;the&nbsp;oldest&nbsp;ID&nbsp;available.&nbsp;[Optional]<br>
+&nbsp;&nbsp;max_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;results&nbsp;with&nbsp;an&nbsp;ID&nbsp;less&nbsp;than&nbsp;(that&nbsp;is,&nbsp;older&nbsp;than)&nbsp;or<br>
+&nbsp;&nbsp;&nbsp;&nbsp;equal&nbsp;to&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;[Optional]<br>
+&nbsp;&nbsp;include_entities:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;True,&nbsp;each&nbsp;tweet&nbsp;will&nbsp;include&nbsp;a&nbsp;node&nbsp;called&nbsp;"entities,".<br>
+&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;node&nbsp;offers&nbsp;a&nbsp;variety&nbsp;of&nbsp;metadata&nbsp;about&nbsp;the&nbsp;tweet&nbsp;in&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;&nbsp;discreet&nbsp;structure,&nbsp;including:&nbsp;user_mentions,&nbsp;urls,&nbsp;and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hashtags.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;message&nbsp;up&nbsp;to&nbsp;count</tt></dd></dl>
+
+<dl><dt><a name="Api-GetUserTimeline"><strong>GetUserTimeline</strong></a>(self, id<font color="#909090">=None</font>, user_id<font color="#909090">=None</font>, screen_name<font color="#909090">=None</font>, since_id<font color="#909090">=None</font>, max_id<font color="#909090">=None</font>, count<font color="#909090">=None</font>, page<font color="#909090">=None</font>, include_rts<font color="#909090">=None</font>, include_entities<font color="#909090">=None</font>)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;public&nbsp;<a href="#Status">Status</a>&nbsp;messages&nbsp;for&nbsp;a&nbsp;single&nbsp;user.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated&nbsp;if&nbsp;the&nbsp;user&nbsp;is&nbsp;private.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;ID&nbsp;or&nbsp;screen&nbsp;name&nbsp;of&nbsp;the&nbsp;user&nbsp;for&nbsp;whom&nbsp;to&nbsp;return<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;user_timeline.&nbsp;[Optional]<br>
+&nbsp;&nbsp;user_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specfies&nbsp;the&nbsp;ID&nbsp;of&nbsp;the&nbsp;user&nbsp;for&nbsp;whom&nbsp;to&nbsp;return&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user_timeline.&nbsp;Helpful&nbsp;for&nbsp;disambiguating&nbsp;when&nbsp;a&nbsp;valid&nbsp;user&nbsp;ID<br>
+&nbsp;&nbsp;&nbsp;&nbsp;is&nbsp;also&nbsp;a&nbsp;valid&nbsp;screen&nbsp;name.&nbsp;[Optional]<br>
+&nbsp;&nbsp;screen_name:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specfies&nbsp;the&nbsp;screen&nbsp;name&nbsp;of&nbsp;the&nbsp;user&nbsp;for&nbsp;whom&nbsp;to&nbsp;return&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user_timeline.&nbsp;Helpful&nbsp;for&nbsp;disambiguating&nbsp;when&nbsp;a&nbsp;valid&nbsp;screen<br>
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;is&nbsp;also&nbsp;a&nbsp;user&nbsp;ID.&nbsp;[Optional]<br>
+&nbsp;&nbsp;since_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;results&nbsp;with&nbsp;an&nbsp;ID&nbsp;greater&nbsp;than&nbsp;(that&nbsp;is,&nbsp;more&nbsp;recent<br>
+&nbsp;&nbsp;&nbsp;&nbsp;than)&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;There&nbsp;are&nbsp;limits&nbsp;to&nbsp;the&nbsp;number&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;which&nbsp;can&nbsp;be&nbsp;accessed&nbsp;through&nbsp;the&nbsp;API.&nbsp;If&nbsp;the&nbsp;limit&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;has&nbsp;occured&nbsp;since&nbsp;the&nbsp;since_id,&nbsp;the&nbsp;since_id&nbsp;will&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;forced&nbsp;to&nbsp;the&nbsp;oldest&nbsp;ID&nbsp;available.&nbsp;[Optional]<br>
+&nbsp;&nbsp;max_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;only&nbsp;statuses&nbsp;with&nbsp;an&nbsp;ID&nbsp;less&nbsp;than&nbsp;(that&nbsp;is,&nbsp;older<br>
+&nbsp;&nbsp;&nbsp;&nbsp;than)&nbsp;or&nbsp;equal&nbsp;to&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;[Optional]<br>
+&nbsp;&nbsp;count:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;number&nbsp;of&nbsp;statuses&nbsp;to&nbsp;retrieve.&nbsp;May&nbsp;not&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;greater&nbsp;than&nbsp;200.&nbsp;&nbsp;[Optional]<br>
+&nbsp;&nbsp;page:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;page&nbsp;of&nbsp;results&nbsp;to&nbsp;retrieve.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Note:&nbsp;there&nbsp;are&nbsp;pagination&nbsp;limits.&nbsp;[Optional]<br>
+&nbsp;&nbsp;include_rts:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;True,&nbsp;the&nbsp;timeline&nbsp;will&nbsp;contain&nbsp;native&nbsp;retweets&nbsp;(if&nbsp;they<br>
+&nbsp;&nbsp;&nbsp;&nbsp;exist)&nbsp;in&nbsp;addition&nbsp;to&nbsp;the&nbsp;standard&nbsp;stream&nbsp;of&nbsp;tweets.&nbsp;[Optional]<br>
+&nbsp;&nbsp;include_entities:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;True,&nbsp;each&nbsp;tweet&nbsp;will&nbsp;include&nbsp;a&nbsp;node&nbsp;called&nbsp;"entities,".<br>
+&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;node&nbsp;offers&nbsp;a&nbsp;variety&nbsp;of&nbsp;metadata&nbsp;about&nbsp;the&nbsp;tweet&nbsp;in&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;&nbsp;discreet&nbsp;structure,&nbsp;including:&nbsp;user_mentions,&nbsp;urls,&nbsp;and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hashtags.&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;<a href="#Status">Status</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;message&nbsp;up&nbsp;to&nbsp;count</tt></dd></dl>
+
+<dl><dt><a name="Api-MaximumHitFrequency"><strong>MaximumHitFrequency</strong></a>(self)</dt><dd><tt>Determines&nbsp;the&nbsp;minimum&nbsp;number&nbsp;of&nbsp;seconds&nbsp;that&nbsp;a&nbsp;program&nbsp;must&nbsp;wait<br>
+before&nbsp;hitting&nbsp;the&nbsp;server&nbsp;again&nbsp;without&nbsp;exceeding&nbsp;the&nbsp;rate_limit<br>
+imposed&nbsp;for&nbsp;the&nbsp;currently&nbsp;authenticated&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;minimum&nbsp;second&nbsp;interval&nbsp;that&nbsp;a&nbsp;program&nbsp;must&nbsp;use&nbsp;so&nbsp;as&nbsp;to&nbsp;not<br>
+&nbsp;&nbsp;exceed&nbsp;the&nbsp;rate_limit&nbsp;imposed&nbsp;for&nbsp;the&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="Api-PostDirectMessage"><strong>PostDirectMessage</strong></a>(self, user, text)</dt><dd><tt>Post&nbsp;a&nbsp;twitter&nbsp;direct&nbsp;message&nbsp;from&nbsp;the&nbsp;authenticated&nbsp;user<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user:&nbsp;The&nbsp;ID&nbsp;or&nbsp;screen&nbsp;name&nbsp;of&nbsp;the&nbsp;recipient&nbsp;user.<br>
+&nbsp;&nbsp;text:&nbsp;The&nbsp;message&nbsp;text&nbsp;to&nbsp;be&nbsp;posted.&nbsp;&nbsp;Must&nbsp;be&nbsp;less&nbsp;than&nbsp;140&nbsp;characters.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#DirectMessage">DirectMessage</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;message&nbsp;posted</tt></dd></dl>
+
+<dl><dt><a name="Api-PostUpdate"><strong>PostUpdate</strong></a>(self, status, in_reply_to_status_id<font color="#909090">=None</font>)</dt><dd><tt>Post&nbsp;a&nbsp;twitter&nbsp;status&nbsp;message&nbsp;from&nbsp;the&nbsp;authenticated&nbsp;user.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;status:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;message&nbsp;text&nbsp;to&nbsp;be&nbsp;posted.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Must&nbsp;be&nbsp;less&nbsp;than&nbsp;or&nbsp;equal&nbsp;to&nbsp;140&nbsp;characters.<br>
+&nbsp;&nbsp;in_reply_to_status_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;ID&nbsp;of&nbsp;an&nbsp;existing&nbsp;status&nbsp;that&nbsp;the&nbsp;status&nbsp;to&nbsp;be&nbsp;posted&nbsp;is<br>
+&nbsp;&nbsp;&nbsp;&nbsp;in&nbsp;reply&nbsp;to.&nbsp;&nbsp;This&nbsp;implicitly&nbsp;sets&nbsp;the&nbsp;in_reply_to_user_id<br>
+&nbsp;&nbsp;&nbsp;&nbsp;attribute&nbsp;of&nbsp;the&nbsp;resulting&nbsp;status&nbsp;to&nbsp;the&nbsp;user&nbsp;ID&nbsp;of&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;message&nbsp;being&nbsp;replied&nbsp;to.&nbsp;&nbsp;Invalid/missing&nbsp;status&nbsp;IDs&nbsp;will&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ignored.&nbsp;[Optional]<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;message&nbsp;posted.</tt></dd></dl>
+
+<dl><dt><a name="Api-PostUpdates"><strong>PostUpdates</strong></a>(self, status, continuation<font color="#909090">=None</font>, **kwargs)</dt><dd><tt>Post&nbsp;one&nbsp;or&nbsp;more&nbsp;twitter&nbsp;status&nbsp;messages&nbsp;from&nbsp;the&nbsp;authenticated&nbsp;user.<br>
+&nbsp;<br>
+Unlike&nbsp;api.PostUpdate,&nbsp;this&nbsp;method&nbsp;will&nbsp;post&nbsp;multiple&nbsp;status&nbsp;updates<br>
+if&nbsp;the&nbsp;message&nbsp;is&nbsp;longer&nbsp;than&nbsp;140&nbsp;characters.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;status:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;message&nbsp;text&nbsp;to&nbsp;be&nbsp;posted.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;May&nbsp;be&nbsp;longer&nbsp;than&nbsp;140&nbsp;characters.<br>
+&nbsp;&nbsp;continuation:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;character&nbsp;string,&nbsp;if&nbsp;any,&nbsp;to&nbsp;be&nbsp;appended&nbsp;to&nbsp;all&nbsp;but&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;last&nbsp;message.&nbsp;&nbsp;Note&nbsp;that&nbsp;Twitter&nbsp;strips&nbsp;trailing&nbsp;'...'&nbsp;strings<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;messages.&nbsp;&nbsp;Consider&nbsp;using&nbsp;the&nbsp;unicode&nbsp;\u2026&nbsp;character<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(horizontal&nbsp;ellipsis)&nbsp;instead.&nbsp;[Defaults&nbsp;to&nbsp;None]<br>
+&nbsp;&nbsp;**kwargs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;See&nbsp;api.PostUpdate&nbsp;for&nbsp;a&nbsp;list&nbsp;of&nbsp;accepted&nbsp;parameters.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;of&nbsp;list&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;messages&nbsp;posted.</tt></dd></dl>
+
+<dl><dt><a name="Api-SetCache"><strong>SetCache</strong></a>(self, cache)</dt><dd><tt>Override&nbsp;the&nbsp;default&nbsp;cache.&nbsp;&nbsp;Set&nbsp;to&nbsp;None&nbsp;to&nbsp;prevent&nbsp;caching.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;cache:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;An&nbsp;instance&nbsp;that&nbsp;supports&nbsp;the&nbsp;same&nbsp;API&nbsp;as&nbsp;the&nbsp;twitter._FileCache</tt></dd></dl>
+
+<dl><dt><a name="Api-SetCacheTimeout"><strong>SetCacheTimeout</strong></a>(self, cache_timeout)</dt><dd><tt>Override&nbsp;the&nbsp;default&nbsp;cache&nbsp;timeout.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;cache_timeout:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Time,&nbsp;in&nbsp;seconds,&nbsp;that&nbsp;responses&nbsp;should&nbsp;be&nbsp;reused.</tt></dd></dl>
+
+<dl><dt><a name="Api-SetCredentials"><strong>SetCredentials</strong></a>(self, consumer_key, consumer_secret, access_token_key<font color="#909090">=None</font>, access_token_secret<font color="#909090">=None</font>)</dt><dd><tt>Set&nbsp;the&nbsp;consumer_key&nbsp;and&nbsp;consumer_secret&nbsp;for&nbsp;this&nbsp;instance<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;consumer_key:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;consumer_key&nbsp;of&nbsp;the&nbsp;twitter&nbsp;account.<br>
+&nbsp;&nbsp;consumer_secret:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;consumer_secret&nbsp;for&nbsp;the&nbsp;twitter&nbsp;account.<br>
+&nbsp;&nbsp;access_token_key:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;oAuth&nbsp;access&nbsp;token&nbsp;key&nbsp;value&nbsp;you&nbsp;retrieved<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;running&nbsp;get_access_token.py.<br>
+&nbsp;&nbsp;access_token_secret:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;oAuth&nbsp;access&nbsp;token's&nbsp;secret,&nbsp;also&nbsp;retrieved<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;the&nbsp;get_access_token.py&nbsp;run.</tt></dd></dl>
+
+<dl><dt><a name="Api-SetSource"><strong>SetSource</strong></a>(self, source)</dt><dd><tt>Suggest&nbsp;the&nbsp;"from&nbsp;source"&nbsp;value&nbsp;to&nbsp;be&nbsp;displayed&nbsp;on&nbsp;the&nbsp;Twitter&nbsp;web&nbsp;site.<br>
+&nbsp;<br>
+The&nbsp;value&nbsp;of&nbsp;the&nbsp;'source'&nbsp;parameter&nbsp;must&nbsp;be&nbsp;first&nbsp;recognized&nbsp;by<br>
+the&nbsp;Twitter&nbsp;server.&nbsp;&nbsp;New&nbsp;source&nbsp;values&nbsp;are&nbsp;authorized&nbsp;on&nbsp;a&nbsp;case&nbsp;by<br>
+case&nbsp;basis&nbsp;by&nbsp;the&nbsp;Twitter&nbsp;development&nbsp;team.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;source:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;source&nbsp;name&nbsp;as&nbsp;a&nbsp;string.&nbsp;&nbsp;Will&nbsp;be&nbsp;sent&nbsp;to&nbsp;the&nbsp;server&nbsp;as<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;'source'&nbsp;parameter.</tt></dd></dl>
+
+<dl><dt><a name="Api-SetUrllib"><strong>SetUrllib</strong></a>(self, urllib)</dt><dd><tt>Override&nbsp;the&nbsp;default&nbsp;urllib&nbsp;implementation.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;urllib:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;An&nbsp;instance&nbsp;that&nbsp;supports&nbsp;the&nbsp;same&nbsp;API&nbsp;as&nbsp;the&nbsp;urllib2&nbsp;module</tt></dd></dl>
+
+<dl><dt><a name="Api-SetUserAgent"><strong>SetUserAgent</strong></a>(self, user_agent)</dt><dd><tt>Override&nbsp;the&nbsp;default&nbsp;user&nbsp;agent<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user_agent:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;string&nbsp;that&nbsp;should&nbsp;be&nbsp;send&nbsp;to&nbsp;the&nbsp;server&nbsp;as&nbsp;the&nbsp;<a href="#User">User</a>-agent</tt></dd></dl>
+
+<dl><dt><a name="Api-SetXTwitterHeaders"><strong>SetXTwitterHeaders</strong></a>(self, client, url, version)</dt><dd><tt>Set&nbsp;the&nbsp;X-Twitter&nbsp;HTTP&nbsp;headers&nbsp;that&nbsp;will&nbsp;be&nbsp;sent&nbsp;to&nbsp;the&nbsp;server.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;client:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;client&nbsp;name&nbsp;as&nbsp;a&nbsp;string.&nbsp;&nbsp;Will&nbsp;be&nbsp;sent&nbsp;to&nbsp;the&nbsp;server&nbsp;as<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;'X-Twitter-Client'&nbsp;header.<br>
+&nbsp;&nbsp;url:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;URL&nbsp;of&nbsp;the&nbsp;meta.xml&nbsp;as&nbsp;a&nbsp;string.&nbsp;&nbsp;Will&nbsp;be&nbsp;sent&nbsp;to&nbsp;the&nbsp;server<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;the&nbsp;'X-Twitter-Client-URL'&nbsp;header.<br>
+&nbsp;&nbsp;version:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;client&nbsp;version&nbsp;as&nbsp;a&nbsp;string.&nbsp;&nbsp;Will&nbsp;be&nbsp;sent&nbsp;to&nbsp;the&nbsp;server<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;the&nbsp;'X-Twitter-Client-Version'&nbsp;header.</tt></dd></dl>
+
+<dl><dt><a name="Api-UsersLookup"><strong>UsersLookup</strong></a>(self, user_id<font color="#909090">=None</font>, screen_name<font color="#909090">=None</font>, users<font color="#909090">=None</font>)</dt><dd><tt>Fetch&nbsp;extended&nbsp;information&nbsp;for&nbsp;the&nbsp;specified&nbsp;users.<br>
+&nbsp;<br>
+Users&nbsp;may&nbsp;be&nbsp;specified&nbsp;either&nbsp;as&nbsp;lists&nbsp;of&nbsp;either&nbsp;user_ids,<br>
+screen_names,&nbsp;or&nbsp;twitter.<a href="#User">User</a>&nbsp;objects.&nbsp;The&nbsp;list&nbsp;of&nbsp;users&nbsp;that<br>
+are&nbsp;queried&nbsp;is&nbsp;the&nbsp;union&nbsp;of&nbsp;all&nbsp;specified&nbsp;parameters.<br>
+&nbsp;<br>
+The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;user_ids&nbsp;to&nbsp;retrieve&nbsp;extended&nbsp;information.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[Optional]<br>
+&nbsp;&nbsp;screen_name:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;screen_names&nbsp;to&nbsp;retrieve&nbsp;extended&nbsp;information.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[Optional]<br>
+&nbsp;&nbsp;users:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;twitter.<a href="#User">User</a>&nbsp;objects&nbsp;to&nbsp;retrieve&nbsp;extended&nbsp;information.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[Optional]<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;twitter.<a href="#User">User</a>&nbsp;objects&nbsp;for&nbsp;the&nbsp;requested&nbsp;users</tt></dd></dl>
+
+<dl><dt><a name="Api-VerifyCredentials"><strong>VerifyCredentials</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;twitter.<a href="#User">User</a>&nbsp;instance&nbsp;if&nbsp;the&nbsp;authenticating&nbsp;user&nbsp;is&nbsp;valid.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#User">User</a>&nbsp;instance&nbsp;representing&nbsp;that&nbsp;user&nbsp;if&nbsp;the<br>
+&nbsp;&nbsp;credentials&nbsp;are&nbsp;valid,&nbsp;None&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="Api-__init__"><strong>__init__</strong></a>(self, consumer_key<font color="#909090">=None</font>, consumer_secret<font color="#909090">=None</font>, access_token_key<font color="#909090">=None</font>, access_token_secret<font color="#909090">=None</font>, input_encoding<font color="#909090">=None</font>, request_headers<font color="#909090">=None</font>, cache<font color="#909090">=&lt;object object at 0x1001da0a0&gt;</font>, shortner<font color="#909090">=None</font>, base_url<font color="#909090">=None</font>, use_gzip_compression<font color="#909090">=False</font>, debugHTTP<font color="#909090">=False</font>)</dt><dd><tt>Instantiate&nbsp;a&nbsp;new&nbsp;twitter.<a href="#Api">Api</a>&nbsp;<a href="__builtin__.html#object">object</a>.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;consumer_key:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Your&nbsp;Twitter&nbsp;user's&nbsp;consumer_key.<br>
+&nbsp;&nbsp;consumer_secret:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Your&nbsp;Twitter&nbsp;user's&nbsp;consumer_secret.<br>
+&nbsp;&nbsp;access_token_key:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;oAuth&nbsp;access&nbsp;token&nbsp;key&nbsp;value&nbsp;you&nbsp;retrieved<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;running&nbsp;get_access_token.py.<br>
+&nbsp;&nbsp;access_token_secret:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;oAuth&nbsp;access&nbsp;token's&nbsp;secret,&nbsp;also&nbsp;retrieved<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;the&nbsp;get_access_token.py&nbsp;run.<br>
+&nbsp;&nbsp;input_encoding:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;encoding&nbsp;used&nbsp;to&nbsp;encode&nbsp;input&nbsp;strings.&nbsp;[Optional]<br>
+&nbsp;&nbsp;request_header:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;dictionary&nbsp;of&nbsp;additional&nbsp;HTTP&nbsp;request&nbsp;headers.&nbsp;[Optional]<br>
+&nbsp;&nbsp;cache:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;cache&nbsp;instance&nbsp;to&nbsp;use.&nbsp;Defaults&nbsp;to&nbsp;DEFAULT_CACHE.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Use&nbsp;None&nbsp;to&nbsp;disable&nbsp;caching.&nbsp;[Optional]<br>
+&nbsp;&nbsp;shortner:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;shortner&nbsp;instance&nbsp;to&nbsp;use.&nbsp;&nbsp;Defaults&nbsp;to&nbsp;None.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;See&nbsp;shorten_url.py&nbsp;for&nbsp;an&nbsp;example&nbsp;shortner.&nbsp;[Optional]<br>
+&nbsp;&nbsp;base_url:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;base&nbsp;URL&nbsp;to&nbsp;use&nbsp;to&nbsp;contact&nbsp;the&nbsp;Twitter&nbsp;API.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Defaults&nbsp;to&nbsp;https://twitter.com.&nbsp;[Optional]<br>
+&nbsp;&nbsp;use_gzip_compression:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Set&nbsp;to&nbsp;True&nbsp;to&nbsp;tell&nbsp;enable&nbsp;gzip&nbsp;compression&nbsp;for&nbsp;any&nbsp;call<br>
+&nbsp;&nbsp;&nbsp;&nbsp;made&nbsp;to&nbsp;Twitter.&nbsp;&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;[Optional]<br>
+&nbsp;&nbsp;debugHTTP:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Set&nbsp;to&nbsp;True&nbsp;to&nbsp;enable&nbsp;debug&nbsp;output&nbsp;from&nbsp;urllib2&nbsp;when&nbsp;performing<br>
+&nbsp;&nbsp;&nbsp;&nbsp;any&nbsp;HTTP&nbsp;requests.&nbsp;&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;[Optional]</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>DEFAULT_CACHE_TIMEOUT</strong> = 60</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="DirectMessage">class <strong>DirectMessage</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;class&nbsp;representing&nbsp;the&nbsp;<a href="#DirectMessage">DirectMessage</a>&nbsp;structure&nbsp;used&nbsp;by&nbsp;the&nbsp;twitter&nbsp;API.<br>
+&nbsp;<br>
+The&nbsp;<a href="#DirectMessage">DirectMessage</a>&nbsp;structure&nbsp;exposes&nbsp;the&nbsp;following&nbsp;properties:<br>
+&nbsp;<br>
+&nbsp;&nbsp;direct_message.id<br>
+&nbsp;&nbsp;direct_message.created_at<br>
+&nbsp;&nbsp;direct_message.created_at_in_seconds&nbsp;#&nbsp;read&nbsp;only<br>
+&nbsp;&nbsp;direct_message.sender_id<br>
+&nbsp;&nbsp;direct_message.sender_screen_name<br>
+&nbsp;&nbsp;direct_message.recipient_id<br>
+&nbsp;&nbsp;direct_message.recipient_screen_name<br>
+&nbsp;&nbsp;direct_message.text<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="DirectMessage-AsDict"><strong>AsDict</strong></a>(self)</dt><dd><tt>A&nbsp;dict&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#DirectMessage">DirectMessage</a>&nbsp;instance.<br>
+&nbsp;<br>
+The&nbsp;return&nbsp;value&nbsp;uses&nbsp;the&nbsp;same&nbsp;key&nbsp;names&nbsp;as&nbsp;the&nbsp;JSON&nbsp;representation.<br>
+&nbsp;<br>
+Return:<br>
+&nbsp;&nbsp;A&nbsp;dict&nbsp;representing&nbsp;this&nbsp;twitter.<a href="#DirectMessage">DirectMessage</a>&nbsp;instance</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-AsJsonString"><strong>AsJsonString</strong></a>(self)</dt><dd><tt>A&nbsp;JSON&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#DirectMessage">DirectMessage</a>&nbsp;instance.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;JSON&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#DirectMessage">DirectMessage</a>&nbsp;instance</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-GetCreatedAt"><strong>GetCreatedAt</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;time&nbsp;this&nbsp;direct&nbsp;message&nbsp;was&nbsp;posted.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;time&nbsp;this&nbsp;direct&nbsp;message&nbsp;was&nbsp;posted</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-GetCreatedAtInSeconds"><strong>GetCreatedAtInSeconds</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;time&nbsp;this&nbsp;direct&nbsp;message&nbsp;was&nbsp;posted,&nbsp;in&nbsp;seconds&nbsp;since&nbsp;the&nbsp;epoch.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;time&nbsp;this&nbsp;direct&nbsp;message&nbsp;was&nbsp;posted,&nbsp;in&nbsp;seconds&nbsp;since&nbsp;the&nbsp;epoch.</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-GetId"><strong>GetId</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-GetRecipientId"><strong>GetRecipientId</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;unique&nbsp;recipient&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;unique&nbsp;recipient&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-GetRecipientScreenName"><strong>GetRecipientScreenName</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;unique&nbsp;recipient&nbsp;screen&nbsp;name&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;unique&nbsp;recipient&nbsp;screen&nbsp;name&nbsp;of&nbsp;this&nbsp;direct&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-GetSenderId"><strong>GetSenderId</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;unique&nbsp;sender&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;unique&nbsp;sender&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-GetSenderScreenName"><strong>GetSenderScreenName</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;unique&nbsp;sender&nbsp;screen&nbsp;name&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;unique&nbsp;sender&nbsp;screen&nbsp;name&nbsp;of&nbsp;this&nbsp;direct&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-GetText"><strong>GetText</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;text&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;text&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-SetCreatedAt"><strong>SetCreatedAt</strong></a>(self, created_at)</dt><dd><tt>Set&nbsp;the&nbsp;time&nbsp;this&nbsp;direct&nbsp;message&nbsp;was&nbsp;posted.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;created_at:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;time&nbsp;this&nbsp;direct&nbsp;message&nbsp;was&nbsp;created</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-SetId"><strong>SetId</strong></a>(self, id)</dt><dd><tt>Set&nbsp;the&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-SetRecipientId"><strong>SetRecipientId</strong></a>(self, recipient_id)</dt><dd><tt>Set&nbsp;the&nbsp;unique&nbsp;recipient&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;recipient_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;unique&nbsp;recipient&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-SetRecipientScreenName"><strong>SetRecipientScreenName</strong></a>(self, recipient_screen_name)</dt><dd><tt>Set&nbsp;the&nbsp;unique&nbsp;recipient&nbsp;screen&nbsp;name&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;recipient_screen_name:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;unique&nbsp;recipient&nbsp;screen&nbsp;name&nbsp;of&nbsp;this&nbsp;direct&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-SetSenderId"><strong>SetSenderId</strong></a>(self, sender_id)</dt><dd><tt>Set&nbsp;the&nbsp;unique&nbsp;sender&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;sender_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;unique&nbsp;sender&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-SetSenderScreenName"><strong>SetSenderScreenName</strong></a>(self, sender_screen_name)</dt><dd><tt>Set&nbsp;the&nbsp;unique&nbsp;sender&nbsp;screen&nbsp;name&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;sender_screen_name:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;unique&nbsp;sender&nbsp;screen&nbsp;name&nbsp;of&nbsp;this&nbsp;direct&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-SetText"><strong>SetText</strong></a>(self, text)</dt><dd><tt>Set&nbsp;the&nbsp;text&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;text:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;text&nbsp;of&nbsp;this&nbsp;direct&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-__eq__"><strong>__eq__</strong></a>(self, other)</dt></dl>
+
+<dl><dt><a name="DirectMessage-__init__"><strong>__init__</strong></a>(self, id<font color="#909090">=None</font>, created_at<font color="#909090">=None</font>, sender_id<font color="#909090">=None</font>, sender_screen_name<font color="#909090">=None</font>, recipient_id<font color="#909090">=None</font>, recipient_screen_name<font color="#909090">=None</font>, text<font color="#909090">=None</font>)</dt><dd><tt>An&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;to&nbsp;hold&nbsp;a&nbsp;Twitter&nbsp;direct&nbsp;message.<br>
+&nbsp;<br>
+This&nbsp;class&nbsp;is&nbsp;normally&nbsp;instantiated&nbsp;by&nbsp;the&nbsp;twitter.<a href="#Api">Api</a>&nbsp;class&nbsp;and<br>
+returned&nbsp;in&nbsp;a&nbsp;sequence.<br>
+&nbsp;<br>
+Note:&nbsp;Dates&nbsp;are&nbsp;posted&nbsp;in&nbsp;the&nbsp;form&nbsp;"Sat&nbsp;Jan&nbsp;27&nbsp;04:17:38&nbsp;+0000&nbsp;2007"<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.&nbsp;[Optional]<br>
+&nbsp;&nbsp;created_at:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;time&nbsp;this&nbsp;direct&nbsp;message&nbsp;was&nbsp;posted.&nbsp;[Optional]<br>
+&nbsp;&nbsp;sender_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;id&nbsp;of&nbsp;the&nbsp;twitter&nbsp;user&nbsp;that&nbsp;sent&nbsp;this&nbsp;message.&nbsp;[Optional]<br>
+&nbsp;&nbsp;sender_screen_name:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;name&nbsp;of&nbsp;the&nbsp;twitter&nbsp;user&nbsp;that&nbsp;sent&nbsp;this&nbsp;message.&nbsp;[Optional]<br>
+&nbsp;&nbsp;recipient_id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;id&nbsp;of&nbsp;the&nbsp;twitter&nbsp;that&nbsp;received&nbsp;this&nbsp;message.&nbsp;[Optional]<br>
+&nbsp;&nbsp;recipient_screen_name:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;name&nbsp;of&nbsp;the&nbsp;twitter&nbsp;that&nbsp;received&nbsp;this&nbsp;message.&nbsp;[Optional]<br>
+&nbsp;&nbsp;text:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;text&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.&nbsp;[Optional]</tt></dd></dl>
+
+<dl><dt><a name="DirectMessage-__ne__"><strong>__ne__</strong></a>(self, other)</dt></dl>
+
+<dl><dt><a name="DirectMessage-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>A&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#DirectMessage">DirectMessage</a>&nbsp;instance.<br>
+&nbsp;<br>
+The&nbsp;return&nbsp;value&nbsp;is&nbsp;the&nbsp;same&nbsp;as&nbsp;the&nbsp;JSON&nbsp;string&nbsp;representation.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#DirectMessage">DirectMessage</a>&nbsp;instance.</tt></dd></dl>
+
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="DirectMessage-NewFromJsonDict"><strong>NewFromJsonDict</strong></a>(data)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;instance&nbsp;based&nbsp;on&nbsp;a&nbsp;JSON&nbsp;dict.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;data:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;JSON&nbsp;dict,&nbsp;as&nbsp;converted&nbsp;from&nbsp;the&nbsp;JSON&nbsp;in&nbsp;the&nbsp;twitter&nbsp;API<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#DirectMessage">DirectMessage</a>&nbsp;instance</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>created_at</strong></dt>
+<dd><tt>The&nbsp;time&nbsp;this&nbsp;direct&nbsp;message&nbsp;was&nbsp;posted.</tt></dd>
+</dl>
+<dl><dt><strong>created_at_in_seconds</strong></dt>
+<dd><tt>The&nbsp;time&nbsp;this&nbsp;direct&nbsp;message&nbsp;was&nbsp;posted,&nbsp;in&nbsp;seconds&nbsp;since&nbsp;the&nbsp;epoch</tt></dd>
+</dl>
+<dl><dt><strong>id</strong></dt>
+<dd><tt>The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.</tt></dd>
+</dl>
+<dl><dt><strong>recipient_id</strong></dt>
+<dd><tt>The&nbsp;unique&nbsp;recipient&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.</tt></dd>
+</dl>
+<dl><dt><strong>recipient_screen_name</strong></dt>
+<dd><tt>The&nbsp;unique&nbsp;recipient&nbsp;screen&nbsp;name&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.</tt></dd>
+</dl>
+<dl><dt><strong>sender_id</strong></dt>
+<dd><tt>The&nbsp;unique&nbsp;sender&nbsp;id&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.</tt></dd>
+</dl>
+<dl><dt><strong>sender_screen_name</strong></dt>
+<dd><tt>The&nbsp;unique&nbsp;sender&nbsp;screen&nbsp;name&nbsp;of&nbsp;this&nbsp;direct&nbsp;message.</tt></dd>
+</dl>
+<dl><dt><strong>text</strong></dt>
+<dd><tt>The&nbsp;text&nbsp;of&nbsp;this&nbsp;direct&nbsp;message</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Hashtag">class <strong>Hashtag</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;class&nbsp;represeinting&nbsp;a&nbsp;twitter&nbsp;hashtag<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Hashtag-__init__"><strong>__init__</strong></a>(self, text<font color="#909090">=None</font>)</dt></dl>
+
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="Hashtag-NewFromJsonDict"><strong>NewFromJsonDict</strong></a>(data)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;instance&nbsp;based&nbsp;on&nbsp;a&nbsp;JSON&nbsp;dict.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;data:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;JSON&nbsp;dict,&nbsp;as&nbsp;converted&nbsp;from&nbsp;the&nbsp;JSON&nbsp;in&nbsp;the&nbsp;twitter&nbsp;API<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#Hashtag">Hashtag</a>&nbsp;instance</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="List">class <strong>List</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;class&nbsp;representing&nbsp;the&nbsp;<a href="#List">List</a>&nbsp;structure&nbsp;used&nbsp;by&nbsp;the&nbsp;twitter&nbsp;API.<br>
+&nbsp;<br>
+The&nbsp;<a href="#List">List</a>&nbsp;structure&nbsp;exposes&nbsp;the&nbsp;following&nbsp;properties:<br>
+&nbsp;<br>
+&nbsp;&nbsp;list.id<br>
+&nbsp;&nbsp;list.name<br>
+&nbsp;&nbsp;list.slug<br>
+&nbsp;&nbsp;list.description<br>
+&nbsp;&nbsp;list.full_name<br>
+&nbsp;&nbsp;list.mode<br>
+&nbsp;&nbsp;list.uri<br>
+&nbsp;&nbsp;list.member_count<br>
+&nbsp;&nbsp;list.subscriber_count<br>
+&nbsp;&nbsp;list.following<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="List-AsDict"><strong>AsDict</strong></a>(self)</dt><dd><tt>A&nbsp;dict&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#List">List</a>&nbsp;instance.<br>
+&nbsp;<br>
+The&nbsp;return&nbsp;value&nbsp;uses&nbsp;the&nbsp;same&nbsp;key&nbsp;names&nbsp;as&nbsp;the&nbsp;JSON&nbsp;representation.<br>
+&nbsp;<br>
+Return:<br>
+&nbsp;&nbsp;A&nbsp;dict&nbsp;representing&nbsp;this&nbsp;twitter.<a href="#List">List</a>&nbsp;instance</tt></dd></dl>
+
+<dl><dt><a name="List-AsJsonString"><strong>AsJsonString</strong></a>(self)</dt><dd><tt>A&nbsp;JSON&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#List">List</a>&nbsp;instance.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;JSON&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#List">List</a>&nbsp;instance</tt></dd></dl>
+
+<dl><dt><a name="List-GetDescription"><strong>GetDescription</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;description&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;description&nbsp;of&nbsp;this&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="List-GetFollowing"><strong>GetFollowing</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;following&nbsp;status&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;following&nbsp;status&nbsp;of&nbsp;this&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="List-GetFull_name"><strong>GetFull_name</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;full_name&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;full_name&nbsp;of&nbsp;this&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="List-GetId"><strong>GetId</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="List-GetMember_count"><strong>GetMember_count</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;member_count&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;member_count&nbsp;of&nbsp;this&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="List-GetMode"><strong>GetMode</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;mode&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;mode&nbsp;of&nbsp;this&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="List-GetName"><strong>GetName</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;real&nbsp;name&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;real&nbsp;name&nbsp;of&nbsp;this&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="List-GetSlug"><strong>GetSlug</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;slug&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;slug&nbsp;of&nbsp;this&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="List-GetSubscriber_count"><strong>GetSubscriber_count</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;subscriber_count&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;subscriber_count&nbsp;of&nbsp;this&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="List-GetUri"><strong>GetUri</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;uri&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;uri&nbsp;of&nbsp;this&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="List-GetUser"><strong>GetUser</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;user&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;owner&nbsp;of&nbsp;this&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="List-SetDescription"><strong>SetDescription</strong></a>(self, description)</dt><dd><tt>Set&nbsp;the&nbsp;description&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;description:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;description&nbsp;of&nbsp;this&nbsp;list.</tt></dd></dl>
+
+<dl><dt><a name="List-SetFollowing"><strong>SetFollowing</strong></a>(self, following)</dt><dd><tt>Set&nbsp;the&nbsp;following&nbsp;status&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;following:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;following&nbsp;of&nbsp;this&nbsp;list.</tt></dd></dl>
+
+<dl><dt><a name="List-SetFull_name"><strong>SetFull_name</strong></a>(self, full_name)</dt><dd><tt>Set&nbsp;the&nbsp;full_name&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;full_name:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;full_name&nbsp;of&nbsp;this&nbsp;list.</tt></dd></dl>
+
+<dl><dt><a name="List-SetId"><strong>SetId</strong></a>(self, id)</dt><dd><tt>Set&nbsp;the&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;list.</tt></dd></dl>
+
+<dl><dt><a name="List-SetMember_count"><strong>SetMember_count</strong></a>(self, member_count)</dt><dd><tt>Set&nbsp;the&nbsp;member_count&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;member_count:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;member_count&nbsp;of&nbsp;this&nbsp;list.</tt></dd></dl>
+
+<dl><dt><a name="List-SetMode"><strong>SetMode</strong></a>(self, mode)</dt><dd><tt>Set&nbsp;the&nbsp;mode&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;mode:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;mode&nbsp;of&nbsp;this&nbsp;list.</tt></dd></dl>
+
+<dl><dt><a name="List-SetName"><strong>SetName</strong></a>(self, name)</dt><dd><tt>Set&nbsp;the&nbsp;real&nbsp;name&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;name:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;real&nbsp;name&nbsp;of&nbsp;this&nbsp;list</tt></dd></dl>
+
+<dl><dt><a name="List-SetSlug"><strong>SetSlug</strong></a>(self, slug)</dt><dd><tt>Set&nbsp;the&nbsp;slug&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;slug:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;slug&nbsp;of&nbsp;this&nbsp;list.</tt></dd></dl>
+
+<dl><dt><a name="List-SetSubscriber_count"><strong>SetSubscriber_count</strong></a>(self, subscriber_count)</dt><dd><tt>Set&nbsp;the&nbsp;subscriber_count&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;subscriber_count:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;subscriber_count&nbsp;of&nbsp;this&nbsp;list.</tt></dd></dl>
+
+<dl><dt><a name="List-SetUri"><strong>SetUri</strong></a>(self, uri)</dt><dd><tt>Set&nbsp;the&nbsp;uri&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;uri:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;uri&nbsp;of&nbsp;this&nbsp;list.</tt></dd></dl>
+
+<dl><dt><a name="List-SetUser"><strong>SetUser</strong></a>(self, user)</dt><dd><tt>Set&nbsp;the&nbsp;user&nbsp;of&nbsp;this&nbsp;list.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;owner&nbsp;of&nbsp;this&nbsp;list.</tt></dd></dl>
+
+<dl><dt><a name="List-__eq__"><strong>__eq__</strong></a>(self, other)</dt></dl>
+
+<dl><dt><a name="List-__init__"><strong>__init__</strong></a>(self, id<font color="#909090">=None</font>, name<font color="#909090">=None</font>, slug<font color="#909090">=None</font>, description<font color="#909090">=None</font>, full_name<font color="#909090">=None</font>, mode<font color="#909090">=None</font>, uri<font color="#909090">=None</font>, member_count<font color="#909090">=None</font>, subscriber_count<font color="#909090">=None</font>, following<font color="#909090">=None</font>, user<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="List-__ne__"><strong>__ne__</strong></a>(self, other)</dt></dl>
+
+<dl><dt><a name="List-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>A&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#List">List</a>&nbsp;instance.<br>
+&nbsp;<br>
+The&nbsp;return&nbsp;value&nbsp;is&nbsp;the&nbsp;same&nbsp;as&nbsp;the&nbsp;JSON&nbsp;string&nbsp;representation.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#List">List</a>&nbsp;instance.</tt></dd></dl>
+
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="List-NewFromJsonDict"><strong>NewFromJsonDict</strong></a>(data)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;instance&nbsp;based&nbsp;on&nbsp;a&nbsp;JSON&nbsp;dict.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;data:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;JSON&nbsp;dict,&nbsp;as&nbsp;converted&nbsp;from&nbsp;the&nbsp;JSON&nbsp;in&nbsp;the&nbsp;twitter&nbsp;API<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#List">List</a>&nbsp;instance</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>description</strong></dt>
+<dd><tt>The&nbsp;description&nbsp;of&nbsp;this&nbsp;list.</tt></dd>
+</dl>
+<dl><dt><strong>following</strong></dt>
+<dd><tt>The&nbsp;following&nbsp;status&nbsp;of&nbsp;this&nbsp;list.</tt></dd>
+</dl>
+<dl><dt><strong>full_name</strong></dt>
+<dd><tt>The&nbsp;full_name&nbsp;of&nbsp;this&nbsp;list.</tt></dd>
+</dl>
+<dl><dt><strong>id</strong></dt>
+<dd><tt>The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;list.</tt></dd>
+</dl>
+<dl><dt><strong>member_count</strong></dt>
+<dd><tt>The&nbsp;member_count&nbsp;of&nbsp;this&nbsp;list.</tt></dd>
+</dl>
+<dl><dt><strong>mode</strong></dt>
+<dd><tt>The&nbsp;mode&nbsp;of&nbsp;this&nbsp;list.</tt></dd>
+</dl>
+<dl><dt><strong>name</strong></dt>
+<dd><tt>The&nbsp;real&nbsp;name&nbsp;of&nbsp;this&nbsp;list.</tt></dd>
+</dl>
+<dl><dt><strong>slug</strong></dt>
+<dd><tt>The&nbsp;slug&nbsp;of&nbsp;this&nbsp;list.</tt></dd>
+</dl>
+<dl><dt><strong>subscriber_count</strong></dt>
+<dd><tt>The&nbsp;subscriber_count&nbsp;of&nbsp;this&nbsp;list.</tt></dd>
+</dl>
+<dl><dt><strong>uri</strong></dt>
+<dd><tt>The&nbsp;uri&nbsp;of&nbsp;this&nbsp;list.</tt></dd>
+</dl>
+<dl><dt><strong>user</strong></dt>
+<dd><tt>The&nbsp;owner&nbsp;of&nbsp;this&nbsp;list.</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Status">class <strong>Status</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;class&nbsp;representing&nbsp;the&nbsp;<a href="#Status">Status</a>&nbsp;structure&nbsp;used&nbsp;by&nbsp;the&nbsp;twitter&nbsp;API.<br>
+&nbsp;<br>
+The&nbsp;<a href="#Status">Status</a>&nbsp;structure&nbsp;exposes&nbsp;the&nbsp;following&nbsp;properties:<br>
+&nbsp;<br>
+&nbsp;&nbsp;status.created_at<br>
+&nbsp;&nbsp;status.created_at_in_seconds&nbsp;#&nbsp;read&nbsp;only<br>
+&nbsp;&nbsp;status.favorited<br>
+&nbsp;&nbsp;status.in_reply_to_screen_name<br>
+&nbsp;&nbsp;status.in_reply_to_user_id<br>
+&nbsp;&nbsp;status.in_reply_to_status_id<br>
+&nbsp;&nbsp;status.truncated<br>
+&nbsp;&nbsp;status.source<br>
+&nbsp;&nbsp;status.id<br>
+&nbsp;&nbsp;status.text<br>
+&nbsp;&nbsp;status.location<br>
+&nbsp;&nbsp;status.relative_created_at&nbsp;#&nbsp;read&nbsp;only<br>
+&nbsp;&nbsp;status.user<br>
+&nbsp;&nbsp;status.urls<br>
+&nbsp;&nbsp;status.user_mentions<br>
+&nbsp;&nbsp;status.hashtags<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Status-AsDict"><strong>AsDict</strong></a>(self)</dt><dd><tt>A&nbsp;dict&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance.<br>
+&nbsp;<br>
+The&nbsp;return&nbsp;value&nbsp;uses&nbsp;the&nbsp;same&nbsp;key&nbsp;names&nbsp;as&nbsp;the&nbsp;JSON&nbsp;representation.<br>
+&nbsp;<br>
+Return:<br>
+&nbsp;&nbsp;A&nbsp;dict&nbsp;representing&nbsp;this&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance</tt></dd></dl>
+
+<dl><dt><a name="Status-AsJsonString"><strong>AsJsonString</strong></a>(self)</dt><dd><tt>A&nbsp;JSON&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;JSON&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance</tt></dd></dl>
+
+<dl><dt><a name="Status-GetCreatedAt"><strong>GetCreatedAt</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;time&nbsp;this&nbsp;status&nbsp;message&nbsp;was&nbsp;posted.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;time&nbsp;this&nbsp;status&nbsp;message&nbsp;was&nbsp;posted</tt></dd></dl>
+
+<dl><dt><a name="Status-GetCreatedAtInSeconds"><strong>GetCreatedAtInSeconds</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;time&nbsp;this&nbsp;status&nbsp;message&nbsp;was&nbsp;posted,&nbsp;in&nbsp;seconds&nbsp;since&nbsp;the&nbsp;epoch.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;time&nbsp;this&nbsp;status&nbsp;message&nbsp;was&nbsp;posted,&nbsp;in&nbsp;seconds&nbsp;since&nbsp;the&nbsp;epoch.</tt></dd></dl>
+
+<dl><dt><a name="Status-GetFavorited"><strong>GetFavorited</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;favorited&nbsp;setting&nbsp;of&nbsp;this&nbsp;status&nbsp;message.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;True&nbsp;if&nbsp;this&nbsp;status&nbsp;message&nbsp;is&nbsp;favorited;&nbsp;False&nbsp;otherwise</tt></dd></dl>
+
+<dl><dt><a name="Status-GetId"><strong>GetId</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;status&nbsp;message.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;status&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="Status-GetInReplyToScreenName"><strong>GetInReplyToScreenName</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Status-GetInReplyToStatusId"><strong>GetInReplyToStatusId</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Status-GetInReplyToUserId"><strong>GetInReplyToUserId</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Status-GetLocation"><strong>GetLocation</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;geolocation&nbsp;associated&nbsp;with&nbsp;this&nbsp;status&nbsp;message<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;geolocation&nbsp;string&nbsp;of&nbsp;this&nbsp;status&nbsp;message.</tt></dd></dl>
+
+<dl><dt><a name="Status-GetNow"><strong>GetNow</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;wallclock&nbsp;time&nbsp;for&nbsp;this&nbsp;status&nbsp;message.<br>
+&nbsp;<br>
+Used&nbsp;to&nbsp;calculate&nbsp;relative_created_at.&nbsp;&nbsp;Defaults&nbsp;to&nbsp;the&nbsp;time<br>
+the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;was&nbsp;instantiated.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;Whatever&nbsp;the&nbsp;status&nbsp;instance&nbsp;believes&nbsp;the&nbsp;current&nbsp;time&nbsp;to&nbsp;be,<br>
+&nbsp;&nbsp;in&nbsp;seconds&nbsp;since&nbsp;the&nbsp;epoch.</tt></dd></dl>
+
+<dl><dt><a name="Status-GetRelativeCreatedAt"><strong>GetRelativeCreatedAt</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;human&nbsp;redable&nbsp;string&nbsp;representing&nbsp;the&nbsp;posting&nbsp;time<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;human&nbsp;readable&nbsp;string&nbsp;representing&nbsp;the&nbsp;posting&nbsp;time</tt></dd></dl>
+
+<dl><dt><a name="Status-GetSource"><strong>GetSource</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Status-GetText"><strong>GetText</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;text&nbsp;of&nbsp;this&nbsp;status&nbsp;message.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;text&nbsp;of&nbsp;this&nbsp;status&nbsp;message.</tt></dd></dl>
+
+<dl><dt><a name="Status-GetTruncated"><strong>GetTruncated</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Status-GetUser"><strong>GetUser</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;twitter.<a href="#User">User</a>&nbsp;reprenting&nbsp;the&nbsp;entity&nbsp;posting&nbsp;this&nbsp;status&nbsp;message.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#User">User</a>&nbsp;reprenting&nbsp;the&nbsp;entity&nbsp;posting&nbsp;this&nbsp;status&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="Status-SetCreatedAt"><strong>SetCreatedAt</strong></a>(self, created_at)</dt><dd><tt>Set&nbsp;the&nbsp;time&nbsp;this&nbsp;status&nbsp;message&nbsp;was&nbsp;posted.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;created_at:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;time&nbsp;this&nbsp;status&nbsp;message&nbsp;was&nbsp;created</tt></dd></dl>
+
+<dl><dt><a name="Status-SetFavorited"><strong>SetFavorited</strong></a>(self, favorited)</dt><dd><tt>Set&nbsp;the&nbsp;favorited&nbsp;state&nbsp;of&nbsp;this&nbsp;status&nbsp;message.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;favorited:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;boolean&nbsp;True/False&nbsp;favorited&nbsp;state&nbsp;of&nbsp;this&nbsp;status&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="Status-SetId"><strong>SetId</strong></a>(self, id)</dt><dd><tt>Set&nbsp;the&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;status&nbsp;message.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;status&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="Status-SetInReplyToScreenName"><strong>SetInReplyToScreenName</strong></a>(self, in_reply_to_screen_name)</dt></dl>
+
+<dl><dt><a name="Status-SetInReplyToStatusId"><strong>SetInReplyToStatusId</strong></a>(self, in_reply_to_status_id)</dt></dl>
+
+<dl><dt><a name="Status-SetInReplyToUserId"><strong>SetInReplyToUserId</strong></a>(self, in_reply_to_user_id)</dt></dl>
+
+<dl><dt><a name="Status-SetLocation"><strong>SetLocation</strong></a>(self, location)</dt><dd><tt>Set&nbsp;the&nbsp;geolocation&nbsp;associated&nbsp;with&nbsp;this&nbsp;status&nbsp;message<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;location:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;geolocation&nbsp;string&nbsp;of&nbsp;this&nbsp;status&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="Status-SetNow"><strong>SetNow</strong></a>(self, now)</dt><dd><tt>Set&nbsp;the&nbsp;wallclock&nbsp;time&nbsp;for&nbsp;this&nbsp;status&nbsp;message.<br>
+&nbsp;<br>
+Used&nbsp;to&nbsp;calculate&nbsp;relative_created_at.&nbsp;&nbsp;Defaults&nbsp;to&nbsp;the&nbsp;time<br>
+the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;was&nbsp;instantiated.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;now:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;wallclock&nbsp;time&nbsp;for&nbsp;this&nbsp;instance.</tt></dd></dl>
+
+<dl><dt><a name="Status-SetSource"><strong>SetSource</strong></a>(self, source)</dt></dl>
+
+<dl><dt><a name="Status-SetText"><strong>SetText</strong></a>(self, text)</dt><dd><tt>Set&nbsp;the&nbsp;text&nbsp;of&nbsp;this&nbsp;status&nbsp;message.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;text:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;text&nbsp;of&nbsp;this&nbsp;status&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="Status-SetTruncated"><strong>SetTruncated</strong></a>(self, truncated)</dt></dl>
+
+<dl><dt><a name="Status-SetUser"><strong>SetUser</strong></a>(self, user)</dt><dd><tt>Set&nbsp;a&nbsp;twitter.<a href="#User">User</a>&nbsp;reprenting&nbsp;the&nbsp;entity&nbsp;posting&nbsp;this&nbsp;status&nbsp;message.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;user:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;twitter.<a href="#User">User</a>&nbsp;reprenting&nbsp;the&nbsp;entity&nbsp;posting&nbsp;this&nbsp;status&nbsp;message</tt></dd></dl>
+
+<dl><dt><a name="Status-__eq__"><strong>__eq__</strong></a>(self, other)</dt></dl>
+
+<dl><dt><a name="Status-__init__"><strong>__init__</strong></a>(self, created_at<font color="#909090">=None</font>, favorited<font color="#909090">=None</font>, id<font color="#909090">=None</font>, text<font color="#909090">=None</font>, location<font color="#909090">=None</font>, user<font color="#909090">=None</font>, in_reply_to_screen_name<font color="#909090">=None</font>, in_reply_to_user_id<font color="#909090">=None</font>, in_reply_to_status_id<font color="#909090">=None</font>, truncated<font color="#909090">=None</font>, source<font color="#909090">=None</font>, now<font color="#909090">=None</font>, urls<font color="#909090">=None</font>, user_mentions<font color="#909090">=None</font>, hashtags<font color="#909090">=None</font>)</dt><dd><tt>An&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;to&nbsp;hold&nbsp;a&nbsp;Twitter&nbsp;status&nbsp;message.<br>
+&nbsp;<br>
+This&nbsp;class&nbsp;is&nbsp;normally&nbsp;instantiated&nbsp;by&nbsp;the&nbsp;twitter.<a href="#Api">Api</a>&nbsp;class&nbsp;and<br>
+returned&nbsp;in&nbsp;a&nbsp;sequence.<br>
+&nbsp;<br>
+Note:&nbsp;Dates&nbsp;are&nbsp;posted&nbsp;in&nbsp;the&nbsp;form&nbsp;"Sat&nbsp;Jan&nbsp;27&nbsp;04:17:38&nbsp;+0000&nbsp;2007"<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;created_at:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;time&nbsp;this&nbsp;status&nbsp;message&nbsp;was&nbsp;posted.&nbsp;[Optiona]<br>
+&nbsp;&nbsp;favorited:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Whether&nbsp;this&nbsp;is&nbsp;a&nbsp;favorite&nbsp;of&nbsp;the&nbsp;authenticated&nbsp;user.&nbsp;[Optiona]<br>
+&nbsp;&nbsp;id:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;status&nbsp;message.&nbsp;[Optiona]<br>
+&nbsp;&nbsp;text:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;text&nbsp;of&nbsp;this&nbsp;status&nbsp;message.&nbsp;[Optiona]<br>
+&nbsp;&nbsp;location:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;geolocation&nbsp;string&nbsp;associated&nbsp;with&nbsp;this&nbsp;message.&nbsp;[Optiona]<br>
+&nbsp;&nbsp;relative_created_at:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;human&nbsp;readable&nbsp;string&nbsp;representing&nbsp;the&nbsp;posting&nbsp;time.&nbsp;[Optiona]<br>
+&nbsp;&nbsp;user:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;twitter.<a href="#User">User</a>&nbsp;instance&nbsp;representing&nbsp;the&nbsp;person&nbsp;posting&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;message.&nbsp;[Optiona]<br>
+&nbsp;&nbsp;now:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;current&nbsp;time,&nbsp;if&nbsp;the&nbsp;client&nbsp;choses&nbsp;to&nbsp;set&nbsp;it.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Defaults&nbsp;to&nbsp;the&nbsp;wall&nbsp;clock&nbsp;time.&nbsp;[Optiona]</tt></dd></dl>
+
+<dl><dt><a name="Status-__ne__"><strong>__ne__</strong></a>(self, other)</dt></dl>
+
+<dl><dt><a name="Status-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>A&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance.<br>
+&nbsp;<br>
+The&nbsp;return&nbsp;value&nbsp;is&nbsp;the&nbsp;same&nbsp;as&nbsp;the&nbsp;JSON&nbsp;string&nbsp;representation.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance.</tt></dd></dl>
+
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="Status-NewFromJsonDict"><strong>NewFromJsonDict</strong></a>(data)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;instance&nbsp;based&nbsp;on&nbsp;a&nbsp;JSON&nbsp;dict.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;data:&nbsp;A&nbsp;JSON&nbsp;dict,&nbsp;as&nbsp;converted&nbsp;from&nbsp;the&nbsp;JSON&nbsp;in&nbsp;the&nbsp;twitter&nbsp;API<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instance</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>created_at</strong></dt>
+<dd><tt>The&nbsp;time&nbsp;this&nbsp;status&nbsp;message&nbsp;was&nbsp;posted.</tt></dd>
+</dl>
+<dl><dt><strong>created_at_in_seconds</strong></dt>
+<dd><tt>The&nbsp;time&nbsp;this&nbsp;status&nbsp;message&nbsp;was&nbsp;posted,&nbsp;in&nbsp;seconds&nbsp;since&nbsp;the&nbsp;epoch</tt></dd>
+</dl>
+<dl><dt><strong>favorited</strong></dt>
+<dd><tt>The&nbsp;favorited&nbsp;state&nbsp;of&nbsp;this&nbsp;status&nbsp;message.</tt></dd>
+</dl>
+<dl><dt><strong>id</strong></dt>
+<dd><tt>The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;status&nbsp;message.</tt></dd>
+</dl>
+<dl><dt><strong>in_reply_to_screen_name</strong></dt>
+<dd><tt></tt></dd>
+</dl>
+<dl><dt><strong>in_reply_to_status_id</strong></dt>
+<dd><tt></tt></dd>
+</dl>
+<dl><dt><strong>in_reply_to_user_id</strong></dt>
+<dd><tt></tt></dd>
+</dl>
+<dl><dt><strong>location</strong></dt>
+<dd><tt>The&nbsp;geolocation&nbsp;string&nbsp;of&nbsp;this&nbsp;status&nbsp;message</tt></dd>
+</dl>
+<dl><dt><strong>now</strong></dt>
+<dd><tt>The&nbsp;wallclock&nbsp;time&nbsp;for&nbsp;this&nbsp;status&nbsp;instance.</tt></dd>
+</dl>
+<dl><dt><strong>relative_created_at</strong></dt>
+<dd><tt>Get&nbsp;a&nbsp;human&nbsp;readable&nbsp;string&nbsp;representing&nbsp;the&nbsp;posting&nbsp;time</tt></dd>
+</dl>
+<dl><dt><strong>source</strong></dt>
+<dd><tt></tt></dd>
+</dl>
+<dl><dt><strong>text</strong></dt>
+<dd><tt>The&nbsp;text&nbsp;of&nbsp;this&nbsp;status&nbsp;message</tt></dd>
+</dl>
+<dl><dt><strong>truncated</strong></dt>
+<dd><tt></tt></dd>
+</dl>
+<dl><dt><strong>user</strong></dt>
+<dd><tt>A&nbsp;twitter.User&nbsp;reprenting&nbsp;the&nbsp;entity&nbsp;posting&nbsp;this&nbsp;status&nbsp;message</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Trend">class <strong>Trend</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;class&nbsp;representing&nbsp;a&nbsp;trending&nbsp;topic<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Trend-__init__"><strong>__init__</strong></a>(self, name<font color="#909090">=None</font>, query<font color="#909090">=None</font>, timestamp<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Trend-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="Trend-NewFromJsonDict"><strong>NewFromJsonDict</strong></a>(data, timestamp<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;instance&nbsp;based&nbsp;on&nbsp;a&nbsp;JSON&nbsp;dict<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;data:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;JSON&nbsp;dict<br>
+&nbsp;&nbsp;timestamp:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;set&nbsp;as&nbsp;the&nbsp;timestamp&nbsp;property&nbsp;of&nbsp;the&nbsp;new&nbsp;<a href="__builtin__.html#object">object</a><br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#Trend">Trend</a>&nbsp;<a href="__builtin__.html#object">object</a></tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TwitterError">class <strong>TwitterError</strong></a>(<a href="exceptions.html#Exception">exceptions.Exception</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Base&nbsp;class&nbsp;for&nbsp;Twitter&nbsp;errors<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="twitter.html#TwitterError">TwitterError</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+<dd><a href="exceptions.html#BaseException">exceptions.BaseException</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>message</strong></dt>
+<dd><tt>Returns&nbsp;the&nbsp;first&nbsp;argument&nbsp;used&nbsp;to&nbsp;construct&nbsp;this&nbsp;error.</tt></dd>
+</dl>
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="TwitterError-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt>x.<a href="#TwitterError-__init__">__init__</a>(...)&nbsp;initializes&nbsp;x;&nbsp;see&nbsp;x.__class__.__doc__&nbsp;for&nbsp;signature</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object at 0x100119f80&gt;<dd><tt>T.<a href="#TwitterError-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<hr>
+Methods inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><a name="TwitterError-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#TwitterError-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="TwitterError-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#TwitterError-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="TwitterError-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#TwitterError-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="TwitterError-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#TwitterError-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
+&nbsp;<br>
+Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
+
+<dl><dt><a name="TwitterError-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TwitterError-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#TwitterError-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="TwitterError-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#TwitterError-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="TwitterError-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TwitterError-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#TwitterError-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
+
+<dl><dt><a name="TwitterError-__unicode__"><strong>__unicode__</strong></a>(...)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Url">class <strong>Url</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;class&nbsp;representing&nbsp;an&nbsp;URL&nbsp;contained&nbsp;in&nbsp;a&nbsp;tweet<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Url-__init__"><strong>__init__</strong></a>(self, url<font color="#909090">=None</font>, expanded_url<font color="#909090">=None</font>)</dt></dl>
+
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="Url-NewFromJsonDict"><strong>NewFromJsonDict</strong></a>(data)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;instance&nbsp;based&nbsp;on&nbsp;a&nbsp;JSON&nbsp;dict.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;data:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;JSON&nbsp;dict,&nbsp;as&nbsp;converted&nbsp;from&nbsp;the&nbsp;JSON&nbsp;in&nbsp;the&nbsp;twitter&nbsp;API<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#Url">Url</a>&nbsp;instance</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="User">class <strong>User</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;class&nbsp;representing&nbsp;the&nbsp;<a href="#User">User</a>&nbsp;structure&nbsp;used&nbsp;by&nbsp;the&nbsp;twitter&nbsp;API.<br>
+&nbsp;<br>
+The&nbsp;<a href="#User">User</a>&nbsp;structure&nbsp;exposes&nbsp;the&nbsp;following&nbsp;properties:<br>
+&nbsp;<br>
+&nbsp;&nbsp;user.id<br>
+&nbsp;&nbsp;user.name<br>
+&nbsp;&nbsp;user.screen_name<br>
+&nbsp;&nbsp;user.location<br>
+&nbsp;&nbsp;user.description<br>
+&nbsp;&nbsp;user.profile_image_url<br>
+&nbsp;&nbsp;user.profile_background_tile<br>
+&nbsp;&nbsp;user.profile_background_image_url<br>
+&nbsp;&nbsp;user.profile_sidebar_fill_color<br>
+&nbsp;&nbsp;user.profile_background_color<br>
+&nbsp;&nbsp;user.profile_link_color<br>
+&nbsp;&nbsp;user.profile_text_color<br>
+&nbsp;&nbsp;user.protected<br>
+&nbsp;&nbsp;user.utc_offset<br>
+&nbsp;&nbsp;user.time_zone<br>
+&nbsp;&nbsp;user.url<br>
+&nbsp;&nbsp;user.status<br>
+&nbsp;&nbsp;user.statuses_count<br>
+&nbsp;&nbsp;user.followers_count<br>
+&nbsp;&nbsp;user.friends_count<br>
+&nbsp;&nbsp;user.favourites_count<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="User-AsDict"><strong>AsDict</strong></a>(self)</dt><dd><tt>A&nbsp;dict&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#User">User</a>&nbsp;instance.<br>
+&nbsp;<br>
+The&nbsp;return&nbsp;value&nbsp;uses&nbsp;the&nbsp;same&nbsp;key&nbsp;names&nbsp;as&nbsp;the&nbsp;JSON&nbsp;representation.<br>
+&nbsp;<br>
+Return:<br>
+&nbsp;&nbsp;A&nbsp;dict&nbsp;representing&nbsp;this&nbsp;twitter.<a href="#User">User</a>&nbsp;instance</tt></dd></dl>
+
+<dl><dt><a name="User-AsJsonString"><strong>AsJsonString</strong></a>(self)</dt><dd><tt>A&nbsp;JSON&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#User">User</a>&nbsp;instance.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;JSON&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#User">User</a>&nbsp;instance</tt></dd></dl>
+
+<dl><dt><a name="User-GetDescription"><strong>GetDescription</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;short&nbsp;text&nbsp;description&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;short&nbsp;text&nbsp;description&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-GetFavouritesCount"><strong>GetFavouritesCount</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;number&nbsp;of&nbsp;favourites&nbsp;for&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;favourites&nbsp;for&nbsp;this&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="User-GetFollowersCount"><strong>GetFollowersCount</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;follower&nbsp;count&nbsp;for&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;users&nbsp;following&nbsp;this&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="User-GetFriendsCount"><strong>GetFriendsCount</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;friend&nbsp;count&nbsp;for&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;users&nbsp;this&nbsp;user&nbsp;has&nbsp;befriended.</tt></dd></dl>
+
+<dl><dt><a name="User-GetId"><strong>GetId</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-GetLocation"><strong>GetLocation</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;geographic&nbsp;location&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;geographic&nbsp;location&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-GetName"><strong>GetName</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;real&nbsp;name&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;real&nbsp;name&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-GetProfileBackgroundColor"><strong>GetProfileBackgroundColor</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="User-GetProfileBackgroundImageUrl"><strong>GetProfileBackgroundImageUrl</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="User-GetProfileBackgroundTile"><strong>GetProfileBackgroundTile</strong></a>(self)</dt><dd><tt>Boolean&nbsp;for&nbsp;whether&nbsp;to&nbsp;tile&nbsp;the&nbsp;profile&nbsp;background&nbsp;image.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;True&nbsp;if&nbsp;the&nbsp;background&nbsp;is&nbsp;to&nbsp;be&nbsp;tiled,&nbsp;False&nbsp;if&nbsp;not,&nbsp;None&nbsp;if&nbsp;unset.</tt></dd></dl>
+
+<dl><dt><a name="User-GetProfileImageUrl"><strong>GetProfileImageUrl</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;url&nbsp;of&nbsp;the&nbsp;thumbnail&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;url&nbsp;of&nbsp;the&nbsp;thumbnail&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-GetProfileLinkColor"><strong>GetProfileLinkColor</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="User-GetProfileSidebarFillColor"><strong>GetProfileSidebarFillColor</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="User-GetProfileTextColor"><strong>GetProfileTextColor</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="User-GetProtected"><strong>GetProtected</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="User-GetScreenName"><strong>GetScreenName</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;short&nbsp;twitter&nbsp;name&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;short&nbsp;twitter&nbsp;name&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-GetStatus"><strong>GetStatus</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;latest&nbsp;twitter.<a href="#Status">Status</a>&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;latest&nbsp;twitter.<a href="#Status">Status</a>&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-GetStatusesCount"><strong>GetStatusesCount</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;number&nbsp;of&nbsp;status&nbsp;updates&nbsp;for&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;status&nbsp;updates&nbsp;for&nbsp;this&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="User-GetTimeZone"><strong>GetTimeZone</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;current&nbsp;time&nbsp;zone&nbsp;string&nbsp;for&nbsp;the&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;descriptive&nbsp;time&nbsp;zone&nbsp;string&nbsp;for&nbsp;the&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="User-GetUrl"><strong>GetUrl</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;homepage&nbsp;url&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;homepage&nbsp;url&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-GetUtcOffset"><strong>GetUtcOffset</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="User-SetDescription"><strong>SetDescription</strong></a>(self, description)</dt><dd><tt>Set&nbsp;the&nbsp;short&nbsp;text&nbsp;description&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;description:&nbsp;The&nbsp;short&nbsp;text&nbsp;description&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-SetFavouritesCount"><strong>SetFavouritesCount</strong></a>(self, count)</dt><dd><tt>Set&nbsp;the&nbsp;favourite&nbsp;count&nbsp;for&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;count:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;favourites&nbsp;for&nbsp;this&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="User-SetFollowersCount"><strong>SetFollowersCount</strong></a>(self, count)</dt><dd><tt>Set&nbsp;the&nbsp;follower&nbsp;count&nbsp;for&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;count:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;users&nbsp;following&nbsp;this&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="User-SetFriendsCount"><strong>SetFriendsCount</strong></a>(self, count)</dt><dd><tt>Set&nbsp;the&nbsp;friend&nbsp;count&nbsp;for&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;count:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;users&nbsp;this&nbsp;user&nbsp;has&nbsp;befriended.</tt></dd></dl>
+
+<dl><dt><a name="User-SetId"><strong>SetId</strong></a>(self, id)</dt><dd><tt>Set&nbsp;the&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;id:&nbsp;The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="User-SetLocation"><strong>SetLocation</strong></a>(self, location)</dt><dd><tt>Set&nbsp;the&nbsp;geographic&nbsp;location&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;location:&nbsp;The&nbsp;geographic&nbsp;location&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-SetName"><strong>SetName</strong></a>(self, name)</dt><dd><tt>Set&nbsp;the&nbsp;real&nbsp;name&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;name:&nbsp;The&nbsp;real&nbsp;name&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-SetProfileBackgroundColor"><strong>SetProfileBackgroundColor</strong></a>(self, profile_background_color)</dt></dl>
+
+<dl><dt><a name="User-SetProfileBackgroundImageUrl"><strong>SetProfileBackgroundImageUrl</strong></a>(self, profile_background_image_url)</dt></dl>
+
+<dl><dt><a name="User-SetProfileBackgroundTile"><strong>SetProfileBackgroundTile</strong></a>(self, profile_background_tile)</dt><dd><tt>Set&nbsp;the&nbsp;boolean&nbsp;flag&nbsp;for&nbsp;whether&nbsp;to&nbsp;tile&nbsp;the&nbsp;profile&nbsp;background&nbsp;image.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;profile_background_tile:&nbsp;Boolean&nbsp;flag&nbsp;for&nbsp;whether&nbsp;to&nbsp;tile&nbsp;or&nbsp;not.</tt></dd></dl>
+
+<dl><dt><a name="User-SetProfileImageUrl"><strong>SetProfileImageUrl</strong></a>(self, profile_image_url)</dt><dd><tt>Set&nbsp;the&nbsp;url&nbsp;of&nbsp;the&nbsp;thumbnail&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;profile_image_url:&nbsp;The&nbsp;url&nbsp;of&nbsp;the&nbsp;thumbnail&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-SetProfileLinkColor"><strong>SetProfileLinkColor</strong></a>(self, profile_link_color)</dt></dl>
+
+<dl><dt><a name="User-SetProfileSidebarFillColor"><strong>SetProfileSidebarFillColor</strong></a>(self, profile_sidebar_fill_color)</dt></dl>
+
+<dl><dt><a name="User-SetProfileTextColor"><strong>SetProfileTextColor</strong></a>(self, profile_text_color)</dt></dl>
+
+<dl><dt><a name="User-SetProtected"><strong>SetProtected</strong></a>(self, protected)</dt></dl>
+
+<dl><dt><a name="User-SetScreenName"><strong>SetScreenName</strong></a>(self, screen_name)</dt><dd><tt>Set&nbsp;the&nbsp;short&nbsp;twitter&nbsp;name&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;screen_name:&nbsp;the&nbsp;short&nbsp;twitter&nbsp;name&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-SetStatus"><strong>SetStatus</strong></a>(self, status)</dt><dd><tt>Set&nbsp;the&nbsp;latest&nbsp;twitter.<a href="#Status">Status</a>&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;status:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;latest&nbsp;twitter.<a href="#Status">Status</a>&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-SetStatusesCount"><strong>SetStatusesCount</strong></a>(self, count)</dt><dd><tt>Set&nbsp;the&nbsp;status&nbsp;update&nbsp;count&nbsp;for&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;count:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;updates&nbsp;for&nbsp;this&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="User-SetTimeZone"><strong>SetTimeZone</strong></a>(self, time_zone)</dt><dd><tt>Sets&nbsp;the&nbsp;user's&nbsp;time&nbsp;zone&nbsp;string.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;time_zone:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;descriptive&nbsp;time&nbsp;zone&nbsp;to&nbsp;assign&nbsp;for&nbsp;the&nbsp;user.</tt></dd></dl>
+
+<dl><dt><a name="User-SetUrl"><strong>SetUrl</strong></a>(self, url)</dt><dd><tt>Set&nbsp;the&nbsp;homepage&nbsp;url&nbsp;of&nbsp;this&nbsp;user.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;url:&nbsp;The&nbsp;homepage&nbsp;url&nbsp;of&nbsp;this&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="User-SetUtcOffset"><strong>SetUtcOffset</strong></a>(self, utc_offset)</dt></dl>
+
+<dl><dt><a name="User-__eq__"><strong>__eq__</strong></a>(self, other)</dt></dl>
+
+<dl><dt><a name="User-__init__"><strong>__init__</strong></a>(self, id<font color="#909090">=None</font>, name<font color="#909090">=None</font>, screen_name<font color="#909090">=None</font>, location<font color="#909090">=None</font>, description<font color="#909090">=None</font>, profile_image_url<font color="#909090">=None</font>, profile_background_tile<font color="#909090">=None</font>, profile_background_image_url<font color="#909090">=None</font>, profile_sidebar_fill_color<font color="#909090">=None</font>, profile_background_color<font color="#909090">=None</font>, profile_link_color<font color="#909090">=None</font>, profile_text_color<font color="#909090">=None</font>, protected<font color="#909090">=None</font>, utc_offset<font color="#909090">=None</font>, time_zone<font color="#909090">=None</font>, followers_count<font color="#909090">=None</font>, friends_count<font color="#909090">=None</font>, statuses_count<font color="#909090">=None</font>, favourites_count<font color="#909090">=None</font>, url<font color="#909090">=None</font>, status<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="User-__ne__"><strong>__ne__</strong></a>(self, other)</dt></dl>
+
+<dl><dt><a name="User-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>A&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#User">User</a>&nbsp;instance.<br>
+&nbsp;<br>
+The&nbsp;return&nbsp;value&nbsp;is&nbsp;the&nbsp;same&nbsp;as&nbsp;the&nbsp;JSON&nbsp;string&nbsp;representation.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;string&nbsp;representation&nbsp;of&nbsp;this&nbsp;twitter.<a href="#User">User</a>&nbsp;instance.</tt></dd></dl>
+
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="User-NewFromJsonDict"><strong>NewFromJsonDict</strong></a>(data)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;instance&nbsp;based&nbsp;on&nbsp;a&nbsp;JSON&nbsp;dict.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;data:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;JSON&nbsp;dict,&nbsp;as&nbsp;converted&nbsp;from&nbsp;the&nbsp;JSON&nbsp;in&nbsp;the&nbsp;twitter&nbsp;API<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;A&nbsp;twitter.<a href="#User">User</a>&nbsp;instance</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>description</strong></dt>
+<dd><tt>The&nbsp;short&nbsp;text&nbsp;description&nbsp;of&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>favourites_count</strong></dt>
+<dd><tt>The&nbsp;number&nbsp;of&nbsp;favourites&nbsp;for&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>followers_count</strong></dt>
+<dd><tt>The&nbsp;number&nbsp;of&nbsp;users&nbsp;following&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>friends_count</strong></dt>
+<dd><tt>The&nbsp;number&nbsp;of&nbsp;friends&nbsp;for&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>id</strong></dt>
+<dd><tt>The&nbsp;unique&nbsp;id&nbsp;of&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>location</strong></dt>
+<dd><tt>The&nbsp;geographic&nbsp;location&nbsp;of&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>name</strong></dt>
+<dd><tt>The&nbsp;real&nbsp;name&nbsp;of&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>profile_background_color</strong></dt>
+</dl>
+<dl><dt><strong>profile_background_image_url</strong></dt>
+<dd><tt>The&nbsp;url&nbsp;of&nbsp;the&nbsp;profile&nbsp;background&nbsp;of&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>profile_background_tile</strong></dt>
+<dd><tt>Boolean&nbsp;for&nbsp;whether&nbsp;to&nbsp;tile&nbsp;the&nbsp;background&nbsp;image.</tt></dd>
+</dl>
+<dl><dt><strong>profile_image_url</strong></dt>
+<dd><tt>The&nbsp;url&nbsp;of&nbsp;the&nbsp;thumbnail&nbsp;of&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>profile_link_color</strong></dt>
+</dl>
+<dl><dt><strong>profile_sidebar_fill_color</strong></dt>
+</dl>
+<dl><dt><strong>profile_text_color</strong></dt>
+</dl>
+<dl><dt><strong>protected</strong></dt>
+</dl>
+<dl><dt><strong>screen_name</strong></dt>
+<dd><tt>The&nbsp;short&nbsp;twitter&nbsp;name&nbsp;of&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>status</strong></dt>
+<dd><tt>The&nbsp;latest&nbsp;twitter.Status&nbsp;of&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>statuses_count</strong></dt>
+<dd><tt>The&nbsp;number&nbsp;of&nbsp;updates&nbsp;for&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>time_zone</strong></dt>
+<dd><tt>Returns&nbsp;the&nbsp;current&nbsp;time&nbsp;zone&nbsp;string&nbsp;for&nbsp;the&nbsp;user.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;The&nbsp;descriptive&nbsp;time&nbsp;zone&nbsp;string&nbsp;for&nbsp;the&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>url</strong></dt>
+<dd><tt>The&nbsp;homepage&nbsp;url&nbsp;of&nbsp;this&nbsp;user.</tt></dd>
+</dl>
+<dl><dt><strong>utc_offset</strong></dt>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-md5"><strong>md5</strong></a> = openssl_md5(...)</dt><dd><tt>Returns&nbsp;a&nbsp;md5&nbsp;hash&nbsp;<a href="__builtin__.html#object">object</a>;&nbsp;optionally&nbsp;initialized&nbsp;with&nbsp;a&nbsp;string</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ACCESS_TOKEN_URL</strong> = 'https://api.twitter.com/oauth/access_token'<br>
+<strong>AUTHORIZATION_URL</strong> = 'https://api.twitter.com/oauth/authorize'<br>
+<strong>CHARACTER_LIMIT</strong> = 140<br>
+<strong>DEFAULT_CACHE</strong> = &lt;object object at 0x1001da0a0&gt;<br>
+<strong>REQUEST_TOKEN_URL</strong> = 'https://api.twitter.com/oauth/request_token'<br>
+<strong>SIGNIN_URL</strong> = 'https://api.twitter.com/oauth/authenticate'<br>
+<strong>__author__</strong> = 'python-twitter@googlegroups.com'<br>
+<strong>__version__</strong> = '0.8'</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#7799ee">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Author</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#7799ee"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">python-twitter@googlegroups.com</td></tr></table>
+</body></html>

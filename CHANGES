@@ -1,0 +1,508 @@
+2011-12-03
+
+ https://code.google.com/p/python-twitter/source/detail?r=263fe2a0db8be23347e92b81d6ab3c33b4ef292f
+ Comment by qfuxiang to the above changeset
+ The base url was wrong for the Followers API calls
+
+ https://code.google.com/p/python-twitter/issues/detail?id=213
+ Add include_entities parameter to GetStatus()
+ Patch by gaelenh
+
+ https://code.google.com/p/python-twitter/issues/detail?id=214
+ Change PostUpdate() so that it takes the shortened link into
+ account.  Small tweak to the patch provided to make the
+ shortened-link length set by a API value instead of a constant.
+ Patch by ceesjan.ytec
+
+ https://code.google.com/p/python-twitter/issues/detail?id=216
+ AttributeError handles the fact that win* doesn't implement
+ os.getlogin()
+ Patch by yaleman
+
+ https://code.google.com/p/python-twitter/issues/detail?id=217
+ As described at https://dev.twitter.com/docs/api/1/get/trends,
+ GET trends (corresponding to Api.GetTrendsCurrent) is now
+ deprecated in favor of GET trends/:woeid. GET trends also now
+ requires authentication, while trends/:woeid doesn't.
+ Patch and excellent description by jessica.mckellar
+
+ https://code.google.com/p/python-twitter/issues/detail?id=218
+ Currently, two Trends containing the same information
+ (name, query, and timestamp) aren't considered equal because
+ __eq__ isn't overridden, like it is for Status, User, and the
+ other Twitter objects.
+ Patch and excellent description by jessica.mckellar
+
+ https://code.google.com/p/python-twitter/issues/detail?id=220
+ https://code.google.com/p/python-twitter/issues/detail?id=211
+ https://code.google.com/p/python-twitter/issues/detail?id=206
+ All variations on a theme - basically Twitter is returning
+ something different for an error payload.  Changed code to
+ check for both 'error' and 'errors'.
+
+2011-05-08
+
+ https://code.google.com/p/python-twitter/issues/detail?id=184
+ A comment in this issue made me realize that the parameter sanity
+ check for max_id was missing in GetMentions() - added
+
+ First pass at working in some of the cursor support that has been
+ in the Twitter API but we haven't made full use of - still working
+ out the small issues.
+
+2011-04-16
+
+ bumped version to 0.8.3
+ released 0.8.2 to PyPI
+ bumped version to 0.8.2
+
+ Issue 193
+ http://code.google.com/p/python-twitter/issues/detail?id=193
+ Missing retweet_count field on Status object
+ Patch (with minor tweaks) by from alissonp
+
+ Issue 181
+ http://code.google.com/p/python-twitter/issues/detail?id=181
+ Add oauth2 to install_requires parameter list and also updated
+ README to note that the oauth2 lib can be found in two locations
+
+ Issue 182, Issue 137, Issue 93, Issue 190
+ language value missing from User object
+ Added 'lang' item and also some others that were needed:
+   verified, notifications, contributors_enabled and listed_count
+ patches by wreinerat, apetresc, jpwigan and ghills
+
+2011-02-26
+
+ Issue 166
+ http://code.google.com/p/python-twitter/issues/detail?id=166
+ Added a basic, but sadly needed, check when parsing the json
+ returned by Twitter as Twitter has a habit of returning the
+ failwhale HTML page for a json api call :(
+ Patch (with minor tweaks) by adam.aviv
+
+ Issue 187
+ http://code.google.com/p/python-twitter/issues/detail?id=187
+ Applied patch by edward.hades to fix issue where MaximumHitFrequency
+ returns 0 when requests are maxed out
+
+ Issue 184
+ http://code.google.com/p/python-twitter/issues/detail?id=184
+ Applied patch by jmstaley to put into the GetUserTimeline API
+ parameter list the max_id value (it was being completely ignored)
+
+2011-02-20
+
+ Added retweeted to Status class
+ Fixed Status class to return Hashtags list in AsDict() call
+
+ Issue 185
+ http://code.google.com/p/python-twitter/issues/detail?id=185
+ Added retweeted_status to Status class - patch by edward.hades
+
+ Issue 183
+ http://code.google.com/p/python-twitter/issues/detail?id=183
+ Removed errant print statement - reported by ProgVal
+
+2010-12-21
+
+ Setting version to 0.8.1
+
+ Issue 179
+ http://code.google.com/p/python-twitter/issues/detail?id=179
+ Added MANIFEST.in to give setup.py sdist some clues as to what
+ files to include in the tarball
+
+2010-11-14
+
+ Setting version to 0.8 for a bit as having a branch for this is
+ really overkill, i'll just take DeWitt advice and tag it when
+ the release is out the door
+
+ Issue 175
+ http://code.google.com/p/python-twitter/issues/detail?id=175
+ Added geo_enabled to User class - basic parts of patch provided
+ by adam.aviv with other bits added by me to allow it to pass tests
+
+ Issue 174
+ http://code.google.com/p/python-twitter/issues/detail?id=174
+ Added parts of adam.aviv's patch - the bits that add new field items
+ to the Status class.
+
+ Issue 159
+ http://code.google.com/p/python-twitter/issues/detail?id=159
+ Added patch form adam.aviv to make the term parameter for GetSearch()
+ optional if geocode parameter is supplied
+
+2010-11-03
+
+ Ran pydoc to generate docs
+
+2010-10-16
+
+ Fixed bad date in previous CHANGES entry
+ 
+ Fixed source of the python-oauth2 library we use: from brosner
+ to simplegeo
+
+ I made a pass thru the docstrings and updated many to be the
+ text from the current Twitter API docs.  Also fixed numerous
+ whitespace issues and did a s/[optional]/[Optional]/ change.
+
+ Imported work by Colin Howe that he did to get the tests working.
+ http://code.google.com/r/colinthehowe-python-twitter-tests/source/detail?r=6cff589aca9c955df8354fe4d8e302ec4a2eb31c
+ http://code.google.com/r/colinthehowe-python-twitter-tests/source/detail?r=cab8e32d7a9c34c66d2e75eebc7a1ba6e1eac8ce
+ http://code.google.com/r/colinthehowe-python-twitter-tests/source/detail?r=b434d9e5dd7b989ae24483477e3f00b1ad362cc5
+
+ Issue 169
+ http://code.google.com/p/python-twitter/issues/detail?id=169
+ Patch by yaemog which adds missing Trends support.
+
+ Issue 168
+ http://code.google.com/p/python-twitter/issues/detail?id=168
+ Only cache successful results as suggested by yaemog.
+
+ Issue 111
+ http://code.google.com/p/python-twitter/issues/detail?id=111
+ Added a new GetUserRetweets() call as suggested by yash888
+ Patch given was adjusted to reflect the current code requirements.
+
+ Issue 110
+ Added a VerifyCredentials() sample call to the README example
+
+ Issue 105
+ Added support for the page parameter to GetFriendsTimeline()
+ as requested by jauderho.
+ I also updated GetFriendsTimeline() to follow the current
+ Twitter API documentation
+
+ Somewhere in the patch frenzy of today an extra GetStatus()
+ def was introduced!?! Luckily it was caught by the tests.
+ wooo tests! \m/
+
+ Setting version to 0.8
+
+ r0.8 branch created and trunk set to version 0.9-devel
+
+2010-09-26
+
+ Issue 150
+ http://code.google.com/p/python-twitter/issues/detail?id=150
+ Patch by blhobbes which removes a double quoting issue that
+ was happening for GetSearch()
+ Reported by huubhuubbarbatruuk
+
+ Issue 160
+ http://code.google.com/p/python-twitter/issues/detail?id=160
+ Patch by yaemog which adds support for include_rts and
+ include_entities support to GetUserTimeline and GetPublicTimeline
+ Small tweaks post-patch
+
+ Applied docstring tweak suggested by dclinton in revision comment 
+ http://code.google.com/p/python-twitter/source/detail?r=a858412e38f7e3856fef924291ef039284d3a6e1
+ Thanks for the catch! 
+
+ Issue 164
+ http://code.google.com/p/python-twitter/issues/detail?id=164
+ Patch by yaemog which adds GetRetweets support.
+ Small tweaks and two typo fixes post-patch.
+             
+ Issue 165
+ http://code.google.com/p/python-twitter/issues/detail?id=165
+ Patch by yaemog which adds GetStatus support.
+ Small tweaks post-patch
+
+ Issue 163
+ http://code.google.com/p/python-twitter/issues/detail?id=163
+ Patch by yaemog which adds users/lookup support.
+ Small tweaks to docstring only post-patch.
+
+ Changed username/password parameter to Api class to be
+ consumer_key/consumer_secret to better match the new
+ oAuth only world that Twitter has demanded.
+ 
+ Added debugHTTP to the parameter list to Api class to
+ control if/when the urllib debug output is displayed.
+
+2010-08-25
+
+ First pass at adding list support.
+ Added a new List class and also added to the Api class
+ new methods for working with lists:
+
+   CreateList(self, user, name, mode=None, description=None)
+   DestroyList(self, user, id)
+   CreateSubscription(self, owner, list)
+   DestroySubscription(self, owner, list)
+   GetSubscriptions(self, user, cursor=-1)
+   GetLists(self, user, cursor=-1)
+
+2010-08-24
+
+ Fixed introduced bug in the Destroy* and Create* API calls
+ where any of the routines were passing in an empty dict for
+ POST data.  Before the oAuth change that was enough to tell
+ _FetchUrl() to use POST instead of GET but now a non-empty
+ dict is required.
+
+ Issue 144
+ http://code.google.com/p/python-twitter/issues/detail?id=144
+ GetFriends() where it was failing with a 'unicode object has
+ no attribute get'. This was caused when Twitter changed how
+ they return the JSON data. It used to be a straight list but
+ now there are some elements *and* then the list.
+
+2010-08-18
+
+ Applied the json/simplejson part of the patch found
+ in Issue 64 (http://code.google.com/p/python-twitter/issues/detail?id=64)
+ Patch provided by Thomas Bohmbach
+
+ Applied patch provided by liris.pp in Issue 147
+ http://code.google.com/p/python-twitter/issues/detail?id=147
+ Ensures that during a PostStatus we count the length using a unicode aware
+ len() routine.  Tweaked patch slightly to take into account that the
+ twitter.Api() instance may have been setup with None for input_encoding.
+
+2010-08-17
+
+ Fixed error in the POST path for _FetchUrl() where by
+ I show to the world that yes, I do make last minute
+ changes and completely forget to test them :(
+ Thanks to Peter Sanchez for finding and pointing to
+ working code that showed the fix
+
+2010-08-15
+
+ Added more help text (I hope it helps) to the README
+ and also to get_access_token.py.
+
+ Added doctext notes to twitter.Api() parameter list
+ to explain more about oAuth.
+
+ Added import exception handling for parse_qs() and
+ parse_qsl() as it seems those funcitons moved between
+ 2.5 and 2.6 so the oAuth update broke the lib under
+ python2.5.  Thanks to Rich for the bug find (sorry
+ it had to be found the hard way!)
+
+ from changeset 184:60315000989c by DeWitt
+ Update the generated twitter.py docs to match the trunk
+
+2010-08-14
+
+ Fixed silly typo in _FetchUrl() when doing a POST
+ Thanks to Peter Sanchez for the find and fix!
+
+ Added some really basic text to the get_access_token.py
+ startup output that explains why, for now, you need to
+ visit Twitter and get an Application key/secret to use
+ this library
+
+2010-08-12
+
+ Updated code to use python-oauth2 library for authentication.
+ Twitter has set a deadline, 2010-08-16 as of this change, for
+ the switch from Basic to oAuth.
+
+ The oAuth integration was inspired by the work done by
+ Hameedullah Khan and others.
+
+ The change to using python-oauth2 library was done purely to
+ align python-twitter with an oauth library that was maintained
+ and had tests to try and minimize grief moving forward.
+
+ Slipped into GetFriendsTimeline() a new parameter, retweets, to
+ allow the call to pull from the "friends_timeline" or the
+ "home_timeline".
+
+ Fixed some typos and white-space issues and also updated the
+ README to point to the new Twitter Dev site.
+
+2010-08-02
+
+ Updated copyright information.
+
+2010-06-13
+
+ Applied changeset from nicdumz repo nicdumz-cleaner-python-twitter
+   r=07df3feee06c8d0f9961596e5fceae9e74493d25
+   datetime is required for MaximumHitFrequency
+
+ Applied changeset from nicdumz repo nicdumz-cleaner-python-twitter
+   r=dd669dff32d101856ed6e50fe8bd938640b04d77
+   update source URLs in README
+
+ Applied changeset from nicdumz repo nicdumz-cleaner-python-twitter
+   r=8f0796d7fdcea17f4162aeb22d3c36cb603088c7
+   adjust tests to reflect http://twitter.com -> https://twitter.com change
+
+ Applied changeset from nicdumz repo nicdumz-cleaner-python-twitter
+   r=3c05b8ebe59eca226d9eaef2760cecca9d50944a
+   tests: add .info() method to objects returned by our Mockup handler
+   This is required to completely mimick urllib, and have successful
+   response.headers attribute accesses.
+
+ Applied partial patch for Issue 113 
+ http://code.google.com/p/python-twitter/issues/detail?id=113
+
+   The partial bit means we changed the parameter from "page" to "cursor"
+   so the call would work.  What was left out was a more direct way
+   to return the cursor value *after* the call and also in the patch
+   they also changed the method to return an iterator.
+
+2010-05-17
+
+ Issue 50 http://code.google.com/p/python-twitter/issues/detail?id=50
+ Applied patch by wheaties.box that implements a new method to return
+ the Rate Limit Status and also adds the new method MaximumHitFrequency
+
+ Multiple typo, indent and whitespace tweaks
+
+ Issue 60 http://code.google.com/p/python-twitter/issues/detail?id=60
+ Pulled out new GetFavorites and GetMentions methods from the patch
+ submitted by joegermuska
+
+ Issue 62 http://code.google.com/p/python-twitter/issues/detail?id=62
+ Applied patch from lukev123 that adds gzip compression to the GET
+ requests sent to Twitter. The patch was modified to default gzip to
+ False and to allow the twitter.API class instantiation to set the
+ value to True.  This was done to not change current default
+ behaviour radically.
+
+ Issue 80 http://code.google.com/p/python-twitter/issues/detail?id=80
+ Fixed PostUpdate() call example in the README
+
+2010-05-16
+
+ Issue 19 http://code.google.com/p/python-twitter/issues/detail?id=19
+ TinyURL example and the idea for this comes from a bug filed by
+ acolorado with patch provided by ghills.
+
+ Issue 37 http://code.google.com/p/python-twitter/issues/detail?id=37
+ Added base_url to the twitter.API class init call to allow the user
+ to override the default https://twitter.com base.  Since Twitter now
+ supports https for all calls I (bear) changed the patch to default to
+ https instead of http.
+ Original issue by kotecha.ravi, patch by wiennat and with implementation
+ tweaks by bear.
+
+ Issue 45 http://code.google.com/p/python-twitter/issues/detail?id=45
+ Two grammar fixes for relative_created_at property
+ Patches by thomasdyson and chris.boardman07
+
+2010-01-24
+
+ Applying patch submitted to fix Issue 70
+ http://code.google.com/p/python-twitter/issues/detail?id=70
+
+ The patch was originally submitted by user ghills, adapted by livibetter and
+ adapted even further by JimMoefoe (read the comments for the full details :) )
+
+ Applying patch submitted by markus.magnuson to add new method GetFriendIDs
+ Issue 94 http://code.google.com/p/python-twitter/issues/detail?id=94
+
+2009-06-13
+
+ Releasing 0.6 to help people avoid the Twitpocalypse.
+
+2009-05-03
+
+ Support hashlib in addition to the older md5 library.
+
+2009-03-11
+
+ Added page parameter to GetReplies, GetFriends, GetFollowers, and GetDirectMessages
+
+2009-03-03
+
+  Added count parameter to GetFriendsTimeline
+
+2009-03-01
+  Add PostUpdates, which automatically splits long text into multiple updates.
+
+2009-02-25
+
+  Add in_reply_to_status_id to api.PostUpdate
+
+2009-02-21
+
+  Wrap any error responses in a TwitterError
+  Add since_id to GetFriendsTimeline and GetUserTimeline
+
+2009-02-20
+
+  Added since and since_id to Api.GetReplies
+
+2008-07-10
+
+  Added new properties to User and Status classes.
+  Removed spurious self-import of the twitter module
+  Added a NOTICE file
+  Require simplejson 2.x or later
+  Added get/create/destroy favorite flags for status messages.
+  Bug fix for non-tty devices.
+
+2007-09-13
+ 
+  Unset the executable bit on README.
+
+2007-09-13
+
+  Released version 0.5.
+  Added back support for setuptools (conditionally)
+  Added support for X-Twitter-* HTTP headers
+  Fixed the tests to work across all timezones
+  Removed the 140 character limit from PostUpdate  
+  Added support for per-user tmp cache directories
+
+2007-06-13
+
+  Released 0.4.
+  Fixed a unicode error that prevented tweet.py from working.
+  Added DestroyStatus
+  Added DestroyDirectMessage
+  Added CreateFriendship
+  Added DestoryFriendship
+
+2007-06-03
+
+  Fixed the bug that prevented unicode strings being posted
+  Username and password now set on twitter.Api, not individual method calls
+  Added SetCredentials and ClearCredentials
+  Added GetUser ("users/show" in the twitter web api)
+  Added GetFeatured
+  Added GetDirectMessages
+  Added GetStatus ("statuses/show" in the twitter web api)
+  Added GetReplies
+  Added optional since_id parameter on GetPublicTimeline
+  Added optional since parameter on GetUserTimeline 
+  Added optional since and user parameters on GetFriendsTimeline
+  Added optional user parameter on GetFriends 
+  
+2007-04-27
+  
+  Modified examples/twitter-to-xhtml.py to handle unicode
+  Dropped dependency on setuptools (too complicated/buggy)
+  Added unicode test cases
+  Fixed issue 2 "Rename needs an unlink in front"
+  
+2007-04-02
+
+  Released 0.3.
+  Use gmtime not localtime to calculate relative_created_at.
+
+2007-03-26
+
+  Released 0.2
+  GetUserTimeline can accept userid or username.
+
+2007-03-21
+
+  Calculate relative_created_at on the fly
+
+2007-01-28
+
+  Released 0.1
+  Initial checkin of python-twitter
+

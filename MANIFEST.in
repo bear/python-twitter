@@ -1,0 +1,9 @@
+include CHANGES
+include COPYING
+include LICENSE
+include NOTICE
+include README
+include *.py
+recursive-include examples *.py
+recursive-include doc *.html
+prune .DS_Store
