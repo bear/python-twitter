@@ -2634,7 +2634,8 @@ class Api(object):
                       count=None,
                       page=None,
                       include_rts=None,
-                      include_entities=None):
+                      include_entities=None,
+                      exclude_replies=None):
     '''Fetch the sequence of public Status messages for a single user.
 
     The twitter.Api instance must be authenticated if the user is private.
@@ -2674,6 +2675,12 @@ class Api(object):
         This node offers a variety of metadata about the tweet in a
         discreet structure, including: user_mentions, urls, and
         hashtags. [Optional]
+       exclude_replies:
+        If True, this will prevent replies from appearing in the returned
+        timeline. Using exclude_replies with the count parameter will mean you
+        will receive up-to count tweets - this is because the count parameter
+        retrieves that many tweets before filtering out retweets and replies.
+        This parameter is only supported for JSON and XML responses. [Optional]
 
     Returns:
       A sequence of Status instances, one for each message up to count
@@ -2721,6 +2728,9 @@ class Api(object):
 
     if include_entities:
       parameters['include_entities'] = 1
+
+    if exclude_replies:
+      parameters['exclude_replies'] = 1
 
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
