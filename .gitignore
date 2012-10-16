@@ -1,5 +1,8 @@
 *.py[co]
 
+#small test code that contains my keys
+t.py
+
 # Packages
 *.egg
 *.egg-info
