@@ -17,7 +17,7 @@
 '''The setup and build script for the python-twitter library.'''
 
 __author__ = 'python-twitter@googlegroups.com'
-__version__ = '0.8.3'
+__version__ = '0.8.4'
 
 
 # The base package metadata to be used by both distutils and setuptools
@@ -29,7 +29,7 @@ METADATA = dict(
   author_email='python-twitter@googlegroups.com',
   description='A python wrapper around the Twitter API',
   license='Apache License 2.0',
-  url='http://code.google.com/p/python-twitter/',
+  url='https://github.com/bear/python-twitter',
   keywords='twitter api',
 )
 

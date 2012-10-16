@@ -1,3 +1,12 @@
+2012-10-16
+ http://code.google.com/p/python-twitter/issues/detail?id=233
+ Patch by dan@dans.im
+ Add exclude_replies parameter to GetUserTimeline
+
+ https://github.com/bear/python-twitter/issues/1
+ Bug reported by michaelmior on github
+ get_access_token.py attempts Web auth
+
 2011-12-03
 
  https://code.google.com/p/python-twitter/source/detail?r=263fe2a0db8be23347e92b81d6ab3c33b4ef292f

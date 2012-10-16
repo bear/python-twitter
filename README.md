@@ -58,14 +58,13 @@ Without setuptools installed:
 
 View the trunk at:
 
-  http://code.google.com/p/python-twitter/source/
+  https://github.com/bear/python-twitter
 
 Check out the latest development version anonymously with:
 
 {{{
-   $ hg clone http://python-twitter.googlecode.com/hg/ python-twitter
+   $ git clone git://github.com/bear/python-twitter.git
    $ cd python-twitter
-   $ hg update dev
 }}}
 
 ==Documentation==
