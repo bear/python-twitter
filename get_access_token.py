@@ -31,8 +31,8 @@ ACCESS_TOKEN_URL  = 'https://api.twitter.com/oauth/access_token'
 AUTHORIZATION_URL = 'https://api.twitter.com/oauth/authorize'
 SIGNIN_URL        = 'https://api.twitter.com/oauth/authenticate'
 
-consumer_key    = "g00szXVinvEk7B9vD1vUQ"
-consumer_secret = "aL1ghD3Ki4MY1k1aEoLVeUVzoKmq7uRKX16GIiw"
+consumer_key    = None
+consumer_secret = None
 
 
 if consumer_key is None or consumer_secret is None:
@@ -78,7 +78,7 @@ else:
   print ''
 
   oauth_client  = oauth.Client(oauth_consumer, token)
-  resp, content = oauth_client.request(ACCESS_TOKEN_URL, method='POST', body='oauth_verifier=%s' % pincode)
+  resp, content = oauth_client.request(ACCESS_TOKEN_URL, method='POST', body='oauth_callback=oob&oauth_verifier=%s' % pincode)
   access_token  = dict(parse_qsl(content))
 
   if resp['status'] != '200':
