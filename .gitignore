@@ -26,6 +26,9 @@ pip-log.txt
 .coverage
 .tox
 
+# PyCharm data
+.idea
+
 #Translations
 *.mo
 

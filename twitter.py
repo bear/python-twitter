@@ -87,9 +87,9 @@ class TwitterError(Exception):
 
 class Status(object):
   '''A class representing the Status structure used by the twitter API.
-  
+
   The Status structure exposes the following properties:
-  
+
     status.created_at
     status.created_at_in_seconds # read only
     status.favorited
@@ -591,7 +591,7 @@ class Status(object):
     if self.urls:
       data['urls'] = dict([(url.url, url.expanded_url) for url in self.urls])
     if self.user_mentions:
-      data['user_mentions'] = [um.AsDict() for um in self.user_mentions]                                                                                                                                       
+      data['user_mentions'] = [um.AsDict() for um in self.user_mentions]
     return data
 
   @staticmethod
@@ -1372,9 +1372,9 @@ class User(object):
 
 class List(object):
   '''A class representing the List structure used by the twitter API.
-  
+
   The List structure exposes the following properties:
-  
+
     list.id
     list.name
     list.slug
@@ -1731,9 +1731,9 @@ class List(object):
 
 class DirectMessage(object):
   '''A class representing the DirectMessage structure used by the twitter API.
-  
+
   The DirectMessage structure exposes the following properties:
-  
+
     direct_message.id
     direct_message.created_at
     direct_message.created_at_in_seconds # read only
@@ -3112,7 +3112,7 @@ class Api(object):
     if not self._oauth_consumer:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     if not user_id and not screen_name and not users:
-      raise TwitterError("Specify at least on of user_id, screen_name, or users.")
+      raise TwitterError("Specify at least one of user_id, screen_name, or users.")
     url = '%s/users/lookup.json' % self.base_url
     parameters = {}
     uids = list()
@@ -3125,7 +3125,15 @@ class Api(object):
     if screen_name:
       parameters['screen_name'] = ','.join(screen_name)
     json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    try:
+      data = self._ParseAndCheckTwitter(json)
+    except TwitterError as e:
+        t = e.args[0]
+        if len(t) == 1 and ('code' in t[0]) and (t[0]['code'] == 34):
+          data = []
+        else:
+            raise
+
     return [User.NewFromJsonDict(u) for u in data]
 
   def GetUser(self, user):
