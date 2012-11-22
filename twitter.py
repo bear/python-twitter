@@ -2350,10 +2350,14 @@ class Api(object):
                 term=None,
                 geocode=None,
                 since_id=None,
+                max_id=None,
+                until=None,
                 per_page=15,
                 page=1,
-                lang="en",
+                lang=None,
                 show_user="true",
+                result_type="mixed",
+                include_entities=None,
                 query_users=False):
     '''Return twitter search results for a given term.
 
@@ -2366,6 +2370,12 @@ class Api(object):
         Tweets which can be accessed through the API. If the limit of
         Tweets has occured since the since_id, the since_id will be
         forced to the oldest ID available. [Optional]
+      max_id:
+        Returns only statuses with an ID less than (that is, older
+        than) or equal to the specified ID. [Optional]
+      until:
+        Returns tweets generated before the given date. Date should be
+        formatted as YYYY-MM-DD. [Optional]
       geocode:
         geolocation information in the form (latitude, longitude, radius)
         [Optional]
@@ -2375,9 +2385,18 @@ class Api(object):
         Specifies the page of results to retrieve.
         Note: there are pagination limits. [Optional]
       lang:
-        language for results.  Default is English [Optional]
+        language for results as ISO 639-1 code.  Default is None (all languages)
+        [Optional]
       show_user:
         prefixes screen name in status
+      result_type:
+        Type of result which should be returned.  Default is "mixed".  Other
+        valid options are "recent" and "popular". [Optional]
+      include_entities:
+        If True, each tweet will include a node called "entities,".
+        This node offers a variety of metadata about the tweet in a
+        discreet structure, including: user_mentions, urls, and
+        hashtags. [Optional]
       query_users:
         If set to False, then all users only have screen_name and
         profile_image_url available.
@@ -2392,7 +2411,22 @@ class Api(object):
     parameters = {}
 
     if since_id:
-      parameters['since_id'] = since_id
+      try:
+        parameters['since_id'] = long(since_id)
+      except:
+        raise TwitterError("since_id must be an integer")
+
+    if max_id:
+      try:
+        parameters['max_id'] = long(max_id)
+      except:
+        raise TwitterError("max_id must be an integer")
+
+    if until:
+        parameters['until'] = until
+
+    if lang:
+      parameters['lang'] = lang
 
     if term is None and geocode is None:
       return []
@@ -2403,10 +2437,14 @@ class Api(object):
     if geocode is not None:
       parameters['geocode'] = ','.join(map(str, geocode))
 
+    if include_entities:
+      parameters['include_entities'] = 1
+
     parameters['show_user'] = show_user
-    parameters['lang'] = lang
     parameters['rpp'] = per_page
     parameters['page'] = page
+    if result_type in ["mixed", "popular", "recent"]:
+      parameters['result_type'] = result_type
 
     # Make and send requests
     url  = 'http://search.twitter.com/search.json'
@@ -2620,7 +2658,7 @@ class Api(object):
     if retweets:
       parameters['include_rts'] = True
     if include_entities:
-      parameters['include_entities'] = True
+      parameters['include_entities'] = 1
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
     return [Status.NewFromJsonDict(x) for x in data]
@@ -2634,6 +2672,7 @@ class Api(object):
                       count=None,
                       page=None,
                       include_rts=None,
+                      trim_user=None,
                       include_entities=None,
                       exclude_replies=None):
     '''Fetch the sequence of public Status messages for a single user.
@@ -2670,6 +2709,10 @@ class Api(object):
       include_rts:
         If True, the timeline will contain native retweets (if they
         exist) in addition to the standard stream of tweets. [Optional]
+      trim_user:
+        If True, statuses will only contain the numerical user ID only.
+        Otherwise a full user object will be returned for each status.
+        [Optional]
       include_entities:
         If True, each tweet will include a node called "entities,".
         This node offers a variety of metadata about the tweet in a
@@ -2728,6 +2771,9 @@ class Api(object):
 
     if include_entities:
       parameters['include_entities'] = 1
+
+    if trim_user:
+      parameters['trim_user'] = 1
 
     if exclude_replies:
       parameters['exclude_replies'] = 1
