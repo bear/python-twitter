@@ -20,7 +20,6 @@ __author__ = 'python-twitter@googlegroups.com'
 __version__ = '0.8.3'
 
 
-import base64
 import calendar
 import datetime
 import httplib
@@ -30,7 +29,6 @@ import sys
 import tempfile
 import textwrap
 import time
-import calendar
 import urllib
 import urllib2
 import urlparse
@@ -2996,11 +2994,21 @@ class Api(object):
       url = '%s/statuses/friends/%s.json' % (self.base_url, user)
     else:
       url = '%s/statuses/friends.json' % self.base_url
+    result = []
     parameters = {}
-    parameters['cursor'] = cursor
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
-    return [User.NewFromJsonDict(x) for x in data['users']]
+    while True:
+      parameters['cursor'] = cursor
+      json = self._FetchUrl(url, parameters=parameters)
+      data = self._ParseAndCheckTwitter(json)
+      result += [User.NewFromJsonDict(x) for x in data['users']]
+      if 'next_cursor' in data:
+        if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+          break
+        else:
+          cursor = data['next_cursor']
+      else:
+        break
+    return result
 
   def GetFriendIDs(self, user=None, cursor=-1):
       '''Returns a list of twitter user id's for every person
@@ -3060,6 +3068,7 @@ class Api(object):
       raise TwitterError("twitter.Api instance must be authenticated")
     url = '%s/statuses/followers.json' % self.base_url
     result = []
+    parameters = {}
     while True:
       parameters = { 'cursor': cursor }
       json = self._FetchUrl(url, parameters=parameters)
@@ -3068,6 +3077,8 @@ class Api(object):
       if 'next_cursor' in data:
         if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
           break
+        else:
+          cursor = data['next_cursor']
       else:
         break
     return result
