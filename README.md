@@ -20,6 +20,10 @@ Install the dependencies:
 - [SimpleGeo's OAuth2](http://github.com/simplegeo/python-oauth2) or [OAuth2](http://pypi.python.org/pypi/oauth2)
 - [HTTPLib2](http://code.google.com/p/httplib2/) (installed along with `oauth2` if you use `setuptools`)
 
+Alternatively use `pip`:
+ 
+    $ pip install -r requirements.txt
+
 Download the latest `python-twitter` library from: http://code.google.com/p/python-twitter/
 
 Extract the source distribution and run:
