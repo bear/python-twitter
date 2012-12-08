@@ -1,0 +1,5 @@
+argparse==1.2.1
+distribute==0.6.24
+httplib2==0.7.7
+oauth2==1.5.211
+wsgiref==0.1.2
