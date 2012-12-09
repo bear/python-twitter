@@ -441,9 +441,9 @@ class ApiTest(unittest.TestCase):
 
   def testGetFollowers(self):
     '''Test the twitter.Api GetFollowers method'''
-    self._AddHandler('https://api.twitter.com/1/statuses/followers.json?page=1',
+    self._AddHandler('https://api.twitter.com/1/statuses/followers.json?cursor=-1',
                      curry(self._OpenTestData, 'followers.json'))
-    users = self._api.GetFollowers(page=1)
+    users = self._api.GetFollowers()
     # This is rather arbitrary, but spot checking is better than nothing
     alexkingorg = [u.status for u in users if u.screen_name == 'alexkingorg']
     self.assertEqual(89554432, alexkingorg[0].id)

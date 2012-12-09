@@ -3122,7 +3122,7 @@ class Api(object):
       parameters = { 'cursor': cursor }
       json = self._FetchUrl(url, parameters=parameters)
       data = self._ParseAndCheckTwitter(json)
-      result += [User.NewFromJsonDict(x) for x in data['users']]
+      result += [User.NewFromJsonDict(x) for x in data]
       if 'next_cursor' in data:
         if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
           break
