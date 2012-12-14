@@ -3045,7 +3045,7 @@ class Api(object):
     if not self._oauth_consumer:
       raise TwitterError("twitter.Api instance must be authenticated")
     if user:
-      url = '%s/statuses/followers/%s.json' % (self.base_url, user)
+      url = '%s/statuses/followers/%s.json' % (self.base_url, user.GetId())
     else:
       url = '%s/statuses/followers.json' % self.base_url
     result = []
@@ -3054,7 +3054,7 @@ class Api(object):
       parameters = { 'cursor': cursor }
       json = self._FetchUrl(url, parameters=parameters)
       data = self._ParseAndCheckTwitter(json)
-      result += [User.NewFromJsonDict(x) for x in data]
+      result += [User.NewFromJsonDict(x) for x in data['users']]
       if 'next_cursor' in data:
         if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
           break
