@@ -422,6 +422,13 @@ class ApiTest(unittest.TestCase):
     statuses = self._api.GetReplies(page=1)
     self.assertEqual(36657062, statuses[0].id)
 
+  def testGetRetweetsOfMe(self):
+    '''Test the twitter.API GetRetweetsOfMe method'''
+    self._AddHandler('https://api.twitter.com/1/statuses/retweets_of_me.json',
+        curry(self._OpenTestData, 'retweets_of_me.json'))
+    retweets = self._api.GetRetweetsOfMe()
+    self.assertEqual(253650670274637824, retweets[0].id)
+
   def testGetFriends(self):
     '''Test the twitter.Api GetFriends method'''
     self._AddHandler('https://api.twitter.com/1/statuses/friends.json?cursor=123',

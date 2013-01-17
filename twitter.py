@@ -2953,6 +2953,57 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return [Status.NewFromJsonDict(s) for s in data]
 
+  def GetRetweetsOfMe(self,
+                      count=None,
+                      since_id=None,
+                      max_id=None,
+                      trim_user=False,
+                      include_entities=True,
+                      include_user_entities=True):
+    '''Returns up to 100 of the most recent tweets of the user that have been
+    retweeted by others.
+
+    Args:
+      count:
+        The number of retweets to retrieve, up to 100. If omitted, 20 is
+        assumed.
+      since_id:
+        Returns results with an ID greater than (newer than) this ID.
+      max_id:
+        Returns results with an ID less than or equal to this ID.
+      trim_user:
+        When True, the user object for each tweet will only be an ID.
+      include_entities:
+        When True, the tweet entities will be included.
+      include_user_entities:
+        When True, the user entities will be included.
+    '''
+    if not self._oauth_consumer:
+      raise TwitterError("The twitter.Api instance must be authenticated.")
+    url = '%s/statuses/retweets_of_me.json' % self.base_url
+    parameters = {}
+    if count is not None:
+      try:
+        if int(count) > 100:
+          raise TwitterError("'count' may not be greater than 100")
+      except ValueError:
+        raise TwitterError("'count' must be an integer")
+    if count:
+      parameters['count'] = count
+    if since_id:
+      parameters['since_id'] = since_id
+    if max_id:
+      parameters['max_id'] = max_id
+    if trim_user:
+      parameters['trim_user'] = trim_user
+    if not include_entities:
+      parameters['include_entities'] = include_entities
+    if not include_user_entities:
+      parameters['include_user_entities'] = include_user_entities
+    json = self._FetchUrl(url, parameters=parameters)
+    data = self._ParseAndCheckTwitter(json)
+    return [Status.NewFromJsonDict(s) for s in data]
+
   def GetFriends(self, user=None, cursor=-1):
     '''Fetch the sequence of twitter.User instances, one for each friend.
 
