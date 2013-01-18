@@ -156,7 +156,7 @@ class Status(object):
         A twitter.User instance representing the person posting the
         message. [Optional]
       now:
-        The current time, if the client choses to set it.
+        The current time, if the client chooses to set it.
         Defaults to the wall clock time. [Optional]
       urls:
       user_mentions:
@@ -359,7 +359,7 @@ class Status(object):
                       doc='The geolocation string of this status message')
 
   def GetRelativeCreatedAt(self):
-    '''Get a human redable string representing the posting time
+    '''Get a human readable string representing the posting time
 
     Returns:
       A human readable string representing the posting time
@@ -389,24 +389,24 @@ class Status(object):
                                      'the posting time')
 
   def GetUser(self):
-    '''Get a twitter.User reprenting the entity posting this status message.
+    '''Get a twitter.User representing the entity posting this status message.
 
     Returns:
-      A twitter.User reprenting the entity posting this status message
+      A twitter.User representing the entity posting this status message
     '''
     return self._user
 
   def SetUser(self, user):
-    '''Set a twitter.User reprenting the entity posting this status message.
+    '''Set a twitter.User representing the entity posting this status message.
 
     Args:
       user:
-        A twitter.User reprenting the entity posting this status message
+        A twitter.User representing the entity posting this status message
     '''
     self._user = user
 
   user = property(GetUser, SetUser,
-                  doc='A twitter.User reprenting the entity posting this '
+                  doc='A twitter.User representing the entity posting this '
                       'status message')
 
   def GetNow(self):
@@ -2012,7 +2012,7 @@ class DirectMessage(object):
                          recipient_screen_name=data.get('recipient_screen_name', None))
 
 class Hashtag(object):
-  ''' A class represeinting a twitter hashtag
+  ''' A class representing a twitter hashtag
   '''
   def __init__(self,
                text=None):
@@ -2298,7 +2298,7 @@ class Api(object):
         Returns results with an ID greater than (that is, more recent
         than) the specified ID. There are limits to the number of
         Tweets which can be accessed through the API. If the limit of
-        Tweets has occured since the since_id, the since_id will be
+        Tweets has occurred since the since_id, the since_id will be
         forced to the oldest ID available. [Optional]
       max_id:
         Returns only statuses with an ID less than (that is, older
@@ -2497,7 +2497,7 @@ class Api(object):
         Currently only exclude=hashtags is supported. [Optional]
     Returns:
       A list with each entry contains the twitter.
-      Trend elements of trending topics for the corrsponding day of the week
+      Trend elements of trending topics for the corresponding day of the week
     '''
     parameters = {}
     if exclude:
@@ -2550,7 +2550,7 @@ class Api(object):
         Returns results with an ID greater than (that is, more recent
         than) the specified ID. There are limits to the number of
         Tweets which can be accessed through the API. If the limit of
-        Tweets has occured since the since_id, the since_id will be
+        Tweets has occurred since the since_id, the since_id will be
         forced to the oldest ID available. [Optional]
       retweets:
         If True, the timeline will contain native retweets. [Optional]
@@ -2614,18 +2614,18 @@ class Api(object):
         Specifies the ID or screen name of the user for whom to return
         the user_timeline. [Optional]
       user_id:
-        Specfies the ID of the user for whom to return the
+        Specifies the ID of the user for whom to return the
         user_timeline. Helpful for disambiguating when a valid user ID
         is also a valid screen name. [Optional]
       screen_name:
-        Specfies the screen name of the user for whom to return the
+        Specifies the screen name of the user for whom to return the
         user_timeline. Helpful for disambiguating when a valid screen
         name is also a user ID. [Optional]
       since_id:
         Returns results with an ID greater than (that is, more recent
         than) the specified ID. There are limits to the number of
         Tweets which can be accessed through the API. If the limit of
-        Tweets has occured since the since_id, the since_id will be
+        Tweets has occurred since the since_id, the since_id will be
         forced to the oldest ID available. [Optional]
       max_id:
         Returns only statuses with an ID less than (that is, older
@@ -2861,7 +2861,7 @@ class Api(object):
          Returns results with an ID greater than (that is, more recent
          than) the specified ID. There are limits to the number of
          Tweets which can be accessed through the API. If the limit of
-         Tweets has occured since the since_id, the since_id will be
+         Tweets has occurred since the since_id, the since_id will be
          forced to the oldest ID available. [Optional]
        max_id:
          Returns results with an ID less than (that is, older than) or
@@ -2910,7 +2910,7 @@ class Api(object):
         Returns results with an ID greater than (that is, more recent
         than) the specified ID. There are limits to the number of
         Tweets which can be accessed through the API. If the limit of
-        Tweets has occured since the since_id, the since_id will be
+        Tweets has occurred since the since_id, the since_id will be
         forced to the oldest ID available. [Optional]
       page:
         Specifies the page of results to retrieve.
@@ -3208,7 +3208,7 @@ class Api(object):
         Returns results with an ID greater than (that is, more recent
         than) the specified ID. There are limits to the number of
         Tweets which can be accessed through the API. If the limit of
-        Tweets has occured since the since_id, the since_id will be
+        Tweets has occurred since the since_id, the since_id will be
         forced to the oldest ID available. [Optional]
       page:
         Specifies the page of results to retrieve.
@@ -3374,7 +3374,7 @@ class Api(object):
         Returns results with an ID greater than (that is, more recent
         than) the specified ID. There are limits to the number of
         Tweets which can be accessed through the API. If the limit of
-        Tweets has occured since the since_id, the since_id will be
+        Tweets has occurred since the since_id, the since_id will be
         forced to the oldest ID available. [Optional]
       max_id:
         Returns only statuses with an ID less than
@@ -3704,7 +3704,7 @@ class Api(object):
     return 60
 
   def _BuildUrl(self, url, path_elements=None, extra_params=None):
-    # Break url into consituent parts
+    # Break url into constituent parts
     (scheme, netloc, path, params, query, fragment) = urlparse.urlparse(url)
 
     # Add any additional path elements to the path
