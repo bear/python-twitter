@@ -3873,10 +3873,12 @@ class Api(object):
 
     http_handler  = self._urllib.HTTPHandler(debuglevel=_debug)
     https_handler = self._urllib.HTTPSHandler(debuglevel=_debug)
+    proxy_handler = self._urllib.ProxyHandler({'http': str(os.environ['http_proxy']), 'https': str(os.environ['http_proxy']) })
 
     opener = self._urllib.OpenerDirector()
     opener.add_handler(http_handler)
     opener.add_handler(https_handler)
+    opener.add_handler(proxy_handler)
 
     if use_gzip_compression is None:
       use_gzip = self._use_gzip
