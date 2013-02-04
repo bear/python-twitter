@@ -3063,22 +3063,31 @@ class Api(object):
       data = self._ParseAndCheckTwitter(json)
       return data
 
-  def GetFollowerIDs(self, userid=None, cursor=-1):
-    '''Fetch the sequence of twitter.User instances, one for each follower
+  def GetFollowerIDs(self, user=None, cursor=-1):
+      '''Returns a list of twitter user id's for every person
+      that is following the specified user.
 
-    The twitter.Api instance must be authenticated.
+      Args:
+        user:
+          The id or screen_name of the user to retrieve the id list for
+          [Optional]
 
-    Returns:
-      A sequence of twitter.User instances, one for each follower
-    '''
-    url = '%s/followers/ids.json' % self.base_url
-    parameters = {}
-    parameters['cursor'] = cursor
-    if userid:
-      parameters['user_id'] = userid
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
-    return data
+      Returns:
+        A list of integers, one for each user id.
+      '''
+
+      if not user and not self._oauth_consumer:
+          raise TwitterError("twitter.Api instance must be authenticated")
+      if user:
+          url = '%s/followers/ids/%s.json' % (self.base_url, user)
+      else:
+          url = '%s/followers/ids.json' % self.base_url
+
+      parameters = {}
+      parameters['cursor'] = cursor
+      json = self._FetchUrl(url, parameters=parameters)
+      data = self._ParseAndCheckTwitter(json)
+      return data
 
   def GetFollowers(self, user=None, cursor=-1):
     '''Fetch the sequence of twitter.User instances, one for each follower
