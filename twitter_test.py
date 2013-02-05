@@ -356,7 +356,7 @@ class ApiTest(unittest.TestCase):
     api = twitter.Api(consumer_key='CONSUMER_KEY',
                       consumer_secret='CONSUMER_SECRET',
                       access_token_key='OAUTH_TOKEN',
-                      access_token_secret='OAUTH_SECRET', 
+                      access_token_secret='OAUTH_SECRET',
                       cache=None)
     api.SetUrllib(self._urllib)
     self._api = api
@@ -534,9 +534,12 @@ class MockUrllib(object):
 
   def HTTPSHandler(self, *args, **kwargs):
       return None
-  
+
   def OpenerDirector(self):
       return self.build_opener()
+
+  def ProxyHandler(self,*args,**kwargs):
+      return None
 
 class MockOpener(object):
   '''A mock opener for urllib'''
@@ -548,20 +551,20 @@ class MockOpener(object):
   def open(self, url, data=None):
     if self._opened:
       raise Exception('MockOpener already opened.')
-  
+
     # Remove parameters from URL - they're only added by oauth and we
-    # don't want to test oauth 
+    # don't want to test oauth
     if '?' in url:
         # We split using & and filter on the beginning of each key
         # This is crude but we have to keep the ordering for now
         (url, qs) = url.split('?')
-        
-        tokens = [token for token in qs.split('&') 
+
+        tokens = [token for token in qs.split('&')
                   if not token.startswith('oauth')]
-        
+
         if len(tokens) > 0:
             url = "%s?%s"%(url, '&'.join(tokens))
-  
+
     if url in self._handlers:
       self._opened = True
       return self._handlers[url]()
