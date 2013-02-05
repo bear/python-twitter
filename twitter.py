@@ -125,6 +125,7 @@ class Status(object):
                urls=None,
                user_mentions=None,
                hashtags=None,
+               media=None,
                geo=None,
                place=None,
                coordinates=None,
@@ -185,6 +186,7 @@ class Status(object):
     self.urls = urls
     self.user_mentions = user_mentions
     self.hashtags = hashtags
+    self.media = media
     self.geo = geo
     self.place = place
     self.coordinates = coordinates
@@ -612,6 +614,7 @@ class Status(object):
     urls = None
     user_mentions = None
     hashtags = None
+    media = None
     if 'entities' in data:
       if 'urls' in data['entities']:
         urls = [Url.NewFromJsonDict(u) for u in data['entities']['urls']]
@@ -619,6 +622,10 @@ class Status(object):
         user_mentions = [User.NewFromJsonDict(u) for u in data['entities']['user_mentions']]
       if 'hashtags' in data['entities']:
         hashtags = [Hashtag.NewFromJsonDict(h) for h in data['entities']['hashtags']]
+      if 'media' in data['entities']:
+        media = data['entities']['media']
+      else:
+        media = []
     return Status(created_at=data.get('created_at', None),
                   favorited=data.get('favorited', None),
                   id=data.get('id', None),
@@ -634,6 +641,7 @@ class Status(object):
                   urls=urls,
                   user_mentions=user_mentions,
                   hashtags=hashtags,
+                  media=media,
                   geo=data.get('geo', None),
                   place=data.get('place', None),
                   coordinates=data.get('coordinates', None),
