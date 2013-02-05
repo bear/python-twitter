@@ -2777,7 +2777,7 @@ class Api(object):
                             for x in status.split(' ')])
     return len(shortened)
 
-  def PostUpdate(self, status, in_reply_to_status_id=None):
+  def PostUpdate(self, status, in_reply_to_status_id=None, latitude=None, longitude=None):
     '''Post a twitter status message from the authenticated user.
 
     The twitter.Api instance must be authenticated.
@@ -2792,6 +2792,16 @@ class Api(object):
         attribute of the resulting status to the user ID of the
         message being replied to.  Invalid/missing status IDs will be
         ignored. [Optional]
+      latitude:
+        Latitude coordinate of the tweet in degrees. Will only work
+        in conjunction with longitude argument. Both longitude and
+        latitude will be ignored by twitter if the user has a false
+        geo_enabled setting. [Optional]
+      longitude:
+        Longitude coordinate of the tweet in degrees. Will only work
+        in conjunction with latitude argument. Both longitude and
+        latitude will be ignored by twitter if the user has a false
+        geo_enabled setting. [Optional]
     Returns:
       A twitter.Status instance representing the message posted.
     '''
@@ -2812,6 +2822,9 @@ class Api(object):
     data = {'status': status}
     if in_reply_to_status_id:
       data['in_reply_to_status_id'] = in_reply_to_status_id
+    if latitude != None and longitude != None:
+        data['lat']     = str(latitude)
+        data['long']    = str(longitude)
     json = self._FetchUrl(url, post_data=data)
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)

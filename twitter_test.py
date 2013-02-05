@@ -415,6 +415,17 @@ class ApiTest(unittest.TestCase):
     # This is rather arbitrary, but spot checking is better than nothing
     self.assertEqual(u'Моё судно на воздушной подушке полно угрей', status.text)
 
+  def testPostUpdateLatLon(self):
+    '''Test the twitter.Api PostUpdate method, when used in conjunction with latitude and longitude'''
+    self._AddHandler('https://api.twitter.com/1/statuses/update.json',
+                     curry(self._OpenTestData, 'update_latlong.json'))
+    #test another update with geo parameters, again test somewhat arbitrary
+    status = self._api.PostUpdate(u'Моё судно на воздушной подушке полно угрей'.encode('utf8'), latitude=54.2, longitude=-2)
+    self.assertEqual(u'Моё судно на воздушной подушке полно угрей', status.text)
+    self.assertEqual(u'Point',status.GetGeo()['type'])
+    self.assertEqual(26.2,status.GetGeo()['coordinates'][0])
+    self.assertEqual(127.5,status.GetGeo()['coordinates'][1])
+
   def testGetReplies(self):
     '''Test the twitter.Api GetReplies method'''
     self._AddHandler('https://api.twitter.com/1/statuses/replies.json?page=1',
