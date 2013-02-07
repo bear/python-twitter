@@ -2158,6 +2158,7 @@ class Api(object):
       >>> api.GetFollowers()
       >>> api.GetFeatured()
       >>> api.GetDirectMessages()
+      >>> api.GetSentDirectMessages()
       >>> api.PostDirectMessage(user, text)
       >>> api.DestroyDirectMessage(id)
       >>> api.DestroyFriendship(user)
@@ -3248,6 +3249,42 @@ class Api(object):
       A sequence of twitter.DirectMessage instances
     '''
     url = '%s/direct_messages.json' % self.base_url
+    if not self._oauth_consumer:
+      raise TwitterError("The twitter.Api instance must be authenticated.")
+    parameters = {}
+    if since:
+      parameters['since'] = since
+    if since_id:
+      parameters['since_id'] = since_id
+    if page:
+      parameters['page'] = page
+    json = self._FetchUrl(url, parameters=parameters)
+    data = self._ParseAndCheckTwitter(json)
+    return [DirectMessage.NewFromJsonDict(x) for x in data]
+
+  def GetSentDirectMessages(self, since=None, since_id=None, page=None):
+    '''Returns a list of the direct messages sent by the authenticating user.
+
+    The twitter.Api instance must be authenticated.
+
+    Args:
+      since:
+        Narrows the returned results to just those statuses created
+        after the specified HTTP-formatted date. [Optional]
+      since_id:
+        Returns results with an ID greater than (that is, more recent
+        than) the specified ID. There are limits to the number of
+        Tweets which can be accessed through the API. If the limit of
+        Tweets has occured since the since_id, the since_id will be
+        forced to the oldest ID available. [Optional]
+      page:
+        Specifies the page of results to retrieve.
+        Note: there are pagination limits. [Optional]
+
+    Returns:
+      A sequence of twitter.DirectMessage instances
+    '''
+    url = '%s/direct_messages/sent.json' % self.base_url
     if not self._oauth_consumer:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     parameters = {}
