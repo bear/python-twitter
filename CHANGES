@@ -1,3 +1,13 @@
+2013-02-07
+  bumped version to 0.8.5
+  lots of changes have been happening on Github and i've been
+  very remiss in documenting them here in the Changes file :(
+
+  this version is the last v1.0 API release and it's being made
+  to push to PyPI and other places
+
+  all work now will be on getting the v1.1 API supported
+  
 2012-11-04
   https://github.com/bear/python-twitter/issues/4
   Api.UserLookUp() throws attribute error when corresponding screen_name is not found
