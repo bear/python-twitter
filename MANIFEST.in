@@ -2,7 +2,7 @@ include CHANGES
 include COPYING
 include LICENSE
 include NOTICE
-include README
+include README.md
 include *.py
 recursive-include examples *.py
 recursive-include doc *.html
