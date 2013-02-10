@@ -1,3 +1,17 @@
+2013-02-10
+  bumped version to 0.8.6
+
+  update requirements.txt to remove distribute reference
+  github commit 3b9214a879e5fbd03036a7d4ae86babc03784846
+
+  Merge pull request #33 from iElectric/profile_image_url_https
+  github commit 67cbb8390701c945a48094795474ca485f092049
+  patch by iElectric on github
+
+  Change User.NewFromJsonDict so that it will pull from either
+  profile_image_url_https or profile_image_url to keep older code
+  working properly if they have stored older json data
+
 2013-02-07
   bumped version to 0.8.5
   lots of changes have been happening on Github and i've been

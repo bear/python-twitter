@@ -17,7 +17,7 @@
 '''A library that provides a Python interface to the Twitter API'''
 
 __author__ = 'python-twitter@googlegroups.com'
-__version__ = '0.8.5'
+__version__ = '0.8.6'
 
 
 import calendar
@@ -1356,7 +1356,7 @@ class User(object):
                 followers_count=data.get('followers_count', None),
                 favourites_count=data.get('favourites_count', None),
                 friends_count=data.get('friends_count', None),
-                profile_image_url=data.get('profile_image_url_https', None),
+                profile_image_url=data.get('profile_image_url_https', data.get('profile_image_url', None)),
                 profile_background_tile = data.get('profile_background_tile', None),
                 profile_background_image_url = data.get('profile_background_image_url', None),
                 profile_sidebar_fill_color = data.get('profile_sidebar_fill_color', None),
