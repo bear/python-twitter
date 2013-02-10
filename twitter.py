@@ -1356,7 +1356,7 @@ class User(object):
                 followers_count=data.get('followers_count', None),
                 favourites_count=data.get('favourites_count', None),
                 friends_count=data.get('friends_count', None),
-                profile_image_url=data.get('profile_image_url', None),
+                profile_image_url=data.get('profile_image_url_https', None),
                 profile_background_tile = data.get('profile_background_tile', None),
                 profile_background_image_url = data.get('profile_background_image_url', None),
                 profile_sidebar_fill_color = data.get('profile_sidebar_fill_color', None),
@@ -2399,7 +2399,7 @@ class Api(object):
         # Build user object with new request
         temp.user = self.GetUser(urllib.quote(x['from_user']))
       else:
-        temp.user = User(screen_name=x['from_user'], profile_image_url=x['profile_image_url'])
+        temp.user = User(screen_name=x['from_user'], profile_image_url=x['profile_image_url_https'])
 
       results.append(temp)
 
