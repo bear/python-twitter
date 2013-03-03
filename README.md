@@ -109,14 +109,6 @@ To see if your credentials are successful:
 
 **NOTE -** much more than the small sample given here will print
 
-To fetch the most recently posted public Twitter status messages:
-
-```
->>> statuses = api.GetPublicTimeline()
->>> print [s.user.name for s in statuses]
-[u'DeWitt', u'Kesuke Miyagi', u'ev', u'Buzz Andersen', u'Biz Stone']
-```
-
 To fetch a single user's public status messages, where `user` is either
 a Twitter *short name* or their user id.
 

@@ -1,3 +1,9 @@
+2013-03-03
+  bumped version to 0.8.7
+
+  removed GetPublicTimeline from the docs so as to stop confusing
+  new folks since it was the first example given ... d'oh!
+  
 2013-02-10
   bumped version to 0.8.6
 

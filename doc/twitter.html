@@ -79,12 +79,6 @@ Example&nbsp;usage:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;import&nbsp;twitter<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api&nbsp;=&nbsp;twitter.<a href="#Api">Api</a>()<br>
 &nbsp;<br>
-&nbsp;&nbsp;To&nbsp;fetch&nbsp;the&nbsp;most&nbsp;recently&nbsp;posted&nbsp;public&nbsp;twitter&nbsp;status&nbsp;messages:<br>
-&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;statuses&nbsp;=&nbsp;api.<a href="#Api-GetPublicTimeline">GetPublicTimeline</a>()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;print&nbsp;[s.user.name&nbsp;for&nbsp;s&nbsp;in&nbsp;statuses]<br>
-&nbsp;&nbsp;&nbsp;&nbsp;[u'DeWitt',&nbsp;u'Kesuke&nbsp;Miyagi',&nbsp;u'ev',&nbsp;u'Buzz&nbsp;Andersen',&nbsp;u'Biz&nbsp;Stone']&nbsp;#...<br>
-&nbsp;<br>
 &nbsp;&nbsp;To&nbsp;fetch&nbsp;a&nbsp;single&nbsp;user's&nbsp;public&nbsp;status&nbsp;messages,&nbsp;where&nbsp;"user"&nbsp;is&nbsp;either<br>
 &nbsp;&nbsp;a&nbsp;Twitter&nbsp;"short&nbsp;name"&nbsp;or&nbsp;their&nbsp;user&nbsp;id.<br>
 &nbsp;<br>
@@ -421,27 +415,6 @@ Args:<br>
 &nbsp;<br>
 Returns:<br>
 &nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;mention&nbsp;of&nbsp;the&nbsp;user.</tt></dd></dl>
-
-<dl><dt><a name="Api-GetPublicTimeline"><strong>GetPublicTimeline</strong></a>(self, since_id<font color="#909090">=None</font>, include_rts<font color="#909090">=None</font>, include_entities<font color="#909090">=None</font>)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;public&nbsp;twitter.<a href="#Status">Status</a>&nbsp;message&nbsp;for&nbsp;all&nbsp;users.<br>
-&nbsp;<br>
-Args:<br>
-&nbsp;&nbsp;since_id:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;results&nbsp;with&nbsp;an&nbsp;ID&nbsp;greater&nbsp;than&nbsp;(that&nbsp;is,&nbsp;more&nbsp;recent<br>
-&nbsp;&nbsp;&nbsp;&nbsp;than)&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;There&nbsp;are&nbsp;limits&nbsp;to&nbsp;the&nbsp;number&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;which&nbsp;can&nbsp;be&nbsp;accessed&nbsp;through&nbsp;the&nbsp;API.&nbsp;If&nbsp;the&nbsp;limit&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;has&nbsp;occured&nbsp;since&nbsp;the&nbsp;since_id,&nbsp;the&nbsp;since_id&nbsp;will&nbsp;be<br>
-&nbsp;&nbsp;&nbsp;&nbsp;forced&nbsp;to&nbsp;the&nbsp;oldest&nbsp;ID&nbsp;available.&nbsp;[Optional]<br>
-&nbsp;&nbsp;include_rts:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;True,&nbsp;the&nbsp;timeline&nbsp;will&nbsp;contain&nbsp;native&nbsp;retweets&nbsp;(if&nbsp;they<br>
-&nbsp;&nbsp;&nbsp;&nbsp;exist)&nbsp;in&nbsp;addition&nbsp;to&nbsp;the&nbsp;standard&nbsp;stream&nbsp;of&nbsp;tweets.&nbsp;[Optional]<br>
-&nbsp;&nbsp;include_entities:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;True,&nbsp;each&nbsp;tweet&nbsp;will&nbsp;include&nbsp;a&nbsp;node&nbsp;called&nbsp;"entities,".<br>
-&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;node&nbsp;offers&nbsp;a&nbsp;variety&nbsp;of&nbsp;metadata&nbsp;about&nbsp;the&nbsp;tweet&nbsp;in&nbsp;a<br>
-&nbsp;&nbsp;&nbsp;&nbsp;discreet&nbsp;structure,&nbsp;including:&nbsp;user_mentions,&nbsp;urls,&nbsp;and<br>
-&nbsp;&nbsp;&nbsp;&nbsp;hashtags.&nbsp;[Optional]<br>
-&nbsp;<br>
-Returns:<br>
-&nbsp;&nbsp;An&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;message</tt></dd></dl>
 
 <dl><dt><a name="Api-GetRateLimitStatus"><strong>GetRateLimitStatus</strong></a>(self)</dt><dd><tt>Fetch&nbsp;the&nbsp;rate&nbsp;limit&nbsp;status&nbsp;for&nbsp;the&nbsp;currently&nbsp;authorized&nbsp;user.<br>
 &nbsp;<br>
