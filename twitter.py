@@ -2824,9 +2824,9 @@ class Api(object):
     else:
       u_status = unicode(status, self._input_encoding)
 
-    if self._calculate_status_length(u_status, self._shortlink_size) > CHARACTER_LIMIT:
-      raise TwitterError("Text must be less than or equal to %d characters. "
-                         "Consider using PostUpdates." % CHARACTER_LIMIT)
+    #if self._calculate_status_length(u_status, self._shortlink_size) > CHARACTER_LIMIT:
+    #  raise TwitterError("Text must be less than or equal to %d characters. "
+    #                     "Consider using PostUpdates." % CHARACTER_LIMIT)
 
     data = {'status': status}
     if in_reply_to_status_id:
