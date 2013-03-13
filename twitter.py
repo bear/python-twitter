@@ -2291,18 +2291,16 @@ class Api(object):
                 since_id=None,
                 max_id=None,
                 until=None,
-                per_page=15,
-                page=1,
+                count=15,
                 lang=None,
-                show_user="true",
+                locale=None,
                 result_type="mixed",
-                include_entities=None,
-                query_users=False):
+                include_entities=None):
     '''Return twitter search results for a given term.
 
     Args:
       term:
-        term to search by. Optional if you include geocode.
+        Term to search by. Optional if you include geocode.
       since_id:
         Returns results with an ID greater than (that is, more recent
         than) the specified ID. There are limits to the number of
@@ -2316,18 +2314,17 @@ class Api(object):
         Returns tweets generated before the given date. Date should be
         formatted as YYYY-MM-DD. [Optional]
       geocode:
-        geolocation information in the form (latitude, longitude, radius)
+        Geolocation information in the form (latitude, longitude, radius)
         [Optional]
-      per_page:
-        number of results to return.  Default is 15 [Optional]
-      page:
-        Specifies the page of results to retrieve.
-        Note: there are pagination limits. [Optional]
+      count:
+        Number of results to return.  Default is 15 [Optional]
       lang:
-        language for results as ISO 639-1 code.  Default is None (all languages)
+        Language for results as ISO 639-1 code.  Default is None (all languages)
         [Optional]
-      show_user:
-        prefixes screen name in status
+      locale:
+        Language of the search query. Currently only 'ja' is effective. This is
+        intended for language-specific consumers and the default should work in
+        the majority of cases.
       result_type:
         Type of result which should be returned.  Default is "mixed".  Other
         valid options are "recent" and "popular". [Optional]
@@ -2336,11 +2333,6 @@ class Api(object):
         This node offers a variety of metadata about the tweet in a
         discreet structure, including: user_mentions, urls, and
         hashtags. [Optional]
-      query_users:
-        If set to False, then all users only have screen_name and
-        profile_image_url available.
-        If set to True, all information of users are available,
-        but it uses lots of request quota, one per status.
 
     Returns:
       A sequence of twitter.Status instances, one for each message containing
@@ -2367,6 +2359,9 @@ class Api(object):
     if lang:
       parameters['lang'] = lang
 
+    if locale:
+      parameters['locale'] = locale
+
     if term is None and geocode is None:
       return []
 
@@ -2379,32 +2374,21 @@ class Api(object):
     if include_entities:
       parameters['include_entities'] = 1
 
-    parameters['show_user'] = show_user
-    parameters['rpp'] = per_page
-    parameters['page'] = page
+    try:
+        parameters['count'] = int(count)
+    except:
+        raise TwitterError("count must be an integer")
+
     if result_type in ["mixed", "popular", "recent"]:
       parameters['result_type'] = result_type
 
     # Make and send requests
-    url  = 'http://search.twitter.com/search.json'
+    url  = '%s/search/tweets.json' % self.base_url
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
 
-    results = []
-
-    for x in data['results']:
-      temp = Status.NewFromJsonDict(x)
-
-      if query_users:
-        # Build user object with new request
-        temp.user = self.GetUser(urllib.quote(x['from_user']))
-      else:
-        temp.user = User(screen_name=x['from_user'], profile_image_url=x['profile_image_url_https'])
-
-      results.append(temp)
-
     # Return built list of statuses
-    return results # [Status.NewFromJsonDict(x) for x in data['results']]
+    return [Status.NewFromJsonDict(x) for x in data['statuses']]
 
   def GetTrendsCurrent(self, exclude=None):
     '''Get the current top trending topics
