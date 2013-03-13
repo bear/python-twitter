@@ -415,6 +415,13 @@ class ApiTest(unittest.TestCase):
     # This is rather arbitrary, but spot checking is better than nothing
     self.assertEqual(u'Моё судно на воздушной подушке полно угрей', status.text)
 
+  def testPostRetweet(self):
+    '''Test the twitter.Api PostRetweet method'''
+    self._AddHandler('https://api.twitter.com/1/statuses/retweet/89512102.json',
+                     curry(self._OpenTestData, 'retweet.json'))
+    status = self._api.PostRetweet(89512102)
+    self.assertEqual(89512102, status.id)
+
   def testPostUpdateLatLon(self):
     '''Test the twitter.Api PostUpdate method, when used in conjunction with latitude and longitude'''
     self._AddHandler('https://api.twitter.com/1/statuses/update.json',
