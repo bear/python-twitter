@@ -2588,25 +2588,19 @@ class Api(object):
     return [Status.NewFromJsonDict(x) for x in data]
 
   def GetUserTimeline(self,
-                      id=None,
                       user_id=None,
                       screen_name=None,
                       since_id=None,
                       max_id=None,
                       count=None,
-                      page=None,
                       include_rts=None,
                       trim_user=None,
-                      include_entities=None,
                       exclude_replies=None):
     '''Fetch the sequence of public Status messages for a single user.
 
     The twitter.Api instance must be authenticated if the user is private.
 
     Args:
-      id:
-        Specifies the ID or screen name of the user for whom to return
-        the user_timeline. [Optional]
       user_id:
         Specifies the ID of the user for whom to return the
         user_timeline. Helpful for disambiguating when a valid user ID
@@ -2627,9 +2621,6 @@ class Api(object):
       count:
         Specifies the number of statuses to retrieve. May not be
         greater than 200.  [Optional]
-      page:
-        Specifies the page of results to retrieve.
-        Note: there are pagination limits. [Optional]
       include_rts:
         If True, the timeline will contain native retweets (if they
         exist) in addition to the standard stream of tweets. [Optional]
@@ -2637,12 +2628,7 @@ class Api(object):
         If True, statuses will only contain the numerical user ID only.
         Otherwise a full user object will be returned for each status.
         [Optional]
-      include_entities:
-        If True, each tweet will include a node called "entities,".
-        This node offers a variety of metadata about the tweet in a
-        discreet structure, including: user_mentions, urls, and
-        hashtags. [Optional]
-       exclude_replies:
+      exclude_replies:
         If True, this will prevent replies from appearing in the returned
         timeline. Using exclude_replies with the count parameter will mean you
         will receive up-to count tweets - this is because the count parameter
@@ -2654,17 +2640,12 @@ class Api(object):
     '''
     parameters = {}
 
-    if id:
-      url = '%s/statuses/user_timeline/%s.json' % (self.base_url, id)
-    elif user_id:
-      url = '%s/statuses/user_timeline.json?user_id=%d' % (self.base_url, user_id)
+    url = '%s/statuses/user_timeline.json' % (self.base_url)
+
+    if user_id:
+      parameters['user_id'] = user_id
     elif screen_name:
-      url = ('%s/statuses/user_timeline.json?screen_name=%s' % (self.base_url,
-             screen_name))
-    elif not self._oauth_consumer:
-      raise TwitterError("User must be specified if API is not authenticated.")
-    else:
-      url = '%s/statuses/user_timeline.json' % self.base_url
+      parameters['screen_name'] = screen_name
 
     if since_id:
       try:
@@ -2684,17 +2665,8 @@ class Api(object):
       except:
         raise TwitterError("count must be an integer")
 
-    if page:
-      try:
-        parameters['page'] = int(page)
-      except:
-        raise TwitterError("page must be an integer")
-
     if include_rts:
       parameters['include_rts'] = 1
-
-    if include_entities:
-      parameters['include_entities'] = 1
 
     if trim_user:
       parameters['trim_user'] = 1
