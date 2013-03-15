@@ -133,7 +133,13 @@ class Status(object):
                contributors=None,
                retweeted=None,
                retweeted_status=None,
-               retweet_count=None):
+               current_user_retweet=None,
+               retweet_count=None,
+               possibly_sensitive=None,
+               scopes=None,
+               withheld_copyright=None,
+               withheld_in_countries=None,
+               withheld_scope=None):
     '''An object to hold a Twitter status message.
 
     This class is normally instantiated by the twitter.Api class and
@@ -169,7 +175,13 @@ class Status(object):
       contributors:
       retweeted:
       retweeted_status:
+      current_user_retweet:
       retweet_count:
+      possibly_sensitive:
+      scopes:
+      withheld_copyright:
+      withheld_in_countries:
+      withheld_scope:
     '''
     self.created_at = created_at
     self.favorited = favorited
@@ -193,7 +205,13 @@ class Status(object):
     self.coordinates = coordinates
     self.contributors = contributors
     self.retweeted_status = retweeted_status
+    self.current_user_retweet = current_user_retweet
     self.retweet_count = retweet_count
+    self.possibly_sensitive = possibly_sensitive
+    self.scopes = scopes
+    self.withheld_copyright = withheld_copyright
+    self.withheld_in_countries = withheld_in_countries
+    self.withheld_scope = withheld_scope
 
   def GetCreatedAt(self):
     '''Get the time this status message was posted.
@@ -495,6 +513,59 @@ class Status(object):
   retweet_count = property(GetRetweetCount, SetRetweetCount,
                            doc='')
 
+  def GetCurrent_user_retweet(self):
+    return self._current_user_retweet
+
+  def SetCurrent_user_retweet(self, current_user_retweet):
+    self._current_user_retweet = current_user_retweet
+
+  current_user_retweet = property(GetCurrent_user_retweet, SetCurrent_user_retweet,
+                                  doc='')
+
+  def GetPossibly_sensitive(self):
+    return self._possibly_sensitive
+
+  def SetPossibly_sensitive(self, possibly_sensitive):
+    self._possibly_sensitive = possibly_sensitive
+
+  possibly_sensitive = property(GetPossibly_sensitive, SetPossibly_sensitive,
+                                doc='')
+
+  def GetScopes(self):
+    return self._scopes
+
+  def SetScopes(self, scopes):
+    self._scopes = scopes
+
+  scopes = property(GetScopes, SetScopes, doc='')
+
+  def GetWithheld_copyright(self):
+    return self._withheld_copyright
+
+  def SetWithheld_copyright(self, withheld_copyright):
+    self._withheld_copyright = withheld_copyright
+
+  withheld_copyright = property(GetWithheld_copyright, SetWithheld_copyright,
+                                doc='')
+
+  def GetWithheld_in_countries(self):
+    return self._withheld_in_countries
+
+  def SetWithheld_in_countries(self, withheld_in_countries):
+    self._withheld_in_countries = withheld_in_countries
+
+  withheld_in_countries = property(GetWithheld_in_countries, SetWithheld_in_countries,
+                                doc='')
+
+  def GetWithheld_scope(self):
+    return self._withheld_scope
+
+  def SetWithheld_scope(self, withheld_scope):
+    self._withheld_scope = withheld_scope
+
+  withheld_scope = property(GetWithheld_scope, SetWithheld_scope,
+                                doc='')
+
   def __ne__(self, other):
     return not self.__eq__(other)
 
@@ -518,7 +589,13 @@ class Status(object):
              self.coordinates == other.coordinates and \
              self.contributors == other.contributors and \
              self.retweeted_status == other.retweeted_status and \
-             self.retweet_count == other.retweet_count
+             self.retweet_count == other.retweet_count and \
+             self.current_user_retweet == other.current_user_retweet and \
+             self.possibly_sensitive == other.possibly_sensitive and \
+             self.scopes == other.scopes and \
+             self.withheld_copyright == other.withheld_copyright and \
+             self.withheld_in_countries == other.withheld_in_countries and \
+             self.withheld_scope == other.withheld_scope
     except AttributeError:
       return False
 
@@ -593,6 +670,18 @@ class Status(object):
       data['urls'] = dict([(url.url, url.expanded_url) for url in self.urls])
     if self.user_mentions:
       data['user_mentions'] = [um.AsDict() for um in self.user_mentions]
+    if self.current_user_retweet:
+      data['current_user_retweet'] = self.current_user_retweet
+    if self.possibly_sensitive:
+      data['possibly_sensitive'] = self.possibly_sensitive
+    if self.scopes:
+      data['scopes'] = self.scopes
+    if self.withheld_copyright:
+      data['withheld_copyright'] = self.withheld_copyright
+    if self.withheld_in_countries:
+      data['withheld_in_countries'] = self.withheld_in_countries
+    if self.withheld_scope:
+      data['withheld_scope'] = self.withheld_scope
     return data
 
   @staticmethod
@@ -612,6 +701,12 @@ class Status(object):
       retweeted_status = Status.NewFromJsonDict(data['retweeted_status'])
     else:
       retweeted_status = None
+
+    if 'current_user_retweet' in data:
+      current_user_retweet = data['current_user_retweet']['id']
+    else:
+      current_user_retweet = None
+
     urls = None
     user_mentions = None
     hashtags = None
@@ -648,7 +743,13 @@ class Status(object):
                   coordinates=data.get('coordinates', None),
                   contributors=data.get('contributors', None),
                   retweeted_status=retweeted_status,
-                  retweet_count=data.get('retweet_count', None))
+                  current_user_retweet=current_user_retweet,
+                  retweet_count=data.get('retweet_count', None),
+                  possibly_sensitive=data.get('possibly_sensitive', None),
+                  scopes=data.get('scopes', None),
+                  withheld_copyright=data.get('withheld_copyright', None),
+                  withheld_in_countries=data.get('withheld_in_countries', None),
+                  withheld_scope=data.get('withheld_scope', None))
 
 
 class User(object):
