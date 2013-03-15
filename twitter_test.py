@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-#
+# vim: sw=2 ts=2 sts=2
 #
 # Copyright 2007 The Python-Twitter Developers
 #
