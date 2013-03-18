@@ -2947,7 +2947,7 @@ class Api(object):
     results.append(self.PostUpdate(lines[-1], **kwargs))
     return results
 
-  def PostRetweet(self, original_id):
+  def PostRetweet(self, original_id, trim_user=False):
     '''Retweet a tweet with the Retweet API.
 
     The twitter.Api instance must be authenticated.
@@ -2955,6 +2955,11 @@ class Api(object):
     Args:
       original_id:
         The numerical id of the tweet that will be retweeted
+      trim_user:
+        If True the returned payload will only contain the user IDs,
+        otherwise the payload will contain the full user data item.
+        [Optional]
+
     Returns:
       A twitter.Status instance representing the original tweet with retweet details embedded.
     '''
@@ -2962,14 +2967,16 @@ class Api(object):
       raise TwitterError("The twitter.Api instance must be authenticated.")
 
     try:
-        if int(original_id) <= 0:
-            raise TwitterError("'original_id' must be a positive number")
+      if int(original_id) <= 0:
+        raise TwitterError("'original_id' must be a positive number")
     except ValueError:
         raise TwitterError("'original_id' must be an integer")
 
     url = '%s/statuses/retweet/%s.json' % (self.base_url, original_id)
 
     data = {'id': original_id}
+    if trim_user:
+      data['trim_user'] = 'true' 
     json = self._FetchUrl(url, post_data=data)
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
