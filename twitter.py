@@ -2844,10 +2844,12 @@ class Api(object):
                             for x in status.split(' ')])
     return len(shortened)
 
-  def PostUpdate(self, status, in_reply_to_status_id=None, latitude=None, longitude=None):
+  def PostUpdate(self, status, in_reply_to_status_id=None, latitude=None, longitude=None, place_id=None, display_coordinates=False, trim_user=False):
     '''Post a twitter status message from the authenticated user.
 
     The twitter.Api instance must be authenticated.
+
+    https://dev.twitter.com/docs/api/1.1/post/statuses/update
 
     Args:
       status:
@@ -2869,6 +2871,16 @@ class Api(object):
         in conjunction with latitude argument. Both longitude and
         latitude will be ignored by twitter if the user has a false
         geo_enabled setting. [Optional]
+      place_id:
+        A place in the world. These IDs can be retrieved from 
+        GET geo/reverse_geocode. [Optional]
+      display_coordinates:
+        Whether or not to put a pin on the exact coordinates a tweet
+        has been sent from. [Optional]
+      trim_user:
+        If True the returned payload will only contain the user IDs,
+        otherwise the payload will contain the full user data item.
+        [Optional]
     Returns:
       A twitter.Status instance representing the message posted.
     '''
@@ -2889,9 +2901,15 @@ class Api(object):
     data = {'status': status}
     if in_reply_to_status_id:
       data['in_reply_to_status_id'] = in_reply_to_status_id
-    if latitude != None and longitude != None:
-        data['lat']     = str(latitude)
-        data['long']    = str(longitude)
+    if latitude is not None and longitude is not None:
+      data['lat']     = str(latitude)
+      data['long']    = str(longitude)
+    if place_id is not None:
+      data['place_id'] = str(place_id)
+    if display_coordinates:
+      data['display_coordinates'] = 'true'
+    if trim_user:
+      data['trim_user'] = 'true' 
     json = self._FetchUrl(url, post_data=data)
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
