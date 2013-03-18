@@ -2334,7 +2334,7 @@ class Api(object):
       include_entities:
         If True, each tweet will include a node called "entities,".
         This node offers a variety of metadata about the tweet in a
-        discreet structure, including: user_mentions, urls, and
+        discrete structure, including: user_mentions, urls, and
         hashtags. [Optional]
       query_users:
         If set to False, then all users only have screen_name and
@@ -2657,7 +2657,7 @@ class Api(object):
         This node offers a variety of metadata about the tweet in a
         discreet structure, including: user_mentions, urls, and
         hashtags. [Optional]
-       exclude_replies:
+      exclude_replies:
         If True, this will prevent replies from appearing in the returned
         timeline. Using exclude_replies with the count parameter will mean you
         will receive up-to count tweets - this is because the count parameter
