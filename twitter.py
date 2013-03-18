@@ -2981,8 +2981,8 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
 
-  def GetUserRetweets(self, count=None, since_id=None, max_id=None, include_entities=False):
-     '''Fetch the sequence of retweets made by a single user.
+  def GetUserRetweets(self, count=None, since_id=None, max_id=None, trim_user=False):
+     '''Fetch the sequence of retweets made by the authenticated user.
 
      The twitter.Api instance must be authenticated.
 
@@ -2998,39 +2998,15 @@ class Api(object):
        max_id:
          Returns results with an ID less than (that is, older than) or
          equal to the specified ID. [Optional]
-       include_entities:
-         If True, each tweet will include a node called "entities,".
-         This node offers a variety of metadata about the tweet in a
-         discreet structure, including: user_mentions, urls, and
-         hashtags. [Optional]
+      trim_user:
+        If True the returned payload will only contain the user IDs,
+        otherwise the payload will contain the full user data item.
+        [Optional]
 
      Returns:
        A sequence of twitter.Status instances, one for each message up to count
      '''
-     url = '%s/statuses/retweeted_by_me.json' % self.base_url
-     if not self._oauth_consumer:
-       raise TwitterError("The twitter.Api instance must be authenticated.")
-     parameters = {}
-     if count is not None:
-       try:
-         if int(count) > 100:
-           raise TwitterError("'count' may not be greater than 100")
-       except ValueError:
-         raise TwitterError("'count' must be an integer")
-     if count:
-       parameters['count'] = count
-     if since_id:
-       parameters['since_id'] = since_id
-     if include_entities:
-       parameters['include_entities'] = True
-     if max_id:
-       try:
-         parameters['max_id'] = long(max_id)
-       except:
-         raise TwitterError("max_id must be an integer")
-     json = self._FetchUrl(url, parameters=parameters)
-     data = self._ParseAndCheckTwitter(json)
-     return [Status.NewFromJsonDict(x) for x in data]
+     return self.GetUserTimeline(since_id=since_id, count=count, max_id=max_id, trim_user=trim_user, exclude_replies=True, include_rts=True)
 
   def GetReplies(self, since=None, since_id=None, page=None):
     '''Get a sequence of status messages representing the 20 most
