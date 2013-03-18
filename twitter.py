@@ -3167,29 +3167,57 @@ class Api(object):
         break
     return result
 
-  def GetFriendIDs(self, user=None, cursor=-1):
+  def GetFriendIDs(self, user_id=None, screen_name=None, cursor=-1, stringify_ids=False, count=None):
       '''Returns a list of twitter user id's for every person
       the specified user is following.
 
       Args:
-        user:
-          The id or screen_name of the user to retrieve the id list for
+        user_id:
+          The id of the user to retrieve the id list for
           [Optional]
+        screen_name:
+          The screen_name of the user to retrieve the id list for
+          [Optional]
+        cursor:
+          Specifies the Twitter API Cursor location to start at.
+          Note: there are pagination limits.
+          [Optional]
+        stringify_ids:
+          if True then twitter will return the ids as strings instead of integers.
+          [Optional]
+        count:
+          The number of status messages to retrieve. [Optional]
 
       Returns:
         A list of integers, one for each user id.
       '''
-      if not user and not self._oauth_consumer:
+      url = '%s/friends/ids.json' % self.base_url
+      if not self._oauth_consumer:
           raise TwitterError("twitter.Api instance must be authenticated")
-      if user:
-          url = '%s/friends/ids/%s.json' % (self.base_url, user)
-      else:
-          url = '%s/friends/ids.json' % self.base_url
       parameters = {}
-      parameters['cursor'] = cursor
-      json = self._FetchUrl(url, parameters=parameters)
-      data = self._ParseAndCheckTwitter(json)
-      return data
+      if user_id is not None:
+        parameters['user_id'] = user_id
+      if screen_name is not None:
+        parameters['screen_name'] = screen_name
+      if stringify_ids:
+        parameters['stringify_ids'] = True
+      if count is not None:
+        parameters['count'] = count
+      result = []
+      while True:
+        parameters['cursor'] = cursor
+        json = self._FetchUrl(url, parameters=parameters)
+        data = self._ParseAndCheckTwitter(json)
+        result += [x for x in data['ids']]
+        if 'next_cursor' in data:
+          if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+            break
+          else:
+            cursor = data['next_cursor']
+        else:
+          break
+      return result
+
 
   def GetFollowerIDs(self, user=None, cursor=-1):
       '''Returns a list of twitter user id's for every person
