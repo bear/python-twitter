@@ -3033,21 +3033,34 @@ class Api(object):
     '''
     return self.GetUserTimeline(since_id=since_id, count=count, max_id=max_id, trim_user=trim_user, exclude_replies=False, include_rts=False)
 
-  def GetRetweets(self, statusid):
+  def GetRetweets(self, statusid, count=None, trim_user=False):
     '''Returns up to 100 of the first retweets of the tweet identified
     by statusid
 
     Args:
       statusid:
         The ID of the tweet for which retweets should be searched for
+      count:
+        The number of status messages to retrieve. [Optional]
+      trim_user:
+        If True the returned payload will only contain the user IDs,
+        otherwise the payload will contain the full user data item.
+        [Optional]
 
     Returns:
       A list of twitter.Status instances, which are retweets of statusid
     '''
     if not self._oauth_consumer:
       raise TwitterError("The twitter.Api instsance must be authenticated.")
-    url = '%s/statuses/retweets/%s.json?include_entities=true&include_rts=true' % (self.base_url, statusid)
+    url = '%s/statuses/retweets/%s.json' % (self.base_url, statusid)
     parameters = {}
+    if trim_user:
+      parameters['trim_user'] = 'true' 
+    if count:
+      try:
+        parameters['count'] = int(count)
+      except:
+        raise TwitterError("count must be an integer")
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
     return [Status.NewFromJsonDict(s) for s in data]
