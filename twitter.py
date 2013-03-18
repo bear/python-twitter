@@ -2433,7 +2433,7 @@ class Api(object):
       include_entities:
         If True, each tweet will include a node called "entities,".
         This node offers a variety of metadata about the tweet in a
-        discreet structure, including: user_mentions, urls, and
+        discrete structure, including: user_mentions, urls, and
         hashtags. [Optional]
 
     Returns:
