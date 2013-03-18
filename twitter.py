@@ -2982,33 +2982,33 @@ class Api(object):
     return Status.NewFromJsonDict(data)
 
   def GetUserRetweets(self, count=None, since_id=None, max_id=None, trim_user=False):
-     '''Fetch the sequence of retweets made by the authenticated user.
+    '''Fetch the sequence of retweets made by the authenticated user.
 
-     The twitter.Api instance must be authenticated.
+    The twitter.Api instance must be authenticated.
 
-     Args:
-       count:
-         The number of status messages to retrieve. [Optional]
-       since_id:
-         Returns results with an ID greater than (that is, more recent
-         than) the specified ID. There are limits to the number of
-         Tweets which can be accessed through the API. If the limit of
-         Tweets has occurred since the since_id, the since_id will be
-         forced to the oldest ID available. [Optional]
-       max_id:
-         Returns results with an ID less than (that is, older than) or
-         equal to the specified ID. [Optional]
+    Args:
+      count:
+        The number of status messages to retrieve. [Optional]
+      since_id:
+        Returns results with an ID greater than (that is, more recent
+        than) the specified ID. There are limits to the number of
+        Tweets which can be accessed through the API. If the limit of
+        Tweets has occurred since the since_id, the since_id will be
+        forced to the oldest ID available. [Optional]
+      max_id:
+        Returns results with an ID less than (that is, older than) or
+        equal to the specified ID. [Optional]
       trim_user:
         If True the returned payload will only contain the user IDs,
         otherwise the payload will contain the full user data item.
         [Optional]
 
-     Returns:
-       A sequence of twitter.Status instances, one for each message up to count
-     '''
-     return self.GetUserTimeline(since_id=since_id, count=count, max_id=max_id, trim_user=trim_user, exclude_replies=True, include_rts=True)
+    Returns:
+      A sequence of twitter.Status instances, one for each message up to count
+    '''
+    return self.GetUserTimeline(since_id=since_id, count=count, max_id=max_id, trim_user=trim_user, exclude_replies=True, include_rts=True)
 
-  def GetReplies(self, since=None, since_id=None, page=None):
+  def GetReplies(self, since_id=None, count=None, max_id=None, trim_user=False):
     '''Get a sequence of status messages representing the 20 most
     recent replies (status updates prefixed with @twitterID) to the
     authenticating user.
@@ -3020,27 +3020,18 @@ class Api(object):
         Tweets which can be accessed through the API. If the limit of
         Tweets has occurred since the since_id, the since_id will be
         forced to the oldest ID available. [Optional]
-      page:
-        Specifies the page of results to retrieve.
-        Note: there are pagination limits. [Optional]
-      since:
+      max_id:
+        Returns results with an ID less than (that is, older than) or
+        equal to the specified ID. [Optional]
+      trim_user:
+        If True the returned payload will only contain the user IDs,
+        otherwise the payload will contain the full user data item.
+        [Optional]
 
     Returns:
       A sequence of twitter.Status instances, one for each reply to the user.
     '''
-    url = '%s/statuses/replies.json' % self.base_url
-    if not self._oauth_consumer:
-      raise TwitterError("The twitter.Api instance must be authenticated.")
-    parameters = {}
-    if since:
-      parameters['since'] = since
-    if since_id:
-      parameters['since_id'] = since_id
-    if page:
-      parameters['page'] = page
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
-    return [Status.NewFromJsonDict(x) for x in data]
+    return self.GetUserTimeline(since_id=since_id, count=count, max_id=max_id, trim_user=trim_user, exclude_replies=False, include_rts=False)
 
   def GetRetweets(self, statusid):
     '''Returns up to 100 of the first retweets of the tweet identified
