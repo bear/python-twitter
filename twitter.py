@@ -2493,7 +2493,7 @@ class Api(object):
     return [Status.NewFromJsonDict(x) for x in data['statuses']]
 
   def GetTrendsCurrent(self, exclude=None):
-    '''Get the current top trending topics
+    '''Get the current top trending topics (global)
 
     Args:
       exclude:
@@ -2501,23 +2501,11 @@ class Api(object):
         Currently only exclude=hashtags is supported. [Optional]
 
     Returns:
-      A list with 10 entries. Each entry contains the twitter.
+      A list with 10 entries. Each entry contains a trend.
     '''
-    parameters = {}
-    if exclude:
-      parameters['exclude'] = exclude
-    url  = '%s/trends/current.json' % self.base_url
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    return self.GetTrendsWoeid(id=1, exclude=exclude)
 
-    trends = []
-
-    for t in data['trends']:
-      for item in data['trends'][t]:
-        trends.append(Trend.NewFromJsonDict(item, timestamp = t))
-    return trends
-
-  def GetTrendsWoeid(self, woeid, exclude=None):
+  def GetTrendsWoeid(self, id, exclude=None):
     '''Return the top 10 trending topics for a specific WOEID, if trending
     information is available for it.
 
@@ -2529,12 +2517,14 @@ class Api(object):
         Currently only exclude=hashtags is supported. [Optional]
 
     Returns:
-      A list with 10 entries. Each entry contains a Trend.
+      A list with 10 entries. Each entry contains a trend.
     '''
-    parameters = {}
+    url  = '%s/trends/place.json' % (self.base_url)
+    parameters = {'id': id}
+
     if exclude:
       parameters['exclude'] = exclude
-    url  = '%s/trends/%s.json' % (self.base_url, woeid)
+
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
 
