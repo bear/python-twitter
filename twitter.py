@@ -2144,13 +2144,14 @@ class Hashtag(object):
 class Trend(object):
   ''' A class representing a trending topic
   '''
-  def __init__(self, name=None, query=None, timestamp=None):
+  def __init__(self, name=None, query=None, timestamp=None, url=None):
     self.name = name
     self.query = query
     self.timestamp = timestamp
+    self.url = url
 
   def __str__(self):
-    return 'Name: %s\nQuery: %s\nTimestamp: %s\n' % (self.name, self.query, self.timestamp)
+    return 'Name: %s\nQuery: %s\nTimestamp: %s\nSearch URL: %s\n' % (self.name, self.query, self.timestamp, self.url)
 
   def __ne__(self, other):
     return not self.__eq__(other)
@@ -2160,7 +2161,8 @@ class Trend(object):
       return other and \
           self.name == other.name and \
           self.query == other.query and \
-          self.timestamp == other.timestamp
+          self.timestamp == other.timestamp and \
+          self.url == self.url
     except AttributeError:
       return False
 
@@ -2179,6 +2181,7 @@ class Trend(object):
     '''
     return Trend(name=data.get('name', None),
                  query=data.get('query', None),
+                 url=data.get('url', None),
                  timestamp=timestamp)
 
 class Url(object):
