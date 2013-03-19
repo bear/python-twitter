@@ -3344,19 +3344,44 @@ class Api(object):
 
     return [User.NewFromJsonDict(u) for u in data]
 
-  def GetUser(self, user):
+  def GetUser(self, user_id=None, screen_name=None, include_entities=True):
     '''Returns a single user.
 
     The twitter.Api instance must be authenticated.
 
     Args:
-      user: The twitter name or id of the user to retrieve.
+      user_id:
+        The id of the user to retrieve.
+        [Optional]
+      screen_name:
+        The screen name of the user for whom to return results for. Either a
+        user_id or screen_name is required for this method.
+        [Optional]
+      include_entities:
+        if set to False, the 'entities' node will not be included.
+        [Optional]
+
 
     Returns:
       A twitter.User instance representing that user
     '''
-    url  = '%s/users/show/%s.json' % (self.base_url, user)
-    json = self._FetchUrl(url)
+    url  = '%s/users/show.json' % (self.base_url)
+    parameters = {}
+
+    if not self._oauth_consumer:
+      raise TwitterError("The twitter.Api instance must be authenticated.")
+
+    if user_id:
+      parameters['user_id'] = user_id
+    elif screen_name:
+      parameters['screen_name'] = screen_name
+    else:
+      raise TwitterError("Specify at least one of user_id or screen_name.")
+
+    if not include_entities:
+      parameters['include_entities'] = 'false'
+
+    json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
     return User.NewFromJsonDict(data)
 
