@@ -2495,6 +2495,52 @@ class Api(object):
     # Return built list of statuses
     return [Status.NewFromJsonDict(x) for x in data['statuses']]
 
+  def GetUsersSearch(self,
+                     term=None,
+                     page=1,
+                     count=20,
+                     include_entities=None):
+    '''Return twitter user search results for a given term.
+
+    Args:
+      term:
+        Term to search by.
+      page:
+        Page of results to return. Default is 1
+        [Optional]
+      count:
+        Number of results to return.  Default is 20
+        [Optional]
+      include_entities:
+        If True, each tweet will include a node called "entities,".
+        This node offers a variety of metadata about the tweet in a
+        discrete structure, including: user_mentions, urls, and hashtags.
+        [Optional]
+
+    Returns:
+      A sequence of twitter.User instances, one for each message containing
+      the term
+    '''
+    # Build request parameters
+    parameters = {}
+
+    if term is not None:
+      parameters['q'] = term
+
+    if include_entities:
+      parameters['include_entities'] = 1
+
+    try:
+      parameters['count'] = int(count)
+    except:
+      raise TwitterError("count must be an integer")
+
+    # Make and send requests
+    url  = '%s/users/search.json' % self.base_url
+    json = self._FetchUrl(url, parameters=parameters)
+    data = self._ParseAndCheckTwitter(json)
+    return [User.NewFromJsonDict(x) for x in data]
+
   def GetTrendsCurrent(self, exclude=None):
     '''Get the current top trending topics (global)
 
