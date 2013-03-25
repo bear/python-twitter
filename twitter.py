@@ -2764,34 +2764,55 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return [Status.NewFromJsonDict(x) for x in data]
 
-  def GetStatus(self, id, include_entities=None):
-    '''Returns a single status message.
+  def GetStatus(self,
+                id,
+                trim_user=False,
+                include_my_retweet=True,
+                include_entities=True):
+    '''Returns a single status message, specified by the id parameter.
 
-    The twitter.Api instance must be authenticated if the
-    status message is private.
+    The twitter.Api instance must be authenticated.
 
     Args:
       id:
         The numeric ID of the status you are trying to retrieve.
+      trim_user:
+        When set to True, each tweet returned in a timeline will include
+        a user object including only the status authors numerical ID.
+        Omit this parameter to receive the complete user object.
+        [Optional]
+      include_my_retweet:
+        When set to True, any Tweets returned that have been retweeted by
+        the authenticating user will include an additional
+        current_user_retweet node, containing the ID of the source status
+        for the retweet. [Optional]
       include_entities:
-        If True, each tweet will include a node called "entities".
+        If False, the entities node will be disincluded.
         This node offers a variety of metadata about the tweet in a
         discreet structure, including: user_mentions, urls, and
         hashtags. [Optional]
     Returns:
       A twitter.Status instance representing that status message
     '''
-    try:
-      if id:
-        long(id)
-    except:
-      raise TwitterError("id must be an long integer")
+    url  = '%s/statuses/show.json' % (self.base_url)
+
+    if not self._oauth_consumer:
+      raise TwitterError("API must be authenticated.")
 
     parameters = {}
-    if include_entities:
-      parameters['include_entities'] = 1
 
-    url  = '%s/statuses/show/%s.json' % (self.base_url, id)
+    try:
+      parameters['id'] = long(id)
+    except ValueError:
+      raise TwitterError("'id' must be an integer.")
+
+    if trim_user:
+      parameters['trim_user'] = 1
+    if include_my_retweet:
+      parameters['include_my_retweet'] = 1
+    if not include_entities:
+      parameters['include_entities'] = 'none'
+
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
