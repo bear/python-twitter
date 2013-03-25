@@ -2817,7 +2817,7 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
 
-  def DestroyStatus(self, id):
+  def DestroyStatus(self, id, trim_user=False):
     '''Destroys the status specified by the required ID parameter.
 
     The twitter.Api instance must be authenticated and the
@@ -2830,13 +2830,17 @@ class Api(object):
     Returns:
       A twitter.Status instance representing the destroyed status message
     '''
+    if not self._oauth_consumer:
+      raise TwitterError("API must be authenticated.")
+
     try:
-      if id:
-        long(id)
+      post_data = {'id': long(id)}
     except:
       raise TwitterError("id must be an integer")
     url  = '%s/statuses/destroy/%s.json' % (self.base_url, id)
-    json = self._FetchUrl(url, post_data={'id': id})
+    if trim_user:
+      post_data['trim_user'] = 1
+    json = self._FetchUrl(url, post_data=post_data)
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
 
