@@ -2882,7 +2882,7 @@ class Api(object):
         latitude will be ignored by twitter if the user has a false
         geo_enabled setting. [Optional]
       place_id:
-        A place in the world. These IDs can be retrieved from 
+        A place in the world. These IDs can be retrieved from
         GET geo/reverse_geocode. [Optional]
       display_coordinates:
         Whether or not to put a pin on the exact coordinates a tweet
@@ -2919,7 +2919,7 @@ class Api(object):
     if display_coordinates:
       data['display_coordinates'] = 'true'
     if trim_user:
-      data['trim_user'] = 'true' 
+      data['trim_user'] = 'true'
     json = self._FetchUrl(url, post_data=data)
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
@@ -2986,7 +2986,7 @@ class Api(object):
 
     data = {'id': original_id}
     if trim_user:
-      data['trim_user'] = 'true' 
+      data['trim_user'] = 'true'
     json = self._FetchUrl(url, post_data=data)
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
@@ -3065,7 +3065,7 @@ class Api(object):
     url = '%s/statuses/retweets/%s.json' % (self.base_url, statusid)
     parameters = {}
     if trim_user:
-      parameters['trim_user'] = 'true' 
+      parameters['trim_user'] = 'true'
     if count:
       try:
         parameters['count'] = int(count)
@@ -3568,8 +3568,12 @@ class Api(object):
     return Status.NewFromJsonDict(data)
 
   def GetFavorites(self,
-                   user=None,
-                   page=None):
+                   user_id=None,
+                   screen_name=None,
+                   count=None,
+                   since_id=None,
+                   max_id=None,
+                   include_entities=True):
     '''Return a list of Status objects representing favorited tweets.
     By default, returns the (up to) 20 most recent tweets for the
     authenticated user.
@@ -3584,15 +3588,34 @@ class Api(object):
     '''
     parameters = {}
 
-    if page:
-      parameters['page'] = page
+    url = '%s/favorites/list.json' % self.base_url
 
-    if user:
-      url = '%s/favorites/%s.json' % (self.base_url, user)
-    elif not user and not self._oauth_consumer:
-      raise TwitterError("User must be specified if API is not authenticated.")
-    else:
-      url = '%s/favorites.json' % self.base_url
+    if user_id:
+      parameters['user_id'] = user_id
+    elif screen_name:
+      parameters['screen_name'] = user_id
+
+    if since_id:
+      try:
+        parameters['since_id'] = long(since_id)
+      except:
+        raise TwitterError("since_id must be an integer")
+
+    if max_id:
+      try:
+        parameters['max_id'] = long(max_id)
+      except:
+        raise TwitterError("max_id must be an integer")
+
+    if count:
+      try:
+        parameters['count'] = int(count)
+      except:
+        raise TwitterError("count must be an integer")
+
+    if include_entities:
+        parameters['include_entities'] = True
+
 
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
