@@ -3917,8 +3917,14 @@ class Api(object):
     '''
     self._default_params['source'] = source
 
-  def GetRateLimitStatus(self):
+  def GetRateLimitStatus(self, resources=None):
     '''Fetch the rate limit status for the currently authorized user.
+
+    Args:
+      resources:
+        A comma seperated list of resource families you want to know the current
+        rate limit disposition of.
+        [Optional]
 
     Returns:
       A dictionary containing the time the limit will reset (reset_time),
@@ -3926,8 +3932,12 @@ class Api(object):
       the number of hits allowed in a 60-minute period (hourly_limit), and
       the time of the reset in seconds since The Epoch (reset_time_in_seconds).
     '''
-    url  = '%s/account/rate_limit_status.json' % self.base_url
-    json = self._FetchUrl(url, no_cache=True)
+    parameters = {}
+    if resources is not None:
+      parameters['resources'] = resources
+
+    url  = '%s/application/rate_limit_status.json' % self.base_url
+    json = self._FetchUrl(url, parameters=parameters, no_cache=True)
     data = self._ParseAndCheckTwitter(json)
     return data
 
