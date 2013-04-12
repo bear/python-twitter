@@ -3532,14 +3532,19 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return [DirectMessage.NewFromJsonDict(x) for x in data]
 
-  def PostDirectMessage(self, user, text):
+  def PostDirectMessage(self, text, user_id=None, screen_name=None):
     '''Post a twitter direct message from the authenticated user
 
     The twitter.Api instance must be authenticated.
 
     Args:
-      user: The ID or screen name of the recipient user.
       text: The message text to be posted.  Must be less than 140 characters.
+      user_id:
+        A list of user_ids to retrieve extended information.
+        [Optional]
+      screen_name:
+        A list of screen_names to retrieve extended information.
+        [Optional]
 
     Returns:
       A twitter.DirectMessage instance representing the message posted
@@ -3547,7 +3552,13 @@ class Api(object):
     if not self._oauth_consumer:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     url  = '%s/direct_messages/new.json' % self.base_url
-    data = {'text': text, 'user': user}
+    data = {'text': text}
+    if user_id:
+      data['user_id'] = user_id
+    elif screen_name:
+      data['screen_name'] = screen_name
+    else:
+      raise TwitterError("Specify at least one of user_id or screen_name.")
     json = self._FetchUrl(url, post_data=data)
     data = self._ParseAndCheckTwitter(json)
     return DirectMessage.NewFromJsonDict(data)
