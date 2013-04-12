@@ -1807,7 +1807,7 @@ class List(object):
     if self.following is not None:
       data['following'] = self.following
     if self.user is not None:
-      data['user'] = self.user
+      data['user'] = self.user.AsDict()
     return data
 
   @staticmethod
