@@ -3563,7 +3563,7 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return DirectMessage.NewFromJsonDict(data)
 
-  def DestroyDirectMessage(self, id):
+  def DestroyDirectMessage(self, id, include_entities=True):
     '''Destroys the direct message specified in the required ID parameter.
 
     The twitter.Api instance must be authenticated, and the
@@ -3576,8 +3576,11 @@ class Api(object):
     Returns:
       A twitter.DirectMessage instance representing the message destroyed
     '''
-    url  = '%s/direct_messages/destroy/%s.json' % (self.base_url, id)
-    json = self._FetchUrl(url, post_data={'id': id})
+    url  = '%s/direct_messages/destroy.json' % self.base_url
+    data = {'id': id}
+    if not include_entities:
+      data['include_entities'] = 'false'
+    json = self._FetchUrl(url, post_data=data)
     data = self._ParseAndCheckTwitter(json)
     return DirectMessage.NewFromJsonDict(data)
 
