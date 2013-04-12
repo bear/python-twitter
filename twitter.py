@@ -3831,14 +3831,12 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return [Status.NewFromJsonDict(x) for x in data]
 
-  def CreateList(self, user, name, mode=None, description=None):
-    '''Creates a new list with the give name
+  def CreateList(self, name, mode=None, description=None):
+    '''Creates a new list with the give name for the authenticated user.
 
     The twitter.Api instance must be authenticated.
 
     Args:
-      user:
-        Twitter name to create the list for
       name:
         New name for the list
       mode:
@@ -3850,7 +3848,10 @@ class Api(object):
     Returns:
       A twitter.List instance representing the new list
     '''
-    url = '%s/%s/lists.json' % (self.base_url, user)
+    url = '%s/lists/create.json' % self.base_url
+
+    if not self._oauth_consumer:
+      raise TwitterError("The twitter.Api instance must be authenticated.")
     parameters = {'name': name}
     if mode is not None:
       parameters['mode'] = mode
