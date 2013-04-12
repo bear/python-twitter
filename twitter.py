@@ -3861,21 +3861,53 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return List.NewFromJsonDict(data)
 
-  def DestroyList(self, user, id):
-    '''Destroys the list from the given user
+  def DestroyList(self,
+                  owner_screen_name=False,
+                  owner_id=False,
+                  list_id=None,
+                  slug=None):
+    '''
+    Destroys the list identified by list_id or owner_screen_name/owner_id and
+    slug.
 
     The twitter.Api instance must be authenticated.
 
     Args:
-      user:
-        The user to remove the list from.
-      id:
-        The slug or id of the list to remove.
+      owner_screen_name:
+        The screen_name of the user who owns the list being requested by a slug.
+      owner_id:
+        The user ID of the user who owns the list being requested by a slug.
+      list_id:
+        The numerical id of the list.
+      slug:
+        You can identify a list by its slug instead of its numerical id. If you
+        decide to do so, note that you'll also have to specify the list owner
+        using the owner_id or owner_screen_name parameters.
     Returns:
       A twitter.List instance representing the removed list.
     '''
-    url  = '%s/%s/lists/%s.json' % (self.base_url, user, id)
-    json = self._FetchUrl(url, post_data={'_method': 'DELETE'})
+    url  = '%s/lists/destroy.json' % self.base_url
+    data = {}
+    if list_id:
+      try:
+        data['list_id']= long(list_id)
+      except:
+        raise TwitterError("list_id must be an integer")
+    elif slug:
+      data['slug'] = slug
+      if owner_id:
+        try:
+          data['owner_id'] = long(owner_id)
+        except:
+          raise TwitterError("owner_id must be an integer")
+      elif owner_screen_name:
+        data['owner_screen_name'] = owner_screen_name
+      else:
+        raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
+    else:
+      raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
+
+    json = self._FetchUrl(url, post_data=data)
     data = self._ParseAndCheckTwitter(json)
     return List.NewFromJsonDict(data)
 
