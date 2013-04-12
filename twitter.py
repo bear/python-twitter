@@ -3759,13 +3759,21 @@ class Api(object):
     return [Status.NewFromJsonDict(x) for x in data]
 
   def GetMentions(self,
+                  count=None,
                   since_id=None,
                   max_id=None,
-                  page=None):
-    '''Returns the 20 most recent mentions (status containing @twitterID)
+                  trim_user=False,
+                  contributor_details=False,
+                  include_entities=True):
+    '''Returns the 20 most recent mentions (status containing @screen_name)
     for the authenticating user.
 
     Args:
+      count:
+        Specifies the number of tweets to try and retrieve, up to a maximum of
+        200. The value of count is best thought of as a limit to the number of
+        tweets to return because suspended or deleted content is removed after
+        the count has been applied. [Optional]
       since_id:
         Returns results with an ID greater than (that is, more recent
         than) the specified ID. There are limits to the number of
@@ -3775,30 +3783,49 @@ class Api(object):
       max_id:
         Returns only statuses with an ID less than
         (that is, older than) the specified ID.  [Optional]
-      page:
-        Specifies the page of results to retrieve.
-        Note: there are pagination limits. [Optional]
+      trim_user:
+        When set to True, each tweet returned in a timeline will include a user
+        object including only the status authors numerical ID. Omit this
+        parameter to receive the complete user object.
+      contributor_details:
+        If set to True, this parameter enhances the contributors element of the
+        status response to include the screen_name of the contributor. By
+        default only the user_id of the contributor is included.
+      include_entities:
+        The entities node will be disincluded when set to False.
 
     Returns:
       A sequence of twitter.Status instances, one for each mention of the user.
     '''
 
-    url = '%s/statuses/mentions.json' % self.base_url
+    url = '%s/statuses/mentions_timeline.json' % self.base_url
 
     if not self._oauth_consumer:
       raise TwitterError("The twitter.Api instance must be authenticated.")
 
     parameters = {}
 
+    if count:
+      try:
+        parameters['count'] = int(count)
+      except:
+        raise TwitterError("count must be an integer")
     if since_id:
-      parameters['since_id'] = since_id
+      try:
+        parameters['since_id'] = long(since_id)
+      except:
+        raise TwitterError("since_id must be an integer")
     if max_id:
       try:
         parameters['max_id'] = long(max_id)
       except:
         raise TwitterError("max_id must be an integer")
-    if page:
-      parameters['page'] = page
+    if trim_user:
+      parameters['trim_user'] = 1
+    if contributor_details:
+      parameters['contributor_details'] = 'true'
+    if not include_entities:
+      parameters['include_entities'] = 'false'
 
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
