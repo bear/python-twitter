@@ -3615,18 +3615,28 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return User.NewFromJsonDict(data)
 
-  def DestroyFriendship(self, user):
-    '''Discontinues friendship with the user specified in the user parameter.
+  def DestroyFriendship(self, user_id=None, screen_name=None):
+    '''Discontinues friendship with a user_id or screen_name.
 
     The twitter.Api instance must be authenticated.
 
     Args:
-      The ID or screen name of the user  with whom to discontinue friendship.
+      user_id:
+        A user_id to unfollow [Optional]
+      screen_name:
+        A screen_name to unfollow [Optional]
     Returns:
       A twitter.User instance representing the discontinued friend.
     '''
-    url  = '%s/friendships/destroy/%s.json' % (self.base_url, user)
-    json = self._FetchUrl(url, post_data={'user': user})
+    url  = '%s/friendships/destroy.json' % self.base_url
+    data = {}
+    if user_id:
+      data['user_id'] = user_id
+    elif screen_name:
+      data['screen_name'] = screen_name
+    else:
+      raise TwitterError("Specify at least one of user_id or screen_name.")
+    json = self._FetchUrl(url, post_data=data)
     data = self._ParseAndCheckTwitter(json)
     return User.NewFromJsonDict(data)
 
