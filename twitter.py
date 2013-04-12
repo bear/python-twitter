@@ -3672,19 +3672,35 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
 
-  def DestroyFavorite(self, status):
-    '''Un-favorites the status specified in the ID parameter as the authenticating user.
-    Returns the un-favorited status in the requested format when successful.
+  def DestroyFavorite(self, status=None, id=None, include_entities=True):
+    '''Un-Favorites the specified status object or id as the authenticating user.
+    Returns the un-favorited status when successful.
 
     The twitter.Api instance must be authenticated.
 
     Args:
-      The twitter.Status to unmark as a favorite.
+      id:
+        The id of the twitter status to unmark as a favorite.
+        [Optional]
+      status:
+        The twitter.Status object to unmark as a favorite.
+        [Optional]
+      include_entities:
+        The entities node will be omitted when set to False.
     Returns:
       A twitter.Status instance representing the newly-unmarked favorite.
     '''
-    url  = '%s/favorites/destroy/%s.json' % (self.base_url, status.id)
-    json = self._FetchUrl(url, post_data={'id': status.id})
+    url  = '%s/favorites/destroy.json' % self.base_url
+    data = {}
+    if id:
+      data['id'] = id
+    elif status:
+      data['id'] = status.id
+    else:
+      raise TwitterError("Specify id or status")
+    if not include_entities:
+      data['include_entities'] = 'false'
+    json = self._FetchUrl(url, post_data=data)
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
 
