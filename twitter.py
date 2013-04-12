@@ -3430,24 +3430,32 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return User.NewFromJsonDict(data)
 
-  def GetDirectMessages(self, since=None, since_id=None, page=None):
+  def GetDirectMessages(self, since_id=None, max_id=None, count=None, include_entities=True, skip_status=False):
     '''Returns a list of the direct messages sent to the authenticating user.
 
     The twitter.Api instance must be authenticated.
 
     Args:
-      since:
-        Narrows the returned results to just those statuses created
-        after the specified HTTP-formatted date. [Optional]
       since_id:
         Returns results with an ID greater than (that is, more recent
         than) the specified ID. There are limits to the number of
         Tweets which can be accessed through the API. If the limit of
         Tweets has occurred since the since_id, the since_id will be
         forced to the oldest ID available. [Optional]
-      page:
-        Specifies the page of results to retrieve.
-        Note: there are pagination limits. [Optional]
+      max_id:
+        Returns results with an ID less than (that is, older than) or
+        equal to the specified ID. [Optional]
+      count:
+        Specifies the number of direct messages to try and retrieve, up to a
+        maximum of 200. The value of count is best thought of as a limit to the
+        number of Tweets to return because suspended or deleted content is
+        removed after the count has been applied. [Optional]
+      include_entities:
+        The entities node will not be included when set to False.
+        [Optional]
+      skip_status:
+        When set to True statuses will not be included in the returned user
+        objects. [Optional]
 
     Returns:
       A sequence of twitter.DirectMessage instances
@@ -3456,12 +3464,19 @@ class Api(object):
     if not self._oauth_consumer:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     parameters = {}
-    if since:
-      parameters['since'] = since
     if since_id:
       parameters['since_id'] = since_id
-    if page:
-      parameters['page'] = page
+    if max_id:
+      parameters['max_id'] = max_id
+    if count:
+      try:
+        parameters['count'] = int(count)
+      except:
+        raise TwitterError("count must be an integer")
+    if not include_entities:
+      parameters['include_entities'] = 'false'
+    if skip_status:
+      parameters['skip_status'] = 1
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
     return [DirectMessage.NewFromJsonDict(x) for x in data]
