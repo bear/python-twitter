@@ -3229,55 +3229,97 @@ class Api(object):
       return result
 
 
-  def GetFollowerIDs(self, user=None, cursor=-1):
+  def GetFollowerIDs(self, user_id=None, screen_name=None, cursor=-1, stringify_ids=False, count=None):
       '''Returns a list of twitter user id's for every person
       that is following the specified user.
 
       Args:
-        user:
-          The id or screen_name of the user to retrieve the id list for
+        user_id:
+          The id of the user to retrieve the id list for
           [Optional]
+        screen_name:
+          The screen_name of the user to retrieve the id list for
+          [Optional]
+        cursor:
+          Specifies the Twitter API Cursor location to start at.
+          Note: there are pagination limits.
+          [Optional]
+        stringify_ids:
+          if True then twitter will return the ids as strings instead of integers.
+          [Optional]
+        count:
+          The number of status messages to retrieve. [Optional]
+
 
       Returns:
         A list of integers, one for each user id.
       '''
-
-      if not user and not self._oauth_consumer:
+      url = '%s/followers/ids.json' % self.base_url
+      if not self._oauth_consumer:
           raise TwitterError("twitter.Api instance must be authenticated")
-      if user:
-          url = '%s/followers/ids/%s.json' % (self.base_url, user)
-      else:
-          url = '%s/followers/ids.json' % self.base_url
-
       parameters = {}
-      parameters['cursor'] = cursor
-      json = self._FetchUrl(url, parameters=parameters)
-      data = self._ParseAndCheckTwitter(json)
-      return data
+      if user_id is not None:
+        parameters['user_id'] = user_id
+      if screen_name is not None:
+        parameters['screen_name'] = screen_name
+      if stringify_ids:
+        parameters['stringify_ids'] = True
+      if count is not None:
+        parameters['count'] = count
+      result = []
+      while True:
+        parameters['cursor'] = cursor
+        json = self._FetchUrl(url, parameters=parameters)
+        data = self._ParseAndCheckTwitter(json)
+        result += [x for x in data['ids']]
+        if 'next_cursor' in data:
+          if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+            break
+          else:
+            cursor = data['next_cursor']
+        else:
+          break
+      return result
 
-  def GetFollowers(self, user=None, cursor=-1):
+  def GetFollowers(self, user_id=None, screen_name=None, cursor=-1, skip_status=False, include_user_entities=False):
     '''Fetch the sequence of twitter.User instances, one for each follower
 
     The twitter.Api instance must be authenticated.
 
     Args:
+      user_id:
+        The twitter id of the user whose followers you are fetching.
+        If not specified, defaults to the authenticated user. [Optional]
+      screen_name:
+        The twitter name of the user whose followers you are fetching.
+        If not specified, defaults to the authenticated user. [Optional]
       cursor:
-        Specifies the Twitter API Cursor location to start at. [Optional]
-        Note: there are pagination limits.
+        Should be set to -1 for the initial call and then is used to
+        control what result page Twitter returns [Optional(ish)]
+      skip_status:
+        If True the statuses will not be returned in the user items.
+        [Optional]
+      include_user_entities:
+        When True, the user entities will be included.
 
     Returns:
       A sequence of twitter.User instances, one for each follower
     '''
     if not self._oauth_consumer:
       raise TwitterError("twitter.Api instance must be authenticated")
-    if user:
-      url = '%s/statuses/followers/%s.json' % (self.base_url, user.GetId())
-    else:
-      url = '%s/statuses/followers.json' % self.base_url
+    url = '%s/followers/list.json' % self.base_url
     result = []
     parameters = {}
+    if user_id is not None:
+      parameters['user_id'] = user_id
+    if screen_name is not None:
+      parameters['screen_name'] = screen_name
+    if skip_status:
+      parameters['skip_status'] = True
+    if include_user_entities:
+      parameters['include_user_entities'] = True
     while True:
-      parameters = { 'cursor': cursor }
+      parameters['cursor'] = cursor
       json = self._FetchUrl(url, parameters=parameters)
       data = self._ParseAndCheckTwitter(json)
       result += [User.NewFromJsonDict(x) for x in data['users']]
