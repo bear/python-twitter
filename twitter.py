@@ -3584,18 +3584,34 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return DirectMessage.NewFromJsonDict(data)
 
-  def CreateFriendship(self, user):
-    '''Befriends the user specified in the user parameter as the authenticating user.
+  def CreateFriendship(self, user_id=None, screen_name=None, follow=True):
+    '''Befriends the user specified by the user_id or screen_name.
 
     The twitter.Api instance must be authenticated.
 
     Args:
-      The ID or screen name of the user to befriend.
+      user_id:
+        A user_id to follow [Optional]
+      screen_name:
+        A screen_name to follow [Optional]
+      follow:
+        Set to False to disable notifications for the target user
     Returns:
       A twitter.User instance representing the befriended user.
     '''
-    url  = '%s/friendships/create/%s.json' % (self.base_url, user)
-    json = self._FetchUrl(url, post_data={'user': user})
+    url  = '%s/friendships/create.json' % (self.base_url)
+    data = {}
+    if user_id:
+      data['user_id'] = user_id
+    elif screen_name:
+      data['screen_name'] = screen_name
+    else:
+      raise TwitterError("Specify at least one of user_id or screen_name.")
+    if follow:
+      data['follow'] = 'true'
+    else:
+      data['follow'] = 'false'
+    json = self._FetchUrl(url, post_data=data)
     data = self._ParseAndCheckTwitter(json)
     return User.NewFromJsonDict(data)
 
