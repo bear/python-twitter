@@ -3978,16 +3978,21 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return [List.NewFromJsonDict(x) for x in data['lists']]
 
-  def GetLists(self, user, cursor=-1):
+  def GetLists(self, user_id=None, screen_name=None, count=None, cursor=-1):
     '''Fetch the sequence of lists for a user.
 
     The twitter.Api instance must be authenticated.
 
     Args:
-      user:
-        The twitter name or id of the user whose friends you are fetching.
-        If the passed in user is the same as the authenticated user
-        then you will also receive private list data.
+      user_id:
+        The ID of the user for whom to return results for. [Optional]
+      screen_name:
+        The screen name of the user for whom to return results for.
+        [Optional]
+      count:
+        The amount of results to return per page. Defaults to 20. No more than
+        1000 results will ever be returned in a single page.
+        [Optional]
       cursor:
         "page" value that Twitter will use to start building the
         list sequence from.  -1 to start at the beginning.
@@ -4000,13 +4005,34 @@ class Api(object):
     if not self._oauth_consumer:
       raise TwitterError("twitter.Api instance must be authenticated")
 
-    url = '%s/%s/lists.json' % (self.base_url, user)
+    url = '%s/lists/ownerships.json' % self.base_url
+    result = []
     parameters = {}
-    parameters['cursor'] = cursor
+    if user_id is not None:
+      try:
+        parameters['user_id'] = long(user_id)
+      except:
+        raise TwitterError('user_id must be an integer')
+    elif screen_name is not None:
+      parameters['screen_name'] = screen_name
+    else:
+      raise TwitterError('Specify user_id or screen_name')
+    if count is not None:
+      parameters['count'] = count
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
-    return [List.NewFromJsonDict(x) for x in data['lists']]
+    while True:
+      parameters['cursor'] = cursor
+      json = self._FetchUrl(url, parameters=parameters)
+      data = self._ParseAndCheckTwitter(json)
+      result += [List.NewFromJsonDict(x) for x in data['lists']]
+      if 'next_cursor' in data:
+        if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+          break
+        else:
+          cursor = data['next_cursor']
+      else:
+        break
+    return result
 
   def GetUserByEmail(self, email):
     '''Returns a single user by email address.
