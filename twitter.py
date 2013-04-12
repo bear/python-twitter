@@ -3640,19 +3640,35 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return User.NewFromJsonDict(data)
 
-  def CreateFavorite(self, status):
-    '''Favorites the status specified in the status parameter as the authenticating user.
+  def CreateFavorite(self, status=None, id=None, include_entities=True):
+    '''Favorites the specified status object or id as the authenticating user.
     Returns the favorite status when successful.
 
     The twitter.Api instance must be authenticated.
 
     Args:
-      The twitter.Status instance to mark as a favorite.
+      id:
+        The id of the twitter status to mark as a favorite.
+        [Optional]
+      status:
+        The twitter.Status object to mark as a favorite.
+        [Optional]
+      include_entities:
+        The entities node will be omitted when set to False.
     Returns:
       A twitter.Status instance representing the newly-marked favorite.
     '''
-    url  = '%s/favorites/create/%s.json' % (self.base_url, status.id)
-    json = self._FetchUrl(url, post_data={'id': status.id})
+    url  = '%s/favorites/create.json' % self.base_url
+    data = {}
+    if id:
+      data['id'] = id
+    elif status:
+      data['id'] = status.id
+    else:
+      raise TwitterError("Specify id or status")
+    if not include_entities:
+      data['include_entities'] = 'false'
+    json = self._FetchUrl(url, post_data=data)
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
 
