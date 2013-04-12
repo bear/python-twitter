@@ -3332,19 +3332,6 @@ class Api(object):
         break
     return result
 
-  def GetFeatured(self):
-    '''Fetch the sequence of twitter.User instances featured on twitter.com
-
-    The twitter.Api instance must be authenticated.
-
-    Returns:
-      A sequence of twitter.User instances
-    '''
-    url  = '%s/statuses/featured.json' % self.base_url
-    json = self._FetchUrl(url)
-    data = self._ParseAndCheckTwitter(json)
-    return [User.NewFromJsonDict(x) for x in data]
-
   def UsersLookup(self, user_id=None, screen_name=None, users=None):
     '''Fetch extended information for the specified users.
 
