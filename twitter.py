@@ -3332,7 +3332,7 @@ class Api(object):
         break
     return result
 
-  def UsersLookup(self, user_id=None, screen_name=None, users=None):
+  def UsersLookup(self, user_id=None, screen_name=None, users=None, include_entities=True):
     '''Fetch extended information for the specified users.
 
     Users may be specified either as lists of either user_ids,
@@ -3350,6 +3350,10 @@ class Api(object):
         [Optional]
       users:
         A list of twitter.User objects to retrieve extended information.
+        [Optional]
+      include_entities:
+        The entities node that may appear within embedded statuses will be
+        disincluded when set to False.
         [Optional]
 
     Returns:
@@ -3371,6 +3375,8 @@ class Api(object):
       parameters['user_id'] = ','.join(["%s" % u for u in uids])
     if screen_name:
       parameters['screen_name'] = ','.join(screen_name)
+    if not include_entities:
+      parameters['include_entities'] = 'false'
     json = self._FetchUrl(url, parameters=parameters)
     try:
       data = self._ParseAndCheckTwitter(json)
