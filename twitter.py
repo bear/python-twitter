@@ -91,6 +91,7 @@ class Status(object):
     status.created_at
     status.created_at_in_seconds # read only
     status.favorited
+    status.favorite_count
     status.in_reply_to_screen_name
     status.in_reply_to_user_id
     status.in_reply_to_status_id
@@ -112,6 +113,7 @@ class Status(object):
   def __init__(self,
                created_at=None,
                favorited=None,
+               favorite_count=None,
                id=None,
                text=None,
                location=None,
@@ -145,6 +147,8 @@ class Status(object):
         The time this status message was posted. [Optional]
       favorited:
         Whether this is a favorite of the authenticated user. [Optional]
+      favorite_count:
+        Number of times this status message has been favorited. [Optional]
       id:
         The unique id of this status message. [Optional]
       text:
@@ -172,6 +176,7 @@ class Status(object):
     '''
     self.created_at = created_at
     self.favorited = favorited
+    self.favorite_count = favorite_count
     self.id = id
     self.text = text
     self.location = location
@@ -245,6 +250,26 @@ class Status(object):
 
   favorited = property(GetFavorited, SetFavorited,
                        doc='The favorited state of this status message.')
+
+  def GetFavoriteCount(self):
+    '''Get the favorite count of this status message.
+
+    Returns:
+      number of times this status message has been favorited
+    '''
+    return self._favorite_count
+
+  def SetFavoriteCount(self, favorite_count):
+    '''Set the favorited state of this status message.
+
+    Args:
+      favorite_count:
+        int number of favorites for this status message
+    '''
+    self._favorite_count = favorite_count
+
+  favorite_count = property(GetFavoriteCount, SetFavoriteCount,
+                       doc='The number of favorites for this status message.')
 
   def GetId(self):
     '''Get the unique id of this status message.
@@ -511,6 +536,7 @@ class Status(object):
              self.truncated == other.truncated and \
              self.retweeted == other.retweeted and \
              self.favorited == other.favorited and \
+             self.favorite_count == other.favorite_count and \
              self.source == other.source and \
              self.geo == other.geo and \
              self.place == other.place and \
@@ -552,6 +578,8 @@ class Status(object):
       data['created_at'] = self.created_at
     if self.favorited:
       data['favorited'] = self.favorited
+    if self.favorite_count:
+      data['favorite_count'] = self.favorite_count
     if self.id:
       data['id'] = self.id
     if self.text:
@@ -628,6 +656,7 @@ class Status(object):
         media = []
     return Status(created_at=data.get('created_at', None),
                   favorited=data.get('favorited', None),
+                  favorite_count=data.get('favorite_count', None),
                   id=data.get('id', None),
                   text=data.get('text', None),
                   location=data.get('location', None),
