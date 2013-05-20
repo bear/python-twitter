@@ -2180,6 +2180,7 @@ class Api(object):
       >>> api.GetUser(user)
       >>> api.GetReplies()
       >>> api.GetUserTimeline(user)
+      >>> api.GetHomeTimeLine()
       >>> api.GetStatus(id)
       >>> api.DestroyStatus(id)
       >>> api.GetFriendsTimeline(user)
@@ -2746,6 +2747,105 @@ class Api(object):
     if exclude_replies:
       parameters['exclude_replies'] = 1
 
+    json = self._FetchUrl(url, parameters=parameters)
+    data = self._ParseAndCheckTwitter(json)
+    return [Status.NewFromJsonDict(x) for x in data]
+
+  def GetHomeTimeline(self,
+                    since_id=None,
+                    max_id=None,
+                    count=None,
+                    page=None,
+                    include_rts=None,
+                    trim_user=None,
+                    include_entities=None,
+                    exclude_replies=None,
+                    contributor_details=None):
+    '''Fetch the sequence of Status messages for authenticated user.
+        
+        Args:
+        since_id:
+        Returns results with an ID greater than (that is, more recent
+        than) the specified ID. There are limits to the number of
+        Tweets which can be accessed through the API. If the limit of
+        Tweets has occurred since the since_id, the since_id will be
+        forced to the oldest ID available. [Optional]
+        max_id:
+        Returns only statuses with an ID less than (that is, older
+        than) or equal to the specified ID. [Optional]
+        count:
+        Specifies the number of statuses to retrieve. May not be
+        greater than 200.  [Optional]
+        page:
+        Specifies the page of results to retrieve.
+        Note: there are pagination limits. [Optional]
+        include_rts:
+        If True, the timeline will contain native retweets (if they
+        exist) in addition to the standard stream of tweets. [Optional]
+        trim_user:
+        If True, statuses will only contain the numerical user ID only.
+        Otherwise a full user object will be returned for each status.
+        [Optional]
+        include_entities:
+        If True, each tweet will include a node called "entities,".
+        This node offers a variety of metadata about the tweet in a
+        discreet structure, including: user_mentions, urls, and
+        hashtags. [Optional]
+        exclude_replies:
+        If True, this will prevent replies from appearing in the returned
+        timeline. Using exclude_replies with the count parameter will mean you
+        will receive up-to count tweets - this is because the count parameter
+        retrieves that many tweets before filtering out retweets and replies.
+        This parameter is only supported for JSON and XML responses. [Optional]
+        contributor_details:
+        If True, screen_name will be included.  By default, only user_id is.
+        
+        Returns:
+        A sequence of Status instances, one for each message up to count
+        '''
+    parameters = {}
+    
+    url = '%s/statuses/home_timeline.json' % self.base_url
+    
+    if since_id:
+        try:
+            parameters['since_id'] = long(since_id)
+        except:
+            raise TwitterError("since_id must be an integer")
+    
+    if max_id:
+        try:
+            parameters['max_id'] = long(max_id)
+        except:
+            raise TwitterError("max_id must be an integer")
+    
+    if count:
+        try:
+            parameters['count'] = int(count)
+        except:
+            raise TwitterError("count must be an integer")
+    
+    if page:
+        try:
+            parameters['page'] = int(page)
+        except:
+            raise TwitterError("page must be an integer")
+    
+    if include_rts:
+        parameters['include_rts'] = 1
+    
+    if include_entities:
+        parameters['include_entities'] = 1
+    
+    if trim_user:
+        parameters['trim_user'] = 1
+    
+    if exclude_replies:
+        parameters['exclude_replies'] = 1
+    
+    if contributor_details:
+        parameters['contributor_details'] = 1
+    
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
     return [Status.NewFromJsonDict(x) for x in data]
