@@ -4063,21 +4063,6 @@ class Api(object):
         break
     return result
 
-  def GetUserByEmail(self, email):
-    '''Returns a single user by email address.
-
-    Args:
-      email:
-        The email of the user to retrieve.
-
-    Returns:
-      A twitter.User instance representing that user
-    '''
-    url = '%s/users/show.json?email=%s' % (self.base_url, email)
-    json = self._FetchUrl(url)
-    data = self._ParseAndCheckTwitter(json)
-    return User.NewFromJsonDict(data)
-
   def VerifyCredentials(self):
     '''Returns a twitter.User instance if the authenticating user is valid.
 
