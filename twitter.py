@@ -4038,14 +4038,22 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return List.NewFromJsonDict(data)
 
-  def GetSubscriptions(self, user, cursor=-1):
-    '''Fetch the sequence of Lists that the given user is subscribed to
+  def GetSubscriptions(self, user_id=None, screen_name=None, count=20, cursor=-1):
+    '''
+    Obtain a collection of the lists the specified user is subscribed to, 20
+    lists per page by default. Does not include the user's own lists.
 
     The twitter.Api instance must be authenticated.
 
     Args:
-      user:
-        The twitter name or id of the user
+      user_id:
+        The ID of the user for whom to return results for. [Optional]
+      screen_name:
+        The screen name of the user for whom to return results for.
+        [Optional]
+      count:
+       The amount of results to return per page. Defaults to 20.
+       No more than 1000 results will ever be returned in a single page.
       cursor:
         "page" value that Twitter will use to start building the
         list sequence from.  -1 to start at the beginning.
@@ -4058,9 +4066,28 @@ class Api(object):
     if not self._oauth_consumer:
       raise TwitterError("twitter.Api instance must be authenticated")
 
-    url = '%s/%s/lists/subscriptions.json' % (self.base_url, user)
+    url = '%s/lists/subscriptions.json' % (self.base_url)
     parameters = {}
-    parameters['cursor'] = cursor
+
+    try:
+      parameters['cursor'] = int(cursor)
+    except:
+      raise TwitterError("cursor must be an integer")
+
+    try:
+      parameters['count'] = int(count)
+    except:
+      raise TwitterError("count must be an integer")
+
+    if user_id is not None:
+      try:
+        parameters['user_id'] = long(user_id)
+      except:
+        raise TwitterError('user_id must be an integer')
+    elif screen_name is not None:
+      parameters['screen_name'] = screen_name
+    else:
+      raise TwitterError('Specify user_id or screen_name')
 
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
