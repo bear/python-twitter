@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #
 # vim: sw=2 ts=2 sts=2
+#
 # Copyright 2007 The Python-Twitter Developers
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +19,7 @@
 '''A library that provides a Python interface to the Twitter API'''
 
 __author__ = 'python-twitter@googlegroups.com'
-__version__ = '0.8.7'
+__version__ = '1.0.0'
 
 
 import calendar
