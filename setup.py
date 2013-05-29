@@ -1,6 +1,6 @@
 #!/usr/bin/python2.4
 #
-# Copyright 2007 The Python-Twitter Developers
+# Copyright 2007-2013 The Python-Twitter Developers
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 '''The setup and build script for the python-twitter library.'''
 
 __author__ = 'python-twitter@googlegroups.com'
-__version__ = '0.8.7'
+__version__ = '1.0.0'
 
 
 # The base package metadata to be used by both distutils and setuptools
@@ -38,7 +38,7 @@ SETUPTOOLS_METADATA = dict(
   install_requires = ['setuptools', 'simplejson', 'oauth2'],
   include_package_data = True,
   classifiers = [
-    'Development Status :: 4 - Beta',
+    'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: Apache Software License',
     'Topic :: Software Development :: Libraries :: Python Modules',
