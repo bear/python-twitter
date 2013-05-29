@@ -156,12 +156,47 @@ Please visit [the google group](http://groups.google.com/group/python-twitter) f
 
 ## Contributors
 
-Additional thanks to Pierre-Jean Coudert, Omar Kilani, Jodok Batlogg, edleaf, glen.tregoning, Brad Choate, Jim Cortez, Jason Lemoine, Thomas Dyson, Robert Laquey, Hameedullah Khan, Mike Taylor, DeWitt Clinton, and the rest of the python-twitter mailing list.
+Originally two libraries by DeWitt Clinton and Mike Taylor which was then merged into python-twitter.
+
+Now it's a full-on open source project with many contributors over time:
+
+* Jodok Batlogg,
+* Kyle Bock,
+* Brad Choate,
+* Robert Clarke,
+* Jim Cortez,
+* Pierre-Jean Coudert,
+* Aish Raj Dahal,
+* Thomas Dyson,
+* Yoshinori Fukushima,
+* Hameedullah Khan,
+* Osama Khalid,
+* Omar Kilani,
+* Domen Kožar,
+* Robert Laquey,
+* Jason Lemoine,
+* Pradeep Nayak,
+* Ian Ozsvald,
+* Nicolas Perriault,
+* Glen Tregoning,
+* Lars Weiler,
+* Sebastian Wiesinger,
+* abloch,
+* cahlan,
+* dpslwk,
+* edleaf,
+* ecesena,
+* git-matrix,
+* sbywater,
+* thefinn93,
+* themylogin,
+
+and the rest of the python-twitter mailing list.
 
 ## License
 
 ```
-Copyright 2007 The Python-Twitter Developers
+Copyright 2007-2013 The Python-Twitter Developers
 
 Licensed under the Apache License, Version 2.0 (the 'License');
 you may not use this file except in compliance with the License.
