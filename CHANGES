@@ -1,3 +1,9 @@
+2013-05-28
+  bumped version to 1.0.0
+  merged in api_v1.1 branch
+
+  The library is now only for Twitter API v1.1
+
 2013-03-03
   bumped version to 0.8.7
 
