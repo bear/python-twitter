@@ -68,7 +68,7 @@ The library provides a Python wrapper around the Twitter API and the Twitter dat
 
 **Model:**
 
-The three model classes are twitter.Status, twitter.User, and `twitter.DirectMessage`. The API methods return instances of these classes.
+The three model classes are `twitter.Status`, `twitter.User`, and `twitter.DirectMessage`. The API methods return instances of these classes.
 
 To read the full API for `twitter.Status`, `twitter.User`, or `twitter.DirectMessage`, run:
 
