@@ -5,5 +5,5 @@ include NOTICE
 include README.md
 include *.py
 recursive-include examples *.py
-recursive-include doc *.html
+recursive-include testdata *.json
 prune .DS_Store
