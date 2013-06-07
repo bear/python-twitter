@@ -168,6 +168,7 @@ Now it's a full-on open source project with many contributors over time:
 * Pierre-Jean Coudert,
 * Aish Raj Dahal,
 * Thomas Dyson,
+* Jim Easterbrook
 * Yoshinori Fukushima,
 * Hameedullah Khan,
 * Osama Khalid,
