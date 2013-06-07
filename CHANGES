@@ -1,3 +1,7 @@
+2013-06-07
+  changed version to 1.0.1
+  added README bit about Python version requirement
+  
 2013-06-04
   changed version to 1.0
   removed doc directory until we can update docs for v1.1 API
