@@ -3411,7 +3411,7 @@ class Api(object):
     json = self._FetchUrl(url, parameters=parameters)
     try:
       data = self._ParseAndCheckTwitter(json)
-    except TwitterError as e:
+    except TwitterError, e:
         t = e.args[0]
         if len(t) == 1 and ('code' in t[0]) and (t[0]['code'] == 34):
           data = []
