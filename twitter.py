@@ -19,7 +19,7 @@
 '''A library that provides a Python interface to the Twitter API'''
 
 __author__ = 'python-twitter@googlegroups.com'
-__version__ = '1.0'
+__version__ = '1.0.1'
 
 
 import calendar
