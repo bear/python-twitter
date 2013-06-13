@@ -3260,7 +3260,7 @@ class Api(object):
       return result
 
 
-  def GetFollowerIDs(self, user_id=None, screen_name=None, cursor=-1, stringify_ids=False, count=None):
+  def GetFollowerIDs(self, user_id=None, screen_name=None, cursor=-1, stringify_ids=False, count=None, total_count=None):
       '''Returns a list of twitter user id's for every person
       that is following the specified user.
 
@@ -3279,7 +3279,15 @@ class Api(object):
           if True then twitter will return the ids as strings instead of integers.
           [Optional]
         count:
-          The number of status messages to retrieve. [Optional]
+          The number of user id's to retrieve per API request. Please be aware that
+          this might get you rate-limited if set to a small number. By default Twitter
+          will retrieve 5000 UIDs per call.
+          [Optional]
+        total_count:
+          The total amount of UIDs to retrieve. Good if the account has many followers
+          and you don't want to get rate limited. The data returned might contain more
+          UIDs if total_count is not a multiple of count (5000 by default).
+          [Optional]
 
 
       Returns:
@@ -3299,6 +3307,8 @@ class Api(object):
         parameters['count'] = count
       result = []
       while True:
+        if total_count and total_count < count:
+          parameters['count'] = total_count
         parameters['cursor'] = cursor
         json = self._FetchUrl(url, parameters=parameters)
         data = self._ParseAndCheckTwitter(json)
@@ -3308,6 +3318,9 @@ class Api(object):
             break
           else:
             cursor = data['next_cursor']
+            total_count -= len(data['ids'])
+            if total_count < 1:
+              break
         else:
           break
       return result
