@@ -3567,15 +3567,16 @@ class Api(object):
   def PostDirectMessage(self, text, user_id=None, screen_name=None):
     '''Post a twitter direct message from the authenticated user
 
-    The twitter.Api instance must be authenticated.
+    The twitter.Api instance must be authenticated. user_id or screen_name
+    must be specified.
 
     Args:
       text: The message text to be posted.  Must be less than 140 characters.
       user_id:
-        A list of user_ids to retrieve extended information.
+        The ID of the user who should receive the direct message.
         [Optional]
       screen_name:
-        A list of screen_names to retrieve extended information.
+        The screen name of the user who should receive the direct message.
         [Optional]
 
     Returns:
