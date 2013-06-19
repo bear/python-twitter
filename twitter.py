@@ -2289,7 +2289,6 @@ class Api(object):
       >>> api.GetHomeTimeLine()
       >>> api.GetStatus(id)
       >>> api.DestroyStatus(id)
-      >>> api.GetFriendsTimeline(user)
       >>> api.GetFriends(user)
       >>> api.GetFollowers()
       >>> api.GetFeatured()
