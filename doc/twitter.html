@@ -113,7 +113,6 @@ Example&nbsp;usage:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetUserTimeline">GetUserTimeline</a>(user)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetStatus">GetStatus</a>(id)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-DestroyStatus">DestroyStatus</a>(id)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetFriendsTimeline">GetFriendsTimeline</a>(user)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetFriends">GetFriends</a>(user)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetFollowers">GetFollowers</a>()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;api.<a href="#Api-GetFeatured">GetFeatured</a>()<br>
@@ -345,38 +344,6 @@ Args:<br>
 &nbsp;<br>
 Returns:<br>
 &nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#User">User</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;friend</tt></dd></dl>
-
-<dl><dt><a name="Api-GetFriendsTimeline"><strong>GetFriendsTimeline</strong></a>(self, user<font color="#909090">=None</font>, count<font color="#909090">=None</font>, page<font color="#909090">=None</font>, since_id<font color="#909090">=None</font>, retweets<font color="#909090">=None</font>, include_entities<font color="#909090">=None</font>)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;messages&nbsp;for&nbsp;a&nbsp;user's&nbsp;friends<br>
-&nbsp;<br>
-The&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;must&nbsp;be&nbsp;authenticated&nbsp;if&nbsp;the&nbsp;user&nbsp;is&nbsp;private.<br>
-&nbsp;<br>
-Args:<br>
-&nbsp;&nbsp;user:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;ID&nbsp;or&nbsp;screen&nbsp;name&nbsp;of&nbsp;the&nbsp;user&nbsp;for&nbsp;whom&nbsp;to&nbsp;return<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;friends_timeline.&nbsp;&nbsp;If&nbsp;not&nbsp;specified&nbsp;then&nbsp;the&nbsp;authenticated<br>
-&nbsp;&nbsp;&nbsp;&nbsp;user&nbsp;set&nbsp;in&nbsp;the&nbsp;twitter.<a href="#Api">Api</a>&nbsp;instance&nbsp;will&nbsp;be&nbsp;used.&nbsp;&nbsp;[Optional]<br>
-&nbsp;&nbsp;count:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;number&nbsp;of&nbsp;statuses&nbsp;to&nbsp;retrieve.&nbsp;May&nbsp;not&nbsp;be<br>
-&nbsp;&nbsp;&nbsp;&nbsp;greater&nbsp;than&nbsp;100.&nbsp;[Optional]<br>
-&nbsp;&nbsp;page:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Specifies&nbsp;the&nbsp;page&nbsp;of&nbsp;results&nbsp;to&nbsp;retrieve.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Note:&nbsp;there&nbsp;are&nbsp;pagination&nbsp;limits.&nbsp;[Optional]<br>
-&nbsp;&nbsp;since_id:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;results&nbsp;with&nbsp;an&nbsp;ID&nbsp;greater&nbsp;than&nbsp;(that&nbsp;is,&nbsp;more&nbsp;recent<br>
-&nbsp;&nbsp;&nbsp;&nbsp;than)&nbsp;the&nbsp;specified&nbsp;ID.&nbsp;There&nbsp;are&nbsp;limits&nbsp;to&nbsp;the&nbsp;number&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;which&nbsp;can&nbsp;be&nbsp;accessed&nbsp;through&nbsp;the&nbsp;API.&nbsp;If&nbsp;the&nbsp;limit&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Tweets&nbsp;has&nbsp;occured&nbsp;since&nbsp;the&nbsp;since_id,&nbsp;the&nbsp;since_id&nbsp;will&nbsp;be<br>
-&nbsp;&nbsp;&nbsp;&nbsp;forced&nbsp;to&nbsp;the&nbsp;oldest&nbsp;ID&nbsp;available.&nbsp;[Optional]<br>
-&nbsp;&nbsp;retweets:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;True,&nbsp;the&nbsp;timeline&nbsp;will&nbsp;contain&nbsp;native&nbsp;retweets.&nbsp;[Optional]<br>
-&nbsp;&nbsp;include_entities:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;True,&nbsp;each&nbsp;tweet&nbsp;will&nbsp;include&nbsp;a&nbsp;node&nbsp;called&nbsp;"entities,".<br>
-&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;node&nbsp;offers&nbsp;a&nbsp;variety&nbsp;of&nbsp;metadata&nbsp;about&nbsp;the&nbsp;tweet&nbsp;in&nbsp;a<br>
-&nbsp;&nbsp;&nbsp;&nbsp;discreet&nbsp;structure,&nbsp;including:&nbsp;user_mentions,&nbsp;urls,&nbsp;and<br>
-&nbsp;&nbsp;&nbsp;&nbsp;hashtags.&nbsp;[Optional]<br>
-&nbsp;<br>
-Returns:<br>
-&nbsp;&nbsp;A&nbsp;sequence&nbsp;of&nbsp;twitter.<a href="#Status">Status</a>&nbsp;instances,&nbsp;one&nbsp;for&nbsp;each&nbsp;message</tt></dd></dl>
 
 <dl><dt><a name="Api-GetLists"><strong>GetLists</strong></a>(self, user, cursor<font color="#909090">=-1</font>)</dt><dd><tt>Fetch&nbsp;the&nbsp;sequence&nbsp;of&nbsp;lists&nbsp;for&nbsp;a&nbsp;user.<br>
 &nbsp;<br>
