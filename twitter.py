@@ -2479,13 +2479,13 @@ class Api(object):
     if since_id:
       try:
         parameters['since_id'] = long(since_id)
-      except:
+      except ValueError:
         raise TwitterError("since_id must be an integer")
 
     if max_id:
       try:
         parameters['max_id'] = long(max_id)
-      except:
+      except ValueError:
         raise TwitterError("max_id must be an integer")
 
     if until:
@@ -2511,7 +2511,7 @@ class Api(object):
 
     try:
         parameters['count'] = int(count)
-    except:
+    except ValueError:
         raise TwitterError("count must be an integer")
 
     if result_type in ["mixed", "popular", "recent"]:
@@ -2562,7 +2562,7 @@ class Api(object):
 
     try:
       parameters['count'] = int(count)
-    except:
+    except ValueError:
       raise TwitterError("count must be an integer")
 
     # Make and send requests
@@ -2766,19 +2766,19 @@ class Api(object):
     if since_id:
       try:
         parameters['since_id'] = long(since_id)
-      except:
+      except ValueError:
         raise TwitterError("since_id must be an integer")
 
     if max_id:
       try:
         parameters['max_id'] = long(max_id)
-      except:
+      except ValueError:
         raise TwitterError("max_id must be an integer")
 
     if count:
       try:
         parameters['count'] = int(count)
-      except:
+      except ValueError:
         raise TwitterError("count must be an integer")
 
     if include_rts:
@@ -2865,7 +2865,7 @@ class Api(object):
 
     try:
       post_data = {'id': long(id)}
-    except:
+    except ValueError:
       raise TwitterError("id must be an integer")
     url  = '%s/statuses/destroy/%s.json' % (self.base_url, id)
     if trim_user:
@@ -3099,7 +3099,7 @@ class Api(object):
     if count:
       try:
         parameters['count'] = int(count)
-      except:
+      except ValueError:
         raise TwitterError("count must be an integer")
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
@@ -3515,7 +3515,7 @@ class Api(object):
     if count:
       try:
         parameters['count'] = int(count)
-      except:
+      except ValueError:
         raise TwitterError("count must be an integer")
     if not include_entities:
       parameters['include_entities'] = 'false'
@@ -3568,7 +3568,7 @@ class Api(object):
     if count:
       try:
         parameters['count'] = int(count)
-      except:
+      except ValueError:
         raise TwitterError("count must be an integer")
     if not include_entities:
       parameters['include_entities'] = 'false'
@@ -3780,19 +3780,19 @@ class Api(object):
     if since_id:
       try:
         parameters['since_id'] = long(since_id)
-      except:
+      except ValueError:
         raise TwitterError("since_id must be an integer")
 
     if max_id:
       try:
         parameters['max_id'] = long(max_id)
-      except:
+      except ValueError:
         raise TwitterError("max_id must be an integer")
 
     if count:
       try:
         parameters['count'] = int(count)
-      except:
+      except ValueError:
         raise TwitterError("count must be an integer")
 
     if include_entities:
@@ -3853,17 +3853,17 @@ class Api(object):
     if count:
       try:
         parameters['count'] = int(count)
-      except:
+      except ValueError:
         raise TwitterError("count must be an integer")
     if since_id:
       try:
         parameters['since_id'] = long(since_id)
-      except:
+      except ValueError:
         raise TwitterError("since_id must be an integer")
     if max_id:
       try:
         parameters['max_id'] = long(max_id)
-      except:
+      except ValueError:
         raise TwitterError("max_id must be an integer")
     if trim_user:
       parameters['trim_user'] = 1
@@ -3936,14 +3936,14 @@ class Api(object):
     if list_id:
       try:
         data['list_id']= long(list_id)
-      except:
+      except ValueError:
         raise TwitterError("list_id must be an integer")
     elif slug:
       data['slug'] = slug
       if owner_id:
         try:
           data['owner_id'] = long(owner_id)
-        except:
+        except ValueError:
           raise TwitterError("owner_id must be an integer")
       elif owner_screen_name:
         data['owner_screen_name'] = owner_screen_name
@@ -3986,14 +3986,14 @@ class Api(object):
     if list_id:
       try:
         data['list_id']= long(list_id)
-      except:
+      except ValueError:
         raise TwitterError("list_id must be an integer")
     elif slug:
       data['slug'] = slug
       if owner_id:
         try:
           data['owner_id'] = long(owner_id)
-        except:
+        except ValueError:
           raise TwitterError("owner_id must be an integer")
       elif owner_screen_name:
         data['owner_screen_name'] = owner_screen_name
@@ -4035,14 +4035,14 @@ class Api(object):
     if list_id:
       try:
         data['list_id']= long(list_id)
-      except:
+      except ValueError:
         raise TwitterError("list_id must be an integer")
     elif slug:
       data['slug'] = slug
       if owner_id:
         try:
           data['owner_id'] = long(owner_id)
-        except:
+        except ValueError:
           raise TwitterError("owner_id must be an integer")
       elif owner_screen_name:
         data['owner_screen_name'] = owner_screen_name
@@ -4087,18 +4087,18 @@ class Api(object):
 
     try:
       parameters['cursor'] = int(cursor)
-    except:
+    except ValueError:
       raise TwitterError("cursor must be an integer")
 
     try:
       parameters['count'] = int(count)
-    except:
+    except ValueError:
       raise TwitterError("count must be an integer")
 
     if user_id is not None:
       try:
         parameters['user_id'] = long(user_id)
-      except:
+      except ValueError:
         raise TwitterError('user_id must be an integer')
     elif screen_name is not None:
       parameters['screen_name'] = screen_name
@@ -4142,7 +4142,7 @@ class Api(object):
     if user_id is not None:
       try:
         parameters['user_id'] = long(user_id)
-      except:
+      except ValueError:
         raise TwitterError('user_id must be an integer')
     elif screen_name is not None:
       parameters['screen_name'] = screen_name
