@@ -2709,7 +2709,7 @@ class Api(object):
                       since_id=None,
                       max_id=None,
                       count=None,
-                      include_rts=None,
+                      include_rts=True,
                       trim_user=None,
                       exclude_replies=None):
     '''Fetch the sequence of public Status messages for a single user.
@@ -2781,8 +2781,8 @@ class Api(object):
       except ValueError:
         raise TwitterError("count must be an integer")
 
-    if include_rts:
-      parameters['include_rts'] = 1
+    if not include_rts:
+      parameters['include_rts'] = 0
 
     if trim_user:
       parameters['trim_user'] = 1
