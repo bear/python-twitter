@@ -54,7 +54,7 @@ oauth_client               = oauth.Client(oauth_consumer)
 
 print 'Requesting temp token from Twitter'
 
-resp, content = oauth_client.request(REQUEST_TOKEN_URL, 'GET')
+resp, content = oauth_client.request(REQUEST_TOKEN_URL, 'POST', body="oauth_callback=oob")
 
 if resp['status'] != '200':
   print 'Invalid respond from Twitter requesting temp token: %s' % resp['status']
