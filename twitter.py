@@ -2841,6 +2841,90 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
 
+  def GetStatusOembed(self,
+                id=None,
+                url=None,
+                maxwidth=None,
+                hide_media=False,
+                hide_thread=False,
+                omit_script=False,
+                align=None,
+                related=None,
+                lang=None):
+    '''Returns information allowing the creation of an embedded representation of a 
+    Tweet on third party sites.
+    Specify tweet by the id or url parameter.
+
+    The twitter.Api instance must be authenticated.
+
+    Args:
+      id:
+        The numeric ID of the status you are trying to embed.
+      url:
+        The url of the status you are trying to embed.
+      maxwidth:
+        The maximum width in pixels that the embed should be rendered at.
+        This value is constrained to be between 250 and 550 pixels. [Optional]
+      hide_media:
+        Specifies whether the embedded Tweet should automatically expand images. [Optional]
+      hide_thread:
+        Specifies whether the embedded Tweet should automatically show the original
+        message in the case that the embedded Tweet is a reply. [Optional]
+      omit_script:
+        Specifies whether the embedded Tweet HTML should include a <script>
+        element pointing to widgets.js. [Optional]
+      align:
+        Specifies whether the embedded Tweet should be left aligned, right aligned,
+        or centered in the page. [Optional]
+      related:
+        A comma sperated string of related screen names. [Optional]
+      lang:
+        Language code for the rendered embed. [Optional]
+
+    Returns:
+      A dictionary with the response.
+    '''
+    request_url  = '%s/statuses/oembed.json' % (self.base_url)
+
+    if not self._oauth_consumer:
+      raise TwitterError("API must be authenticated.")
+    
+    parameters = {}
+
+    if id is not None:
+      try:
+        parameters['id'] = long(id)
+      except ValueError:
+        raise TwitterError("'id' must be an integer.")
+    elif url is not None:
+      parameters['url'] = url
+    else:
+      raise TwitterError("Must specify either 'id' or 'url'")
+
+    if maxwidth is not None:
+       parameters['maxwidth'] = maxwidth
+    if hide_media == True:
+       parameters['hide_media'] = 'true'
+    if hide_thread == True:
+       parameters['hide_thread'] = 'true'
+    if omit_script == True:
+       parameters['omit_script'] = 'true'
+    if align is not None:
+       if align not in ('left', 'center', 'right', 'none'):
+         raise TwitterError("'align' must be 'left', 'center', 'right', or 'none'")
+       parameters['align'] = align
+    if related:
+        if not isinstance(related, str):
+          raise TwitterError("'related' should be a string of comma separated screen names")
+        parameters['related'] = related
+    if lang is not None:
+        if not isinstance(lang, str):
+          raise TwitterError("'lang' should be string instance")
+        parameters['lang'] = lang
+    json = self._FetchUrl(request_url, parameters=parameters)
+    data = self._ParseAndCheckTwitter(json)
+    return data 
+
   def DestroyStatus(self, id, trim_user=False):
     '''Destroys the status specified by the required ID parameter.
 
