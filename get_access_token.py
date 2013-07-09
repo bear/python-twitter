@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/env python
 #
 # Copyright 2007-2013 The Python-Twitter Developers
 #
@@ -20,6 +20,7 @@ try:
 except:
     from cgi import parse_qsl
 
+import webbrowser
 import oauth2 as oauth
 
 REQUEST_TOKEN_URL = 'https://api.twitter.com/oauth/request_token'
@@ -42,14 +43,18 @@ def get_access_token(consumer_key, consumer_secret):
         print 'Invalid respond from Twitter requesting temp token: %s' % resp['status']
     else:
         request_token = dict(parse_qsl(content))
+        url = '%s?oauth_token=%s' % (AUTHORIZATION_URL, request_token['oauth_token'])
 
         print ''
-        print 'Please visit this Twitter page and retrieve the pincode to be used'
+        print 'I will try to start a browser to visit the following Twitter page'
+        print 'if a browser will not start, copy the URL to your browser'
+        print 'and retrieve the pincode to be used'
         print 'in the next step to obtaining an Authentication Token:'
         print ''
-        print '%s?oauth_token=%s' % (AUTHORIZATION_URL, request_token['oauth_token'])
+        print url
         print ''
 
+        webbrowser.open(url)
         pincode = raw_input('Pincode? ')
 
         token = oauth.Token(request_token['oauth_token'], request_token['oauth_token_secret'])
