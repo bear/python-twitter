@@ -1,4 +1,4 @@
-#!/usr/bin/python2.4
+#!/usr/bin/env python
 
 '''Load the latest update for a Twitter user and leave it in an XHTML fragment'''
 

@@ -1,6 +1,6 @@
-#!/usr/bin/python2.4
+#!/usr/bin/env python
 #
-# Copyright 2007 The Python-Twitter Developers
+# Copyright 2007-2013 The Python-Twitter Developers
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
