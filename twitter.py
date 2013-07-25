@@ -2888,7 +2888,7 @@ class Api(object):
 
     if not self._oauth_consumer:
       raise TwitterError("API must be authenticated.")
-    
+
     parameters = {}
 
     if id is not None:
@@ -2923,7 +2923,7 @@ class Api(object):
         parameters['lang'] = lang
     json = self._FetchUrl(request_url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
-    return data 
+    return data
 
   def DestroyStatus(self, id, trim_user=False):
     '''Destroys the status specified by the required ID parameter.
