@@ -2180,6 +2180,9 @@ class Trend(object):
     self.timestamp = timestamp
     self.url = url
 
+  def __repr__(self):
+    return self.name
+
   def __str__(self):
     return 'Name: %s\nQuery: %s\nTimestamp: %s\nSearch URL: %s\n' % (self.name, self.query, self.timestamp, self.url)
 
