@@ -2416,8 +2416,8 @@ class Api(object):
 
   def GetHelpConfiguration(self):
     url  = '%s/help/configuration.json' % self.base_url
-    json = self._FetchUrl(url)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._ReqestUrl(url)
+    data = self._ParseAndCheckTwitter(json.content)
     return data
 
   def GetShortUrlLength(self, https=False):
