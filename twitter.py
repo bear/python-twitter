@@ -36,6 +36,8 @@ import urllib2
 import urlparse
 import gzip
 import StringIO
+import requests
+from requests_oauthlib import OAuth1
 
 try:
   # Python >= 2.6
@@ -2407,6 +2409,8 @@ class Api(object):
 
       self._oauth_token    = oauth.Token(key=access_token_key, secret=access_token_secret)
       self._oauth_consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
+      self.__auth = OAuth1(consumer_key, consumer_secret,  # For request upgrade
+              access_token_key, access_token_secret)
 
     self._config = self.GetHelpConfiguration()
 
@@ -2430,6 +2434,7 @@ class Api(object):
     self._access_token_key    = None
     self._access_token_secret = None
     self._oauth_consumer      = None
+    self.__auth               = None  # for request upgrade
 
   def GetSearch(self,
                 term=None,
@@ -2615,8 +2620,9 @@ class Api(object):
     if exclude:
       parameters['exclude'] = exclude
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, verb='GET', data=parameters)
+    #json = self._FetchUrl(url, parameters=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
 
     trends = []
     timestamp = data[0]['as_of']
@@ -4579,6 +4585,24 @@ class Api(object):
       raise TwitterError(data['error'])
     if 'errors' in data:
       raise TwitterError(data['errors'])
+
+  def _RequestUrl(self, url, verb, data):  # upgrade to requests
+    '''Reqeust a Url, base function to replace _FetchUrl that uses
+        the request library.
+
+       Args:
+         url:   the web location we want to retrieve
+         verb:  POST, GET, etc...
+         data:  A dict of (str, unicode) key/value pairs.
+
+       Returns:
+         A JSON object.
+    '''
+    if verb == 'POST':  return requests.post(url, data=data, auth=self.__auth)
+    if verb == 'GET':
+      url = self._BuildUrl(url, extra_params=data)
+      return requests.get(url, auth=self.__auth)
+    return 0  # if not a POST or GET request
 
   def _FetchUrl(self,
                 url,
