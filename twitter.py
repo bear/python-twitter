@@ -2416,7 +2416,7 @@ class Api(object):
 
   def GetHelpConfiguration(self):
     url  = '%s/help/configuration.json' % self.base_url
-    json = self._ReqestUrl(url)
+    json = self._RequestUrl(url, 'GET')
     data = self._ParseAndCheckTwitter(json.content)
     return data
 
@@ -2535,8 +2535,8 @@ class Api(object):
 
     # Make and send requests
     url  = '%s/search/tweets.json' % self.base_url
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
 
     # Return built list of statuses
     return [Status.NewFromJsonDict(x) for x in data['statuses']]
@@ -2583,8 +2583,8 @@ class Api(object):
 
     # Make and send requests
     url  = '%s/users/search.json' % self.base_url
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [User.NewFromJsonDict(x) for x in data]
 
   def GetTrendsCurrent(self, exclude=None):
@@ -4586,7 +4586,7 @@ class Api(object):
     if 'errors' in data:
       raise TwitterError(data['errors'])
 
-  def _RequestUrl(self, url, verb, data):  # upgrade to requests
+  def _RequestUrl(self, url, verb, data=None):  # upgrade to requests
     '''Reqeust a Url, base function to replace _FetchUrl that uses
         the request library.
 
