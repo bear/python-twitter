@@ -3051,8 +3051,8 @@ class Api(object):
       data['display_coordinates'] = 'true'
     if trim_user:
       data['trim_user'] = 'true'
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   def PostUpdates(self, status, continuation=None, **kwargs):
@@ -4257,8 +4257,8 @@ class Api(object):
     else:
       raise TwitterError('Specify user_id or screen_name')
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [List.NewFromJsonDict(x) for x in data['lists']]
 
   def GetLists(self, user_id=None, screen_name=None, count=None, cursor=-1):
@@ -4305,8 +4305,8 @@ class Api(object):
 
     while True:
       parameters['cursor'] = cursor
-      json = self._FetchUrl(url, parameters=parameters)
-      data = self._ParseAndCheckTwitter(json)
+      json = self._RequestUrl(url, 'GET', data=parameters)
+      data = self._ParseAndCheckTwitter(json.content)
       result += [List.NewFromJsonDict(x) for x in data['lists']]
       if 'next_cursor' in data:
         if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -4327,14 +4327,8 @@ class Api(object):
     if not self._oauth_consumer:
       raise TwitterError("Api instance must first be given user credentials.")
     url = '%s/account/verify_credentials.json' % self.base_url
-    try:
-      json = self._FetchUrl(url, no_cache=True)
-    except urllib2.HTTPError, http_error:
-      if http_error.code == httplib.UNAUTHORIZED:
-        return None
-      else:
-        raise http_error
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET')  # No_cache
+    data = self._ParseAndCheckTwitter(json.content)
     return User.NewFromJsonDict(data)
 
   def SetCache(self, cache):
@@ -4428,8 +4422,8 @@ class Api(object):
       parameters['resources'] = resources
 
     url  = '%s/application/rate_limit_status.json' % self.base_url
-    json = self._FetchUrl(url, parameters=parameters, no_cache=True)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)  # No-Cache
+    data = self._ParseAndCheckTwitter(json.content)
     return data
 
   def MaximumHitFrequency(self):
