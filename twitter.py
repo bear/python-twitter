@@ -2401,9 +2401,10 @@ class Api(object):
     self._access_token_key    = access_token_key
     self._access_token_secret = access_token_secret
     self._oauth_consumer      = None
+    auth_list = [consumer_key, consumer_secret,
+                 access_token_key, access_token_secret]
 
-    if consumer_key is not None and consumer_secret is not None and \
-       access_token_key is not None and access_token_secret is not None:
+    if all(auth_list):
       self._signature_method_plaintext = oauth.SignatureMethod_PLAINTEXT()
       self._signature_method_hmac_sha1 = oauth.SignatureMethod_HMAC_SHA1()
 
@@ -2621,7 +2622,6 @@ class Api(object):
       parameters['exclude'] = exclude
 
     json = self._RequestUrl(url, verb='GET', data=parameters)
-    #json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json.content)
 
     trends = []
@@ -2971,8 +2971,8 @@ class Api(object):
     url  = '%s/statuses/destroy/%s.json' % (self.base_url, id)
     if trim_user:
       post_data['trim_user'] = 1
-    json = self._FetchUrl(url, post_data=post_data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=post_data)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   @classmethod
@@ -3897,8 +3897,8 @@ class Api(object):
       raise TwitterError("Specify id or status")
     if not include_entities:
       data['include_entities'] = 'false'
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   def GetFavorites(self,
@@ -3951,8 +3951,8 @@ class Api(object):
         parameters['include_entities'] = True
 
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(x) for x in data]
 
   def GetMentions(self,
@@ -4024,8 +4024,8 @@ class Api(object):
     if not include_entities:
       parameters['include_entities'] = 'false'
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(x) for x in data]
 
   def CreateList(self, name, mode=None, description=None):
