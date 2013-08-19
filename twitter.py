@@ -3118,8 +3118,8 @@ class Api(object):
     data = {'id': original_id}
     if trim_user:
       data['trim_user'] = 'true'
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   def GetUserRetweets(self, count=None, since_id=None, max_id=None, trim_user=False):
