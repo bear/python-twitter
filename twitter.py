@@ -2716,8 +2716,8 @@ class Api(object):
       parameters['contributor_details'] = 1
     if not include_entities:
       parameters['include_entities'] = 'false'
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(x) for x in data]
 
   def GetUserTimeline(self,
@@ -2807,8 +2807,8 @@ class Api(object):
     if exclude_replies:
       parameters['exclude_replies'] = 1
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(x) for x in data]
 
   def GetStatus(self,
@@ -2860,8 +2860,8 @@ class Api(object):
     if not include_entities:
       parameters['include_entities'] = 'none'
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   def GetStatusOembed(self,
@@ -2907,7 +2907,7 @@ class Api(object):
     Returns:
       A dictionary with the response.
     '''
-    request_url  = '%s/statuses/oembed.json' % (self.base_url)
+    url  = '%s/statuses/oembed.json' % (self.base_url)
 
     if not self._oauth_consumer:
       raise TwitterError("API must be authenticated.")
@@ -2944,8 +2944,8 @@ class Api(object):
         if not isinstance(lang, str):
           raise TwitterError("'lang' should be string instance")
         parameters['lang'] = lang
-    json = self._FetchUrl(request_url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return data
 
   def DestroyStatus(self, id, trim_user=False):
