@@ -3202,8 +3202,8 @@ class Api(object):
         parameters['count'] = int(count)
       except ValueError:
         raise TwitterError("count must be an integer")
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(s) for s in data]
 
   def GetRetweetsOfMe(self,
@@ -3253,8 +3253,8 @@ class Api(object):
       parameters['include_entities'] = include_entities
     if not include_user_entities:
       parameters['include_user_entities'] = include_user_entities
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(s) for s in data]
 
   def GetBlocks(self, user_id=None, screen_name=None, cursor=-1, skip_status=False, include_user_entities=False):
@@ -3296,8 +3296,8 @@ class Api(object):
       parameters['include_user_entities'] = True
     while True:
       parameters['cursor'] = cursor
-      json = self._FetchUrl(url, parameters=parameters)
-      data = self._ParseAndCheckTwitter(json)
+      json = self._RequestUrl(url, 'GET', data=parameters)
+      data = self._ParseAndCheckTwitter(json.content)
       result += [User.NewFromJsonDict(x) for x in data['users']]
       if 'next_cursor' in data:
         if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3347,8 +3347,8 @@ class Api(object):
       parameters['include_user_entities'] = True
     while True:
       parameters['cursor'] = cursor
-      json = self._FetchUrl(url, parameters=parameters)
-      data = self._ParseAndCheckTwitter(json)
+      json = self._RequestUrl(url, 'GET', data=parameters)
+      data = self._ParseAndCheckTwitter(json.content)
       result += [User.NewFromJsonDict(x) for x in data['users']]
       if 'next_cursor' in data:
         if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3398,8 +3398,8 @@ class Api(object):
       result = []
       while True:
         parameters['cursor'] = cursor
-        json = self._FetchUrl(url, parameters=parameters)
-        data = self._ParseAndCheckTwitter(json)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content)
         result += [x for x in data['ids']]
         if 'next_cursor' in data:
           if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3461,8 +3461,8 @@ class Api(object):
         if total_count and total_count < count:
           parameters['count'] = total_count
         parameters['cursor'] = cursor
-        json = self._FetchUrl(url, parameters=parameters)
-        data = self._ParseAndCheckTwitter(json)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content)
         result += [x for x in data['ids']]
         if 'next_cursor' in data:
           if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3515,8 +3515,8 @@ class Api(object):
       parameters['include_user_entities'] = True
     while True:
       parameters['cursor'] = cursor
-      json = self._FetchUrl(url, parameters=parameters)
-      data = self._ParseAndCheckTwitter(json)
+      json = self._RequestUrl(url, 'GET', data=parameters)
+      data = self._ParseAndCheckTwitter(json.content)
       result += [User.NewFromJsonDict(x) for x in data['users']]
       if 'next_cursor' in data:
         if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3572,9 +3572,9 @@ class Api(object):
       parameters['screen_name'] = ','.join(screen_name)
     if not include_entities:
       parameters['include_entities'] = 'false'
-    json = self._FetchUrl(url, parameters=parameters)
+    json = self._RequestUrl(url, 'GET', data=parameters)
     try:
-      data = self._ParseAndCheckTwitter(json)
+      data = self._ParseAndCheckTwitter(json.content)
     except TwitterError, e:
         _, e, _ = sys.exc_info()
         t = e.args[0]
@@ -3622,8 +3622,8 @@ class Api(object):
     if not include_entities:
       parameters['include_entities'] = 'false'
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return User.NewFromJsonDict(data)
 
   def GetDirectMessages(self, since_id=None, max_id=None, count=None, include_entities=True, skip_status=False):
@@ -3673,8 +3673,8 @@ class Api(object):
       parameters['include_entities'] = 'false'
     if skip_status:
       parameters['skip_status'] = 1
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [DirectMessage.NewFromJsonDict(x) for x in data]
 
   def GetSentDirectMessages(self, since_id=None, max_id=None, count=None, page=None, include_entities=True):
@@ -3724,8 +3724,8 @@ class Api(object):
         raise TwitterError("count must be an integer")
     if not include_entities:
       parameters['include_entities'] = 'false'
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [DirectMessage.NewFromJsonDict(x) for x in data]
 
   def PostDirectMessage(self, text, user_id=None, screen_name=None):
@@ -3756,8 +3756,8 @@ class Api(object):
       data['screen_name'] = screen_name
     else:
       raise TwitterError("Specify at least one of user_id or screen_name.")
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return DirectMessage.NewFromJsonDict(data)
 
   def DestroyDirectMessage(self, id, include_entities=True):
@@ -3777,8 +3777,8 @@ class Api(object):
     data = {'id': id}
     if not include_entities:
       data['include_entities'] = 'false'
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return DirectMessage.NewFromJsonDict(data)
 
   def CreateFriendship(self, user_id=None, screen_name=None, follow=True):
@@ -3808,8 +3808,8 @@ class Api(object):
       data['follow'] = 'true'
     else:
       data['follow'] = 'false'
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return User.NewFromJsonDict(data)
 
   def DestroyFriendship(self, user_id=None, screen_name=None):
@@ -3833,8 +3833,8 @@ class Api(object):
       data['screen_name'] = screen_name
     else:
       raise TwitterError("Specify at least one of user_id or screen_name.")
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return User.NewFromJsonDict(data)
 
   def CreateFavorite(self, status=None, id=None, include_entities=True):
@@ -3865,8 +3865,8 @@ class Api(object):
       raise TwitterError("Specify id or status")
     if not include_entities:
       data['include_entities'] = 'false'
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   def DestroyFavorite(self, status=None, id=None, include_entities=True):
@@ -4054,8 +4054,8 @@ class Api(object):
       parameters['mode'] = mode
     if description is not None:
       parameters['description'] = description
-    json = self._FetchUrl(url, post_data=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
 
   def DestroyList(self,
@@ -4104,8 +4104,8 @@ class Api(object):
     else:
       raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
 
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
 
   def CreateSubscription(self,
@@ -4153,8 +4153,8 @@ class Api(object):
         raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
     else:
       raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
 
   def DestroySubscription(self,
@@ -4202,8 +4202,8 @@ class Api(object):
         raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
     else:
       raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
 
   def GetSubscriptions(self, user_id=None, screen_name=None, count=20, cursor=-1):
@@ -4597,7 +4597,9 @@ class Api(object):
       url = self._BuildUrl(url, extra_params=data)
       return requests.get(url, auth=self.__auth)
     return 0  # if not a POST or GET request
-
+  
+# Save until request is fully tested
+"""
   def _FetchUrl(self,
                 url,
                 post_data=None,
@@ -4721,6 +4723,7 @@ class Api(object):
 
     # Always return the latest version
     return url_data
+  """
 
 class _FileCacheError(Exception):
   '''Base exception class for FileCache related errors'''
