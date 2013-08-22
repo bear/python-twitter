@@ -2180,6 +2180,9 @@ class Trend(object):
     self.timestamp = timestamp
     self.url = url
 
+  def __repr__(self):
+    return self.name
+
   def __str__(self):
     return 'Name: %s\nQuery: %s\nTimestamp: %s\nSearch URL: %s\n' % (self.name, self.query, self.timestamp, self.url)
 
@@ -2366,7 +2369,7 @@ class Api(object):
                                      access_token_secret is None):
       print >> sys.stderr, 'Twitter now requires an oAuth Access Token for API calls.'
       print >> sys.stderr, 'If your using this library from a command line utility, please'
-      print >> sys.stderr, 'run the the included get_access_token.py tool to generate one.'
+      print >> sys.stderr, 'run the included get_access_token.py tool to generate one.'
 
       raise TwitterError('Twitter requires oAuth Access Token for all API access')
 
@@ -2404,6 +2407,20 @@ class Api(object):
 
       self._oauth_token    = oauth.Token(key=access_token_key, secret=access_token_secret)
       self._oauth_consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
+
+    self._config = self.GetHelpConfiguration()
+
+  def GetHelpConfiguration(self):
+    url  = '%s/help/configuration.json' % self.base_url
+    json = self._FetchUrl(url)
+    data = self._ParseAndCheckTwitter(json)
+    return data
+
+  def GetShortUrlLength(self, https=False):
+    if https:
+      return self._config['short_url_length_https']
+    else:
+      return self._config['short_url_length']
 
   def ClearCredentials(self):
     '''Clear the any credentials for this instance
@@ -2851,7 +2868,7 @@ class Api(object):
                 align=None,
                 related=None,
                 lang=None):
-    '''Returns information allowing the creation of an embedded representation of a 
+    '''Returns information allowing the creation of an embedded representation of a
     Tweet on third party sites.
     Specify tweet by the id or url parameter.
 
