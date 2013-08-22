@@ -3045,6 +3045,30 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
+  def PostMedia(self, status):
+    '''Post a twitter status message from the authenticated user.
+
+    '''
+    if not self.__auth:
+      raise TwitterError("The twitter.Api instance must be authenticated.")
+
+    url = '%s/statuses/update_with_media.json' % self.base_url
+
+    if isinstance(status, unicode) or self._input_encoding is None:
+      u_status = status
+    else:
+      u_status = unicode(status, self._input_encoding)
+
+    #if self._calculate_status_length(u_status, self._shortlink_size) > CHARACTER_LIMIT:
+    #  raise TwitterError("Text must be less than or equal to %d characters. "
+    #                     "Consider using PostUpdates." % CHARACTER_LIMIT)
+
+    data = {'status': status}
+    data['media'] = open('image.gif', 'rb').read()
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
+    return Status.NewFromJsonDict(data)
+
   def PostUpdates(self, status, continuation=None, **kwargs):
     '''Post one or more twitter status messages from the authenticated user.
 
@@ -4582,7 +4606,11 @@ class Api(object):
        Returns:
          A JSON object.
     '''
-    if verb == 'POST':  return requests.post(url, data=data, auth=self.__auth)
+    if verb == 'POST':
+      if data.has_key('media'):
+        return requests.post(url, files=data, auth=self.__auth)
+      else:
+        return requests.post(url, data=data, auth=self.__auth)
     if verb == 'GET':
       url = self._BuildUrl(url, extra_params=data)
       return requests.get(url, auth=self.__auth)
