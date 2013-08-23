@@ -2202,6 +2202,9 @@ class Trend(object):
     self.timestamp = timestamp
     self.url = url
 
+  def __repr__(self):
+    return self.name
+
   def __str__(self):
     return 'Name: %s\nQuery: %s\nTimestamp: %s\nSearch URL: %s\n' % (self.name, self.query, self.timestamp, self.url)
 
@@ -2388,7 +2391,7 @@ class Api(object):
                                      access_token_secret is None):
       print >> sys.stderr, 'Twitter now requires an oAuth Access Token for API calls.'
       print >> sys.stderr, 'If your using this library from a command line utility, please'
-      print >> sys.stderr, 'run the the included get_access_token.py tool to generate one.'
+      print >> sys.stderr, 'run the included get_access_token.py tool to generate one.'
 
       raise TwitterError('Twitter requires oAuth Access Token for all API access')
 
@@ -2426,6 +2429,20 @@ class Api(object):
 
       self._oauth_token = oauth.Token(key=access_token_key, secret=access_token_secret)
       self._oauth_consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
+
+    self._config = self.GetHelpConfiguration()
+
+  def GetHelpConfiguration(self):
+    url  = '%s/help/configuration.json' % self.base_url
+    json = self._FetchUrl(url)
+    data = self._ParseAndCheckTwitter(json)
+    return data
+
+  def GetShortUrlLength(self, https=False):
+    if https:
+      return self._config['short_url_length_https']
+    else:
+      return self._config['short_url_length']
 
   def ClearCredentials(self):
     '''Clear the any credentials for this instance
@@ -2873,7 +2890,7 @@ class Api(object):
                 align=None,
                 related=None,
                 lang=None):
-    '''Returns information allowing the creation of an embedded representation of a 
+    '''Returns information allowing the creation of an embedded representation of a
     Tweet on third party sites.
     Specify tweet by the id or url parameter.
 
@@ -2910,7 +2927,7 @@ class Api(object):
 
     if not self._oauth_consumer:
       raise TwitterError("API must be authenticated.")
-    
+
     parameters = {}
 
     if id is not None:
@@ -2945,7 +2962,7 @@ class Api(object):
         parameters['lang'] = lang
     json = self._FetchUrl(request_url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
-    return data 
+    return data
 
   def DestroyStatus(self, id, trim_user=False):
     '''Destroys the status specified by the required ID parameter.
@@ -3255,6 +3272,57 @@ class Api(object):
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
     return [Status.NewFromJsonDict(s) for s in data]
+
+  def GetBlocks(self, user_id=None, screen_name=None, cursor=-1, skip_status=False, include_user_entities=False):
+    '''Fetch the sequence of twitter.User instances, one for each blocked user.
+
+    The twitter.Api instance must be authenticated.
+
+    Args:
+      user_id:
+        The twitter id of the user whose friends you are fetching.
+        If not specified, defaults to the authenticated user. [Optional]
+      screen_name:
+        The twitter name of the user whose friends you are fetching.
+        If not specified, defaults to the authenticated user. [Optional]
+      cursor:
+        Should be set to -1 for the initial call and then is used to
+        control what result page Twitter returns [Optional(ish)]
+      skip_status:
+        If True the statuses will not be returned in the user items.
+        [Optional]
+      include_user_entities:
+        When True, the user entities will be included.
+
+    Returns:
+      A sequence of twitter.User instances, one for each friend
+    '''
+    if not self._oauth_consumer:
+      raise TwitterError("twitter.Api instance must be authenticated")
+    url = '%s/blocks/list.json' % self.base_url
+    result = []
+    parameters = {}
+    if user_id is not None:
+      parameters['user_id'] = user_id
+    if screen_name is not None:
+      parameters['screen_name'] = screen_name
+    if skip_status:
+      parameters['skip_status'] = True
+    if include_user_entities:
+      parameters['include_user_entities'] = True
+    while True:
+      parameters['cursor'] = cursor
+      json = self._FetchUrl(url, parameters=parameters)
+      data = self._ParseAndCheckTwitter(json)
+      result += [User.NewFromJsonDict(x) for x in data['users']]
+      if 'next_cursor' in data:
+        if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+          break
+        else:
+          cursor = data['next_cursor']
+      else:
+        break
+    return result
 
   def GetFriends(self, user_id=None, screen_name=None, cursor=-1, skip_status=False, include_user_entities=False):
     '''Fetch the sequence of twitter.User instances, one for each friend.
