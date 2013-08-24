@@ -3922,7 +3922,7 @@ class Api(object):
     if user_id:
       parameters['user_id'] = user_id
     elif screen_name:
-      parameters['screen_name'] = user_id
+      parameters['screen_name'] = screen_name
 
     if since_id:
       try:
