@@ -20,6 +20,11 @@ Install the dependencies:
 - [SimpleGeo's OAuth2](http://github.com/simplegeo/python-oauth2) or [OAuth2](http://pypi.python.org/pypi/oauth2)
 - [HTTPLib2](http://code.google.com/p/httplib2/) (installed along with `oauth2` if you use `setuptools`)
 
+This branch is currently in development to replace the OAuth and HTTPLib2 libarays with the following:
+
+- [Requests](http://docs.python-requests.org/en/latest/)
+- [Requests OAuthlib](https://requests-oauthlib.readthedocs.org/en/latest/)
+
 Alternatively use `pip`:
  
     $ pip install -r requirements.txt

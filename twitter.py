@@ -36,6 +36,9 @@ import urllib2
 import urlparse
 import gzip
 import StringIO
+import re
+import requests
+from requests_oauthlib import OAuth1
 
 try:
   # Python >= 2.6
@@ -2399,21 +2402,24 @@ class Api(object):
     self._access_token_key    = access_token_key
     self._access_token_secret = access_token_secret
     self._oauth_consumer      = None
+    auth_list = [consumer_key, consumer_secret,
+                 access_token_key, access_token_secret]
 
-    if consumer_key is not None and consumer_secret is not None and \
-       access_token_key is not None and access_token_secret is not None:
+    if all(auth_list):
       self._signature_method_plaintext = oauth.SignatureMethod_PLAINTEXT()
       self._signature_method_hmac_sha1 = oauth.SignatureMethod_HMAC_SHA1()
 
       self._oauth_token    = oauth.Token(key=access_token_key, secret=access_token_secret)
       self._oauth_consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
+      self.__auth = OAuth1(consumer_key, consumer_secret,  # For request upgrade
+              access_token_key, access_token_secret)
 
     self._config = self.GetHelpConfiguration()
 
   def GetHelpConfiguration(self):
     url  = '%s/help/configuration.json' % self.base_url
-    json = self._FetchUrl(url)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET')
+    data = self._ParseAndCheckTwitter(json.content)
     return data
 
   def GetShortUrlLength(self, https=False):
@@ -2430,6 +2436,7 @@ class Api(object):
     self._access_token_key    = None
     self._access_token_secret = None
     self._oauth_consumer      = None
+    self.__auth               = None  # for request upgrade
 
   def GetSearch(self,
                 term=None,
@@ -2530,8 +2537,8 @@ class Api(object):
 
     # Make and send requests
     url  = '%s/search/tweets.json' % self.base_url
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
 
     # Return built list of statuses
     return [Status.NewFromJsonDict(x) for x in data['statuses']]
@@ -2578,8 +2585,8 @@ class Api(object):
 
     # Make and send requests
     url  = '%s/users/search.json' % self.base_url
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [User.NewFromJsonDict(x) for x in data]
 
   def GetTrendsCurrent(self, exclude=None):
@@ -2615,8 +2622,8 @@ class Api(object):
     if exclude:
       parameters['exclude'] = exclude
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, verb='GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
 
     trends = []
     timestamp = data[0]['as_of']
@@ -2710,8 +2717,8 @@ class Api(object):
       parameters['contributor_details'] = 1
     if not include_entities:
       parameters['include_entities'] = 'false'
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(x) for x in data]
 
   def GetUserTimeline(self,
@@ -2801,8 +2808,8 @@ class Api(object):
     if exclude_replies:
       parameters['exclude_replies'] = 1
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(x) for x in data]
 
   def GetStatus(self,
@@ -2854,8 +2861,8 @@ class Api(object):
     if not include_entities:
       parameters['include_entities'] = 'none'
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   def GetStatusOembed(self,
@@ -2901,7 +2908,7 @@ class Api(object):
     Returns:
       A dictionary with the response.
     '''
-    request_url  = '%s/statuses/oembed.json' % (self.base_url)
+    url  = '%s/statuses/oembed.json' % (self.base_url)
 
     if not self._oauth_consumer:
       raise TwitterError("API must be authenticated.")
@@ -2938,8 +2945,8 @@ class Api(object):
         if not isinstance(lang, str):
           raise TwitterError("'lang' should be string instance")
         parameters['lang'] = lang
-    json = self._FetchUrl(request_url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return data
 
   def DestroyStatus(self, id, trim_user=False):
@@ -2965,8 +2972,8 @@ class Api(object):
     url  = '%s/statuses/destroy/%s.json' % (self.base_url, id)
     if trim_user:
       post_data['trim_user'] = 1
-    json = self._FetchUrl(url, post_data=post_data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=post_data)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   @classmethod
@@ -3045,8 +3052,8 @@ class Api(object):
       data['display_coordinates'] = 'true'
     if trim_user:
       data['trim_user'] = 'true'
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   def PostUpdates(self, status, continuation=None, **kwargs):
@@ -3112,8 +3119,8 @@ class Api(object):
     data = {'id': original_id}
     if trim_user:
       data['trim_user'] = 'true'
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   def GetUserRetweets(self, count=None, since_id=None, max_id=None, trim_user=False):
@@ -3196,8 +3203,8 @@ class Api(object):
         parameters['count'] = int(count)
       except ValueError:
         raise TwitterError("count must be an integer")
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(s) for s in data]
 
   def GetRetweeters(self, status_id, cursor=None, stringify_ids=None):
@@ -3276,8 +3283,8 @@ class Api(object):
       parameters['include_entities'] = include_entities
     if not include_user_entities:
       parameters['include_user_entities'] = include_user_entities
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(s) for s in data]
 
   def GetBlocks(self, user_id=None, screen_name=None, cursor=-1, skip_status=False, include_user_entities=False):
@@ -3319,8 +3326,8 @@ class Api(object):
       parameters['include_user_entities'] = True
     while True:
       parameters['cursor'] = cursor
-      json = self._FetchUrl(url, parameters=parameters)
-      data = self._ParseAndCheckTwitter(json)
+      json = self._RequestUrl(url, 'GET', data=parameters)
+      data = self._ParseAndCheckTwitter(json.content)
       result += [User.NewFromJsonDict(x) for x in data['users']]
       if 'next_cursor' in data:
         if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3370,8 +3377,8 @@ class Api(object):
       parameters['include_user_entities'] = True
     while True:
       parameters['cursor'] = cursor
-      json = self._FetchUrl(url, parameters=parameters)
-      data = self._ParseAndCheckTwitter(json)
+      json = self._RequestUrl(url, 'GET', data=parameters)
+      data = self._ParseAndCheckTwitter(json.content)
       result += [User.NewFromJsonDict(x) for x in data['users']]
       if 'next_cursor' in data:
         if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3421,8 +3428,8 @@ class Api(object):
       result = []
       while True:
         parameters['cursor'] = cursor
-        json = self._FetchUrl(url, parameters=parameters)
-        data = self._ParseAndCheckTwitter(json)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content)
         result += [x for x in data['ids']]
         if 'next_cursor' in data:
           if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3484,17 +3491,18 @@ class Api(object):
         if total_count and total_count < count:
           parameters['count'] = total_count
         parameters['cursor'] = cursor
-        json = self._FetchUrl(url, parameters=parameters)
-        data = self._ParseAndCheckTwitter(json)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content)
         result += [x for x in data['ids']]
         if 'next_cursor' in data:
           if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
             break
           else:
             cursor = data['next_cursor']
-            total_count -= len(data['ids'])
-            if total_count < 1:
-              break
+            if total_count is not None:
+              total_count -= len(data['ids'])
+              if total_count < 1:
+                break
         else:
           break
       return result
@@ -3538,8 +3546,8 @@ class Api(object):
       parameters['include_user_entities'] = True
     while True:
       parameters['cursor'] = cursor
-      json = self._FetchUrl(url, parameters=parameters)
-      data = self._ParseAndCheckTwitter(json)
+      json = self._RequestUrl(url, 'GET', data=parameters)
+      data = self._ParseAndCheckTwitter(json.content)
       result += [User.NewFromJsonDict(x) for x in data['users']]
       if 'next_cursor' in data:
         if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3595,9 +3603,9 @@ class Api(object):
       parameters['screen_name'] = ','.join(screen_name)
     if not include_entities:
       parameters['include_entities'] = 'false'
-    json = self._FetchUrl(url, parameters=parameters)
+    json = self._RequestUrl(url, 'GET', data=parameters)
     try:
-      data = self._ParseAndCheckTwitter(json)
+      data = self._ParseAndCheckTwitter(json.content)
     except TwitterError, e:
         _, e, _ = sys.exc_info()
         t = e.args[0]
@@ -3645,8 +3653,8 @@ class Api(object):
     if not include_entities:
       parameters['include_entities'] = 'false'
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return User.NewFromJsonDict(data)
 
   def GetDirectMessages(self, since_id=None, max_id=None, count=None, include_entities=True, skip_status=False):
@@ -3696,8 +3704,8 @@ class Api(object):
       parameters['include_entities'] = 'false'
     if skip_status:
       parameters['skip_status'] = 1
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [DirectMessage.NewFromJsonDict(x) for x in data]
 
   def GetSentDirectMessages(self, since_id=None, max_id=None, count=None, page=None, include_entities=True):
@@ -3747,8 +3755,8 @@ class Api(object):
         raise TwitterError("count must be an integer")
     if not include_entities:
       parameters['include_entities'] = 'false'
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [DirectMessage.NewFromJsonDict(x) for x in data]
 
   def PostDirectMessage(self, text, user_id=None, screen_name=None):
@@ -3779,8 +3787,8 @@ class Api(object):
       data['screen_name'] = screen_name
     else:
       raise TwitterError("Specify at least one of user_id or screen_name.")
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return DirectMessage.NewFromJsonDict(data)
 
   def DestroyDirectMessage(self, id, include_entities=True):
@@ -3800,8 +3808,8 @@ class Api(object):
     data = {'id': id}
     if not include_entities:
       data['include_entities'] = 'false'
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return DirectMessage.NewFromJsonDict(data)
 
   def CreateFriendship(self, user_id=None, screen_name=None, follow=True):
@@ -3831,8 +3839,8 @@ class Api(object):
       data['follow'] = 'true'
     else:
       data['follow'] = 'false'
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return User.NewFromJsonDict(data)
 
   def DestroyFriendship(self, user_id=None, screen_name=None):
@@ -3856,8 +3864,8 @@ class Api(object):
       data['screen_name'] = screen_name
     else:
       raise TwitterError("Specify at least one of user_id or screen_name.")
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return User.NewFromJsonDict(data)
 
   def CreateFavorite(self, status=None, id=None, include_entities=True):
@@ -3888,8 +3896,8 @@ class Api(object):
       raise TwitterError("Specify id or status")
     if not include_entities:
       data['include_entities'] = 'false'
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   def DestroyFavorite(self, status=None, id=None, include_entities=True):
@@ -3920,8 +3928,8 @@ class Api(object):
       raise TwitterError("Specify id or status")
     if not include_entities:
       data['include_entities'] = 'false'
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   def GetFavorites(self,
@@ -3950,7 +3958,7 @@ class Api(object):
     if user_id:
       parameters['user_id'] = user_id
     elif screen_name:
-      parameters['screen_name'] = user_id
+      parameters['screen_name'] = screen_name
 
     if since_id:
       try:
@@ -3974,8 +3982,8 @@ class Api(object):
         parameters['include_entities'] = True
 
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(x) for x in data]
 
   def GetMentions(self,
@@ -4047,8 +4055,8 @@ class Api(object):
     if not include_entities:
       parameters['include_entities'] = 'false'
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(x) for x in data]
 
   def CreateList(self, name, mode=None, description=None):
@@ -4077,8 +4085,8 @@ class Api(object):
       parameters['mode'] = mode
     if description is not None:
       parameters['description'] = description
-    json = self._FetchUrl(url, post_data=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
 
   def DestroyList(self,
@@ -4127,8 +4135,8 @@ class Api(object):
     else:
       raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
 
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
 
   def CreateSubscription(self,
@@ -4176,8 +4184,8 @@ class Api(object):
         raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
     else:
       raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
 
   def DestroySubscription(self,
@@ -4225,8 +4233,8 @@ class Api(object):
         raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
     else:
       raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
-    json = self._FetchUrl(url, post_data=data)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
 
   def GetSubscriptions(self, user_id=None, screen_name=None, count=20, cursor=-1):
@@ -4280,8 +4288,8 @@ class Api(object):
     else:
       raise TwitterError('Specify user_id or screen_name')
 
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
     return [List.NewFromJsonDict(x) for x in data['lists']]
 
   def GetLists(self, user_id=None, screen_name=None, count=None, cursor=-1):
@@ -4328,8 +4336,8 @@ class Api(object):
 
     while True:
       parameters['cursor'] = cursor
-      json = self._FetchUrl(url, parameters=parameters)
-      data = self._ParseAndCheckTwitter(json)
+      json = self._RequestUrl(url, 'GET', data=parameters)
+      data = self._ParseAndCheckTwitter(json.content)
       result += [List.NewFromJsonDict(x) for x in data['lists']]
       if 'next_cursor' in data:
         if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -4350,14 +4358,8 @@ class Api(object):
     if not self._oauth_consumer:
       raise TwitterError("Api instance must first be given user credentials.")
     url = '%s/account/verify_credentials.json' % self.base_url
-    try:
-      json = self._FetchUrl(url, no_cache=True)
-    except urllib2.HTTPError, http_error:
-      if http_error.code == httplib.UNAUTHORIZED:
-        return None
-      else:
-        raise http_error
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET')  # No_cache
+    data = self._ParseAndCheckTwitter(json.content)
     return User.NewFromJsonDict(data)
 
   def SetCache(self, cache):
@@ -4451,8 +4453,8 @@ class Api(object):
       parameters['resources'] = resources
 
     url  = '%s/application/rate_limit_status.json' % self.base_url
-    json = self._FetchUrl(url, parameters=parameters, no_cache=True)
-    data = self._ParseAndCheckTwitter(json)
+    json = self._RequestUrl(url, 'GET', data=parameters)  # No-Cache
+    data = self._ParseAndCheckTwitter(json.content)
     return data
 
   def MaximumHitFrequency(self):
@@ -4609,129 +4611,23 @@ class Api(object):
     if 'errors' in data:
       raise TwitterError(data['errors'])
 
-  def _FetchUrl(self,
-                url,
-                post_data=None,
-                parameters=None,
-                no_cache=None,
-                use_gzip_compression=None):
-    '''Fetch a URL, optionally caching for a specified time.
+  def _RequestUrl(self, url, verb, data=None):  # upgrade to requests
+    '''Reqeust a Url, base function to replace _FetchUrl that uses
+        the request library.
 
-    Args:
-      url:
-        The URL to retrieve
-      post_data:
-        A dict of (str, unicode) key/value pairs.
-        If set, POST will be used.
-      parameters:
-        A dict whose key/value pairs should encoded and added
-        to the query string. [Optional]
-      no_cache:
-        If true, overrides the cache on the current request
-      use_gzip_compression:
-        If True, tells the server to gzip-compress the response.
-        It does not apply to POST requests.
-        Defaults to None, which will get the value to use from
-        the instance variable self._use_gzip [Optional]
+       Args:
+         url:   the web location we want to retrieve
+         verb:  POST, GET, etc...
+         data:  A dict of (str, unicode) key/value pairs.
 
-    Returns:
-      A string containing the body of the response.
+       Returns:
+         A JSON object.
     '''
-    # Build the extra parameters dict
-    extra_params = {}
-    if self._default_params:
-      extra_params.update(self._default_params)
-    if parameters:
-      extra_params.update(parameters)
-
-    if post_data:
-      http_method = "POST"
-    else:
-      http_method = "GET"
-
-    if self._debugHTTP:
-      _debug = 1
-    else:
-      _debug = 0
-
-    http_handler  = self._urllib.HTTPHandler(debuglevel=_debug)
-    https_handler = self._urllib.HTTPSHandler(debuglevel=_debug)
-    http_proxy = os.environ.get('http_proxy')
-    https_proxy = os.environ.get('https_proxy')
-
-    if http_proxy is None or  https_proxy is None :
-      proxy_status = False
-    else :
-      proxy_status = True
-
-    opener = self._urllib.OpenerDirector()
-    opener.add_handler(http_handler)
-    opener.add_handler(https_handler)
-
-    if proxy_status is True :
-      proxy_handler = self._urllib.ProxyHandler({'http':str(http_proxy),'https': str(https_proxy)})
-      opener.add_handler(proxy_handler)
-
-    if use_gzip_compression is None:
-      use_gzip = self._use_gzip
-    else:
-      use_gzip = use_gzip_compression
-
-    # Set up compression
-    if use_gzip and not post_data:
-      opener.addheaders.append(('Accept-Encoding', 'gzip'))
-
-    if self._oauth_consumer is not None:
-      if post_data and http_method == "POST":
-        parameters = post_data.copy()
-
-      req = oauth.Request.from_consumer_and_token(self._oauth_consumer,
-                                                  token=self._oauth_token,
-                                                  http_method=http_method,
-                                                  http_url=url, parameters=parameters)
-
-      req.sign_request(self._signature_method_hmac_sha1, self._oauth_consumer, self._oauth_token)
-
-      headers = req.to_header()
-
-      if http_method == "POST":
-        encoded_post_data = req.to_postdata()
-      else:
-        encoded_post_data = None
-        url = req.to_url()
-    else:
-      url = self._BuildUrl(url, extra_params=extra_params)
-      encoded_post_data = self._EncodePostData(post_data)
-
-    # Open and return the URL immediately if we're not going to cache
-    if encoded_post_data or no_cache or not self._cache or not self._cache_timeout:
-      response = opener.open(url, encoded_post_data)
-      url_data = self._DecompressGzippedResponse(response)
-      opener.close()
-    else:
-      # Unique keys are a combination of the url and the oAuth Consumer Key
-      if self._consumer_key:
-        key = self._consumer_key + ':' + url
-      else:
-        key = url
-
-      # See if it has been cached before
-      last_cached = self._cache.GetCachedTime(key)
-
-      # If the cached version is outdated then fetch another and store it
-      if not last_cached or time.time() >= last_cached + self._cache_timeout:
-        try:
-          response = opener.open(url, encoded_post_data)
-          url_data = self._DecompressGzippedResponse(response)
-          self._cache.Set(key, url_data)
-        except urllib2.HTTPError, e:
-          print e
-        opener.close()
-      else:
-        url_data = self._cache.Get(key)
-
-    # Always return the latest version
-    return url_data
+    if verb == 'POST':  return requests.post(url, data=data, auth=self.__auth)
+    if verb == 'GET':
+      url = self._BuildUrl(url, extra_params=data)
+      return requests.get(url, auth=self.__auth)
+    return 0  # if not a POST or GET request
 
 class _FileCacheError(Exception):
   '''Base exception class for FileCache related errors'''
@@ -4822,3 +4718,57 @@ class _FileCache(object):
 
   def _GetPrefix(self,hashed_key):
     return os.path.sep.join(hashed_key[0:_FileCache.DEPTH])
+
+class ParseTweet:
+  # compile once on import
+  regexp ={"RT": "^RT","MT":r"^MT","ALNUM":r"(@[a-zA-Z0-9_]+)",
+           "HASHTAG":r"(#[\w\d]+)","URL":r"([http://]?[a-zA-Z\d\/]+[\.]+[a-zA-Z\d\/\.]+)"}
+  regexp = {key:re.compile(value) for key,value in regexp.items()}
+  def __init__(self,timeline_owner,tweet):
+    ''' timeline_owner : twitter handle of user account. tweet - 140 chars from feed; object does all computation on construction
+        properties: 
+        RT, MT - boolean
+        URLs - list of URL
+        Hashtags - list of tags
+    '''
+    self.Owner = timeline_owner
+    self.tweet = tweet
+    self.UserHandles = ParseTweet.getUserHandles(tweet)
+    self.Hashtags = ParseTweet.getHashtags(tweet)
+    self.URLs = ParseTweet.getURLs(tweet)
+    self.RT = ParseTweet.getAttributeRT(tweet)
+    self.MT = ParseTweet.getAttributeMT(tweet)
+    
+    # additional intelligence
+    if ( self.RT and len(self.UserHandles) > 0 ): #change the owner of tweet?
+      self.Owner = self.UserHandles[0]
+    return
+
+  def __str__(self):
+    ''' for display method '''
+    return "owner %s, urls: %d, hashtags %d, user_handles %d, len_tweet %d, RT = %s, MT = %s"%(self.Owner,len(self.URLs),len(self.Hashtags),len(self.UserHandles), len(self.tweet), self.RT,self.MT)
+  
+  @staticmethod
+  def getAttributeRT( tweet ):
+    """ see if tweet is a RT """
+    return re.search(ParseTweet.regexp["RT"],tweet.strip()) != None
+
+  @staticmethod
+  def getAttributeMT( tweet ):
+    """ see if tweet is a MT """
+    return re.search(ParseTweet.regexp["MT"],tweet.strip()) != None
+  
+  @staticmethod
+  def getUserHandles( tweet ):
+    """ given a tweet we try and extract all user handles in order of occurrence"""
+    return re.findall(ParseTweet.regexp["ALNUM"],tweet)
+  
+  @staticmethod
+  def getHashtags( tweet ):
+    """ return all hashtags"""
+    return re.findall(ParseTweet.regexp["HASHTAG"],tweet)
+  
+  @staticmethod
+  def getURLs( tweet ):
+    """ URL : [http://]?[\w\.?/]+"""
+    return re.findall(ParseTweet.regexp["URL"],tweet)
