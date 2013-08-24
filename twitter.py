@@ -3463,9 +3463,10 @@ class Api(object):
             break
           else:
             cursor = data['next_cursor']
-            total_count -= len(data['ids'])
-            if total_count < 1:
-              break
+            if total_count is not None:
+              total_count -= len(data['ids'])
+              if total_count < 1:
+                break
         else:
           break
       return result
