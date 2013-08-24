@@ -36,6 +36,7 @@ import urllib2
 import urlparse
 import gzip
 import StringIO
+import re
 
 try:
   # Python >= 2.6
@@ -4794,3 +4795,49 @@ class _FileCache(object):
 
   def _GetPrefix(self,hashed_key):
     return os.path.sep.join(hashed_key[0:_FileCache.DEPTH])
+
+class ParseTweet:
+  def __init__(self,timeline_owner,tweet):
+    ''' timeline_owner : twitter handle of user account. tweet - 140 chars from feed; object does all computation on construction'''      
+    self.Owner = timeline_owner;
+    self.tweet = tweet;
+    self.RT = False;         
+    self.tweet = tweet;
+    self.UserHandles = ParseTweet.getUserHandles(tweet);
+    self.Hashtags = ParseTweet.getHashtags(tweet);
+    self.URLs = ParseTweet.getURLs(tweet);
+    self.RT = ParseTweet.getAttributeRT(tweet);
+    self.MT = ParseTweet.getAttributeMT(tweet);
+    # additional intelligence
+    if ( self.RT and len(self.UserHandles) > 0 ): #change the owner of tweet?
+      self.Owner = self.UserHandles[0];        
+    return
+
+  def __str__(self):
+    ''' for display method '''
+    return "owner %s, urls: %d, hashtags %d, user_handles %d, len_tweet %d, RT = %s, MT = %s"%(self.Owner,len(self.URLs),len(self.Hashtags),len(self.UserHandles), len(self.tweet), self.RT,self.MT)
+  
+  @staticmethod
+  def getAttributeRT( tweet ):
+    """ see if tweet is a RT """
+    return re.search(r'^RT',tweet.strip()) != None
+
+  @staticmethod
+  def getAttributeMT( tweet ):
+    """ see if tweet is a MT """
+    return re.search(r'^MT',tweet.strip()) != None
+  
+  @staticmethod
+  def getUserHandles( tweet ):
+    """ given a tweet we try and extract all user handles in order of occurrence"""
+    return re.findall(r'(@[a-zA-Z0-9_]+)',tweet);
+  
+  @staticmethod
+  def getHashtags( tweet ):
+    """ return all hashtags"""
+    return re.findall(r'(#[\w\d]+)',tweet);
+  
+  @staticmethod
+  def getURLs( tweet ):
+    """ URL : [http://]?[\w\.?/]+"""
+    return re.findall(r'([http://]?[a-zA-Z\d\/]+[\.]+[a-zA-Z\d\/\.]+)',tweet);
