@@ -39,6 +39,7 @@ import StringIO
 import re
 import requests
 from requests_oauthlib import OAuth1
+import oauth2 as oauth
 
 try:
   # Python >= 2.6
@@ -3056,6 +3057,63 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
+  def PostMedia(self, status, media, possibly_sensitive=None,
+                in_reply_to_status_id=None, latitude=None,
+                longitude=None, place_id=None,
+                display_coordinates=False):
+    '''
+    Post a twitter status message from the authenticated user with a
+    picture attached.
+
+    Args:
+      status:
+          the text of your update
+      media:
+          location of media(PNG, JPG, GIF)
+      possibly_sensitive:
+          set true is content is "advanced"
+      in_reply_to_status_id:
+          ID of a status that this is in reply to
+      lat:
+          location in latitude
+      long:
+          location in longitude
+      place_id:
+          A place in the world identified by a Twitter place ID
+      display_coordinates:
+          Set true if you want to display coordinates
+
+      Returns:
+          A twitter.Status instance representing the message posted.
+    '''
+    if not self.__auth:
+      raise TwitterError("The twitter.Api instance must be authenticated.")
+
+    url = '%s/statuses/update_with_media.json' % self.base_url
+
+    if isinstance(status, unicode) or self._input_encoding is None:
+      u_status = status
+    else:
+      u_status = unicode(status, self._input_encoding)
+
+    data = {'status': status}
+    data['media'] = open(str(media), 'rb').read()
+    if possibly_sensitive:
+      data['possibly_sensitive'] = 'true'
+    if in_reply_to_status_id:
+      data['in_reply_to_status_id'] = in_reply_to_status_id
+    if latitude is not None and longitude is not None:
+      data['lat']  = str(latitude)
+      data['long'] = str(longitude)
+    if place_id is not None:
+      data['place_id'] = str(place_id)
+    if display_coordinates:
+      data['display_coordinates'] = 'true'
+      
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
+    return Status.NewFromJsonDict(data)
+
   def PostUpdates(self, status, continuation=None, **kwargs):
     '''Post one or more twitter status messages from the authenticated user.
 
@@ -4594,7 +4652,11 @@ class Api(object):
        Returns:
          A JSON object.
     '''
-    if verb == 'POST':  return requests.post(url, data=data, auth=self.__auth)
+    if verb == 'POST':
+      if data.has_key('media'):
+        return requests.post(url, files=data, auth=self.__auth)
+      else:
+        return requests.post(url, data=data, auth=self.__auth)
     if verb == 'GET':
       url = self._BuildUrl(url, extra_params=data)
       return requests.get(url, auth=self.__auth)
