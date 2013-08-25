@@ -136,12 +136,6 @@ def main():
     print "Try explicitly specifying the encoding with the --encoding flag"
     sys.exit(2)
   print "%s just posted: %s" % (status.user.name, status.text)
-  
-  # try out the ParseTweet object
-  z = ParseTweet('@me',"fubar @geez how did that happen? #gosh #OMG");
-  z.MT
-  z.Owner
-  z.Hashtags
 
 if __name__ == "__main__":
   main()
