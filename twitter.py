@@ -94,56 +94,59 @@ class Status(object):
 
   The Status structure exposes the following properties:
 
+    status.contributors
+    status.coordinates
     status.created_at
     status.created_at_in_seconds # read only
     status.favorited
     status.favorite_count
+    status.geo
+    status.id    
     status.in_reply_to_screen_name
     status.in_reply_to_user_id
     status.in_reply_to_status_id
-    status.truncated
-    status.source
-    status.id
-    status.text
-    status.location
+    status.lang
+    status.place
+    status.retweet_count
     status.relative_created_at # read only
+    status.source
+    status.text
+    status.truncated
+    status.location
     status.user
     status.urls
     status.user_mentions
     status.hashtags
-    status.geo
-    status.place
-    status.coordinates
-    status.contributors
   '''
   def __init__(self,
+               coordinates=None,
+               contributors=None,
                created_at=None,
+               current_user_retweet=None,
                favorited=None,
                favorite_count=None,
+               geo=None,
                id=None,
-               text=None,
-               location=None,
-               user=None,
                in_reply_to_screen_name=None,
                in_reply_to_user_id=None,
                in_reply_to_status_id=None,
-               truncated=None,
-               source=None,
+               lang=None,
+               location=None,
                now=None,
+               place=None,
+               possibly_sensitive=None,
+               retweeted=None,
+               retweeted_status=None,
+               retweet_count=None,
+               scopes=None,
+               source=None,
+               text=None,
+               truncated=None,
                urls=None,
+               user=None,
                user_mentions=None,
                hashtags=None,
                media=None,
-               geo=None,
-               place=None,
-               coordinates=None,
-               contributors=None,
-               retweeted=None,
-               retweeted_status=None,
-               current_user_retweet=None,
-               retweet_count=None,
-               possibly_sensitive=None,
-               scopes=None,
                withheld_copyright=None,
                withheld_in_countries=None,
                withheld_scope=None):
@@ -192,33 +195,34 @@ class Status(object):
       withheld_in_countries:
       withheld_scope:
     '''
+    self.coordinates = coordinates
+    self.contributors = contributors
     self.created_at = created_at
+    self.current_user_retweet = current_user_retweet
     self.favorited = favorited
     self.favorite_count = favorite_count
+    self.geo = geo
     self.id = id
-    self.text = text
-    self.location = location
-    self.user = user
-    self.now = now
     self.in_reply_to_screen_name = in_reply_to_screen_name
     self.in_reply_to_user_id = in_reply_to_user_id
     self.in_reply_to_status_id = in_reply_to_status_id
-    self.truncated = truncated
+    self.lang = lang
+    self.location = location
+    self.now = now
+    self.place = place
+    self.possibly_sensitive = possibly_sensitive
     self.retweeted = retweeted
+    self.retweeted_status = retweeted_status    
+    self.retweet_count = retweet_count
+    self.scopes = scopes
     self.source = source
+    self.text = text  
+    self.truncated = truncated    
     self.urls = urls
+    self.user = user
     self.user_mentions = user_mentions
     self.hashtags = hashtags
     self.media = media
-    self.geo = geo
-    self.place = place
-    self.coordinates = coordinates
-    self.contributors = contributors
-    self.retweeted_status = retweeted_status
-    self.current_user_retweet = current_user_retweet
-    self.retweet_count = retweet_count
-    self.possibly_sensitive = possibly_sensitive
-    self.scopes = scopes
     self.withheld_copyright = withheld_copyright
     self.withheld_in_countries = withheld_in_countries
     self.withheld_scope = withheld_scope
@@ -389,6 +393,20 @@ class Status(object):
   text = property(GetText, SetText,
                   doc='The text of this status message')
 
+  def GetLang(self):
+    '''Get the machine-detected language of this status message 
+
+    Returns:
+      The machine-detected language  code of this status message.
+    '''  
+    return self._lang
+
+  '''
+  don't think that there will be a Setter....
+  def SetLang(selfm lang):
+      self._lang = lang
+      
+  '''
   def GetLocation(self):
     '''Get the geolocation associated with this status message
 
@@ -416,19 +434,19 @@ class Status(object):
       A human readable string representing the posting time
     '''
     fudge = 1.25
-    delta  = long(self.now) - long(self.created_at_in_seconds)
+    delta = long(self.now) - long(self.created_at_in_seconds)
 
     if delta < (1 * fudge):
       return 'about a second ago'
-    elif delta < (60 * (1/fudge)):
+    elif delta < (60 * (1 / fudge)):
       return 'about %d seconds ago' % (delta)
     elif delta < (60 * fudge):
       return 'about a minute ago'
-    elif delta < (60 * 60 * (1/fudge)):
+    elif delta < (60 * 60 * (1 / fudge)):
       return 'about %d minutes ago' % (delta / 60)
     elif delta < (60 * 60 * fudge) or delta / (60 * 60) == 1:
       return 'about an hour ago'
-    elif delta < (60 * 60 * 24 * (1/fudge)):
+    elif delta < (60 * 60 * 24 * (1 / fudge)):
       return 'about %d hours ago' % (delta / (60 * 60))
     elif delta < (60 * 60 * 24 * fudge) or delta / (60 * 60 * 24) == 1:
       return 'about a day ago'
@@ -667,6 +685,8 @@ class Status(object):
       data['id'] = self.id
     if self.text:
       data['text'] = self.text
+    if self.lang:
+      data['lang'] = self.lang
     if self.location:
       data['location'] = self.location
     if self.user:
@@ -761,6 +781,7 @@ class Status(object):
                   id=data.get('id', None),
                   text=data.get('text', None),
                   location=data.get('location', None),
+                  lang=data.get('lang', None),
                   in_reply_to_screen_name=data.get('in_reply_to_screen_name', None),
                   in_reply_to_user_id=data.get('in_reply_to_user_id', None),
                   in_reply_to_status_id=data.get('in_reply_to_status_id', None),
@@ -1008,7 +1029,7 @@ class User(object):
     '''
     self._profile_image_url = profile_image_url
 
-  profile_image_url= property(GetProfileImageUrl, SetProfileImageUrl,
+  profile_image_url = property(GetProfileImageUrl, SetProfileImageUrl,
                               doc='The url of the thumbnail of this user.')
 
   def GetProfileBackgroundTile(self):
@@ -1493,15 +1514,15 @@ class User(object):
                 favourites_count=data.get('favourites_count', None),
                 friends_count=data.get('friends_count', None),
                 profile_image_url=data.get('profile_image_url_https', data.get('profile_image_url', None)),
-                profile_background_tile = data.get('profile_background_tile', None),
-                profile_background_image_url = data.get('profile_background_image_url', None),
-                profile_sidebar_fill_color = data.get('profile_sidebar_fill_color', None),
-                profile_background_color = data.get('profile_background_color', None),
-                profile_link_color = data.get('profile_link_color', None),
-                profile_text_color = data.get('profile_text_color', None),
-                protected = data.get('protected', None),
-                utc_offset = data.get('utc_offset', None),
-                time_zone = data.get('time_zone', None),
+                profile_background_tile=data.get('profile_background_tile', None),
+                profile_background_image_url=data.get('profile_background_image_url', None),
+                profile_sidebar_fill_color=data.get('profile_sidebar_fill_color', None),
+                profile_background_color=data.get('profile_background_color', None),
+                profile_link_color=data.get('profile_link_color', None),
+                profile_text_color=data.get('profile_text_color', None),
+                protected=data.get('protected', None),
+                utc_offset=data.get('utc_offset', None),
+                time_zone=data.get('time_zone', None),
                 url=data.get('url', None),
                 status=status,
                 geo_enabled=data.get('geo_enabled', None),
@@ -2173,7 +2194,7 @@ class Hashtag(object):
     Returns:
       A twitter.Hashtag instance
     '''
-    return Hashtag(text = data.get('text', None))
+    return Hashtag(text=data.get('text', None))
 
 class Trend(object):
   ''' A class representing a trending topic
@@ -2204,7 +2225,7 @@ class Trend(object):
       return False
 
   @staticmethod
-  def NewFromJsonDict(data, timestamp = None):
+  def NewFromJsonDict(data, timestamp=None):
     '''Create a new instance based on a JSON dict
 
     Args:
@@ -2303,7 +2324,7 @@ class Api(object):
       >>> api.VerifyCredentials()
   '''
 
-  DEFAULT_CACHE_TIMEOUT = 60 # cache for 1 minute
+  DEFAULT_CACHE_TIMEOUT = 60  # cache for 1 minute
   _API_REALM = 'Twitter API'
 
   def __init__(self,
@@ -2617,7 +2638,7 @@ class Api(object):
     Returns:
       A list with 10 entries. Each entry contains a trend.
     '''
-    url  = '%s/trends/place.json' % (self.base_url)
+    url = '%s/trends/place.json' % (self.base_url)
     parameters = {'id': id}
 
     if exclude:
@@ -2630,7 +2651,7 @@ class Api(object):
     timestamp = data[0]['as_of']
 
     for trend in data[0]['trends']:
-        trends.append(Trend.NewFromJsonDict(trend, timestamp = timestamp))
+        trends.append(Trend.NewFromJsonDict(trend, timestamp=timestamp))
     return trends
 
   def GetHomeTimeline(self,
@@ -2843,7 +2864,7 @@ class Api(object):
     Returns:
       A twitter.Status instance representing that status message
     '''
-    url  = '%s/statuses/show.json' % (self.base_url)
+    url = '%s/statuses/show.json' % (self.base_url)
 
     if not self._oauth_consumer:
       raise TwitterError("API must be authenticated.")
@@ -2970,7 +2991,7 @@ class Api(object):
       post_data = {'id': long(id)}
     except ValueError:
       raise TwitterError("id must be an integer")
-    url  = '%s/statuses/destroy/%s.json' % (self.base_url, id)
+    url = '%s/statuses/destroy/%s.json' % (self.base_url, id)
     if trim_user:
       post_data['trim_user'] = 1
     json = self._RequestUrl(url, 'POST', data=post_data)
@@ -2979,7 +3000,7 @@ class Api(object):
 
   @classmethod
   def _calculate_status_length(cls, status, linksize=19):
-    dummy_link_replacement = 'https://-%d-chars%s/' % (linksize, '-'*(linksize - 18))
+    dummy_link_replacement = 'https://-%d-chars%s/' % (linksize, '-' * (linksize - 18))
     shortened = ' '.join([x if not (x.startswith('http://') or
                                     x.startswith('https://'))
                             else
@@ -3037,7 +3058,7 @@ class Api(object):
     else:
       u_status = unicode(status, self._input_encoding)
 
-    #if self._calculate_status_length(u_status, self._shortlink_size) > CHARACTER_LIMIT:
+    # if self._calculate_status_length(u_status, self._shortlink_size) > CHARACTER_LIMIT:
     #  raise TwitterError("Text must be less than or equal to %d characters. "
     #                     "Consider using PostUpdates." % CHARACTER_LIMIT)
 
@@ -3416,6 +3437,8 @@ class Api(object):
           cursor = data['next_cursor']
       else:
         break
+      sec = self.GetSleepTime('/friends/list')
+      time.sleep(sec)
     return result
 
   def GetFriendIDs(self, user_id=None, screen_name=None, cursor=-1, stringify_ids=False, count=None):
@@ -3467,6 +3490,8 @@ class Api(object):
             cursor = data['next_cursor']
         else:
           break
+        sec = self.GetSleepTime('/friends/ids')
+        time.sleep(sec)        
       return result
 
 
@@ -3534,6 +3559,8 @@ class Api(object):
                 break
         else:
           break
+        sec = self.GetSleepTime('/followers/ids')
+        time.sleep(sec) 
       return result
 
   def GetFollowers(self, user_id=None, screen_name=None, cursor=-1, skip_status=False, include_user_entities=False):
@@ -3585,6 +3612,8 @@ class Api(object):
           cursor = data['next_cursor']
       else:
         break
+      sec = self.GetSleepTime('/followers/list')
+      time.sleep(sec) 
     return result
 
   def UsersLookup(self, user_id=None, screen_name=None, users=None, include_entities=True):
@@ -3666,7 +3695,7 @@ class Api(object):
     Returns:
       A twitter.User instance representing that user
     '''
-    url  = '%s/users/show.json' % (self.base_url)
+    url = '%s/users/show.json' % (self.base_url)
     parameters = {}
 
     if not self._oauth_consumer:
@@ -3808,7 +3837,7 @@ class Api(object):
     '''
     if not self._oauth_consumer:
       raise TwitterError("The twitter.Api instance must be authenticated.")
-    url  = '%s/direct_messages/new.json' % self.base_url
+    url = '%s/direct_messages/new.json' % self.base_url
     data = {'text': text}
     if user_id:
       data['user_id'] = user_id
@@ -3833,7 +3862,7 @@ class Api(object):
     Returns:
       A twitter.DirectMessage instance representing the message destroyed
     '''
-    url  = '%s/direct_messages/destroy.json' % self.base_url
+    url = '%s/direct_messages/destroy.json' % self.base_url
     data = {'id': id}
     if not include_entities:
       data['include_entities'] = 'false'
@@ -3856,7 +3885,7 @@ class Api(object):
     Returns:
       A twitter.User instance representing the befriended user.
     '''
-    url  = '%s/friendships/create.json' % (self.base_url)
+    url = '%s/friendships/create.json' % (self.base_url)
     data = {}
     if user_id:
       data['user_id'] = user_id
@@ -3885,7 +3914,7 @@ class Api(object):
     Returns:
       A twitter.User instance representing the discontinued friend.
     '''
-    url  = '%s/friendships/destroy.json' % self.base_url
+    url = '%s/friendships/destroy.json' % self.base_url
     data = {}
     if user_id:
       data['user_id'] = user_id
@@ -3915,7 +3944,7 @@ class Api(object):
     Returns:
       A twitter.Status instance representing the newly-marked favorite.
     '''
-    url  = '%s/favorites/create.json' % self.base_url
+    url = '%s/favorites/create.json' % self.base_url
     data = {}
     if id:
       data['id'] = id
@@ -3947,7 +3976,7 @@ class Api(object):
     Returns:
       A twitter.Status instance representing the newly-unmarked favorite.
     '''
-    url  = '%s/favorites/destroy.json' % self.base_url
+    url = '%s/favorites/destroy.json' % self.base_url
     data = {}
     if id:
       data['id'] = id
@@ -4143,11 +4172,11 @@ class Api(object):
     Returns:
       A twitter.List instance representing the removed list.
     '''
-    url  = '%s/lists/destroy.json' % self.base_url
+    url = '%s/lists/destroy.json' % self.base_url
     data = {}
     if list_id:
       try:
-        data['list_id']= long(list_id)
+        data['list_id'] = long(list_id)
       except ValueError:
         raise TwitterError("list_id must be an integer")
     elif slug:
@@ -4191,13 +4220,13 @@ class Api(object):
     Returns:
       A twitter.List instance representing the list subscribed to
     '''
-    url  = '%s/lists/subscribers/create.json' % (self.base_url)
+    url = '%s/lists/subscribers/create.json' % (self.base_url)
     if not self._oauth_consumer:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     data = {}
     if list_id:
       try:
-        data['list_id']= long(list_id)
+        data['list_id'] = long(list_id)
       except ValueError:
         raise TwitterError("list_id must be an integer")
     elif slug:
@@ -4240,13 +4269,13 @@ class Api(object):
     Returns:
       A twitter.List instance representing the removed list.
     '''
-    url  = '%s/lists/subscribers/destroy.json' % (self.base_url)
+    url = '%s/lists/subscribers/destroy.json' % (self.base_url)
     if not self._oauth_consumer:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     data = {}
     if list_id:
       try:
-        data['list_id']= long(list_id)
+        data['list_id'] = long(list_id)
       except ValueError:
         raise TwitterError("list_id must be an integer")
     elif slug:
@@ -4462,7 +4491,7 @@ class Api(object):
     '''
     self._default_params['source'] = source
 
-  def GetRateLimitStatus(self, resources=None):
+  def GetRateLimitStatus(self, resource_families=None):
     '''Fetch the rate limit status for the currently authorized user.
 
     Args:
@@ -4478,44 +4507,72 @@ class Api(object):
       the time of the reset in seconds since The Epoch (reset_time_in_seconds).
     '''
     parameters = {}
-    if resources is not None:
-      parameters['resources'] = resources
+    if resource_families is not None:
+      parameters['resources'] = resource_families
 
-    url  = '%s/application/rate_limit_status.json' % self.base_url
+    url = '%s/application/rate_limit_status.json' % self.base_url
     json = self._RequestUrl(url, 'GET', data=parameters)  # No-Cache
     data = self._ParseAndCheckTwitter(json.content)
     return data
 
-  def MaximumHitFrequency(self):
+  def GetAverageSleepTime(self, resources):
     '''Determines the minimum number of seconds that a program must wait
     before hitting the server again without exceeding the rate_limit
     imposed for the currently authenticated user.
 
     Returns:
-      The minimum second interval that a program must use so as to not
-      exceed the rate_limit imposed for the user.
+      The average seconds that the api must have to sleep       
     '''
-    rate_status = self.GetRateLimitStatus()
-    reset_time  = rate_status.get('reset_time', None)
-    limit       = rate_status.get('remaining_hits', None)
+    if resources[0] == '/':
+        resources = resources[1:]
+    
+    resource_families = resources[:resources.find('/')] if '/' in resources else resources
+    
+    rate_status = self.GetRateLimitStatus(resource_families)
+    try:
+        reset_time = rate_status['resources'][resource_families]['/' + resources]['reset']
+        remaining = rate_status['resources'][resource_families]['/' + resources]['remaining']
+    except:
+        raise TwitterError('Wrong resources')
+    
+    utc_now = datetime.datetime.utcnow()
+    utc_stuct = utc_now.timetuple()
+    current_time = calendar.timegm(utc_stuct)
+    delta = reset_time - current_time
+    
+    if remaining == 0:
+        return remaining
+    else:
+        return delta/ remaining
 
-    if reset_time:
-      # put the reset time into a datetime object
-      reset = datetime.datetime(*rfc822.parsedate(reset_time)[:7])
+  def GetSleepTime(self, resources):
+    '''Determines the minimum number of seconds that a program must wait
+    before hitting the server again without exceeding the rate_limit
+    imposed for the currently authenticated user.
 
-      # find the difference in time between now and the reset time + 1 hour
-      delta = reset + datetime.timedelta(hours=1) - datetime.datetime.utcnow()
+    Returns:
+      The minimum seconds that the api must have to sleep before query again      
+    '''
+    if resources[0] == '/':
+        resources = resources[1:]
+    
+    resource_families = resources[:resources.find('/')] if '/' in resources else resources
+    
+    rate_status = self.GetRateLimitStatus(resource_families)
+    try:
+        reset_time = rate_status['resources'][resource_families]['/' + resources]['reset']
+        remaining = rate_status['resources'][resource_families]['/' + resources]['remaining']
+    except:
+        raise TwitterError('Wrong resources')
 
-      if not limit:
-          return int(delta.seconds)
-
-      # determine the minimum number of seconds allowed as a regular interval
-      max_frequency = int(delta.seconds / limit) + 1
-
-      # return the number of seconds
-      return max_frequency
-
-    return 60
+    if remaining == 0:
+        utc_now = datetime.datetime.utcnow()
+        utc_stuct = utc_now.timetuple()
+        current_time = calendar.timegm(utc_stuct)
+        delta = reset_time - current_time
+        return delta
+    else:
+        return 0
 
   def _BuildUrl(self, url, path_elements=None, extra_params=None):
     # Break url into constituent parts
@@ -4672,14 +4729,14 @@ class _FileCache(object):
   def __init__(self,root_directory=None):
     self._InitializeRootDirectory(root_directory)
 
-  def Get(self,key):
+  def Get(self, key):
     path = self._GetPath(key)
     if os.path.exists(path):
       return open(path).read()
     else:
       return None
 
-  def Set(self,key,data):
+  def Set(self, key, data):
     path = self._GetPath(key)
     directory = os.path.dirname(path)
     if not os.path.exists(directory):
@@ -4697,7 +4754,7 @@ class _FileCache(object):
       os.remove(path)
     os.rename(temp_path, path)
 
-  def Remove(self,key):
+  def Remove(self, key):
     path = self._GetPath(key)
     if not path.startswith(self._root_directory):
       raise _FileCacheError('%s does not appear to live under %s' %
@@ -4705,7 +4762,7 @@ class _FileCache(object):
     if os.path.exists(path):
       os.remove(path)
 
-  def GetCachedTime(self,key):
+  def GetCachedTime(self, key):
     path = self._GetPath(key)
     if os.path.exists(path):
       return os.path.getmtime(path)
@@ -4739,7 +4796,7 @@ class _FileCache(object):
                             root_directory)
     self._root_directory = root_directory
 
-  def _GetPath(self,key):
+  def _GetPath(self, key):
     try:
         hashed_key = md5(key).hexdigest()
     except TypeError:
@@ -4749,7 +4806,7 @@ class _FileCache(object):
                         self._GetPrefix(hashed_key),
                         hashed_key)
 
-  def _GetPrefix(self,hashed_key):
+  def _GetPrefix(self, hashed_key):
     return os.path.sep.join(hashed_key[0:_FileCache.DEPTH])
 
 class ParseTweet:
