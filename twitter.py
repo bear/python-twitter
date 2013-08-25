@@ -4515,13 +4515,43 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json.content)
     return data
 
+  def GetAverageSleepTime(self, resources):
+    '''Determines the minimum number of seconds that a program must wait
+    before hitting the server again without exceeding the rate_limit
+    imposed for the currently authenticated user.
+
+    Returns:
+      The average seconds that the api must have to sleep       
+    '''
+    if resources[0] == '/':
+        resources = resources[1:]
+    
+    resource_families = resources[:resources.find('/')] if '/' in resources else resources
+    
+    rate_status = self.GetRateLimitStatus(resource_families)
+    try:
+        reset_time = rate_status['resources'][resource_families]['/' + resources]['reset']
+        remaining = rate_status['resources'][resource_families]['/' + resources]['remaining']
+    except:
+        raise TwitterError('Wrong resources')
+    
+    utc_now = datetime.datetime.utcnow()
+    utc_stuct = utc_now.timetuple()
+    current_time = calendar.timegm(utc_stuct)
+    delta = reset_time - current_time
+    
+    if remaining == 0:
+        return remaining
+    else:
+        return delta/ remaining
+
   def GetSleepTime(self, resources):
     '''Determines the minimum number of seconds that a program must wait
     before hitting the server again without exceeding the rate_limit
     imposed for the currently authenticated user.
 
     Returns:
-      The minimum seconds that the api must have to spleep before query again      
+      The minimum seconds that the api must have to sleep before query again      
     '''
     if resources[0] == '/':
         resources = resources[1:]
