@@ -4386,7 +4386,8 @@ class Api(object):
     json = self._RequestStream(url, 'GET')
     for line in json.iter_lines():
       if line:
-        print line
+        data = self._ParseAndCheckTwitter(line)
+        yield data
 
   def VerifyCredentials(self):
     '''Returns a twitter.User instance if the authenticating user is valid.
