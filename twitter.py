@@ -2337,6 +2337,7 @@ class Api(object):
                cache=DEFAULT_CACHE,
                shortner=None,
                base_url=None,
+               stream_url=None,
                use_gzip_compression=False,
                debugHTTP=False):
     '''Instantiate a new twitter.Api object.
@@ -2389,6 +2390,11 @@ class Api(object):
       self.base_url = 'https://api.twitter.com/1.1'
     else:
       self.base_url = base_url
+      
+    if stream_url is None:
+      self.stream_url = 'https://stream.twitter.com/1.1'
+    else:
+      self.stream_url = stream_url
 
     if consumer_key is not None and (access_token_key is None or
                                      access_token_secret is None):
@@ -4586,6 +4592,27 @@ class Api(object):
         break
     return result
 
+  def GetStreamSample(self, delimited=None, stall_warnings=None):
+    '''
+    Returns a small sample of public statuses
+
+    args:
+      delimited:      specifies a message length            [optional]
+      stall_warnings: set to True to deliver stall warnings [optional]
+
+    returns:
+      a twitter stream
+    '''
+    if not self._oauth_consumer:
+      raise TwitterError("twitter.Api instance must be authenticated")
+
+    url = '%s/statuses/sample.json' % self.stream_url
+    json = self._RequestStream(url, 'GET')
+    for line in json.iter_lines():
+      if line:
+        data = self._ParseAndCheckTwitter(line)
+        yield data
+
   def VerifyCredentials(self):
     '''Returns a twitter.User instance if the authenticating user is valid.
 
@@ -4877,7 +4904,7 @@ class Api(object):
     if 'errors' in data:
       raise TwitterError(data['errors'])
 
-  def _RequestUrl(self, url, verb, data=None):  # upgrade to requests
+  def _RequestUrl(self, url, verb, data=None):
     '''Reqeust a Url, base function to replace _FetchUrl that uses
         the request library.
 
@@ -4897,6 +4924,24 @@ class Api(object):
     if verb == 'GET':
       url = self._BuildUrl(url, extra_params=data)
       return requests.get(url, auth=self.__auth)
+    return 0  # if not a POST or GET request
+
+  def _RequestStream(self, url, verb, data=None):
+    '''Reqeust a stream of data
+
+       Args:
+         url:   the web location we want to retrieve
+         verb:  POST, GET, etc...
+         data:  A dict of (str, unicode) key/value pairs.
+
+       Returns:
+         A twitter stream.
+    '''
+    if verb == 'POST':  return requests.post(url, data=data, stream=True,
+                                             auth=self.__auth)
+    if verb == 'GET':
+      url = self._BuildUrl(url, extra_params=data)
+      return requests.get(url, stream=True, auth=self.__auth)
     return 0  # if not a POST or GET request
 
 class _FileCacheError(Exception):
