@@ -3214,27 +3214,41 @@ class Api(object):
     Args:
       status_id:     the tweet's numerical ID
       cursor:        breaks the ids into pages of no more than 100.
-                                                       [Semi-Optional]
-      stringify_ids: returns the IDs as strings        [Optional]
+                                                        [Semi-Optional]
+      stringify_ids: returns the IDs as unicode strings [Optional]
 
     Returns:
       A list of user IDs
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instsance must be authenticated.")
     url = '%s/statuses/retweeters/ids.json' % (self.base_url)
     parameters = {}
     parameters['id'] = status_id
     if stringify_ids:
       parameters['stringify_ids'] = 'true'
-    if cursor:
-      try:
-        parameters['count'] = int(cursor)
-      except ValueError:
-        raise TwitterError("cursor must be an integer")
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
-    return data
+    result = []
+    while True:
+      if cursor:
+        try:
+          parameters['count'] = int(cursor)
+        except ValueError:
+          raise TwitterError("cursor must be an integer")
+          break
+      json = self._RequestUrl(url, 'GET', data=parameters)
+      data = self._ParseAndCheckTwitter(json.content)
+      result += [x for x in data['ids']]
+      if 'next_cursor' in data:
+        if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+          break
+        else:
+          cursor = data['next_cursor']
+          total_count -= len(data['ids'])
+          if total_count < 1:
+            break
+      else:
+        break
+    return result
 
   def GetRetweetsOfMe(self,
                       count=None,
