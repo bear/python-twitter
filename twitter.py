@@ -66,8 +66,6 @@ try:
 except ImportError:
   from md5 import md5
 
-import oauth2 as oauth
-
 
 CHARACTER_LIMIT = 140
 
@@ -2379,7 +2377,6 @@ class Api(object):
     self._input_encoding = input_encoding
     self._use_gzip       = use_gzip_compression
     self._debugHTTP      = debugHTTP
-    self._oauth_consumer = None
     self._shortlink_size = 19
 
     self._InitializeRequestHeaders(request_headers)
@@ -2429,17 +2426,11 @@ class Api(object):
     self._consumer_secret     = consumer_secret
     self._access_token_key    = access_token_key
     self._access_token_secret = access_token_secret
-    self._oauth_consumer      = None
     auth_list = [consumer_key, consumer_secret,
                  access_token_key, access_token_secret]
 
     if all(auth_list):
-      self._signature_method_plaintext = oauth.SignatureMethod_PLAINTEXT()
-      self._signature_method_hmac_sha1 = oauth.SignatureMethod_HMAC_SHA1()
-
-      self._oauth_token    = oauth.Token(key=access_token_key, secret=access_token_secret)
-      self._oauth_consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
-      self.__auth = OAuth1(consumer_key, consumer_secret,  # For request upgrade
+      self.__auth = OAuth1(consumer_key, consumer_secret,  
               access_token_key, access_token_secret)
 
     self._config = self.GetHelpConfiguration()
@@ -2463,7 +2454,6 @@ class Api(object):
     self._consumer_secret     = None
     self._access_token_key    = None
     self._access_token_secret = None
-    self._oauth_consumer      = None
     self.__auth               = None  # for request upgrade
 
   def GetSearch(self,
@@ -2717,7 +2707,7 @@ class Api(object):
     '''
     url = '%s/statuses/home_timeline.json' % self.base_url
 
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("API must be authenticated.")
     parameters = {}
     if count is not None:
@@ -2872,7 +2862,7 @@ class Api(object):
     '''
     url = '%s/statuses/show.json' % (self.base_url)
 
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("API must be authenticated.")
 
     parameters = {}
@@ -2938,7 +2928,7 @@ class Api(object):
     '''
     url  = '%s/statuses/oembed.json' % (self.base_url)
 
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("API must be authenticated.")
 
     parameters = {}
@@ -2990,7 +2980,7 @@ class Api(object):
     Returns:
       A twitter.Status instance representing the destroyed status message
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("API must be authenticated.")
 
     try:
@@ -3054,7 +3044,7 @@ class Api(object):
     Returns:
       A twitter.Status instance representing the message posted.
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
 
     url = '%s/statuses/update.json' % self.base_url
@@ -3190,7 +3180,7 @@ class Api(object):
     Returns:
       A twitter.Status instance representing the original tweet with retweet details embedded.
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
 
     try:
@@ -3234,7 +3224,7 @@ class Api(object):
     '''
     url = '%s/lists/list.json' % (self.base_url)
 
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("API must be authenticated.")
 
     parameters = {}
@@ -3418,7 +3408,7 @@ class Api(object):
     Returns:
       A list of twitter.Status instances, which are retweets of statusid
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instsance must be authenticated.")
     url = '%s/statuses/retweets/%s.json' % (self.base_url, statusid)
     parameters = {}
@@ -3501,7 +3491,7 @@ class Api(object):
       include_user_entities:
         When True, the user entities will be included.
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     url = '%s/statuses/retweets_of_me.json' % self.base_url
     parameters = {}
@@ -3551,7 +3541,7 @@ class Api(object):
     Returns:
       A sequence of twitter.User instances, one for each friend
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("twitter.Api instance must be authenticated")
     url = '%s/blocks/list.json' % self.base_url
     result = []
@@ -3602,7 +3592,7 @@ class Api(object):
     Returns:
       A sequence of twitter.User instances, one for each friend
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("twitter.Api instance must be authenticated")
     url = '%s/friends/list.json' % self.base_url
     result = []
@@ -3656,7 +3646,7 @@ class Api(object):
         A list of integers, one for each user id.
       '''
       url = '%s/friends/ids.json' % self.base_url
-      if not self._oauth_consumer:
+      if not self.__auth:
           raise TwitterError("twitter.Api instance must be authenticated")
       parameters = {}
       if user_id is not None:
@@ -3719,7 +3709,7 @@ class Api(object):
         A list of integers, one for each user id.
       '''
       url = '%s/followers/ids.json' % self.base_url
-      if not self._oauth_consumer:
+      if not self.__auth:
           raise TwitterError("twitter.Api instance must be authenticated")
       parameters = {}
       if user_id is not None:
@@ -3777,7 +3767,7 @@ class Api(object):
     Returns:
       A sequence of twitter.User instances, one for each follower
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("twitter.Api instance must be authenticated")
     url = '%s/followers/list.json' % self.base_url
     result = []
@@ -3834,7 +3824,7 @@ class Api(object):
       A list of twitter.User objects for the requested users
     '''
 
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     if not user_id and not screen_name and not users:
       raise TwitterError("Specify at least one of user_id, screen_name, or users.")
@@ -3888,7 +3878,7 @@ class Api(object):
     url = '%s/users/show.json' % (self.base_url)
     parameters = {}
 
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
 
     if user_id:
@@ -3936,7 +3926,7 @@ class Api(object):
       A sequence of twitter.DirectMessage instances
     '''
     url = '%s/direct_messages.json' % self.base_url
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     parameters = {}
     if since_id:
@@ -3987,7 +3977,7 @@ class Api(object):
       A sequence of twitter.DirectMessage instances
     '''
     url = '%s/direct_messages/sent.json' % self.base_url
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     parameters = {}
     if since_id:
@@ -4025,7 +4015,7 @@ class Api(object):
     Returns:
       A twitter.DirectMessage instance representing the message posted
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     url = '%s/direct_messages/new.json' % self.base_url
     data = {'text': text}
@@ -4276,7 +4266,7 @@ class Api(object):
 
     url = '%s/statuses/mentions_timeline.json' % self.base_url
 
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
 
     parameters = {}
@@ -4326,7 +4316,7 @@ class Api(object):
     '''
     url = '%s/lists/create.json' % self.base_url
 
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     parameters = {'name': name}
     if mode is not None:
@@ -4411,7 +4401,7 @@ class Api(object):
       A twitter.List instance representing the list subscribed to
     '''
     url = '%s/lists/subscribers/create.json' % (self.base_url)
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     data = {}
     if list_id:
@@ -4460,7 +4450,7 @@ class Api(object):
       A twitter.List instance representing the removed list.
     '''
     url = '%s/lists/subscribers/destroy.json' % (self.base_url)
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     data = {}
     if list_id:
@@ -4510,7 +4500,7 @@ class Api(object):
     Returns:
       A sequence of twitter.List instances, one for each list
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("twitter.Api instance must be authenticated")
 
     url = '%s/lists/subscriptions.json' % (self.base_url)
@@ -4564,7 +4554,7 @@ class Api(object):
     Returns:
       A sequence of twitter.List instances, one for each list
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("twitter.Api instance must be authenticated")
 
     url = '%s/lists/ownerships.json' % self.base_url
@@ -4607,7 +4597,7 @@ class Api(object):
     returns:
       a twitter stream
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("twitter.Api instance must be authenticated")
 
     url = '%s/statuses/sample.json' % self.stream_url
@@ -4624,7 +4614,7 @@ class Api(object):
       A twitter.User instance representing that user if the
       credentials are valid, None otherwise.
     '''
-    if not self._oauth_consumer:
+    if not self.__auth:
       raise TwitterError("Api instance must first be given user credentials.")
     url = '%s/account/verify_credentials.json' % self.base_url
     json = self._RequestUrl(url, 'GET')  # No_cache
