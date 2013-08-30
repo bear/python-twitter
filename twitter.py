@@ -116,38 +116,7 @@ class Status(object):
     status.user_mentions
     status.hashtags
   '''
-  def __init__(self,
-               coordinates=None,
-               contributors=None,
-               created_at=None,
-               current_user_retweet=None,
-               favorited=None,
-               favorite_count=None,
-               geo=None,
-               id=None,
-               in_reply_to_screen_name=None,
-               in_reply_to_user_id=None,
-               in_reply_to_status_id=None,
-               lang=None,
-               location=None,
-               now=None,
-               place=None,
-               possibly_sensitive=None,
-               retweeted=None,
-               retweeted_status=None,
-               retweet_count=None,
-               scopes=None,
-               source=None,
-               text=None,
-               truncated=None,
-               urls=None,
-               user=None,
-               user_mentions=None,
-               hashtags=None,
-               media=None,
-               withheld_copyright=None,
-               withheld_in_countries=None,
-               withheld_scope=None):
+  def __init__(self, **kwargs):
     '''An object to hold a Twitter status message.
 
     This class is normally instantiated by the twitter.Api class and
@@ -193,37 +162,41 @@ class Status(object):
       withheld_in_countries:
       withheld_scope:
     '''
-    self.coordinates = coordinates
-    self.contributors = contributors
-    self.created_at = created_at
-    self.current_user_retweet = current_user_retweet
-    self.favorited = favorited
-    self.favorite_count = favorite_count
-    self.geo = geo
-    self.id = id
-    self.in_reply_to_screen_name = in_reply_to_screen_name
-    self.in_reply_to_user_id = in_reply_to_user_id
-    self.in_reply_to_status_id = in_reply_to_status_id
-    self.lang = lang
-    self.location = location
-    self.now = now
-    self.place = place
-    self.possibly_sensitive = possibly_sensitive
-    self.retweeted = retweeted
-    self.retweeted_status = retweeted_status    
-    self.retweet_count = retweet_count
-    self.scopes = scopes
-    self.source = source
-    self.text = text  
-    self.truncated = truncated    
-    self.urls = urls
-    self.user = user
-    self.user_mentions = user_mentions
-    self.hashtags = hashtags
-    self.media = media
-    self.withheld_copyright = withheld_copyright
-    self.withheld_in_countries = withheld_in_countries
-    self.withheld_scope = withheld_scope
+    param_defaults = {
+      'coordinates':             None,
+      'contributors':            None,
+      'created_at':              None,
+      'current_user_retweet':    None,
+      'favorited':               None,
+      'favorite_count':          None,
+      'geo':                     None,
+      'id':                      None,
+      'in_reply_to_screen_name': None,
+      'in_reply_to_user_id':     None,
+      'in_reply_to_status_id':   None,
+      'lang':                    None,
+      'location':                None,
+      'now':                     None,
+      'place':                   None,
+      'possibly_sensitive':      None,
+      'retweeted':               None,
+      'retweeted_status':        None,
+      'retweet_count':           None,
+      'scopes':                  None,
+      'source':                  None,
+      'text':                    None,
+      'truncated':               None,
+      'urls':                    None,
+      'user':                    None,
+      'user_mentions':           None,
+      'hashtags':                None,
+      'media':                   None,
+      'withheld_copyright':      None,
+      'withheld_in_countries':   None,
+      'withheld_scope':          None}
+
+    for (param, default) in param_defaults.iteritems():
+            setattr(self, param, kwargs.get(param, default))
 
   def GetCreatedAt(self):
     '''Get the time this status message was posted.
