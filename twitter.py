@@ -3252,10 +3252,10 @@ class Api(object):
     return [List.NewFromJsonDict(x) for x in data]
 
   def GetListTimeline(self,
+                      list_id,
                       slug,
-                      list_id=None,
-                      user_id=None,
-                      screen_name=None,
+                      owner_id=None,
+                      owner_screen_name=None,
                       since_id=None,
                       max_id=None,
                       count=None,
@@ -3266,17 +3266,16 @@ class Api(object):
     The twitter.Api instance must be authenticated if the user is private.
 
     Args:
-      slug:
-        The slug name for the list to retrieve.
-        Optional if you specify a list_id which will be used instead.
       list_id:
-        Specifies the ID of the list to retrieve. Optional only if you
-        specify the slug name. [Optional]
-      user_id:
+        Specifies the ID of the list to retrieve.
+      slug:
+        The slug name for the list to retrieve. If you specify None for the
+        list_id, then you have to provide either a owner_screen_name or owner_id.
+      owner_id:
         Specifies the ID of the user for whom to return the
-        user_timeline. Helpful for disambiguating when a valid user ID
+        list timeline. Helpful for disambiguating when a valid user ID
         is also a valid screen name. [Optional]
-      screen_name:
+      owner_screen_name:
         Specifies the screen name of the user for whom to return the
         user_timeline. Helpful for disambiguating when a valid screen
         name is also a user ID. [Optional]
@@ -3302,19 +3301,24 @@ class Api(object):
     Returns:
       A sequence of Status instances, one for each message up to count
     '''
-    parameters = {}
-
+    parameters = { 'slug':    slug,
+                   'list_id': list_id,
+                 }
     url = '%s/lists/statuses.json' % (self.base_url)
 
-    if list_id:
-      parameters['list_id'] = list_id
-    else:
-      parameters['slug'] = slug
+    parameters['slug']    = slug
+    parameters['list_id'] = list_id
 
-    if user_id:
-      parameters['user_id'] = user_id
-    if screen_name:
-      parameters['screen_name'] = screen_name
+    if list_id is None:
+      if slug is None:
+        raise TwitterError('list_id or slug required')
+      if owner_id is None and owner_screen_name:
+        raise TwitterError('if list_id is not given you have to include an owner to help identify the proper list')
+
+    if owner_id:
+      parameters['owner_id'] = owner_id
+    if owner_screen_name:
+      parameters['owner_screen_name'] = owner_screen_name
 
     if since_id:
       try:
