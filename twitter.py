@@ -1497,29 +1497,22 @@ class List(object):
     list.subscriber_count
     list.following
   '''
-  def __init__(self,
-               id=None,
-               name=None,
-               slug=None,
-               description=None,
-               full_name=None,
-               mode=None,
-               uri=None,
-               member_count=None,
-               subscriber_count=None,
-               following=None,
-               user=None):
-    self.id = id
-    self.name = name
-    self.slug = slug
-    self.description = description
-    self.full_name = full_name
-    self.mode = mode
-    self.uri = uri
-    self.member_count = member_count
-    self.subscriber_count = subscriber_count
-    self.following = following
-    self.user = user
+  def __init__(self, **kwargs):
+    param_defaults = {
+      'id':               None,
+      'name':             None,
+      'slug':             None,
+      'description':      None,
+      'full_name':        None,
+      'mode':             None,
+      'uri':              None,
+      'member_count':     None,
+      'subscriber_count': None,
+      'following':        None,
+      'user':             None}
+    
+    for (param, default) in param_defaults.iteritems():
+            setattr(self, param, kwargs.get(param, default))
 
   def GetId(self):
     '''Get the unique id of this list.
