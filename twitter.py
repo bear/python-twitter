@@ -813,7 +813,7 @@ class User(object):
     user.listed_count
   '''
   def __init__(self, **kwargs):
-    param_default = {
+    param_defaults = {
       'id':                           None,
       'name':                         None,
       'screen_name':                  None,
