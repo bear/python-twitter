@@ -196,7 +196,7 @@ class Status(object):
       'withheld_scope':          None}
 
     for (param, default) in param_defaults.iteritems():
-            setattr(self, param, kwargs.get(param, default))
+      setattr(self, param, kwargs.get(param, default))
 
   def GetCreatedAt(self):
     '''Get the time this status message was posted.
@@ -812,63 +812,40 @@ class User(object):
     user.created_at
     user.listed_count
   '''
-  def __init__(self,
-               id=None,
-               name=None,
-               screen_name=None,
-               location=None,
-               description=None,
-               profile_image_url=None,
-               profile_background_tile=None,
-               profile_background_image_url=None,
-               profile_sidebar_fill_color=None,
-               profile_background_color=None,
-               profile_link_color=None,
-               profile_text_color=None,
-               protected=None,
-               utc_offset=None,
-               time_zone=None,
-               followers_count=None,
-               friends_count=None,
-               statuses_count=None,
-               favourites_count=None,
-               url=None,
-               status=None,
-               geo_enabled=None,
-               verified=None,
-               lang=None,
-               notifications=None,
-               contributors_enabled=None,
-               created_at=None,
-               listed_count=None):
-    self.id = id
-    self.name = name
-    self.screen_name = screen_name
-    self.location = location
-    self.description = description
-    self.profile_image_url = profile_image_url
-    self.profile_background_tile = profile_background_tile
-    self.profile_background_image_url = profile_background_image_url
-    self.profile_sidebar_fill_color = profile_sidebar_fill_color
-    self.profile_background_color = profile_background_color
-    self.profile_link_color = profile_link_color
-    self.profile_text_color = profile_text_color
-    self.protected = protected
-    self.utc_offset = utc_offset
-    self.time_zone = time_zone
-    self.followers_count = followers_count
-    self.friends_count = friends_count
-    self.statuses_count = statuses_count
-    self.favourites_count = favourites_count
-    self.url = url
-    self.status = status
-    self.geo_enabled = geo_enabled
-    self.verified = verified
-    self.lang = lang
-    self.notifications = notifications
-    self.contributors_enabled = contributors_enabled
-    self.created_at = created_at
-    self.listed_count = listed_count
+  def __init__(self, **kwargs):
+    param_defaults = {
+      'id':                           None,
+      'name':                         None,
+      'screen_name':                  None,
+      'location':                     None,
+      'description':                  None,
+      'profile_image_url':            None,
+      'profile_background_tile':      None,
+      'profile_background_image_url': None,
+      'profile_sidebar_fill_color':   None,
+      'profile_background_color':     None,
+      'profile_link_color':           None,
+      'profile_text_color':           None,
+      'protected':                    None,
+      'utc_offset':                   None,
+      'time_zone':                    None,
+      'followers_count':              None,
+      'friends_count':                None,
+      'statuses_count':               None,
+      'favourites_count':             None,
+      'url':                          None,
+      'status':                       None,
+      'geo_enabled':                  None,
+      'verified':                     None,
+      'lang':                         None,
+      'notifications':                None,
+      'contributors_enabled':         None,
+      'created_at':                   None,
+      'listed_count':                 None}
+
+    for (param, default) in param_defaults.iteritems():
+      setattr(self, param, kwargs.get(param, default))
+               
 
   def GetId(self):
     '''Get the unique id of this user.
@@ -1520,29 +1497,22 @@ class List(object):
     list.subscriber_count
     list.following
   '''
-  def __init__(self,
-               id=None,
-               name=None,
-               slug=None,
-               description=None,
-               full_name=None,
-               mode=None,
-               uri=None,
-               member_count=None,
-               subscriber_count=None,
-               following=None,
-               user=None):
-    self.id = id
-    self.name = name
-    self.slug = slug
-    self.description = description
-    self.full_name = full_name
-    self.mode = mode
-    self.uri = uri
-    self.member_count = member_count
-    self.subscriber_count = subscriber_count
-    self.following = following
-    self.user = user
+  def __init__(self, **kwargs):
+    param_defaults = {
+      'id':               None,
+      'name':             None,
+      'slug':             None,
+      'description':      None,
+      'full_name':        None,
+      'mode':             None,
+      'uri':              None,
+      'member_count':     None,
+      'subscriber_count': None,
+      'following':        None,
+      'user':             None}
+    
+    for (param, default) in param_defaults.iteritems():
+      setattr(self, param, kwargs.get(param, default))
 
   def GetId(self):
     '''Get the unique id of this list.
