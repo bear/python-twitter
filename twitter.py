@@ -1512,7 +1512,7 @@ class List(object):
       'user':             None}
     
     for (param, default) in param_defaults.iteritems():
-            setattr(self, param, kwargs.get(param, default))
+      setattr(self, param, kwargs.get(param, default))
 
   def GetId(self):
     '''Get the unique id of this list.
