@@ -38,7 +38,6 @@ import StringIO
 import re
 import requests
 from requests_oauthlib import OAuth1
-import oauth2 as oauth
 
 try:
   # Python >= 2.6
