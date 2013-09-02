@@ -2678,6 +2678,7 @@ class Api(object):
       parameters['include_entities'] = 'false'
     json = self._RequestUrl(url, 'GET', data=parameters)
     data = self._ParseAndCheckTwitter(json.content)
+    print data
     return [Status.NewFromJsonDict(x) for x in data]
 
   def GetUserTimeline(self,
