@@ -3280,6 +3280,83 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json.content)
     return [Status.NewFromJsonDict(x) for x in data]
 
+  def GetListMembers(self, list_id, slug, owner_id=None, owner_screen_name=None, cursor=-1, skip_status=False, include_entities=False):
+    '''Fetch the sequence of twitter.User instances, one for each member
+    of the given list_id or slug.
+
+    The twitter.Api instance must be authenticated.
+
+    Args:
+      list_id:
+        Specifies the ID of the list to retrieve.
+      slug:
+        The slug name for the list to retrieve. If you specify None for the
+        list_id, then you have to provide either a owner_screen_name or owner_id.
+      owner_id:
+        Specifies the ID of the user for whom to return the
+        list timeline. Helpful for disambiguating when a valid user ID
+        is also a valid screen name. [Optional]
+      owner_screen_name:
+        Specifies the screen name of the user for whom to return the
+        user_timeline. Helpful for disambiguating when a valid screen
+        name is also a user ID. [Optional]
+      cursor:
+        Should be set to -1 for the initial call and then is used to
+        control what result page Twitter returns [Optional(ish)]
+      skip_status:
+        If True the statuses will not be returned in the user items.
+        [Optional]
+      include_entities:
+        If False, the timeline will not contain additional metadata.
+        defaults to True. [Optional]
+
+    Returns:
+      A sequence of twitter.User instances, one for each follower
+    '''
+    parameters = { 'slug':    slug,
+                   'list_id': list_id,
+                 }
+    url = '%s/lists/members.json' % (self.base_url)
+
+    parameters['slug']    = slug
+    parameters['list_id'] = list_id
+
+    if list_id is None:
+      if slug is None:
+        raise TwitterError('list_id or slug required')
+      if owner_id is None and owner_screen_name:
+        raise TwitterError('if list_id is not given you have to include an owner to help identify the proper list')
+
+    if owner_id:
+      parameters['owner_id'] = owner_id
+    if owner_screen_name:
+      parameters['owner_screen_name'] = owner_screen_name
+    if cursor:
+      try:
+        parameters['cursor'] = int(cursor)
+      except ValueError:
+        raise TwitterError("cursor must be an integer")
+    if skip_status:
+      parameters['skip_status'] = True
+    if include_entities:
+      parameters['include_user_entities'] = True
+    result = []
+    while True:
+      parameters['cursor'] = cursor
+      json = self._RequestUrl(url, 'GET', data=parameters)
+      data = self._ParseAndCheckTwitter(json.content)
+      result += [User.NewFromJsonDict(x) for x in data['users']]
+      if 'next_cursor' in data:
+        if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+          break
+        else:
+          cursor = data['next_cursor']
+      else:
+        break
+      sec = self.GetSleepTime('/followers/list')
+      time.sleep(sec) 
+
+    return result
 
   def GetUserRetweets(self, count=None, since_id=None, max_id=None, trim_user=False):
     '''Fetch the sequence of retweets made by the authenticated user.
@@ -3370,10 +3447,13 @@ class Api(object):
     users who have retweeted the tweet specified by the id parameter.
 
     Args:
-      status_id:     the tweet's numerical ID
-      cursor:        breaks the ids into pages of no more than 100.
-                                                        [Semi-Optional]
-      stringify_ids: returns the IDs as unicode strings [Optional]
+      status_id:
+        the tweet's numerical ID
+      cursor:
+        breaks the ids into pages of no more than 100.
+        [Semi-Optional]
+      stringify_ids:
+        returns the IDs as unicode strings [Optional]
 
     Returns:
       A list of user IDs
