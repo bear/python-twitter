@@ -2280,7 +2280,8 @@ class Api(object):
                base_url=None,
                stream_url=None,
                use_gzip_compression=False,
-               debugHTTP=False):
+               debugHTTP=False,
+               requests_timeout=None):
     '''Instantiate a new twitter.Api object.
 
     Args:
@@ -2313,6 +2314,9 @@ class Api(object):
       debugHTTP:
         Set to True to enable debug output from urllib2 when performing
         any HTTP requests.  Defaults to False. [Optional]
+      requests_timeout:
+        Set timeout (in seconds) of the http/https requests. If None the
+        requests lib default will be used.  Defaults to None. [Optional]
     '''
     self.SetCache(cache)
     self._urllib         = urllib2
@@ -2321,6 +2325,7 @@ class Api(object):
     self._use_gzip       = use_gzip_compression
     self._debugHTTP      = debugHTTP
     self._shortlink_size = 19
+    self._requests_timeout = requests_timeout
 
     self._InitializeRequestHeaders(request_headers)
     self._InitializeUserAgent()
@@ -4935,12 +4940,26 @@ class Api(object):
     '''
     if verb == 'POST':
       if data.has_key('media'):
-        return requests.post(url, files=data, auth=self.__auth)
+        return requests.post(
+          url,
+          files=data,
+          auth=self.__auth,
+          timeout=self._requests_timeout
+        )
       else:
-        return requests.post(url, data=data, auth=self.__auth)
+        return requests.post(
+          url,
+          data=data,
+          auth=self.__auth,
+          timeout=self._requests_timeout
+        )
     if verb == 'GET':
       url = self._BuildUrl(url, extra_params=data)
-      return requests.get(url, auth=self.__auth)
+      return requests.get(
+        url,
+        auth=self.__auth,
+        timeout=self._requests_timeout
+      )
     return 0  # if not a POST or GET request
 
   def _RequestStream(self, url, verb, data=None):
@@ -4955,10 +4974,14 @@ class Api(object):
          A twitter stream.
     '''
     if verb == 'POST':  return requests.post(url, data=data, stream=True,
-                                             auth=self.__auth)
+                                             auth=self.__auth,
+                                             timeout=self._requests_timeout
+                                             )
     if verb == 'GET':
       url = self._BuildUrl(url, extra_params=data)
-      return requests.get(url, stream=True, auth=self.__auth)
+      return requests.get(url, stream=True, auth=self.__auth,
+                          timeout=self._requests_timeout
+                          )
     return 0  # if not a POST or GET request
 
 class _FileCacheError(Exception):
