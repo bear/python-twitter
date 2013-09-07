@@ -22,9 +22,8 @@ __author__ = 'python-twitter@googlegroups.com'
 __version__ = '1.0.1'
 
 
-import calendar
-import datetime
-import httplib
+from calendar import timegm
+from datetime import datetime
 import os
 import rfc822
 import sys
@@ -39,7 +38,6 @@ import StringIO
 import re
 import requests
 from requests_oauthlib import OAuth1
-import oauth2 as oauth
 
 try:
   # Python >= 2.6
@@ -224,7 +222,7 @@ class Status(object):
     Returns:
       The time this status message was posted, in seconds since the epoch.
     '''
-    return calendar.timegm(rfc822.parsedate(self.created_at))
+    return timegm(rfc822.parsedate(self.created_at))
 
   created_at_in_seconds = property(GetCreatedAtInSeconds,
                                    doc="The time this status message was "
@@ -1933,7 +1931,7 @@ class DirectMessage(object):
     Returns:
       The time this direct message was posted, in seconds since the epoch.
     '''
-    return calendar.timegm(rfc822.parsedate(self.created_at))
+    return timegm(rfc822.parsedate(self.created_at))
 
   created_at_in_seconds = property(GetCreatedAtInSeconds,
                                    doc="The time this direct message was "
@@ -2685,6 +2683,7 @@ class Api(object):
       parameters['include_entities'] = 'false'
     json = self._RequestUrl(url, 'GET', data=parameters)
     data = self._ParseAndCheckTwitter(json.content)
+    print data
     return [Status.NewFromJsonDict(x) for x in data]
 
   def GetUserTimeline(self,
@@ -4764,9 +4763,9 @@ class Api(object):
     except:
         raise TwitterError('Wrong resources')
     
-    utc_now = datetime.datetime.utcnow()
+    utc_now = datetime.utcnow()
     utc_stuct = utc_now.timetuple()
-    current_time = calendar.timegm(utc_stuct)
+    current_time = timegm(utc_stuct)
     delta = reset_time - current_time
     
     if remaining == 0:
@@ -4795,9 +4794,9 @@ class Api(object):
         raise TwitterError('Wrong resources')
 
     if remaining == 0:
-        utc_now = datetime.datetime.utcnow()
+        utc_now = datetime.utcnow()
         utc_stuct = utc_now.timetuple()
-        current_time = calendar.timegm(utc_stuct)
+        current_time = timegm(utc_stuct)
         delta = reset_time - current_time
         return delta
     else:
