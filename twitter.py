@@ -4971,16 +4971,16 @@ class Api(object):
        Returns:
          A twitter stream.
     '''
-<<<<<<< HEAD
+
     if verb == 'POST':
       return requests.post(url, data=data, stream=True,
                            auth=self.__auth)
-=======
+    
     if verb == 'POST':  return requests.post(url, data=data, stream=True,
                                              auth=self.__auth,
                                              timeout=self._requests_timeout
                                              )
->>>>>>> pr/8
+
     if verb == 'GET':
       url = self._BuildUrl(url, extra_params=data)
       return requests.get(url, stream=True, auth=self.__auth,
