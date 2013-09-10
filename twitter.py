@@ -22,8 +22,6 @@ __author__ = 'python-twitter@googlegroups.com'
 __version__ = '1.0.1'
 
 
-from calendar import timegm
-from datetime import datetime
 import os
 import rfc822
 import sys
@@ -38,6 +36,8 @@ import StringIO
 import re
 import requests
 from requests_oauthlib import OAuth1
+from calendar import timegm
+from datetime import datetime
 
 try:
   # Python >= 2.6
