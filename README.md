@@ -186,6 +186,7 @@ Now it's a full-on open source project with many contributors over time:
 * Glen Tregoning,
 * Lars Weiler,
 * Sebastian Wiesinger,
+* Jake Robinson,
 * abloch,
 * cahlan,
 * dpslwk,
