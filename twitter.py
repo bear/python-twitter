@@ -4921,8 +4921,7 @@ class Api(object):
       raise TwitterError(data['errors'])
 
   def _RequestUrl(self, url, verb, data=None):
-    '''Reqeust a Url, base function to replace _FetchUrl that uses
-        the request library.
+    '''Reqeust a Url
 
        Args:
          url:   the web location we want to retrieve
@@ -4953,8 +4952,9 @@ class Api(object):
        Returns:
          A twitter stream.
     '''
-    if verb == 'POST':  return requests.post(url, data=data, stream=True,
-                                             auth=self.__auth)
+    if verb == 'POST':
+      return requests.post(url, data=data, stream=True,
+                           auth=self.__auth)
     if verb == 'GET':
       url = self._BuildUrl(url, extra_params=data)
       return requests.get(url, stream=True, auth=self.__auth)
