@@ -1,13 +1,13 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           python-twitter
-Version:        0.7-devel
+Version:        1.1
 Release:        1%{?dist}
 Summary:        Python Interface for Twitter API
 
 Group:          Development/Libraries
 License:        Apache License 2.0
-URL:            http://code.google.com/p/python-twitter/
+URL:            http://github.com/bear/python-twitter
 Source0:        http://python-twitter.googlecode.com/files/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 

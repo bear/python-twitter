@@ -1,3 +1,18 @@
+2013-10-06
+  changed version to 1.1
+  The following changes have been made since the 1.0.1 release
+
+  Remove from ParseTweet the Python 2.7 only dict comprehension item
+  Fix GetListTimeline condition to enable owner_screen_name based fetching
+  Many fixes for readability and PEP8
+  Cleaning up some of the package importing. Only importing the functions that are needed
+  Also added first build of the sphinx documentation. Copied some info from the readme to the index page
+  Added lines to setup.py to help the user troubleshoot install problems. #109
+  Removed the OAuth2 lines from the readme
+  Removed OAuth2 library requirements
+  Added GetListMembers()
+
+
 2013-06-07
   changed version to 1.0.1
   added README bit about Python version requirement
