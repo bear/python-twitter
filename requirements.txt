@@ -3,3 +3,6 @@ httplib2==0.7.7
 wsgiref==0.1.2
 requests==1.2.3
 requests-oauthlib==0.3.3
+simplejson==3.3.1
+oauth2==1.5.211
+oauthlib==0.6.0
