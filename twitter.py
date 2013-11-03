@@ -3611,8 +3611,8 @@ class Api(object):
         Should be set to -1 for the initial call and then is used to
         control what result page Twitter returns [Optional(ish)]
       count:
-	The number of users to return per page, up to a maximum of 200.
-	Defaults to 20. [Optional]
+        The number of users to return per page, up to a maximum of 200.
+        Defaults to 20. [Optional]
       skip_status:
         If True the statuses will not be returned in the user items.
         [Optional]
@@ -3794,8 +3794,8 @@ class Api(object):
         Should be set to -1 for the initial call and then is used to
         control what result page Twitter returns [Optional(ish)]
       count:
-	The number of users to return per page, up to a maximum of 200.
-	Defaults to 20. [Optional]
+        The number of users to return per page, up to a maximum of 200.
+        Defaults to 20. [Optional]
       skip_status:
         If True the statuses will not be returned in the user items.
         [Optional]
