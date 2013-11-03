@@ -3595,7 +3595,7 @@ class Api(object):
         break
     return result
 
-  def GetFriends(self, user_id=None, screen_name=None, cursor=-1, skip_status=False, include_user_entities=False):
+  def GetFriends(self, user_id=None, screen_name=None, cursor=-1, count=None, skip_status=False, include_user_entities=False):
     '''Fetch the sequence of twitter.User instances, one for each friend.
 
     The twitter.Api instance must be authenticated.
@@ -3610,6 +3610,9 @@ class Api(object):
       cursor:
         Should be set to -1 for the initial call and then is used to
         control what result page Twitter returns [Optional(ish)]
+      count:
+        The number of users to return per page, up to a maximum of 200.
+        Defaults to 20. [Optional]
       skip_status:
         If True the statuses will not be returned in the user items.
         [Optional]
@@ -3628,6 +3631,11 @@ class Api(object):
       parameters['user_id'] = user_id
     if screen_name is not None:
       parameters['screen_name'] = screen_name
+    if count:
+      try:
+        parameters['count'] = int(count)
+      except ValueError:
+        raise TwitterError("count must be an integer")
     if skip_status:
       parameters['skip_status'] = True
     if include_user_entities:
@@ -3770,7 +3778,7 @@ class Api(object):
         time.sleep(sec) 
       return result
 
-  def GetFollowers(self, user_id=None, screen_name=None, cursor=-1, skip_status=False, include_user_entities=False):
+  def GetFollowers(self, user_id=None, screen_name=None, cursor=-1, count=None, skip_status=False, include_user_entities=False):
     '''Fetch the sequence of twitter.User instances, one for each follower
 
     The twitter.Api instance must be authenticated.
@@ -3785,6 +3793,9 @@ class Api(object):
       cursor:
         Should be set to -1 for the initial call and then is used to
         control what result page Twitter returns [Optional(ish)]
+      count:
+        The number of users to return per page, up to a maximum of 200.
+        Defaults to 20. [Optional]
       skip_status:
         If True the statuses will not be returned in the user items.
         [Optional]
@@ -3803,6 +3814,11 @@ class Api(object):
       parameters['user_id'] = user_id
     if screen_name is not None:
       parameters['screen_name'] = screen_name
+    if count:
+      try:
+        parameters['count'] = int(count)
+      except ValueError:
+        raise TwitterError("count must be an integer")
     if skip_status:
       parameters['skip_status'] = True
     if include_user_entities:
