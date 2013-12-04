@@ -86,18 +86,12 @@ $ pydoc twitter.DirectMessage
 
 The API is exposed via the `twitter.Api` class.
 
-To create an instance of the `twitter.Api` class:
+The python-twitter library now only supports oAuth authentication as the Twitter devs have indicated that OAuth is the only method that will be supported moving forward.
+
+To create an instance of the `twitter.Api` with login credentials (Twitter now requires an oAuth Access Token for all API calls)
 
 ```
 >>> import twitter
->>> api = twitter.Api()
-```
-
-To create an instance of the `twitter.Api` with login credentials (many API calls required the client to be authenticated.)
-
-The python-twitter library now only supports oAuth authentication as the Twitter devs have indicated that OAuth is the only method that will be supported moving forward.
-
-```
 >>> api = twitter.Api(consumer_key='consumer_key',
                       consumer_secret='consumer_secret',
                       access_token_key='access_token',
