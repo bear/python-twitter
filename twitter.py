@@ -2379,19 +2379,22 @@ class Api(object):
       self.__auth = OAuth1(consumer_key, consumer_secret,  
               access_token_key, access_token_secret)
 
-    self._config = self.GetHelpConfiguration()
+    self._config = None
 
   def GetHelpConfiguration(self):
-    url  = '%s/help/configuration.json' % self.base_url
-    json = self._RequestUrl(url, 'GET')
-    data = self._ParseAndCheckTwitter(json.content)
-    return data
+    if self._config is None:
+      url  = '%s/help/configuration.json' % self.base_url
+      json = self._RequestUrl(url, 'GET')
+      data = self._ParseAndCheckTwitter(json.content)
+      self._config = data
+    return self._config
 
   def GetShortUrlLength(self, https=False):
+    config = self.GetHelpConfiguration()
     if https:
-      return self._config['short_url_length_https']
+      return config['short_url_length_https']
     else:
-      return self._config['short_url_length']
+      return config['short_url_length']
 
   def ClearCredentials(self):
     '''Clear the any credentials for this instance
