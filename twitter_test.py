@@ -25,7 +25,11 @@ import simplejson
 import time
 import calendar
 import unittest
-import urllib
+
+try:
+    import urllib.request as urllib
+except ImportError:
+    import urllib
 
 import twitter
 

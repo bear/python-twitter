@@ -28,12 +28,11 @@ except ImportError:
   import email
 
 import os
+import urllib
 import sys
 import tempfile
 import textwrap
 import time
-import urllib
-import urllib2
 import urlparse
 import gzip
 import StringIO
@@ -2314,14 +2313,14 @@ class Api(object):
         Set to True to tell enable gzip compression for any call
         made to Twitter.  Defaults to False. [Optional]
       debugHTTP:
-        Set to True to enable debug output from urllib2 when performing
+        Set to True to enable debug output from urllib when performing
         any HTTP requests.  Defaults to False. [Optional]
       requests_timeout:
         Set timeout (in seconds) of the http/https requests. If None the
         requests lib default will be used.  Defaults to None. [Optional]
     '''
     self.SetCache(cache)
-    self._urllib         = urllib2
+    self._urllib         = urllib
     self._cache_timeout  = Api.DEFAULT_CACHE_TIMEOUT
     self._input_encoding = input_encoding
     self._use_gzip       = use_gzip_compression
@@ -4688,7 +4687,7 @@ class Api(object):
 
     Args:
       urllib:
-        An instance that supports the same API as the urllib2 module
+        An instance that supports the same API as the urllib module
     '''
     self._urllib = urllib
 
@@ -4893,7 +4892,7 @@ class Api(object):
     if parameters is None:
       return None
     else:
-      return urllib.urlencode(dict([(k, self._Encode(v)) for k, v in parameters.items() if v is not None]))
+      return urllib.parse.urlencode(dict([(k, self._Encode(v)) for k, v in parameters.items() if v is not None]))
 
   def _EncodePostData(self, post_data):
     '''Return a string in key=value&key=value form
@@ -4912,7 +4911,7 @@ class Api(object):
     if post_data is None:
       return None
     else:
-      return urllib.urlencode(dict([(k, self._Encode(v)) for k, v in post_data.items()]))
+      return urllib.parse.urlencode(dict([(k, self._Encode(v)) for k, v in post_data.items()]))
 
   def _ParseAndCheckTwitter(self, json):
     """Try and parse the JSON returned from Twitter and return

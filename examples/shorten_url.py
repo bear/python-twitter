@@ -19,7 +19,10 @@
 TinyURL is provided as the default and as an example.
 '''
 
-import urllib
+try:
+    import urllib.request as urllib
+except ImportError:
+    import urllib
 
 
  # Change History
