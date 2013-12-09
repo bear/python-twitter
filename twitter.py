@@ -27,13 +27,17 @@ try:
 except ImportError:
   import email
 
+try:
+  import urlparse
+except ImportError:
+  import urllib.parse as urlparse
+
 import os
 import urllib
 import sys
 import tempfile
 import textwrap
 import time
-import urlparse
 import gzip
 import StringIO
 import re

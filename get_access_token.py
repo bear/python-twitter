@@ -16,9 +16,12 @@
 
 # parse_qsl moved to urlparse module in v2.6
 try:
-    from urlparse import parse_qsl
+    from urllib.parse import parse_qsl
 except:
-    from cgi import parse_qsl
+    try:
+        from urlparse import parse_qsl
+    except:
+        from cgi import parse_qsl
 
 import webbrowser
 import oauth2 as oauth
