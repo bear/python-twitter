@@ -25,7 +25,7 @@ def main():
         raise SystemExit("%s [infile [outfile]]" % (sys.argv[0],))
     try:
         obj = simplejson.load(infile)
-    except ValueError, e:
+    except ValueError as e:
         raise SystemExit(e)
     simplejson.dump(obj, outfile, sort_keys=True, indent=4)
     outfile.write('\n')

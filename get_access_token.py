@@ -35,24 +35,24 @@ def get_access_token(consumer_key, consumer_secret):
     oauth_consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
     oauth_client = oauth.Client(oauth_consumer)
 
-    print 'Requesting temp token from Twitter'
+    print('Requesting temp token from Twitter')
 
     resp, content = oauth_client.request(REQUEST_TOKEN_URL, 'POST', body="oauth_callback=oob")
 
     if resp['status'] != '200':
-        print 'Invalid respond from Twitter requesting temp token: %s' % resp['status']
+        print('Invalid respond from Twitter requesting temp token: %s' % resp['status'])
     else:
         request_token = dict(parse_qsl(content))
         url = '%s?oauth_token=%s' % (AUTHORIZATION_URL, request_token['oauth_token'])
 
-        print ''
-        print 'I will try to start a browser to visit the following Twitter page'
-        print 'if a browser will not start, copy the URL to your browser'
-        print 'and retrieve the pincode to be used'
-        print 'in the next step to obtaining an Authentication Token:'
-        print ''
-        print url
-        print ''
+        print('')
+        print('I will try to start a browser to visit the following Twitter page')
+        print('if a browser will not start, copy the URL to your browser')
+        print('and retrieve the pincode to be used')
+        print('in the next step to obtaining an Authentication Token:')
+        print('')
+        print(url)
+        print('')
 
         webbrowser.open(url)
         pincode = raw_input('Pincode? ')
@@ -60,21 +60,21 @@ def get_access_token(consumer_key, consumer_secret):
         token = oauth.Token(request_token['oauth_token'], request_token['oauth_token_secret'])
         token.set_verifier(pincode)
 
-        print ''
-        print 'Generating and signing request for an access token'
-        print ''
+        print('')
+        print('Generating and signing request for an access token')
+        print('')
 
         oauth_client = oauth.Client(oauth_consumer, token)
         resp, content = oauth_client.request(ACCESS_TOKEN_URL, method='POST', body='oauth_callback=oob&oauth_verifier=%s' % pincode)
         access_token = dict(parse_qsl(content))
 
         if resp['status'] != '200':
-            print 'The request for a Token did not succeed: %s' % resp['status']
-            print access_token
+            print('The request for a Token did not succeed: %s' % resp['status'])
+            print(access_token)
         else:
-            print 'Your Twitter Access Token key: %s' % access_token['oauth_token']
-            print '          Access Token secret: %s' % access_token['oauth_token_secret']
-            print ''
+            print('Your Twitter Access Token key: %s' % access_token['oauth_token'])
+            print('          Access Token secret: %s' % access_token['oauth_token_secret'])
+            print('')
 
 
 def main():

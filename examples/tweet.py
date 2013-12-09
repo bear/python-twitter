@@ -47,7 +47,7 @@ USAGE = '''Usage: tweet [options] message
 '''
 
 def PrintUsageAndExit():
-  print USAGE
+  print(USAGE)
   sys.exit(2)
 
 def GetConsumerKeyEnv():
@@ -132,10 +132,10 @@ def main():
   try:
     status = api.PostUpdate(message)
   except UnicodeDecodeError:
-    print "Your message could not be encoded.  Perhaps it contains non-ASCII characters? "
-    print "Try explicitly specifying the encoding with the --encoding flag"
+    print("Your message could not be encoded.  Perhaps it contains non-ASCII characters? ")
+    print("Try explicitly specifying the encoding with the --encoding flag")
     sys.exit(2)
-  print "%s just posted: %s" % (status.user.name, status.text)
+  print("%s just posted: %s" % (status.user.name, status.text))
 
 if __name__ == "__main__":
   main()
