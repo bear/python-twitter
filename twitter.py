@@ -22,8 +22,12 @@ __author__ = 'python-twitter@googlegroups.com'
 __version__ = '1.1'
 
 
+try:
+  import rfc822
+except ImportError:
+  import email
+
 import os
-import rfc822
 import sys
 import tempfile
 import textwrap
@@ -222,7 +226,7 @@ class Status(object):
     Returns:
       The time this status message was posted, in seconds since the epoch.
     '''
-    return timegm(rfc822.parsedate(self.created_at))
+    return timegm(email.parsedate(self.created_at))
 
   created_at_in_seconds = property(GetCreatedAtInSeconds,
                                    doc="The time this status message was "
@@ -1931,7 +1935,7 @@ class DirectMessage(object):
     Returns:
       The time this direct message was posted, in seconds since the epoch.
     '''
-    return timegm(rfc822.parsedate(self.created_at))
+    return timegm(email.parsedate(self.created_at))
 
   created_at_in_seconds = property(GetCreatedAtInSeconds,
                                    doc="The time this direct message was "
