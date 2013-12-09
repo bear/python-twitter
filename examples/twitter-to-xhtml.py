@@ -18,14 +18,14 @@ TEMPLATE = """
 """
 
 def Usage():
-  print 'Usage: %s [options] twitterid' % __file__
-  print
-  print '  This script fetches a users latest twitter update and stores'
-  print '  the result in a file as an XHTML fragment'
-  print
-  print '  Options:'
-  print '    --help -h : print this help'
-  print '    --output : the output file [default: stdout]'
+  print('Usage: %s [options] twitterid' % __file__)
+  print()
+  print('  This script fetches a users latest twitter update and stores')
+  print('  the result in a file as an XHTML fragment')
+  print()
+  print('  Options:')
+  print('    --help -h : print this help')
+  print('    --output : the output file [default: stdout]')
 
 
 def FetchTwitter(user, output):
@@ -36,7 +36,7 @@ def FetchTwitter(user, output):
   if output:
     Save(xhtml, output)
   else:
-    print xhtml
+    print(xhtml)
 
 
 def Save(xhtml, output):

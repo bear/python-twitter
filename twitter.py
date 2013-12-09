@@ -51,7 +51,7 @@ except ImportError:
       # Google App Engine
       from django.utils import simplejson
     except ImportError:
-      raise ImportError, "Unable to load a json library"
+      raise ImportError("Unable to load a json library")
 
 # parse_qsl moved to urlparse module in v2.6
 try:
@@ -2219,7 +2219,7 @@ class Api(object):
     a Twitter "short name" or their user id.
 
       >>> statuses = api.GetUserTimeline(user)
-      >>> print [s.text for s in statuses]
+      >>> print([s.text for s in statuses])
 
     To use authentication, instantiate the twitter.Api class with a
     consumer key and secret; and the oAuth key and secret:
@@ -2232,12 +2232,12 @@ class Api(object):
     To fetch your friends (after being authenticated):
 
       >>> users = api.GetFriends()
-      >>> print [u.name for u in users]
+      >>> print([u.name for u in users])
 
     To post a twitter status message (after being authenticated):
 
       >>> status = api.PostUpdate('I love python-twitter!')
-      >>> print status.text
+      >>> print(status.text)
       I love python-twitter!
 
     There are many other methods, including:
@@ -2341,9 +2341,9 @@ class Api(object):
 
     if consumer_key is not None and (access_token_key is None or
                                      access_token_secret is None):
-      print >> sys.stderr, 'Twitter now requires an oAuth Access Token for API calls.'
-      print >> sys.stderr, 'If your using this library from a command line utility, please'
-      print >> sys.stderr, 'run the included get_access_token.py tool to generate one.'
+      sys.stderr.write('Twitter now requires an oAuth Access Token for API calls.\n')
+      sys.stderr.write('If your using this library from a command line utility, please\n')
+      sys.stderr.write('run the included get_access_token.py tool to generate one.\n')
 
       raise TwitterError('Twitter requires oAuth Access Token for all API access')
 
@@ -3890,7 +3890,7 @@ class Api(object):
     json = self._RequestUrl(url, 'GET', data=parameters)
     try:
       data = self._ParseAndCheckTwitter(json.content)
-    except TwitterError, e:
+    except TwitterError as e:
         _, e, _ = sys.exc_info()
         t = e.args[0]
         if len(t) == 1 and ('code' in t[0]) and (t[0]['code'] == 34):
@@ -5065,7 +5065,7 @@ class _FileCache(object):
              os.getenv('USERNAME') or \
              os.getlogin() or \
              'nobody'
-    except (AttributeError, IOError, OSError), e:
+    except (AttributeError, IOError, OSError) as e:
       return 'nobody'
 
   def _GetTmpCachePath(self):
