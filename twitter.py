@@ -32,6 +32,11 @@ try:
 except ImportError:
   import urllib.parse as urlparse
 
+try:
+  import StringIO
+except ImportError:
+  import io.StringIO as StringIO
+
 import os
 import urllib
 import sys
@@ -39,7 +44,6 @@ import tempfile
 import textwrap
 import time
 import gzip
-import StringIO
 import re
 import requests
 from requests_oauthlib import OAuth1
