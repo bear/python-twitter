@@ -23,19 +23,25 @@ __version__ = '1.1'
 
 
 try:
+  # Python 2
   import rfc822
 except ImportError:
+  # Python 3
   import email
 
 try:
+  # Python 2
   import urlparse
 except ImportError:
+  # Python 3
   import urllib.parse as urlparse
 
 try:
+  # Python 2
   import StringIO
 except ImportError:
-  import io.StringIO as StringIO
+  # Python 3
+  from io import StringIO
 
 import os
 import urllib
