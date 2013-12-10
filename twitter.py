@@ -23,28 +23,20 @@ __version__ = '1.1'
 
 
 try:
-  # Python 2
-  import rfc822
-except ImportError:
   # Python 3
   import email
-
-try:
-  # Python 2
-  import urlparse
-except ImportError:
-  # Python 3
-  import urllib.parse as urlparse
-
-try:
-  # Python 2
-  import StringIO
-except ImportError:
-  # Python 3
   from io import StringIO
+  from urllib import parse as urllib_parse
+  from urllib import request as urllib_request
+except ImportError:
+  # Python 2
+  import rfc822
+  import StringIO
+  import urlparse as urllib_parse
+  import urllib as urllib_request
+
 
 import os
-import urllib
 import sys
 import tempfile
 import textwrap
@@ -72,9 +64,12 @@ except ImportError:
 
 # parse_qsl moved to urlparse module in v2.6
 try:
-  from urlparse import parse_qsl, parse_qs
+  from urllib.parse import parse_qsl, parse_qs
 except ImportError:
-  from cgi import parse_qsl, parse_qs
+  try:
+    from urlparse import parse_qsl, parse_qs
+  except ImportError:
+    from cgi import parse_qsl, parse_qs
 
 try:
   from hashlib import md5
@@ -2334,7 +2329,8 @@ class Api(object):
         requests lib default will be used.  Defaults to None. [Optional]
     '''
     self.SetCache(cache)
-    self._urllib         = urllib
+    self._urllib_request = urllib_request
+    self._urllib_parse   = urllib_parse
     self._cache_timeout  = Api.DEFAULT_CACHE_TIMEOUT
     self._input_encoding = input_encoding
     self._use_gzip       = use_gzip_compression
@@ -4696,14 +4692,23 @@ class Api(object):
     else:
       self._cache = cache
 
-  def SetUrllib(self, urllib):
-    '''Override the default urllib implementation.
+  def SetUrllibParse(self, urllib_parse):
+    '''Override the default urllib.parse implementation.
 
     Args:
-      urllib:
-        An instance that supports the same API as the urllib module
+      urllib_parse:
+        An instance that supports the same API as the urllib.parse module
     '''
-    self._urllib = urllib
+    self._urllib_parse = urllib_parse
+
+  def SetUrllibRequest(self, urllib_request):
+    '''Override the default urllib.request implementation.
+
+    Args:
+      urllib_request:
+        An instance that supports the same API as the urllib.request module
+    '''
+    self._urllib_request = urllib_request
 
   def SetCacheTimeout(self, cache_timeout):
     '''Override the default cache timeout.
@@ -4840,7 +4845,7 @@ class Api(object):
 
   def _BuildUrl(self, url, path_elements=None, extra_params=None):
     # Break url into constituent parts
-    (scheme, netloc, path, params, query, fragment) = urlparse.urlparse(url)
+    (scheme, netloc, path, params, query, fragment) = urllib_parse.urlparse(url)
 
     # Add any additional path elements to the path
     if path_elements:
@@ -4860,7 +4865,7 @@ class Api(object):
         query = extra_query
 
     # Return the rebuilt URL
-    return urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
+    return urllib_parse.urlunparse((scheme, netloc, path, params, query, fragment))
 
   def _InitializeRequestHeaders(self, request_headers):
     if request_headers:
@@ -4870,7 +4875,7 @@ class Api(object):
 
   def _InitializeUserAgent(self):
     user_agent = 'Python-urllib/%s (python-twitter/%s)' % \
-                 (self._urllib.__version__, __version__)
+                 (self._urllib_request.__version__, __version__)
     self.SetUserAgent(user_agent)
 
   def _InitializeDefaultParameters(self):
@@ -4906,7 +4911,7 @@ class Api(object):
     if parameters is None:
       return None
     else:
-      return urllib.parse.urlencode(dict([(k, self._Encode(v)) for k, v in parameters.items() if v is not None]))
+      return urllib_parse.parse.urlencode(dict([(k, self._Encode(v)) for k, v in parameters.items() if v is not None]))
 
   def _EncodePostData(self, post_data):
     '''Return a string in key=value&key=value form
@@ -4925,7 +4930,7 @@ class Api(object):
     if post_data is None:
       return None
     else:
-      return urllib.parse.urlencode(dict([(k, self._Encode(v)) for k, v in post_data.items()]))
+      return urllib_parse.urlencode(dict([(k, self._Encode(v)) for k, v in post_data.items()]))
 
   def _ParseAndCheckTwitter(self, json):
     """Try and parse the JSON returned from Twitter and return

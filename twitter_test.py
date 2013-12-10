@@ -27,9 +27,9 @@ import calendar
 import unittest
 
 try:
-    import urllib.request as urllib
+    import urllib.request as urllib_request
 except ImportError:
-    import urllib
+    import urllib as urllib_request
 
 import twitter
 
@@ -357,14 +357,15 @@ class FileCacheTest(unittest.TestCase):
 class ApiTest(unittest.TestCase):
 
   def setUp(self):
-    self._urllib = MockUrllib()
+    self._urllib_request = MockUrllibRequest()
     time.sleep(15)
     api = twitter.Api(consumer_key='yDkaORxEcwX6SheX6pa1fw',
                       consumer_secret='VYIGd2KITohR4ygmHrcyZgV0B74CXi5wsT1eryVtw',
                       access_token_key='227846642-8IjK2K32CDFt3682SNOOpnzegAja3TyVpzFOGrQj',
                       access_token_secret='L6of20EZdBv48EA2GE8Js6roIfZFnCKBpoPwvBDxF8',
                       cache=None)
-    api.SetUrllib(self._urllib)
+    api.SetUrllibParse(self._urllib_parse)
+    api.SetUrllibRequest(self._urllib_request)
     self._api = api
     print("Testing the API class. This test is time controled")
 
@@ -560,7 +561,7 @@ class ApiTest(unittest.TestCase):
     self.assertEqual(89586072, user.status.id)
 
   def _AddHandler(self, url, callback):
-    self._urllib.AddHandler(url, callback)
+    self._urllib_request.AddHandler(url, callback)
 
   def _GetTestDataPath(self, filename):
     directory = os.path.dirname(os.path.abspath(__file__))
@@ -571,10 +572,10 @@ class ApiTest(unittest.TestCase):
     f = open(self._GetTestDataPath(filename))
     # make sure that the returned object contains an .info() method:
     # headers are set to {}
-    return urllib.addinfo(f, {})
+    return urllib_request.addinfo(f, {})
 
-class MockUrllib(object):
-  '''A mock replacement for urllib that hardcodes specific responses.'''
+class MockUrllibRequest(object):
+  '''A mock replacement for urllib.request that hardcodes specific responses.'''
 
   def __init__(self):
     self._handlers = {}

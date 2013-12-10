@@ -700,11 +700,17 @@ Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;source&nbsp;name&nbsp;as&nbsp;a&nbsp;string.&nbsp;&nbsp;Will&nbsp;be&nbsp;sent&nbsp;to&nbsp;the&nbsp;server&nbsp;as<br>
 &nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;'source'&nbsp;parameter.</tt></dd></dl>
 
-<dl><dt><a name="Api-SetUrllib"><strong>SetUrllib</strong></a>(self, urllib)</dt><dd><tt>Override&nbsp;the&nbsp;default&nbsp;urllib&nbsp;implementation.<br>
+<dl><dt><a name="Api-SetUrllibParse"><strong>SetUrllibParse</strong></a>(self, urllib_parse)</dt><dd><tt>Override&nbsp;the&nbsp;default&nbsp;urllib.parse&nbsp;implementation.<br>
 &nbsp;<br>
 Args:<br>
-&nbsp;&nbsp;urllib:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;An&nbsp;instance&nbsp;that&nbsp;supports&nbsp;the&nbsp;same&nbsp;API&nbsp;as&nbsp;the&nbsp;urllib2&nbsp;module</tt></dd></dl>
+&nbsp;&nbsp;urllib_parse:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;An&nbsp;instance&nbsp;that&nbsp;supports&nbsp;the&nbsp;same&nbsp;API&nbsp;as&nbsp;the&nbsp;urllib.parse&nbsp;module</tt></dd></dl>
+
+<dl><dt><a name="Api-SetUrllibRequest"><strong>SetUrllibRequest</strong></a>(self, urllib_request)</dt><dd><tt>Override&nbsp;the&nbsp;default&nbsp;urllib.request&nbsp;implementation.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;urllib_request:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;An&nbsp;instance&nbsp;that&nbsp;supports&nbsp;the&nbsp;same&nbsp;API&nbsp;as&nbsp;the&nbsp;urllib.request&nbsp;module</tt></dd></dl>
 
 <dl><dt><a name="Api-SetUserAgent"><strong>SetUserAgent</strong></a>(self, user_agent)</dt><dd><tt>Override&nbsp;the&nbsp;default&nbsp;user&nbsp;agent<br>
 &nbsp;<br>

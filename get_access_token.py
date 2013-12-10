@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# parse_qsl moved to urlparse module in v2.6
+# parse_qsl moved to urllib.parse module in v3.x or urlparse module in v2.6
 try:
     from urllib.parse import parse_qsl
 except:
