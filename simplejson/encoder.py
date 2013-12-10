@@ -1,6 +1,6 @@
 """Implementation of JSONEncoder
 """
-import re
+import sys, re
 
 try:
     from simplejson._speedups import encode_basestring_ascii as c_encode_basestring_ascii
@@ -11,6 +11,7 @@ try:
 except ImportError:
     c_make_encoder = None
 
+_PY3 = sys.version_info[0] >= 3
 ESCAPE = re.compile(r'[\x00-\x1f\\"\b\f\n\r\t]')
 ESCAPE_ASCII = re.compile(r'([\\"]|[^\ -~])')
 HAS_UTF8 = re.compile(r'[\x80-\xff]')
@@ -348,7 +349,10 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr, _key_separ
             items = dct.items()
             items.sort(key=lambda kv: kv[0])
         else:
-            items = dct.iteritems()
+            if _PY3:
+                iteritems = dct.items()
+            else:
+                iteritems = dct.iteritems()
         for key, value in items:
             if isinstance(key, basestring):
                 pass

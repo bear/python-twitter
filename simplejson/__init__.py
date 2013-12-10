@@ -103,8 +103,8 @@ __all__ = [
     'JSONDecoder', 'JSONEncoder',
 ]
 
-from decoder import JSONDecoder
-from encoder import JSONEncoder
+from .decoder import JSONDecoder
+from .encoder import JSONEncoder
 
 _default_encoder = JSONEncoder(
     skipkeys=False,

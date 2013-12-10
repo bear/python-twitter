@@ -77,6 +77,7 @@ except ImportError:
   from md5 import md5
 
 
+_PY3 = sys.version_info[0] >= 3
 CHARACTER_LIMIT = 140
 
 # A singleton representing a lazily instantiated FileCache.
@@ -205,7 +206,12 @@ class Status(object):
       'withheld_in_countries':   None,
       'withheld_scope':          None}
 
-    for (param, default) in param_defaults.iteritems():
+    if _PY3:
+      iterable = param_defaults.items()
+    else:
+      iterable = param_defaults.iteritems()
+
+    for (param, default) in iterable:
       setattr(self, param, kwargs.get(param, default))
 
   def GetCreatedAt(self):
@@ -853,7 +859,12 @@ class User(object):
       'created_at':                   None,
       'listed_count':                 None}
 
-    for (param, default) in param_defaults.iteritems():
+    if _PY3:
+      iterable = param_defaults.items()
+    else:
+      iterable = param_defaults.iteritems()
+
+    for (param, default) in iterable:
       setattr(self, param, kwargs.get(param, default))
                
 
@@ -1521,7 +1532,12 @@ class List(object):
       'following':        None,
       'user':             None}
     
-    for (param, default) in param_defaults.iteritems():
+    if _PY3:
+      iterable = param_defaults.items()
+    else:
+      iterable = param_defaults.iteritems()
+
+    for (param, default) in iterable:
       setattr(self, param, kwargs.get(param, default))
 
   def GetId(self):
@@ -4938,6 +4954,7 @@ class Api(object):
     defensive check because during some Twitter network outages
     it will return an HTML failwhale page."""
     try:
+      json = json.decode('utf-8')
       data = simplejson.loads(json)
       self._CheckForTwitterError(data)
     except ValueError:
