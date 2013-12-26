@@ -2542,6 +2542,9 @@ class Api(object):
     if term is not None:
       parameters['q'] = term
 
+    if page != 1:
+      parameters['page'] = page
+
     if include_entities:
       parameters['include_entities'] = 1
 
