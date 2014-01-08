@@ -22,6 +22,7 @@ __author__ = 'python-twitter@googlegroups.com'
 __version__ = '1.1'
 
 
+import base64
 import os
 import rfc822
 import sys
@@ -789,6 +790,7 @@ class User(object):
     user.profile_image_url
     user.profile_background_tile
     user.profile_background_image_url
+    user.profile_banner_url
     user.profile_sidebar_fill_color
     user.profile_background_color
     user.profile_link_color
@@ -820,6 +822,7 @@ class User(object):
       'profile_image_url':            None,
       'profile_background_tile':      None,
       'profile_background_image_url': None,
+      'profile_banner_url':           None,
       'profile_sidebar_fill_color':   None,
       'profile_background_color':     None,
       'profile_link_color':           None,
@@ -1005,6 +1008,15 @@ class User(object):
 
   profile_background_image_url = property(GetProfileBackgroundImageUrl, SetProfileBackgroundImageUrl,
                                           doc='The url of the profile background of this user.')
+
+  def GetProfileBannerUrl(self):
+    return self._profile_banner_url
+
+  def SetProfileBannerUrl(self, profile_banner_url):
+    self._profile_banner_url = profile_banner_url
+
+  profile_banner_url = property(GetProfileBannerUrl, SetProfileBannerUrl,
+                                          doc='The url of the profile banner of this user.')
 
   def GetProfileSidebarFillColor(self):
     return self._profile_sidebar_fill_color
@@ -1327,6 +1339,7 @@ class User(object):
              self.profile_image_url == other.profile_image_url and \
              self.profile_background_tile == other.profile_background_tile and \
              self.profile_background_image_url == other.profile_background_image_url and \
+             self.profile_banner_url == other.profile_banner_url and \
              self.profile_sidebar_fill_color == other.profile_sidebar_fill_color and \
              self.profile_background_color == other.profile_background_color and \
              self.profile_link_color == other.profile_link_color and \
@@ -1393,7 +1406,11 @@ class User(object):
     if self.profile_background_tile is not None:
       data['profile_background_tile'] = self.profile_background_tile
     if self.profile_background_image_url:
-      data['profile_sidebar_fill_color'] = self.profile_background_image_url
+      data['profile_background_image_url'] = self.profile_background_image_url
+    if self.profile_banner_url:
+      data['profile_banner_url'] = self.profile_banner_url
+    if self.profile_sidebar_fill_color:
+      data['profile_sidebar_fill_color'] = self.profile_sidebar_fill_color
     if self.profile_background_color:
       data['profile_background_color'] = self.profile_background_color
     if self.profile_link_color:
@@ -1462,6 +1479,7 @@ class User(object):
                 profile_image_url=data.get('profile_image_url_https', data.get('profile_image_url', None)),
                 profile_background_tile=data.get('profile_background_tile', None),
                 profile_background_image_url=data.get('profile_background_image_url', None),
+                profile_banner_url=data.get('profile_banner_url', None),
                 profile_sidebar_fill_color=data.get('profile_sidebar_fill_color', None),
                 profile_background_color=data.get('profile_background_color', None),
                 profile_link_color=data.get('profile_link_color', None),
@@ -4634,6 +4652,63 @@ class Api(object):
       else:
         break
     return result
+
+
+  def UpdateBanner(self,
+                  image,
+                  include_entities=False,
+                  skip_status=False):
+    '''Updates the authenticated users profile banner
+
+    The twitter.Api instance must be authenticated.
+
+    Args:
+      image:
+        Location of image in file system
+      include_entities:
+        If True, each tweet will include a node called "entities,".
+        This node offers a variety of metadata about the tweet in a
+        discrete structure, including: user_mentions, urls, and hashtags.
+        [Optional]
+      slug:
+        You can identify a list by its slug instead of its numerical id. If you
+        decide to do so, note that you'll also have to specify the list owner
+        using the owner_id or owner_screen_name parameters.
+    Returns:
+      A twitter.List instance representing the list subscribed to
+    '''
+    url = '%s/account/update_profile_banner.json' % (self.base_url)
+    if not self.__auth:
+      raise TwitterError("The twitter.Api instance must be authenticated.")
+    
+    with open(image, 'rb') as image_file:
+      encoded_image = base64.b64encode(image_file.read())
+
+    data = {
+      # When updated for API v1.1 use image, not banner
+      # https://dev.twitter.com/docs/api/1.1/post/account/update_profile_banner
+      # 'image': encoded_image
+      'banner': encoded_image
+    }
+
+    if include_entities:
+      data['include_entities'] = 1
+
+    if skip_status:
+      data['skip_status'] = 1
+
+    json = self._RequestUrl(url, 'POST', data=data)
+    if json.status_code in [200, 201, 202]:
+      return True
+
+    if json.status_code == 400:
+      raise TwitterError("Image data could not be processed")
+
+    if json.status_code == 422:
+      raise TwitterError("The image could not be resized or is too large.")
+
+    raise TwitterError("Unkown banner image upload issue")
+
 
   def GetStreamSample(self, delimited=None, stall_warnings=None):
     '''
