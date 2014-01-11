@@ -4695,7 +4695,6 @@ class Api(object):
     url = '%s/account/update_profile.json' % (self.base_url)
 
     data = {}
-    for arg in [name, url, location, description]:
     if name:
       data['name'] = name
     if url:
