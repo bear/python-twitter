@@ -4655,7 +4655,7 @@ class Api(object):
 
   def UpdateProfile(self,
                     name=None,
-                    url=None,
+                    profileURL=None,
                     location=None,
                     description=None,
                     include_entities=False,
@@ -4669,7 +4669,7 @@ class Api(object):
       name:
         Full name associated with the profile. Maximum of 20 characters.
         [Optional]
-      url:
+      profileURL:
         URL associated with the profile. Will be prepended with "http://" if not present. Maximum of 100 characters.
         [Optional]
       location:
@@ -4697,8 +4697,8 @@ class Api(object):
     data = {}
     if name:
       data['name'] = name
-    if url:
-      data['url'] = url
+    if profileURL:
+      data['url'] = profileURL
     if location:
       data['location'] = location
     if description:
