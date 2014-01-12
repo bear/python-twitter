@@ -4653,6 +4653,64 @@ class Api(object):
         break
     return result
 
+  def UpdateProfile(self,
+                    name=None,
+                    profileURL=None,
+                    location=None,
+                    description=None,
+                    include_entities=False,
+                    skip_status=False
+                    ):
+    '''Update's the authenticated user's profile data.
+
+    The twitter.Api instance must be authenticated.
+
+    Args:
+      name:
+        Full name associated with the profile. Maximum of 20 characters.
+        [Optional]
+      profileURL:
+        URL associated with the profile. Will be prepended with "http://" if not present. Maximum of 100 characters.
+        [Optional]
+      location:
+        The city or country describing where the user of the account is located. The contents are not normalized or geocoded in any way. Maximum of 30 characters.
+        [Optional]
+      description:
+        A description of the user owning the account. Maximum of 160 characters.
+        [Optional]
+      include_entities:
+        The entities node will not be included when set to false.
+        [Optional]
+      skip_status:
+        When set to either true, t or 1 statuses will not be included in the returned user objects.
+        [Optional]
+      
+
+    Returns:
+      A twitter.User instance representing the modified user.
+    '''
+    if not self.__auth:
+      raise TwitterError("The twitter.Api instance must be authenticated.")
+
+    url = '%s/account/update_profile.json' % (self.base_url)
+
+    data = {}
+    if name:
+      data['name'] = name
+    if profileURL:
+      data['url'] = profileURL
+    if location:
+      data['location'] = location
+    if description:
+      data['description'] = description
+    if include_entities:
+      data['include_entities'] = include_entities
+    if skip_status:
+      data['skip_status'] = skip_status
+
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
+    return User.NewFromJsonDict(data)
 
   def UpdateBanner(self,
                   image,
