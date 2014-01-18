@@ -3802,7 +3802,63 @@ class Api(object):
         time.sleep(sec) 
       return result
 
-  def GetFollowers(self, user_id=None, screen_name=None, cursor=-1, count=None, skip_status=False, include_user_entities=False):
+  def GetFollowersPaged(self, user_id=None, screen_name=None, cursor=-1, count=200, skip_status=False, include_user_entities=False):
+    '''Make a cursor driven call to return the list of all followers
+
+    The caller is responsible for handling the cursor value and looping
+    to gather all of the data
+
+    Args:
+      user_id:
+        The twitter id of the user whose followers you are fetching.
+        If not specified, defaults to the authenticated user. [Optional]
+      screen_name:
+        The twitter name of the user whose followers you are fetching.
+        If not specified, defaults to the authenticated user. [Optional]
+      cursor:
+        Should be set to -1 for the initial call and then is used to
+        control what result page Twitter returns [Optional(ish)]
+      count:
+        The number of users to return per page, up to a maximum of 200.
+        Defaults to 200. [Optional]
+      skip_status:
+        If True the statuses will not be returned in the user items.
+        [Optional]
+      include_user_entities:
+        When True, the user entities will be included.
+
+    Returns:
+      next_cursor, previous_cursor, data sequence of twitter.User instances, one for each follower
+    '''
+    url = '%s/followers/list.json' % self.base_url
+    result = []
+    parameters = {}
+    if user_id is not None:
+      parameters['user_id'] = user_id
+    if screen_name is not None:
+      parameters['screen_name'] = screen_name
+    try:
+      parameters['count'] = int(count)
+    except ValueError:
+      raise TwitterError("count must be an integer")
+    if skip_status:
+      parameters['skip_status'] = True
+    if include_user_entities:
+      parameters['include_user_entities'] = True
+    parameters['cursor'] = cursor
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
+    if 'next_cursor' in data:
+      next_cursor = data['next_cursor']
+    else:
+      next_cursor = 0
+    if 'previous_cursor' in data:
+      previous_cursor = data['previous_cursor']
+    else:
+      previous_cursor = 0
+    return next_cursor, previous_cursor, data
+
+  def GetFollowers(self, user_id=None, screen_name=None, cursor=-1, count=200, skip_status=False, include_user_entities=False):
     '''Fetch the sequence of twitter.User instances, one for each follower
 
     The twitter.Api instance must be authenticated.
@@ -3819,7 +3875,7 @@ class Api(object):
         control what result page Twitter returns [Optional(ish)]
       count:
         The number of users to return per page, up to a maximum of 200.
-        Defaults to 20. [Optional]
+        Defaults to 200. [Optional]
       skip_status:
         If True the statuses will not be returned in the user items.
         [Optional]
@@ -3831,34 +3887,15 @@ class Api(object):
     '''
     if not self.__auth:
       raise TwitterError("twitter.Api instance must be authenticated")
-    url = '%s/followers/list.json' % self.base_url
     result = []
     parameters = {}
-    if user_id is not None:
-      parameters['user_id'] = user_id
-    if screen_name is not None:
-      parameters['screen_name'] = screen_name
-    if count:
-      try:
-        parameters['count'] = int(count)
-      except ValueError:
-        raise TwitterError("count must be an integer")
-    if skip_status:
-      parameters['skip_status'] = True
-    if include_user_entities:
-      parameters['include_user_entities'] = True
     while True:
-      parameters['cursor'] = cursor
-      json = self._RequestUrl(url, 'GET', data=parameters)
-      data = self._ParseAndCheckTwitter(json.content)
+      next_cursor, previous_cursor, data = self.GetFollowersPaged(user_id, screen_name, cursor, count, skip_status, include_user_entities)
       result += [User.NewFromJsonDict(x) for x in data['users']]
-      if 'next_cursor' in data:
-        if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
-          break
-        else:
-          cursor = data['next_cursor']
-      else:
+      if next_cursor == 0 or next_cursor == previous_cursor:
         break
+      else:
+        cursor = next_cursor
       sec = self.GetSleepTime('/followers/list')
       time.sleep(sec) 
     return result
@@ -4390,7 +4427,7 @@ class Api(object):
       parameters['mode'] = mode
     if description is not None:
       parameters['description'] = description
-    json = self._RequestUrl(url, 'POST', data=data)
+    json = self._RequestUrl(url, 'POST', data=parameters)
     data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
 
