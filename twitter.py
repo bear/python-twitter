@@ -4826,6 +4826,47 @@ class Api(object):
         data = self._ParseAndCheckTwitter(line)
         yield data
 
+  def GetStreamFilter(self, follow=None, track=None, locations=None,
+                      delimited=None, stall_warning=None):
+    '''Returns a filtered view of public statuses.
+
+    args:
+      follow:         a list of user ids to track           [optional]
+      track:          a list of expressions to track        [optional]
+      locations:      a list of pairs strings 'lat,lon', specifying
+                      bounding boxes for the tweets' origin [optional]
+      delimited:      specifies a message length            [optional]
+      stall_warnings: set to True to deliver stall warnings [optional]
+
+    returns:
+      a twitter stream
+
+    '''
+    if not self.__auth:
+      raise TwitterError("twitter.Api instance must be authenticated")
+
+    if all((follow is None, track is None, locations is None)):
+      raise ValueError('No filter parameters specified.')
+
+    data = {}
+    if follow is not None:
+      data['follow'] = ','.join(follow)
+    if track is not None:
+      data['track'] = ','.join(track)
+    if locations is not None:
+      data['locations'] = ','.join(locations)
+    if delimited is not None:
+      data['delimited'] = str(delimited)
+    if delimited is not None:
+      data['stall_warning'] = str(stall_warning)
+
+    url = '%s/statuses/filter.json' % self.stream_url
+    json = self._RequestStream(url, 'POST', data=data)
+    for line in json.iter_lines():
+      if line:
+        data = self._ParseAndCheckTwitter(line)
+        yield data
+
   def VerifyCredentials(self):
     '''Returns a twitter.User instance if the authenticating user is valid.
 
