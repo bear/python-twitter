@@ -4194,8 +4194,8 @@ class Api(object):
   # done GET lists/members
   # done POST lists/members/create
   # done POST lists/members/create_all
-  #      POST lists/members/destroy
-  #      POST lists/members/destroy_all
+  # done POST lists/members/destroy
+  # done POST lists/members/destroy_all
   #      GET lists/members/show
   # done POST lists/create
   # done POST lists/destroy
@@ -4858,9 +4858,9 @@ class Api(object):
     Returns:
       A twitter.List instance representing the removed list.
     '''
-    url = '%s/lists/members/destroy.json' % (self.base_url)
     if not self.__auth:
       raise TwitterError("The twitter.Api instance must be authenticated.")
+    isList = False
     data = {}
     if list_id:
       try:
@@ -4882,11 +4882,23 @@ class Api(object):
       raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
     if user_id:
       try:
-        data['user_id'] = long(user_id)
+        if type(user_id) == types.ListType or type(user_id) == types.TupleType:
+          isList = True
+          data['user_id'] = '%s' % ','.join(user_id)
+        else:
+          data['user_id'] = long(user_id)
       except ValueError:
         raise TwitterError("user_id must be an integer")
     elif screen_name:
-        data['screen_name'] = screen_name
+        if type(screen_name) == types.ListType or type(screen_name) == types.TupleType:
+          isList = True
+          data['screen_name'] = '%s' % ','.join(screen_name)
+        else:
+          data['screen_name'] = screen_name
+    if isList:
+      url = '%s/lists/members/destroy_all.json' % self.base_url
+    else:
+      url = '%s/lists/members/destroy.json' % (self.base_url)
     json = self._RequestUrl(url, 'POST', data=data)
     data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
