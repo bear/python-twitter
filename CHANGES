@@ -1,3 +1,14 @@
+2014-01-18
+  backfilling varioius lists endpoints
+  added a basic user stream call
+
+2014-01-17
+  changed to version 1.2
+  fixed python 3 issue in setup.py (print statements)
+  fixed error in CreateList(), changed count default for GetFollowers to 200 and added a GetFollowersPaged() method
+
+need to backfill commit log entries!
+
 2013-10-06
   changed version to 1.1
   The following changes have been made since the 1.0.1 release
