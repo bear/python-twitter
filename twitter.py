@@ -4342,10 +4342,10 @@ class Api(object):
     return User.NewFromJsonDict(data)
 
   def DestroySubscription(self,
-                  owner_screen_name=False,
-                  owner_id=False,
-                  list_id=None,
-                  slug=None):
+                          owner_screen_name=False,
+                          owner_id=False,
+                          list_id=None,
+                          slug=None):
     '''Destroys the subscription to a list for the authenticated user
 
     The twitter.Api instance must be authenticated.
@@ -4823,6 +4823,70 @@ class Api(object):
       url = '%s/lists/members/create_all.json' % self.base_url
     else:
       url = '%s/lists/members/create.json' % self.base_url
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
+    return List.NewFromJsonDict(data)
+
+  def DestroyListsMember(self,
+                         list_id=None,
+                         slug=None,
+                         owner_screen_name=False,
+                         owner_id=False,
+                         user_id=None,
+                         screen_name=None):
+    '''Destroys the subscription to a list for the authenticated user
+
+    The twitter.Api instance must be authenticated.
+
+    Twitter endpoint: /lists/subscribers/destroy
+
+    Args:
+      list_id:
+        The numerical id of the list.
+      slug:
+        You can identify a list by its slug instead of its numerical id. If you
+        decide to do so, note that you'll also have to specify the list owner
+        using the owner_id or owner_screen_name parameters.
+      owner_screen_name:
+        The screen_name of the user who owns the list being requested by a slug.
+      owner_id:
+        The user ID of the user who owns the list being requested by a slug.
+      user_id:
+        User_id or a list of User_id's to add to the list. If not given, then screen_name is required.
+      screen_name:
+        Screen_name or a list of Screen_name's to add to the list. If not given, then user_id is required.
+    Returns:
+      A twitter.List instance representing the removed list.
+    '''
+    url = '%s/lists/members/destroy.json' % (self.base_url)
+    if not self.__auth:
+      raise TwitterError("The twitter.Api instance must be authenticated.")
+    data = {}
+    if list_id:
+      try:
+        data['list_id'] = long(list_id)
+      except ValueError:
+        raise TwitterError("list_id must be an integer")
+    elif slug:
+      data['slug'] = slug
+      if owner_id:
+        try:
+          data['owner_id'] = long(owner_id)
+        except ValueError:
+          raise TwitterError("owner_id must be an integer")
+      elif owner_screen_name:
+        data['owner_screen_name'] = owner_screen_name
+      else:
+        raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
+    else:
+      raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
+    if user_id:
+      try:
+        data['user_id'] = long(user_id)
+      except ValueError:
+        raise TwitterError("user_id must be an integer")
+    elif screen_name:
+        data['screen_name'] = screen_name
     json = self._RequestUrl(url, 'POST', data=data)
     data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
