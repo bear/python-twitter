@@ -4189,7 +4189,7 @@ class Api(object):
   # done GET lists/list
   # done GET lists/statuses
   # done POST lists/subscribers/create
-  #      GET lists/subscribers/show
+  # done GET lists/subscribers/show
   # done POST lists/subscribers/destroy
   # done GET lists/members
   # done POST lists/members/create
@@ -4291,10 +4291,10 @@ class Api(object):
     return List.NewFromJsonDict(data)
 
   def CreateSubscription(self,
-                  owner_screen_name=False,
-                  owner_id=False,
-                  list_id=None,
-                  slug=None):
+                         owner_screen_name=False,
+                         owner_id=False,
+                         list_id=None,
+                         slug=None):
     '''Creates a subscription to a list by the authenticated user
 
     The twitter.Api instance must be authenticated.
@@ -4313,7 +4313,7 @@ class Api(object):
         decide to do so, note that you'll also have to specify the list owner
         using the owner_id or owner_screen_name parameters.
     Returns:
-      A twitter.List instance representing the list subscribed to
+      A twitter.User instance representing the user subscribed
     '''
     url = '%s/lists/subscribers/create.json' % (self.base_url)
     if not self.__auth:
@@ -4339,7 +4339,7 @@ class Api(object):
       raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
     json = self._RequestUrl(url, 'POST', data=data)
     data = self._ParseAndCheckTwitter(json.content)
-    return List.NewFromJsonDict(data)
+    return User.NewFromJsonDict(data)
 
   def DestroySubscription(self,
                   owner_screen_name=False,
@@ -4391,6 +4391,84 @@ class Api(object):
     json = self._RequestUrl(url, 'POST', data=data)
     data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
+
+  def ShowSubscription(self,
+                       owner_screen_name=False,
+                       owner_id=False,
+                       list_id=None,
+                       slug=None,
+                       user_id=None,
+                       screen_name=None,
+                       include_entities=False,
+                       skip_status=False):
+    '''Check if the specified user is a subscriber of the specified list.
+    Returns the user if they are subscriber.
+
+    The twitter.Api instance must be authenticated.
+
+    Twitter endpoint: /lists/subscribers/show
+
+    Args:
+      owner_screen_name:
+        The screen_name of the user who owns the list being requested by a slug.
+      owner_id:
+        The user ID of the user who owns the list being requested by a slug.
+      list_id:
+        The numerical id of the list.
+      slug:
+        You can identify a list by its slug instead of its numerical id. If you
+        decide to do so, note that you'll also have to specify the list owner
+        using the owner_id or owner_screen_name parameters.
+      user_id:
+        User_id or a list of User_id's to add to the list. If not given, then screen_name is required.
+      screen_name:
+        Screen_name or a list of Screen_name's to add to the list. If not given, then user_id is required.
+      include_entities:
+        If False, the timeline will not contain additional metadata.
+        defaults to True. [Optional]
+      skip_status:
+        If True the statuses will not be returned in the user items.
+        [Optional]
+    Returns:
+      A twitter.User instance representing the user requested
+    '''
+    url = '%s/lists/subscribers/show.json' % (self.base_url)
+    if not self.__auth:
+      raise TwitterError("The twitter.Api instance must be authenticated.")
+    data = {}
+    if list_id:
+      try:
+        data['list_id'] = long(list_id)
+      except ValueError:
+        raise TwitterError("list_id must be an integer")
+    elif slug:
+      data['slug'] = slug
+      if owner_id:
+        try:
+          data['owner_id'] = long(owner_id)
+        except ValueError:
+          raise TwitterError("owner_id must be an integer")
+      elif owner_screen_name:
+        data['owner_screen_name'] = owner_screen_name
+      else:
+        raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
+    else:
+      raise TwitterError("Identify list by list_id or owner_screen_name/owner_id and slug")
+    if user_id:
+      try:
+        data['user_id'] = long(user_id)
+      except ValueError:
+        raise TwitterError("user_id must be an integer")
+    elif screen_name:
+        data['screen_name'] = screen_name
+    if skip_status:
+      parameters['skip_status'] = True
+    if include_entities:
+      parameters['include_entities'] = True
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
+    print data
+    return User.NewFromJsonDict(data)
 
   def GetSubscriptions(self, user_id=None, screen_name=None, count=20, cursor=-1):
     '''
@@ -4745,7 +4823,6 @@ class Api(object):
       url = '%s/lists/members/create_all.json' % self.base_url
     else:
       url = '%s/lists/members/create.json' % self.base_url
-    print isList, type(screen_name), url, data
     json = self._RequestUrl(url, 'POST', data=data)
     data = self._ParseAndCheckTwitter(json.content)
     return List.NewFromJsonDict(data)
