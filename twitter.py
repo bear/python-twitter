@@ -4717,7 +4717,7 @@ class Api(object):
     if list_id is None:
       if slug is None:
         raise TwitterError('list_id or slug required')
-      if owner_id is None and owner_screen_name:
+      if owner_id is None and not owner_screen_name:
         raise TwitterError('if list_id is not given you have to include an owner to help identify the proper list')
 
     if owner_id:
