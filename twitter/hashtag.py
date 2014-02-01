@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from twitter import TwitterError
-# from twitter.error import TwitterError
 
 class Hashtag(object):
   ''' A class representing a twitter hashtag

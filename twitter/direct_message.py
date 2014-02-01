@@ -3,8 +3,6 @@ from calendar import timegm
 import rfc822
 
 from twitter import simplejson, TwitterError
-# from twitter._simplejson import simplejson
-# from twitter.error import TwitterError
 
 class DirectMessage(object):
   '''A class representing the DirectMessage structure used by the twitter API.

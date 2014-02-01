@@ -17,16 +17,6 @@ import StringIO
 from twitter import (__version__, _FileCache, simplejson, DirectMessage, List,
                      Status, Trend, TwitterError, User)
 
-# from twitter import __version__
-# from twitter._file_cache import _FileCache
-# from twitter._simplejson import simplejson
-# from twitter.direct_message import DirectMessage
-# from twitter.error import TwitterError
-# from twitter.list import List
-# from twitter.status import Status
-# from twitter.trend import Trend
-# from twitter.user import User
-
 CHARACTER_LIMIT = 140
 
 # A singleton representing a lazily instantiated FileCache.
