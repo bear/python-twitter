@@ -133,6 +133,8 @@ class Status(object):
         Number of times this status message has been favorited. [Optional]
       id:
         The unique id of this status message. [Optional]
+      id_str:
+        The string version of the unique id of this status message. [Optional]
       text:
         The text of this status message. [Optional]
       location:
@@ -171,6 +173,7 @@ class Status(object):
       'favorite_count':          None,
       'geo':                     None,
       'id':                      None,
+      'id_str':                  None,
       'in_reply_to_screen_name': None,
       'in_reply_to_user_id':     None,
       'in_reply_to_status_id':   None,
@@ -289,6 +292,26 @@ class Status(object):
 
   id = property(GetId, SetId,
                 doc='The unique id of this status message.')
+
+  def GetIdStr(self):
+    '''Get the unique id_str of this status message.
+
+    Returns:
+      The unique id_str of this status message
+    '''
+    return self._id_str
+
+  def SetIdStr(self, id_str):
+    '''Set the unique id_str of this status message.
+
+    Args:
+      id:
+        The unique id_str of this status message
+    '''
+    self._id_str = id_str
+
+  id_str = property(GetIdStr, SetIdStr,
+                doc='The unique id_str of this status message.')
 
   def GetInReplyToScreenName(self):
     return self._in_reply_to_screen_name
@@ -593,6 +616,7 @@ class Status(object):
       return other and \
              self.created_at == other.created_at and \
              self.id == other.id and \
+             self.id_str == other.id_str and \
              self.text == other.text and \
              self.location == other.location and \
              self.user == other.user and \
@@ -654,6 +678,8 @@ class Status(object):
       data['favorite_count'] = self.favorite_count
     if self.id:
       data['id'] = self.id
+    if self.id_str:
+      data['id_str'] = self.id_str
     if self.text:
       data['text'] = self.text
     if self.lang:
@@ -750,6 +776,7 @@ class Status(object):
                   favorited=data.get('favorited', None),
                   favorite_count=data.get('favorite_count', None),
                   id=data.get('id', None),
+                  id_str=data.get('id_str', None),
                   text=data.get('text', None),
                   location=data.get('location', None),
                   lang=data.get('lang', None),
