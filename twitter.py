@@ -805,6 +805,131 @@ class Status(object):
                   withheld_scope=data.get('withheld_scope', None))
 
 
+class UserStatus(object):
+  '''A class representing the UserStatus structure used by the twitter API.
+
+  The UserStatus structure exposes the following properties:
+
+    userstatus.name
+    userstatus.id_str
+    userstatus.id
+    userstatus.screen_name
+    userstatus.following
+    userstatus.follwed_by
+  '''
+  def __init__(self, **kwargs):
+    '''An object to hold a Twitter user status message.
+
+    This class is normally instantiated by the twitter.Api class and
+    returned in a sequence.
+
+    Args:
+      id:
+        The unique id of this status message. [Optional]
+      id_str:
+        The string version of the unique id of this status message. [Optional]
+    '''
+    param_defaults = {
+      'name':                    None,
+      'id':                      None,
+      'id_str':                  None,
+      'screen_name':             None,
+      'following':               None,
+      'followed_by':             None}
+
+    for (param, default) in param_defaults.iteritems():
+      setattr(self, param, kwargs.get(param, default))
+
+  def GetFollowedBy(self):
+    return self.followed_by or False
+
+  def GetFollowing(self):
+    return self.following or False
+
+  def GetScreenName(self):
+    return self.screen_name
+
+  def __ne__(self, other):
+    return not self.__eq__(other)
+
+  def __eq__(self, other):
+    try:
+      return other and \
+             self.name == other.name and \
+             self.id == other.id and \
+             self.id_str == other.id_str and \
+             self.screen_name == other.screen_name and \
+             self.following == other.following and \
+             self.followed_by == other.followed_by
+    except AttributeError:
+      return False
+
+  def __str__(self):
+    '''A string representation of this twitter.UserStatus instance.
+
+    The return value is the same as the JSON string representation.
+
+    Returns:
+      A string representation of this twitter.UserStatus instance.
+    '''
+    return self.AsJsonString()
+
+  def AsJsonString(self):
+    '''A JSON string representation of this twitter.UserStatus instance.
+
+    Returns:
+      A JSON string representation of this twitter.UserStatus instance
+   '''
+    return simplejson.dumps(self.AsDict(), sort_keys=True)
+
+  def AsDict(self):
+    '''A dict representation of this twitter.UserStatus instance.
+
+    The return value uses the same key names as the JSON representation.
+
+    Return:
+      A dict representing this twitter.UserStatus instance
+    '''
+    data = {}
+    if self.name:
+      data['name'] = self.name
+    if self.id:
+      data['id'] = self.id
+    if self.id_str:
+      data['id_str'] = self.id_str
+    if self.screen_name:
+      data['screen_name'] = self.screen_name
+    if self.following:
+      data['following'] = self.following
+    if self.followed_by:
+      data['followed_by'] = self.followed_by
+    return data
+
+  @staticmethod
+  def NewFromJsonDict(data):
+    '''Create a new instance based on a JSON dict.
+
+    Args:
+      data: A JSON dict, as converted from the JSON in the twitter API
+    Returns:
+      A twitter.UserStatus instance
+    '''
+    following = None
+    followed_by = None
+    if 'connections' in data:
+      if 'following' in data['connections']:
+        following = True
+      if 'followed_by' in data['connections']:
+        followed_by = True
+
+    return UserStatus(name=data.get('name', None),
+                  id=data.get('id', None),
+                  id_str=data.get('id_str', None),
+                  screen_name=data.get('screen_name', None),
+                  following=following,
+                  followed_by=followed_by)
+
+
 class User(object):
   '''A class representing the User structure used by the twitter API.
 
@@ -2305,6 +2430,7 @@ class Api(object):
       >>> api.DestroyDirectMessage(id)
       >>> api.DestroyFriendship(user)
       >>> api.CreateFriendship(user)
+      >>> api.LookupFriendship(user)
       >>> api.GetUserByEmail(email)
       >>> api.VerifyCredentials()
   '''
@@ -4019,6 +4145,35 @@ class Api(object):
     json = self._RequestUrl(url, 'POST', data=data)
     data = self._ParseAndCheckTwitter(json.content)
     return User.NewFromJsonDict(data)
+
+  def LookupFriendship(self, user_id=None, screen_name=None):
+    '''Lookup friendship status for user specified by user_id or screen_name.
+    Currently only supports one user at a time.
+
+    The twitter.Api instance must be authenticated.
+
+    Args:
+      user_id:
+        A user_id to lookup [Optional]
+      screen_name:
+        A screen_name to lookup [Optional]
+    Returns:
+      A twitter.UserStatus instance representing the friendship status
+    '''
+    url = '%s/friendships/lookup.json' % (self.base_url)
+    data = {}
+    if user_id:
+      data['user_id'] = user_id
+    elif screen_name:
+      data['screen_name'] = screen_name
+    else:
+      raise TwitterError("Specify at least one of user_id or screen_name.")
+    json = self._RequestUrl(url, 'GET', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
+    if len(data) >= 1:
+      return UserStatus.NewFromJsonDict(data[0])
+    else:
+      return None
 
   def CreateFavorite(self, status=None, id=None, include_entities=True):
     '''Favorites the specified status object or id as the authenticating user.
