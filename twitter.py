@@ -3051,7 +3051,7 @@ class Api(object):
     Returns:
       A dictionary with the response.
     '''
-    url  = '%s/statuses/oembed.json' % (self.base_url)
+    request_url  = '%s/statuses/oembed.json' % (self.base_url)
 
     if not self.__auth:
       raise TwitterError("API must be authenticated.")
@@ -3088,7 +3088,8 @@ class Api(object):
         if not isinstance(lang, str):
           raise TwitterError("'lang' should be string instance")
         parameters['lang'] = lang
-    json = self._RequestUrl(url, 'GET', data=parameters)
+    print 'request_url', request_url, parameters
+    json = self._RequestUrl(request_url, 'GET', data=parameters)
     data = self._ParseAndCheckTwitter(json.content)
     return data
 
