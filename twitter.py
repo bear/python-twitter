@@ -19,7 +19,7 @@
 '''A library that provides a Python interface to the Twitter API'''
 
 __author__ = 'python-twitter@googlegroups.com'
-__version__ = '1.3'
+__version__ = '1.3.1'
 
 
 import base64
