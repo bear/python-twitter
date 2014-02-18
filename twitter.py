@@ -2521,6 +2521,17 @@ class Api(object):
 
     self.SetCredentials(consumer_key, consumer_secret, access_token_key, access_token_secret)
 
+    if debugHTTP:
+      import logging
+      import httplib
+      httplib.HTTPConnection.debuglevel = 1
+
+      logging.basicConfig() # you need to initialize logging, otherwise you will not see anything from requests
+      logging.getLogger().setLevel(logging.DEBUG)
+      requests_log = logging.getLogger("requests.packages.urllib3")
+      requests_log.setLevel(logging.DEBUG)
+      requests_log.propagate = True
+
   def SetCredentials(self,
                      consumer_key,
                      consumer_secret,
