@@ -1,3 +1,13 @@
+2014-02-17
+  changed version to 1.3
+  fix Issue 143 - GetStatusOembed() url parameter was being stomped on
+  fix debugHTTP in a brute force way but it works again
+  Add id_str to Status class
+  Added LookupFriendship() method for checking follow status
+    pull request from lucas
+  Fix bug of GetListMembers when specifying `owner_screen_name`
+    pull request from shichao-an
+
 2014-01-18
   backfilling varioius lists endpoints
   added a basic user stream call
