@@ -16,13 +16,9 @@ From source:
 
 Install the dependencies:
 
+- [Requests](http://docs.python-requests.org/en/latest/)
 - [SimpleJson](http://cheeseshop.python.org/pypi/simplejson)
 - [Requests OAuthlib](https://requests-oauthlib.readthedocs.org/en/latest/)
-- [HTTPLib2](http://code.google.com/p/httplib2/)
-
-This branch is currently in development to replace the HTTPLib2 libaray with the following:
-
-- [Requests](http://docs.python-requests.org/en/latest/)
 
 Alternatively use `pip`:
  
