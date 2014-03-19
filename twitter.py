@@ -3103,6 +3103,8 @@ class Api(object):
         raise TwitterError("count must be an integer")
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
+    sec = self.GetSleepTime('/statuses/retweets/ids')
+    time.sleep(sec)
     return [Status.NewFromJsonDict(s) for s in data]
 
   def GetRetweetsOfMe(self,
@@ -3205,6 +3207,8 @@ class Api(object):
           cursor = data['next_cursor']
       else:
         break
+      sec = self.GetSleepTime('/friends/list')
+      time.sleep(sec)
     return result
 
   def GetFriendIDs(self, user_id=None, screen_name=None, cursor=-1, stringify_ids=False, count=None):
@@ -3256,6 +3260,8 @@ class Api(object):
             cursor = data['next_cursor']
         else:
           break
+        sec = self.GetSleepTime('/friends/ids')
+        time.sleep(sec)   
       return result
 
 
@@ -3373,6 +3379,8 @@ class Api(object):
           cursor = data['next_cursor']
       else:
         break
+      sec = self.GetSleepTime('/followers/ids')
+      time.sleep(sec) 
     return result
 
   def UsersLookup(self, user_id=None, screen_name=None, users=None, include_entities=True):
