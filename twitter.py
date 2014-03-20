@@ -2792,6 +2792,8 @@ class Api(object):
 
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
+    sec = self.GetSleepTime('/statuses/user_timeline')
+    time.sleep(sec)
     return [Status.NewFromJsonDict(x) for x in data]
 
   def GetStatus(self,
