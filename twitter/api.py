@@ -923,7 +923,7 @@ class Api(object):
     if possibly_sensitive:
       data['possibly_sensitive'] = 'true'
     if in_reply_to_status_id:
-      data['in_reply_to_status_id'] = in_reply_to_status_id
+      data['in_reply_to_status_id'] = str(in_reply_to_status_id)
     if latitude is not None and longitude is not None:
       data['lat']  = str(latitude)
       data['long'] = str(longitude)
