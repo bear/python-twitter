@@ -55,4 +55,5 @@ from url import Url
 from status import Status
 from user import User, UserStatus
 from list import List
+from timeline import Timeline
 from api import Api

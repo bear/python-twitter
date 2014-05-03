@@ -35,7 +35,7 @@ from requests_oauthlib import OAuth1
 import StringIO
 
 from twitter import (__version__, _FileCache, simplejson, DirectMessage, List,
-                     Status, Trend, TwitterError, User)
+                     Timeline, Status, Trend, TwitterError, User)
 
 CHARACTER_LIMIT = 140
 
@@ -3057,6 +3057,141 @@ class Api(object):
       if len(line) > 0:
         data = simplejson.loads(line)
         yield data
+
+  def GetCustomTimelines(self, user_id=None, screen_name=None, count=None, cursor=-1):
+    '''Fetch the sequence of timelines for a user.
+
+    The twitter.Api instance must be authenticated.
+
+    Args:
+      user_id:
+        The ID of the user for whom to return results for. [Optional]
+      screen_name:
+        The screen name of the user for whom to return results for.
+        [Optional]
+      count:
+        The amount of results to return per page. Defaults to 20. No more than
+        1000 results will ever be returned in a single page.
+        [Optional]
+      cursor:
+        "page" value that Twitter will use to start building the
+        list sequence from.  -1 to start at the beginning.
+        Twitter will return in the result the values for next_cursor
+        and previous_cursor. [Optional]
+
+    Returns:
+      A sequence of twitter.Timeline instances, one for each list
+    '''
+    if not self.__auth:
+      raise TwitterError("twitter.Api instance must be authenticated")
+
+    url = '%s/beta/timelines/custom/list.json' % self.base_url
+    result = []
+    parameters = {}
+    if user_id is not None:
+      try:
+        parameters['user_id'] = long(user_id)
+      except ValueError:
+        raise TwitterError('user_id must be an integer')
+    elif screen_name is not None:
+      parameters['screen_name'] = screen_name
+    else:
+      raise TwitterError('Specify user_id or screen_name')
+    if count is not None:
+      parameters['count'] = count
+
+    while True:
+      parameters['cursor'] = cursor
+      json = self._RequestUrl(url, 'GET', data=parameters)
+      data = self._ParseAndCheckTwitter(json.content)
+      if data['objects'].get('timelines', None):
+        result += [Timeline.NewFromJsonDict(x, y) for x,y in data['objects']['timelines'].iteritems()]
+      if 'next_cursor' in data:
+        if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+          break
+        else:
+          cursor = data['next_cursor']
+      else:
+        break
+    return result
+
+  def CreateTimeline(self, name, description=None):
+      '''Creates a new timeline with the give name for the authenticated user.
+
+      The twitter.Api instance must be authenticated.
+
+      Args:
+        name:
+          New name for the timeline
+        description:
+          Description of the timeline. [Optional]
+
+      Returns:
+        A twitter.Timeline instance representing the new list
+      '''
+      url = '%s/beta/timelines/custom/create.json' % self.base_url
+
+      if not self.__auth:
+        raise TwitterError("The twitter.Api instance must be authenticated.")
+      data = {'name': name}
+      if description is not None:
+        data['description'] = description
+
+      json = self._RequestUrl(url, 'POST', data=data)
+      data = self._ParseAndCheckTwitter(json.content)
+      return [Timeline.NewFromJsonDict(x, y) for x,y in data['objects']['timelines'].iteritems()][0]
+
+  def DestroyTimeline(self, id, trim_user=False):
+    '''Destroys the timeline specified by the required ID parameter.
+
+    The twitter.Api instance must be authenticated and the
+    authenticating user must be the author of the specified status.
+
+    Args:
+      id:
+        The numerical ID of the timeline you're trying to destroy.
+
+    Returns:
+      A twitter.Timeline instance representing the destroyed timeline
+    '''
+    if not self.__auth:
+      raise TwitterError("API must be authenticated.")
+
+    try:
+      post_data = {'id': id}
+    except ValueError:
+      raise TwitterError("id must be an integer")
+    url = '%s/beta/timelines/custom/destroy.json?id=%s' % (self.base_url, id)
+    if trim_user:
+      post_data['trim_user'] = 1
+    json = self._RequestUrl(url, 'POST', data=post_data)
+    data = self._ParseAndCheckTwitter(json.content)
+
+    return data    
+
+  def AddToTimeline(self, timeline, tweet):
+      '''Add tweet to timeline
+
+      The twitter.Api instance must be authenticated.
+
+      Args:
+        timeline:
+          id of timeline
+        tweet:
+          id of tweet
+
+      Returns:
+        A response object
+      '''
+      url = '%s/beta/timelines/custom/add.json' % self.base_url
+
+      if not self.__auth:
+        raise TwitterError("The twitter.Api instance must be authenticated.")
+      data = {'id': timeline, 'tweet_id': tweet}
+
+      json = self._RequestUrl(url, 'POST', data=data)
+      data = self._ParseAndCheckTwitter(json.content)
+      return data
 
   def VerifyCredentials(self):
     '''Returns a twitter.User instance if the authenticating user is valid.
