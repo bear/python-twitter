@@ -3058,7 +3058,7 @@ class Api(object):
         data = simplejson.loads(line)
         yield data
 
-  def GetCustomTimelines(self, user_id=None, screen_name=None, count=None, cursor=-1):
+  def GetTimelines(self, user_id=None, screen_name=None, count=None, cursor=-1):
     '''Fetch the sequence of timelines for a user.
 
     The twitter.Api instance must be authenticated.
