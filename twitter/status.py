@@ -576,7 +576,7 @@ class Status(object):
   def AsJsonString(self, allow_non_ascii=False):
     '''A JSON string representation of this twitter.Status instance.
     
-    For unicode encodings, use keyword allow_non_ascii=True.
+    To output non-ascii, set keyword allow_non_ascii=True.
 
     Returns:
       A JSON string representation of this twitter.Status instance
