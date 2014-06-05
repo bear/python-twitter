@@ -573,14 +573,16 @@ class Status(object):
     '''
     return self.AsJsonString()
 
-  def AsJsonString(self):
+  def AsJsonString(self, allow_non_ascii=False):
     '''A JSON string representation of this twitter.Status instance.
+    
+    For unicode encodings, use keyword allow_non_ascii=True.
 
     Returns:
       A JSON string representation of this twitter.Status instance
    '''
-    return simplejson.dumps(self.AsDict(), sort_keys=True)
-
+    return simplejson.dumps(self.AsDict(), sort_keys=True,
+               ensure_ascii= not allow_non_ascii )
   def AsDict(self):
     '''A dict representation of this twitter.Status instance.
 
