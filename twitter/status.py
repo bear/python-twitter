@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#line
 
 from calendar import timegm
 import rfc822
