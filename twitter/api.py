@@ -919,7 +919,11 @@ class Api(object):
       u_status = unicode(status, self._input_encoding)
 
     data = {'status': status}
-    data['media'] = open(str(media), 'rb').read()
+    if media.startswith('http'):
+        data['media'] = urllib2.urlopen(media).read()
+    else:
+        data['media'] = open(str(media), 'rb').read()
+        
     if possibly_sensitive:
       data['possibly_sensitive'] = 'true'
     if in_reply_to_status_id:
