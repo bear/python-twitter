@@ -3054,8 +3054,8 @@ class Api(object):
     url = 'https://userstream.twitter.com/1.1/user.json'
     r = self._RequestStream(url, 'POST', data=data)
     for line in r.iter_lines():
-      if len(line) > 0:
-        data = simplejson.loads(line)
+      if line:
+        data = self._ParseAndCheckTwitter(line)
         yield data
 
   def VerifyCredentials(self):
@@ -3328,6 +3328,8 @@ class Api(object):
         raise TwitterError("Capacity Error")
       if "<title>Twitter / Error</title>" in json:
         raise TwitterError("Technical Error")
+      if "Exceeded connection limit for user" in json:
+        raise TwitterError("Exceeded connection limit for user")
       raise TwitterError("json decoding")
 
     return data
