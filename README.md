@@ -12,6 +12,10 @@ This library provides a pure Python interface for the [Twitter API](https://dev.
 
 ## Building
 
+You can install python twitter from `pip` :
+
+    $ pip install python-twitter
+  
 From source:
 
 Install the dependencies:
