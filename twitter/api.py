@@ -3368,26 +3368,35 @@ class Api(object):
     '''
     if verb == 'POST':
       if data.has_key('media'):
-        return requests.post(
-          url,
-          files=data,
-          auth=self.__auth,
-          timeout=self._requests_timeout
-        )
+        try:
+          return requests.post(
+            url,
+            files=data,
+            auth=self.__auth,
+            timeout=self._requests_timeout
+          )
+        except requests.RequestException as e:
+          raise TwitterError(str(e))
       else:
-        return requests.post(
-          url,
-          data=data,
-          auth=self.__auth,
-          timeout=self._requests_timeout
-        )
+        try:
+          return requests.post(
+            url,
+            data=data,
+            auth=self.__auth,
+            timeout=self._requests_timeout
+          )
+        except requests.RequestException as e:
+          raise TwitterError(str(e))
     if verb == 'GET':
       url = self._BuildUrl(url, extra_params=data)
-      return requests.get(
-        url,
-        auth=self.__auth,
-        timeout=self._requests_timeout
-      )
+      try:
+        return requests.get(
+          url,
+          auth=self.__auth,
+          timeout=self._requests_timeout
+        )
+      except requests.RequestException as e:
+        raise TwitterError(str(e))
     return 0  # if not a POST or GET request
 
   def _RequestStream(self, url, verb, data=None):
@@ -3403,17 +3412,27 @@ class Api(object):
     '''
 
     if verb == 'POST':
-      return requests.post(url, data=data, stream=True,
-                           auth=self.__auth)
-    
-    if verb == 'POST':  return requests.post(url, data=data, stream=True,
-                                             auth=self.__auth,
-                                             timeout=self._requests_timeout
-                                             )
+      try:
+        return requests.post(url, data=data, stream=True,
+                             auth=self.__auth)
+      except requests.RequestException as e:
+        raise TwitterError(str(e))
+
+    if verb == 'POST':
+      try:  
+        return requests.post(url, data=data, stream=True,
+                             auth=self.__auth,
+                             timeout=self._requests_timeout
+                            )
+      except requests.RequestException as e:
+        raise TwitterError(str(e))
 
     if verb == 'GET':
       url = self._BuildUrl(url, extra_params=data)
-      return requests.get(url, stream=True, auth=self.__auth,
-                          timeout=self._requests_timeout
-                          )
+      try:
+        return requests.get(url, stream=True, auth=self.__auth,
+                            timeout=self._requests_timeout
+                           )
+      except requests.RequestException as e:
+        raise TwitterError(str(e))
     return 0  # if not a POST or GET request
