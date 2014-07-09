@@ -21,7 +21,7 @@
 __author__ = 'python-twitter@googlegroups.com'
 
 import os
-import simplejson
+import json as simplejson
 import time
 import calendar
 import unittest
