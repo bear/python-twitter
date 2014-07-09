@@ -897,7 +897,8 @@ class Api(object):
       status:
           the text of your update
       media:
-          location of media(PNG, JPG, GIF)
+          This can be the location of media(PNG, JPG, GIF) on the local file
+          system or at an HTTP URL, it can also be a file-like object
       possibly_sensitive:
           set true if content is "advanced." [Optional]
       in_reply_to_status_id:
@@ -925,10 +926,14 @@ class Api(object):
       u_status = unicode(status, self._input_encoding)
 
     data = {'status': status}
-    if media.startswith('http'):
+    if not hasattr(media, 'read'):
+      if media.startswith('http'):
         data['media'] = urllib2.urlopen(media).read()
+      else:
+        with open(str(media), 'rb') as f:
+          data['media'] = f.read()
     else:
-        data['media'] = open(str(media), 'rb').read()
+      data['media'] = media.read()
     if possibly_sensitive:
       data['possibly_sensitive'] = 'true'
     if in_reply_to_status_id:
@@ -940,7 +945,7 @@ class Api(object):
       data['place_id'] = str(place_id)
     if display_coordinates:
       data['display_coordinates'] = 'true'
-      
+
     json = self._RequestUrl(url, 'POST', data=data)
     data = self._ParseAndCheckTwitter(json.content)
 
