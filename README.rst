@@ -4,6 +4,10 @@ A Python wrapper around the Twitter API.
 
 By the Python-Twitter Developers <python-twitter@googlegroups.com>
 
+.. image:: https://pypip.in/wheel/python-twitter/badge.png
+    :target: https://pypi.python.org/pypi/python-twitter/
+    :alt: Wheel Status
+
 ============
 Introduction
 ============
