@@ -30,7 +30,7 @@ USAGE = '''Usage: tweet [options] message
   variables TWEETUSERNAME and TWEETPASSWORD will then be checked for your
   consumer_key or consumer_secret, respectively.
 
-  If neither the command line flags nor the enviroment variables are
+  If neither the command line flags nor the environment variables are
   present, the .tweetrc file, if it exists, can be used to set the
   default consumer_key and consumer_secret.  The file should contain the
   following three lines, replacing *consumer_key* with your consumer key, and
