@@ -58,14 +58,12 @@ def get_access_token(consumer_key, consumer_secret):
         print('')
 
         webbrowser.open(url)
-        pincode = raw_input('Pincode? ')
+        pincode = input('Pincode? ')
 
         token = oauth.Token(request_token['oauth_token'], request_token['oauth_token_secret'])
         token.set_verifier(pincode)
 
-        print('')
-        print('Generating and signing request for an access token')
-        print('')
+        print('\nGenerating and signing request for an access token\n')
 
         oauth_client = oauth.Client(oauth_consumer, token)
         resp, content = oauth_client.request(ACCESS_TOKEN_URL, method='POST', body='oauth_callback=oob&oauth_verifier=%s' % pincode)
@@ -81,8 +79,8 @@ def get_access_token(consumer_key, consumer_secret):
 
 
 def main():
-    consumer_key = raw_input('Enter your consumer key: ')
-    consumer_secret = raw_input("Enter your consumer secret: ")
+    consumer_key = input('Enter your consumer key: ')
+    consumer_secret = input("Enter your consumer secret: ")
     get_access_token(consumer_key, consumer_secret)
 
 if __name__ == "__main__":
