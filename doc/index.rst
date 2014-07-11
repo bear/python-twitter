@@ -11,7 +11,7 @@ Author: The Python-Twitter Developers <python-twitter@googlegroups.com>
 
 Introduction
 ------------
-This library provides a pure Python interface for the `Twitter API <https://dev.twitter.com/>`_. It works with Python versions from 2.5 to 2.7. Python 3 support is under development.
+This library provides a pure Python interface for the `Twitter API <https://dev.twitter.com/>`_. It works with Python version 2.6+. Python 3 support is under development.
 
 `Twitter <http://twitter.com>`_ provides a service that allows people to connect via the web, IM, and SMS. Twitter exposes a `web services API <http://dev.twitter.com/doc>`_ and this library is intended to make it even easier for Python programmers to use.
 
@@ -22,14 +22,8 @@ From source:
 
 Install the dependencies:
 
-- `SimpleJson <http://cheeseshop.python.org/pypi/simplejson>`_
-- `Requests OAuthlib <https://requests-oauthlib.readthedocs.org/en/latest/>`_
-- `HTTPLib2 <http://code.google.com/p/httplib2/>`_
-
-This branch is currently in development to replace the OAuth and HTTPLib2 libarays with the following:
-
 - `Requests <http://docs.python-requests.org/en/latest/>`_
-
+- `Requests OAuthlib <https://requests-oauthlib.readthedocs.org/en/latest/>`_
 
 Alternatively use `pip`::
  

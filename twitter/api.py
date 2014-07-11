@@ -119,7 +119,7 @@ class Api(object):
                stream_url=None,
                use_gzip_compression=False,
                debugHTTP=False,
-               requests_timeout=None):
+               timeout=None):
     '''Instantiate a new twitter.Api object.
 
     Args:
@@ -152,7 +152,7 @@ class Api(object):
       debugHTTP:
         Set to True to enable debug output from urllib2 when performing
         any HTTP requests.  Defaults to False. [Optional]
-      requests_timeout:
+      timeout:
         Set timeout (in seconds) of the http/https requests. If None the
         requests lib default will be used.  Defaults to None. [Optional]
     '''
@@ -163,7 +163,7 @@ class Api(object):
     self._use_gzip       = use_gzip_compression
     self._debugHTTP      = debugHTTP
     self._shortlink_size = 19
-    self._requests_timeout = requests_timeout
+    self._timeout = timeout
 
     self._InitializeRequestHeaders(request_headers)
     self._InitializeUserAgent()
@@ -897,7 +897,8 @@ class Api(object):
       status:
           the text of your update
       media:
-          location of media(PNG, JPG, GIF)
+          This can be the location of media(PNG, JPG, GIF) on the local file
+          system or at an HTTP URL, it can also be a file-like object
       possibly_sensitive:
           set true if content is "advanced." [Optional]
       in_reply_to_status_id:
@@ -925,10 +926,14 @@ class Api(object):
       u_status = unicode(status, self._input_encoding)
 
     data = {'status': status}
-    if media.startswith('http'):
+    if not hasattr(media, 'read'):
+      if media.startswith('http'):
         data['media'] = urllib2.urlopen(media).read()
+      else:
+        with open(str(media), 'rb') as f:
+          data['media'] = f.read()
     else:
-        data['media'] = open(str(media), 'rb').read()
+      data['media'] = media.read()
     if possibly_sensitive:
       data['possibly_sensitive'] = 'true'
     if in_reply_to_status_id:
@@ -940,7 +945,7 @@ class Api(object):
       data['place_id'] = str(place_id)
     if display_coordinates:
       data['display_coordinates'] = 'true'
-      
+
     json = self._RequestUrl(url, 'POST', data=data)
     data = self._ParseAndCheckTwitter(json.content)
 
@@ -3460,7 +3465,7 @@ class Api(object):
             url,
             files=data,
             auth=self.__auth,
-            timeout=self._requests_timeout
+            timeout=self._timeout
           )
         except requests.RequestException as e:
           raise TwitterError(str(e))
@@ -3470,7 +3475,7 @@ class Api(object):
             url,
             data=data,
             auth=self.__auth,
-            timeout=self._requests_timeout
+            timeout=self._timeout
           )
         except requests.RequestException as e:
           raise TwitterError(str(e))
@@ -3480,7 +3485,7 @@ class Api(object):
         return requests.get(
           url,
           auth=self.__auth,
-          timeout=self._requests_timeout
+          timeout=self._timeout
         )
       except requests.RequestException as e:
         raise TwitterError(str(e))
@@ -3504,7 +3509,7 @@ class Api(object):
       try:  
         return requests.post(url, data=data, stream=True,
                              auth=self.__auth,
-                             timeout=self._requests_timeout
+                             timeout=self._timeout
                             )
       except requests.RequestException as e:
         raise TwitterError(str(e))
@@ -3512,7 +3517,7 @@ class Api(object):
       url = self._BuildUrl(url, extra_params=data)
       try:
         return requests.get(url, stream=True, auth=self.__auth,
-                            timeout=self._requests_timeout
+                            timeout=self._timeout
                            )
       except requests.RequestException as e:
         raise TwitterError(str(e))

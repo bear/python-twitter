@@ -38,7 +38,7 @@ setup(
                       read('AUTHORS.rst') + '\n\n' +
                       read('CHANGES')),
     packages=find_packages(exclude=['tests*']),
-    install_requires = ['simplejson', 'requests', 'requests-oauthlib'],
+    install_requires = ['requests', 'requests-oauthlib'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',

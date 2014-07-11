@@ -48,7 +48,7 @@ class ShortenURL(object):
         self.password = password
 
     def Shorten(self,
-               longURL):
+                longURL):
         '''Call TinyURL API and returned shortened URL result
         
         Args:
