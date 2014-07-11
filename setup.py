@@ -52,8 +52,10 @@ SETUPTOOLS_METADATA = dict(
 def Read(file):
   return open(file).read()
 
+
 def BuildLongDescription():
   return '\n'.join([Read('README.md'), Read('CHANGES')])
+
 
 def Main():
   # Build the long_description from the README and CHANGES

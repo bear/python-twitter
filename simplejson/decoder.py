@@ -14,6 +14,7 @@ __all__ = ['JSONDecoder']
 
 FLAGS = re.VERBOSE | re.MULTILINE | re.DOTALL
 
+
 def _floatconstants():
     _BYTES = '7FF80000000000007FF0000000000000'.decode('hex')
     if sys.byteorder != 'big':
@@ -56,6 +57,7 @@ BACKSLASH = {
 }
 
 DEFAULT_ENCODING = "utf-8"
+
 
 def py_scanstring(s, end, encoding=None, strict=True, _b=BACKSLASH, _m=STRINGCHUNK.match):
     """Scan the string s for a JSON string. End is the index of the
@@ -139,6 +141,7 @@ scanstring = c_scanstring or py_scanstring
 WHITESPACE = re.compile(r'[ \t\n\r]*', FLAGS)
 WHITESPACE_STR = ' \t\n\r'
 
+
 def JSONObject(s, end, encoding, strict, scan_once, object_hook, _w=WHITESPACE.match, _ws=WHITESPACE_STR):
     pairs = {}
     # Use a slice to prevent IndexError from being raised, the following
@@ -214,6 +217,7 @@ def JSONObject(s, end, encoding, strict, scan_once, object_hook, _w=WHITESPACE.m
         pairs = object_hook(pairs)
     return pairs, end
 
+
 def JSONArray(s, end, scan_once, _w=WHITESPACE.match, _ws=WHITESPACE_STR):
     values = []
     nextchar = s[end:end + 1]
@@ -249,6 +253,7 @@ def JSONArray(s, end, scan_once, _w=WHITESPACE.match, _ws=WHITESPACE_STR):
             pass
 
     return values, end
+
 
 class JSONDecoder(object):
     """Simple JSON <http://json.org> decoder
