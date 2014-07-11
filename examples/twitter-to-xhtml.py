@@ -17,12 +17,11 @@ TEMPLATE = """
 </div>
 """
 
+
 def Usage():
   print('Usage: %s [options] twitterid' % __file__)
-  print()
-  print('  This script fetches a users latest twitter update and stores')
-  print('  the result in a file as an XHTML fragment')
-  print()
+  print('\n  This script fetches a users latest twitter update and stores')
+  print('  the result in a file as an XHTML fragment\n')
   print('  Options:')
   print('    --help -h : print this help')
   print('    --output : the output file [default: stdout]')
@@ -44,6 +43,7 @@ def Save(xhtml, output):
                     errors='xmlcharrefreplace')
   out.write(xhtml)
   out.close()
+
 
 def main():
   try:
