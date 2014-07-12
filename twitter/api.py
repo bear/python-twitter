@@ -248,7 +248,7 @@ class Api(object):
       return config['short_url_length']
 
   def ClearCredentials(self):
-    '''Clear the any credentials for this instance
+    '''Clear any credentials for this instance
     '''
     self._consumer_key        = None
     self._consumer_secret     = None
@@ -1669,7 +1669,8 @@ class Api(object):
         Either a user_id or screen_name is required for this method.
         [Optional]
       include_entities:
-        if set to False, the 'entities' node will not be included. [Optional]
+        The entities node will be omitted when set to False.
+        [Optional]
 
     Returns:
       A twitter.User instance representing that user
@@ -1719,7 +1720,8 @@ class Api(object):
         number of Tweets to return because suspended or deleted content is
         removed after the count has been applied. [Optional]
       include_entities:
-        The entities node will not be included when set to False. [Optional]
+        The entities node will be omitted when set to False.
+        [Optional]
       skip_status:
         When set to True statuses will not be included in the returned user
         objects. [Optional]
@@ -1780,7 +1782,8 @@ class Api(object):
         Specifies the page of results to retrieve.
         Note: there are pagination limits. [Optional]
       include_entities:
-        The entities node will not be included when set to False. [Optional]
+        The entities node will be omitted when set to False.
+        [Optional]
 
     Returns:
       A sequence of twitter.DirectMessage instances
@@ -2959,7 +2962,8 @@ class Api(object):
         A description of the user owning the account.
         Maximum of 160 characters. [Optional]
       include_entities:
-        The entities node will not be included when set to False. [Optional]
+        The entities node will be omitted when set to False.
+        [Optional]
       skip_status:
         When set to either True, t or 1 then statuses will not be included
         in the returned user objects. [Optional]
