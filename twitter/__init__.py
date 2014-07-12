@@ -19,26 +19,9 @@
 '''A library that provides a Python interface to the Twitter API'''
 
 __author__ = 'python-twitter@googlegroups.com'
-__version__ = '2.0'
+__version__ = '2.1'
 
-try:
-  # Python >= 2.6
-  import json as simplejson
-except ImportError:
-  try:
-    # Python < 2.6
-    import simplejson
-  except ImportError:
-    try:
-      # Google App Engine
-      from django.utils import simplejson
-    except ImportError:
-      raise ImportError, "Unable to load a json library"
-# parse_qsl moved to urlparse module in v2.6
-try:
-  from urlparse import parse_qsl, parse_qs
-except ImportError:
-  from cgi import parse_qsl, parse_qs
+import json as simplejson
 
 try:
   from hashlib import md5
