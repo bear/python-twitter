@@ -68,7 +68,7 @@ def Main():
     setuptools.setup(**METADATA)
   except ImportError:
     print("Could not import setuptools, using distutils")
-    print("NOTE: You will need to install dependencies manualy" )
+    print("NOTE: You will need to install dependencies manually")
     import distutils.core
     distutils.core.setup(**METADATA)
 
