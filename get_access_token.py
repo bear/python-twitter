@@ -17,10 +17,10 @@
 # parse_qsl moved to urllib.parse module in v3.x or urlparse module in v2.6
 try:
     from urllib.parse import parse_qsl
-except:
+except ImportError:
     try:
         from urlparse import parse_qsl
-    except:
+    except ImportError:
         from cgi import parse_qsl
 
 import webbrowser
@@ -34,7 +34,7 @@ SIGNIN_URL = 'https://api.twitter.com/oauth/authenticate'
 
 def get_access_token(consumer_key, consumer_secret):
 
-    signature_method_hmac_sha1 = oauth.SignatureMethod_HMAC_SHA1()
+    oauth.SignatureMethod_HMAC_SHA1() # Don't know if this call is important, but its return isn't.
     oauth_consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
     oauth_client = oauth.Client(oauth_consumer)
 
@@ -48,14 +48,10 @@ def get_access_token(consumer_key, consumer_secret):
         request_token = dict(parse_qsl(content))
         url = '%s?oauth_token=%s' % (AUTHORIZATION_URL, request_token['oauth_token'])
 
-        print('')
-        print('I will try to start a browser to visit the following Twitter page')
+        print('\nI will try to start a browser to visit the following Twitter page')
         print('if a browser will not start, copy the URL to your browser')
         print('and retrieve the pincode to be used')
-        print('in the next step to obtaining an Authentication Token:')
-        print('')
-        print(url)
-        print('')
+        print('in the next step to obtaining an Authentication Token:\n%s\n' % url)
 
         webbrowser.open(url)
         pincode = input('Pincode? ')
@@ -74,8 +70,7 @@ def get_access_token(consumer_key, consumer_secret):
             print(access_token)
         else:
             print('Your Twitter Access Token key: %s' % access_token['oauth_token'])
-            print('          Access Token secret: %s' % access_token['oauth_token_secret'])
-            print('')
+            print('          Access Token secret: %s\n' % access_token['oauth_token_secret'])
 
 
 def main():
