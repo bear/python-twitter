@@ -2924,11 +2924,11 @@ class Api(object):
 
     if maxwidth is not None:
        parameters['maxwidth'] = maxwidth
-    if hide_media == True:
+    if hide_media:
        parameters['hide_media'] = 'true'
-    if hide_thread == True:
+    if hide_thread:
        parameters['hide_thread'] = 'true'
-    if omit_script == True:
+    if omit_script:
        parameters['omit_script'] = 'true'
     if align is not None:
        if align not in ('left', 'center', 'right', 'none'):
