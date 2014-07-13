@@ -29,7 +29,7 @@ def Usage():
 
 def FetchTwitter(user, output):
   assert user
-  statuses = twitter.Api().GetUserTimeline(id=user, count=1)
+  statuses = twitter.Api().GetUserTimeline(user_id=user, count=1)
   s = statuses[0]
   xhtml = TEMPLATE % (s.user.screen_name, s.text, s.user.screen_name, s.id, s.relative_created_at)
   if output:
