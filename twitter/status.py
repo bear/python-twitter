@@ -631,6 +631,8 @@ class Status(object):
       data['contributors'] = self.contributors
     if self.hashtags:
       data['hashtags'] = [h.text for h in self.hashtags]
+    if self.media:
+      data['media'] = [m for m in self.media]
     if self.retweeted_status:
       data['retweeted_status'] = self.retweeted_status.AsDict()
     if self.retweet_count:
@@ -695,6 +697,12 @@ class Status(object):
         media = data['entities']['media']
       else:
         media = []
+
+    # the new extended entities
+    if 'extended_entities' in data:
+      if 'media' in data['extended_entities']:
+        media = [m for m in data['extended_entities']['media']]
+
     return Status(created_at=data.get('created_at', None),
                   favorited=data.get('favorited', None),
                   favorite_count=data.get('favorite_count', None),
