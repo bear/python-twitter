@@ -12,7 +12,7 @@ class UserStatus(object):
     userstatus.id
     userstatus.screen_name
     userstatus.following
-    userstatus.follwed_by
+    userstatus.followed_by
   '''
   def __init__(self, **kwargs):
     '''An object to hold a Twitter user status message.

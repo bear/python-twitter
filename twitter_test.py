@@ -21,7 +21,7 @@
 __author__ = 'python-twitter@googlegroups.com'
 
 import os
-import simplejson
+import json as simplejson
 import time
 import calendar
 import unittest
@@ -362,7 +362,7 @@ class ApiTest(unittest.TestCase):
                       cache=None)
     api.SetUrllib(self._urllib)
     self._api = api
-    print "Testing the API class. This test is time controled"
+    print "Testing the API class. This test is time controlled"
 
   def testTwitterError(self):
     '''Test that twitter responses containing an error message are wrapped.'''
