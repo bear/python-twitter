@@ -117,6 +117,7 @@ class Api(object):
                shortner=None,
                base_url=None,
                stream_url=None,
+               upload_url=None,
                use_gzip_compression=False,
                debugHTTP=False,
                timeout=None):
@@ -178,6 +179,11 @@ class Api(object):
       self.stream_url = 'https://stream.twitter.com/1.1'
     else:
       self.stream_url = stream_url
+      
+    if upload_url is None:
+      self.upload_url = 'https://upload.twitter.com/1.1'
+    else:
+      self.upload_url = upload_url
 
     if consumer_key is not None and (access_token_key is None or
                                      access_token_secret is None):
@@ -949,6 +955,74 @@ class Api(object):
     json = self._RequestUrl(url, 'POST', data=data)
     data = self._ParseAndCheckTwitter(json.content)
 
+    return Status.NewFromJsonDict(data)
+
+  def PostMultipleMedia(self, status, media, possibly_sensitive=None,
+                        in_reply_to_status_id=None, latitude=None,
+                        longitude=None, place_id=None,
+                        display_coordinates=False):
+    '''
+    Post a twitter status message from the authenticated user with
+    multiple pictures attached.
+
+    Args:
+      status:
+          the text of your update
+      media:
+          location of multiple media elements(PNG, JPG, GIF)
+      possibly_sensitive:
+          set true is content is "advanced"
+      in_reply_to_status_id:
+          ID of a status that this is in reply to
+      lat:
+          location in latitude
+      long:
+          location in longitude
+      place_id:
+          A place in the world identified by a Twitter place ID
+      display_coordinates:
+
+      Returns:
+          A twitter.Status instance representing the message posted.
+    '''
+    if not self.__auth:
+      raise TwitterError("The twitter.Api instance must be authenticated.")
+
+    if type(media) is not list:
+      raise TwitterError("Must by multiple media elements")
+
+    url = '%s/media/upload.json' % self.upload_url
+
+    if isinstance(status, unicode) or self._input_encoding is None:
+      u_status = status
+    else:
+      u_status = unicode(status, self._input_encoding)
+
+    media_ids = ''
+    for m in range(0,len(media)):
+
+      data = {}
+      if not hasattr(media[m], 'read'):
+        if media[m].startswith('http'):
+          data['media'] = urllib2.urlopen(media[m]).read()
+        else:
+          data['media'] = open(str(media[m]), 'rb').read()
+      else:
+        data['media'] = media[m].read()
+
+      json = self._RequestUrl(url, 'POST', data=data)
+      data = self._ParseAndCheckTwitter(json.content)
+
+      media_ids += str(data['media_id_string'])
+      if m is not len(media)-1:
+        media_ids += ","
+
+    data = {'status': status, 'media_ids' : media_ids}
+
+    url = '%s/statuses/update.json' % self.base_url
+
+    json = self._RequestUrl(url, 'POST', data=data)
+    data = self._ParseAndCheckTwitter(json.content)
     return Status.NewFromJsonDict(data)
 
   def PostUpdates(self,
@@ -3463,6 +3537,8 @@ class Api(object):
          A JSON object.
     '''
     if verb == 'POST':
+      if data.has_key('media_ids'):
+        url = self._BuildUrl(url, extra_params={'media_ids' : data['media_ids']})
       if data.has_key('media'):
         try:
           return requests.post(
