@@ -91,9 +91,9 @@ To see if your credentials are successful::
 
 **NOTE**: much more than the small sample given here will print
 
-To fetch a single user's public status messages, where ``user`` is either a Twitter *short name* or their user id::
+To fetch a single user's public status messages, where ``user`` is a Twitter *short name*::
 
-    >>> statuses = api.GetUserTimeline(user)
+    >>> statuses = api.GetUserTimeline(screen_name=user)
     >>> print [s.text for s in statuses]
 
 To fetch a list a user's friends (requires authentication)::
