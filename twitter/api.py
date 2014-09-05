@@ -3133,7 +3133,7 @@ class Api(object):
                       track=None,
                       locations=None,
                       delimited=None,
-                      stall_warning=None):
+                      stall_warnings=None):
     '''Returns a filtered view of public statuses.
 
     Args:
@@ -3164,8 +3164,8 @@ class Api(object):
       data['locations'] = ','.join(locations)
     if delimited is not None:
       data['delimited'] = str(delimited)
-    if delimited is not None:
-      data['stall_warning'] = str(stall_warning)
+    if stall_warnings is not None:
+      data['stall_warnings'] = str(stall_warnings)
 
     json = self._RequestStream(url, 'POST', data=data)
     for line in json.iter_lines():
