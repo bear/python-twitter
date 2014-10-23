@@ -14,7 +14,7 @@ Introduction
 
 This library provides a pure Python interface for the `Twitter API https://dev.twitter.com/`. It works with Python versions from 2.6+. Python 3 support is under development.
 
-`Twitter http://twitter.com` provides a service that allows people to connect via the web, IM, and SMS. Twitter exposes a `web services API http://dev.twitter.com/doc` and this library is intended to make it even easier for Python programmers to use.
+`Twitter http://twitter.com` provides a service that allows people to connect via the web, IM, and SMS. Twitter exposes a `web services API https://dev.twitter.com/overview/documentation` and this library is intended to make it even easier for Python programmers to use.
 
 ==========
 Installing
@@ -48,7 +48,7 @@ Dependencies
 Documentation
 =============
 
-View the last release API documentation at: http://dev.twitter.com/doc
+View the last release API documentation at: https://dev.twitter.com/overview/documentation
 
 =====
 Using
