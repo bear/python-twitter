@@ -86,7 +86,7 @@ class Api(object):
       >>> api.GetUser(user)
       >>> api.GetReplies()
       >>> api.GetUserTimeline(user)
-      >>> api.GetHomeTimeLine()
+      >>> api.GetHomeTimeline()
       >>> api.GetStatus(id)
       >>> api.DestroyStatus(id)
       >>> api.GetFriends(user)
