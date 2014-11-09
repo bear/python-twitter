@@ -1380,10 +1380,10 @@ class Api(object):
       raise TwitterError({'message': "API must be authenticated."})
 
     try:
-      post_data = {'id': long(id)}
+      post_data = {'user_id': long(id)}
     except ValueError:
       raise TwitterError({'message': "id must be an integer"})
-    url = '%s/blocks/destroy/%s.json' % (self.base_url, id)
+    url = '%s/blocks/destroy.json' % (self.base_url)
     if trim_user:
       post_data['trim_user'] = 1
 
