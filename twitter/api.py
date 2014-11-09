@@ -1361,6 +1361,37 @@ class Api(object):
 
     return result
 
+  def DestroyBlock(self, id, trim_user=False):
+    '''Destroys the block for the user specified by the required ID
+    parameter.
+
+    The twitter.Api instance must be authenticated and the
+    authenticating user must have blocked the user specified by the
+    required ID parameter.
+
+    Args:
+      id:
+        The numerical ID of the user to be un-blocked.
+
+    Returns:
+      A twitter.User instance representing the un-blocked user.
+    '''
+    if not self.__auth:
+      raise TwitterError({'message': "API must be authenticated."})
+
+    try:
+      post_data = {'id': long(id)}
+    except ValueError:
+      raise TwitterError({'message': "id must be an integer"})
+    url = '%s/blocks/destroy/%s.json' % (self.base_url, id)
+    if trim_user:
+      post_data['trim_user'] = 1
+
+    json = self._RequestUrl(url, 'POST', data=post_data)
+    data = self._ParseAndCheckTwitter(json.content)
+
+    return Status.NewFromJsonDict(data)
+
   def GetFriends(self, user_id=None, screen_name=None, cursor=-1, count=None, skip_status=False, include_user_entities=False):
     '''Fetch the sequence of twitter.User instances, one for each friend.
 
