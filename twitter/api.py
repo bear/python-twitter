@@ -174,12 +174,12 @@ class Api(object):
       self.base_url = 'https://api.twitter.com/1.1'
     else:
       self.base_url = base_url
-      
+
     if stream_url is None:
       self.stream_url = 'https://stream.twitter.com/1.1'
     else:
       self.stream_url = stream_url
-      
+
     if upload_url is None:
       self.upload_url = 'https://upload.twitter.com/1.1'
     else:
@@ -233,7 +233,7 @@ class Api(object):
                  access_token_key, access_token_secret]
 
     if all(auth_list):
-      self.__auth = OAuth1(consumer_key, consumer_secret,  
+      self.__auth = OAuth1(consumer_key, consumer_secret,
               access_token_key, access_token_secret)
 
     self._config = None
@@ -1127,7 +1127,7 @@ class Api(object):
     '''
     return self.GetUserTimeline(since_id=since_id, count=count, max_id=max_id, trim_user=trim_user, exclude_replies=True, include_rts=True)
 
-  def GetReplies(self, 
+  def GetReplies(self,
                  since_id=None,
                  count=None,
                  max_id=None,
@@ -1509,7 +1509,7 @@ class Api(object):
         else:
           break
         sec = self.GetSleepTime('/friends/ids')
-        time.sleep(sec)        
+        time.sleep(sec)
 
       return result
 
@@ -1580,7 +1580,7 @@ class Api(object):
         else:
           break
         sec = self.GetSleepTime('/followers/ids')
-        time.sleep(sec) 
+        time.sleep(sec)
 
       return result
 
@@ -1694,7 +1694,7 @@ class Api(object):
       else:
         cursor = next_cursor
       sec = self.GetSleepTime('/followers/list')
-      time.sleep(sec) 
+      time.sleep(sec)
 
     return result
 
@@ -2680,7 +2680,7 @@ class Api(object):
       since_id:
         Returns results with an ID greater than (that is, more recent than)
         the specified ID. There are limits to the number of Tweets which
-        can be accessed through the API. 
+        can be accessed through the API.
         If the limit of Tweets has occurred since the since_id, the since_id
         will be forced to the oldest ID available. [Optional]
       max_id:
@@ -2820,7 +2820,7 @@ class Api(object):
       else:
         break
       sec = self.GetSleepTime('/followers/list')
-      time.sleep(sec) 
+      time.sleep(sec)
 
     return result
 
@@ -3215,10 +3215,10 @@ class Api(object):
     '''Returns the data from the user stream.
 
     Args:
-      replies:        
+      replies:
         Specifies whether to return additional @replies in the stream.
         Defaults to 'all'.
-      withuser: 
+      withuser:
         Specifies whether to return information for just the authenticating
         user, or include messages from accounts the user follows. [Optional]
       track:
@@ -3378,7 +3378,7 @@ class Api(object):
     imposed for the currently authenticated user.
 
     Returns:
-      The average seconds that the api must have to sleep       
+      The average seconds that the api must have to sleep
     '''
     if resources[0] == '/':
         resources = resources[1:]
@@ -3405,7 +3405,7 @@ class Api(object):
     imposed for the currently authenticated user.
 
     Returns:
-      The minimum seconds that the api must have to sleep before query again      
+      The minimum seconds that the api must have to sleep before query again
     '''
     if resources[0] == '/':
         resources = resources[1:]
@@ -3422,7 +3422,10 @@ class Api(object):
         utc_stuct = utc_now.timetuple()
         current_time = timegm(utc_stuct)
         delta = reset_time - current_time
-        return delta
+        if delta < 0:
+            return 0
+        else:
+            return delta
     else:
         return 0
 
@@ -3554,7 +3557,7 @@ class Api(object):
       raise TwitterError(data['errors'])
 
   def _RequestUrl(self, url, verb, data=None):
-    '''Request a url. 
+    '''Request a url.
 
        Args:
          url:
@@ -3617,7 +3620,7 @@ class Api(object):
          A twitter stream.
     '''
     if verb == 'POST':
-      try:  
+      try:
         return requests.post(url, data=data, stream=True,
                              auth=self.__auth,
                              timeout=self._timeout
