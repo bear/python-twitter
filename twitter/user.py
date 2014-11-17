@@ -689,6 +689,8 @@ class User(object):
              self.screen_name == other.screen_name and \
              self.location == other.location and \
              self.description == other.description and \
+             self.default_profile == other.default_profile and \
+             self.default_profile_image == other.default_profile_image and \
              self.profile_image_url == other.profile_image_url and \
              self.profile_background_tile == other.profile_background_tile and \
              self.profile_background_image_url == other.profile_background_image_url and \
@@ -754,6 +756,10 @@ class User(object):
       data['location'] = self.location
     if self.description:
       data['description'] = self.description
+    if self.default_profile:
+      data['default_profile'] = self.default_profile
+    if self.default_profile_image:
+      data['default_profile_image'] = self.default_profile_image
     if self.profile_image_url:
       data['profile_image_url'] = self.profile_image_url
     if self.profile_background_tile is not None:
