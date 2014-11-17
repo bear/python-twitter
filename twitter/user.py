@@ -136,6 +136,8 @@ class User(object):
     user.screen_name
     user.location
     user.description
+    user.default_profile
+    user.default_profile_image
     user.profile_image_url
     user.profile_background_tile
     user.profile_background_image_url
@@ -168,6 +170,8 @@ class User(object):
       'screen_name':                  None,
       'location':                     None,
       'description':                  None,
+      'default_profile':              None,
+      'default_profile_image':        None,
       'profile_image_url':            None,
       'profile_background_tile':      None,
       'profile_background_image_url': None,
@@ -685,6 +689,8 @@ class User(object):
              self.screen_name == other.screen_name and \
              self.location == other.location and \
              self.description == other.description and \
+             self.default_profile == other.default_profile and \
+             self.default_profile_image == other.default_profile_image and \
              self.profile_image_url == other.profile_image_url and \
              self.profile_background_tile == other.profile_background_tile and \
              self.profile_background_image_url == other.profile_background_image_url and \
@@ -750,6 +756,10 @@ class User(object):
       data['location'] = self.location
     if self.description:
       data['description'] = self.description
+    if self.default_profile:
+      data['default_profile'] = self.default_profile
+    if self.default_profile_image:
+      data['default_profile_image'] = self.default_profile_image
     if self.profile_image_url:
       data['profile_image_url'] = self.profile_image_url
     if self.profile_background_tile is not None:
@@ -827,6 +837,8 @@ class User(object):
                 statuses_count=data.get('statuses_count', None),
                 followers_count=data.get('followers_count', None),
                 favourites_count=data.get('favourites_count', None),
+                default_profile=data.get('default_profile', None),
+                default_profile_image=data.get('default_profile_image', None),
                 friends_count=data.get('friends_count', None),
                 profile_image_url=data.get('profile_image_url_https', data.get('profile_image_url', None)),
                 profile_background_tile=data.get('profile_background_tile', None),
