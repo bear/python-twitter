@@ -1,3 +1,4 @@
+from builtins import object
 #!/usr/bin/env python
 from hashlib import md5
 import os
@@ -63,7 +64,7 @@ class _FileCache(object):
                    os.getenv('USERNAME') or \
                    os.getlogin() or \
                    'nobody'
-        except (AttributeError, IOError, OSError), e:
+        except (AttributeError, IOError, OSError) as e:
             return 'nobody'
 
     def _GetTmpCachePath(self):
@@ -96,11 +97,11 @@ class _FileCache(object):
         return os.path.sep.join(hashed_key[0:_FileCache.DEPTH])
 
 
-class ParseTweet:
+class ParseTweet(object):
     # compile once on import
     regexp = {"RT": "^RT", "MT": r"^MT", "ALNUM": r"(@[a-zA-Z0-9_]+)",
               "HASHTAG": r"(#[\w\d]+)", "URL": r"([http://]?[a-zA-Z\d\/]+[\.]+[a-zA-Z\d\/\.]+)"}
-    regexp = dict((key, re.compile(value)) for key, value in regexp.items())
+    regexp = dict((key, re.compile(value)) for key, value in list(regexp.items()))
 
     def __init__(self, timeline_owner, tweet):
         """ timeline_owner : twitter handle of user account. tweet - 140 chars from feed; object does all computation on construction

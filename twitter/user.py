@@ -1,3 +1,4 @@
+from builtins import object
 #!/usr/bin/env python
 
 from twitter import simplejson, TwitterError  # TwitterError not used
@@ -36,7 +37,7 @@ class UserStatus(object):
             'following': None,
             'followed_by': None}
 
-        for (param, default) in param_defaults.iteritems():
+        for (param, default) in param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
     def GetFollowedBy(self):
@@ -201,7 +202,7 @@ class User(object):
             'created_at': None,
             'listed_count': None}
 
-        for (param, default) in param_defaults.iteritems():
+        for (param, default) in param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
 

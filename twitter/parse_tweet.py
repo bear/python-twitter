@@ -1,3 +1,4 @@
+from builtins import object
 #!/usr/bin/env python
 
 import re
@@ -5,11 +6,11 @@ import re
 from twitter import TwitterError  # import not used?
 
 
-class ParseTweet:
+class ParseTweet(object):
     # compile once on import
     regexp = {"RT": "^RT", "MT": r"^MT", "ALNUM": r"(@[a-zA-Z0-9_]+)",
               "HASHTAG": r"(#[\w\d]+)", "URL": r"([http://]?[a-zA-Z\d\/]+[\.]+[a-zA-Z\d\/\.]+)"}
-    regexp = dict((key, re.compile(value)) for key, value in regexp.items())
+    regexp = dict((key, re.compile(value)) for key, value in list(regexp.items()))
 
     def __init__(self, timeline_owner, tweet):
         """ timeline_owner : twitter handle of user account. tweet - 140 chars from feed; object does all computation on construction

@@ -1,3 +1,4 @@
+from builtins import object
 #!/usr/bin/env python
 
 from twitter import TwitterError  # import not used

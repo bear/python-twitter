@@ -1,3 +1,4 @@
+from builtins import object
 #!/usr/bin/env python
 
 from twitter import simplejson, TwitterError, User
@@ -34,7 +35,7 @@ class List(object):
             'following': None,
             'user': None}
 
-        for (param, default) in param_defaults.iteritems():
+        for (param, default) in param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
     def GetId(self):

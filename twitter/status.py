@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from builtins import object
+from past.utils import old_div
 from calendar import timegm
 import rfc822
 import time
@@ -120,7 +123,7 @@ class Status(object):
             'withheld_in_countries': None,
             'withheld_scope': None}
 
-        for (param, default) in param_defaults.iteritems():
+        for (param, default) in param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
     def GetCreatedAt(self):
@@ -351,24 +354,24 @@ class Status(object):
           A human readable string representing the posting time
         """
         fudge = 1.25
-        delta = long(self.now) - long(self.created_at_in_seconds)
+        delta = int(self.now) - int(self.created_at_in_seconds)
 
         if delta < (1 * fudge):
             return 'about a second ago'
-        elif delta < (60 * (1 / fudge)):
+        elif delta < (60 * (old_div(1, fudge))):
             return 'about %d seconds ago' % (delta)
         elif delta < (60 * fudge):
             return 'about a minute ago'
-        elif delta < (60 * 60 * (1 / fudge)):
-            return 'about %d minutes ago' % (delta / 60)
-        elif delta < (60 * 60 * fudge) or delta / (60 * 60) == 1:
+        elif delta < (60 * 60 * (old_div(1, fudge))):
+            return 'about %d minutes ago' % (old_div(delta, 60))
+        elif delta < (60 * 60 * fudge) or old_div(delta, (60 * 60)) == 1:
             return 'about an hour ago'
-        elif delta < (60 * 60 * 24 * (1 / fudge)):
-            return 'about %d hours ago' % (delta / (60 * 60))
-        elif delta < (60 * 60 * 24 * fudge) or delta / (60 * 60 * 24) == 1:
+        elif delta < (60 * 60 * 24 * (old_div(1, fudge))):
+            return 'about %d hours ago' % (old_div(delta, (60 * 60)))
+        elif delta < (60 * 60 * 24 * fudge) or old_div(delta, (60 * 60 * 24)) == 1:
             return 'about a day ago'
         else:
-            return 'about %d days ago' % (delta / (60 * 60 * 24))
+            return 'about %d days ago' % (old_div(delta, (60 * 60 * 24)))
 
     relative_created_at = property(GetRelativeCreatedAt,
                                    doc='Get a human readable string representing '
