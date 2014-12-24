@@ -68,6 +68,12 @@ Using
 
 The library provides a Python wrapper around the Twitter API and the Twitter data model.
 
+----
+Using with Django
+----
+
+Additional template tags that expand tweet urls and urlize tweet text. See the django template tags available for use with python-twitter: https://github.com/radlws/python-twitter-django-tags
+
 -----
 Model
 -----
@@ -124,12 +130,6 @@ There are many more API methods, to read the full API documentation::
     $ pydoc twitter.Api
 
 
-----
-Using with Django
-----
-
-
-See the django template tags available for use with python-twitter: https://github.com/radlws/python-twitter-django-tags
 
 ----
 Todo
