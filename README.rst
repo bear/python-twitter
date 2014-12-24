@@ -38,11 +38,23 @@ Check out the latest development version anonymously with::
 
     $ git clone git://github.com/bear/python-twitter.git
     $ cd python-twitter
+    
+Setup a virtual environment and install dependencies:
 
-Dependencies
+	$ make env
 
-* [Requests](http://docs.python-requests.org/en/latest/)
-* [Requests OAuthlib](https://requests-oauthlib.readthedocs.org/en/latest/)
+Activate the virtual environment created:
+
+	$ source env/bin/activate
+	
+Run tests:
+
+	$ make test
+	
+To see other options available, run:
+
+	$ make help
+
 
 =============
 Documentation
