@@ -18,11 +18,11 @@ deps:
 	pip install -r requirements.txt --use-mirrors
 
 clean:
-	rm -fr build \
-	rm -fr dist \
-	find . -name '*.pyc' -exec rm -f {} \
-	find . -name '*.pyo' -exec rm -f {} \
-	find . -name '*~' -exec rm -f {}
+	rm -fr build
+	rm -fr dist
+	find . -name '*.pyc' -exec rm -f {} \;
+	find . -name '*.pyo' -exec rm -f {} \;
+	find . -name '*~' -exec rm -f {} \;
 
 lint:
 	flake8 twitter > violations.flake8.txt
@@ -30,3 +30,6 @@ lint:
 test:
 	python twitter_test.py
 
+upload: clean
+	python setup.py sdist upload
+	python setup.py bdist_wheel upload
