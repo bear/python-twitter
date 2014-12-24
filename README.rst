@@ -123,6 +123,14 @@ There are many more API methods, to read the full API documentation::
 
     $ pydoc twitter.Api
 
+
+----
+Using with Django
+----
+
+
+See the django template tags available for use with python-twitter: https://github.com/radlws/python-twitter-django-tags
+
 ----
 Todo
 ----
