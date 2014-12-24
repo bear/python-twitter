@@ -45,43 +45,43 @@ DEFAULT_CACHE = object()
 
 class Api(object):
     """A python interface into the Twitter API
-
+  
     By default, the Api caches results for 1 minute.
-
+  
     Example usage:
-
+  
       To create an instance of the twitter.Api class, with no authentication:
-
+  
         >>> import twitter
         >>> api = twitter.Api()
-
+  
       To fetch a single user's public status messages, where "user" is either
       a Twitter "short name" or their user id.
-
+  
         >>> statuses = api.GetUserTimeline(user)
         >>> print [s.text for s in statuses]
-
+  
       To use authentication, instantiate the twitter.Api class with a
       consumer key and secret; and the oAuth key and secret:
-
+  
         >>> api = twitter.Api(consumer_key='twitter consumer key',
                               consumer_secret='twitter consumer secret',
                               access_token_key='the_key_given',
                               access_token_secret='the_key_secret')
-
+  
       To fetch your friends (after being authenticated):
-
+  
         >>> users = api.GetFriends()
         >>> print [u.name for u in users]
-
+  
       To post a twitter status message (after being authenticated):
-
+  
         >>> status = api.PostUpdate('I love python-twitter!')
         >>> print status.text
         I love python-twitter!
-
+  
       There are many other methods, including:
-
+  
         >>> api.PostUpdates(status)
         >>> api.PostDirectMessage(user, text)
         >>> api.GetUser(user)
@@ -123,7 +123,7 @@ class Api(object):
                  debugHTTP=False,
                  timeout=None):
         """Instantiate a new twitter.Api object.
-
+    
         Args:
           consumer_key:
             Your Twitter user's consumer_key.
@@ -214,7 +214,7 @@ class Api(object):
                        access_token_key=None,
                        access_token_secret=None):
         """Set the consumer_key and consumer_secret for this instance
-
+    
         Args:
           consumer_key:
             The consumer_key of the twitter account.
@@ -276,7 +276,7 @@ class Api(object):
                   result_type="mixed",
                   include_entities=None):
         """Return twitter search results for a given term.
-
+    
         Args:
           term:
             Term to search by. Optional if you include geocode.
@@ -312,7 +312,7 @@ class Api(object):
             This node offers a variety of metadata about the tweet in a
             discrete structure, including: user_mentions, urls, and
             hashtags. [Optional]
-
+    
         Returns:
           A sequence of twitter.Status instances, one for each message containing
           the term
@@ -375,7 +375,7 @@ class Api(object):
                        count=20,
                        include_entities=None):
         """Return twitter user search results for a given term.
-
+    
         Args:
           term:
             Term to search by.
@@ -390,7 +390,7 @@ class Api(object):
             This node offers a variety of metadata about the tweet in a
             discrete structure, including: user_mentions, urls, and hashtags.
             [Optional]
-
+    
         Returns:
           A sequence of twitter.User instances, one for each message containing
           the term
@@ -420,12 +420,12 @@ class Api(object):
 
     def GetTrendsCurrent(self, exclude=None):
         """Get the current top trending topics (global)
-
+    
         Args:
           exclude:
             Appends the exclude parameter as a request parameter.
             Currently only exclude=hashtags is supported. [Optional]
-
+    
         Returns:
           A list with 10 entries. Each entry contains a trend.
         """
@@ -434,14 +434,14 @@ class Api(object):
     def GetTrendsWoeid(self, id, exclude=None):
         """Return the top 10 trending topics for a specific WOEID, if trending
         information is available for it.
-
+    
         Args:
           woeid:
             the Yahoo! Where On Earth ID for a location.
           exclude:
             Appends the exclude parameter as a request parameter.
             Currently only exclude=hashtags is supported. [Optional]
-
+    
         Returns:
           A list with 10 entries. Each entry contains a trend.
         """
@@ -471,11 +471,11 @@ class Api(object):
                         include_entities=True):
         """Fetch a collection of the most recent Tweets and retweets posted
         by the authenticating user and the users they follow.
-
+    
         The home timeline is central to how most users interact with Twitter.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           count:
             Specifies the number of statuses to retrieve. May not be
@@ -508,7 +508,7 @@ class Api(object):
             This node offers a variety of metadata about the tweet in a
             discreet structure, including: user_mentions, urls, and
             hashtags. [Optional]
-
+    
         Returns:
           A sequence of twitter.Status instances, one for each message
         """
@@ -557,9 +557,9 @@ class Api(object):
                         trim_user=None,
                         exclude_replies=None):
         """Fetch the sequence of public Status messages for a single user.
-
+    
         The twitter.Api instance must be authenticated if the user is private.
-
+    
         Args:
           user_id:
             Specifies the ID of the user for whom to return the
@@ -594,7 +594,7 @@ class Api(object):
             will receive up-to count tweets - this is because the count parameter
             retrieves that many tweets before filtering out retweets and replies.
             This parameter is only supported for JSON and XML responses. [Optional]
-
+    
         Returns:
           A sequence of Status instances, one for each message up to count
         """
@@ -638,9 +638,9 @@ class Api(object):
                   include_my_retweet=True,
                   include_entities=True):
         """Returns a single status message, specified by the id parameter.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           id:
             The numeric ID of the status you are trying to retrieve.
@@ -697,11 +697,11 @@ class Api(object):
                         lang=None):
         """Returns information allowing the creation of an embedded representation of a
         Tweet on third party sites.
-
+    
         Specify tweet by the id or url parameter.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           id:
             The numeric ID of the status you are trying to embed.
@@ -725,7 +725,7 @@ class Api(object):
             A comma sperated string of related screen names. [Optional]
           lang:
             Language code for the rendered embed. [Optional]
-
+    
         Returns:
           A dictionary with the response.
         """
@@ -774,14 +774,14 @@ class Api(object):
 
     def DestroyStatus(self, id, trim_user=False):
         """Destroys the status specified by the required ID parameter.
-
+    
         The twitter.Api instance must be authenticated and the
         authenticating user must be the author of the specified status.
-
+    
         Args:
           id:
             The numerical ID of the status you're trying to destroy.
-
+    
         Returns:
           A twitter.Status instance representing the destroyed status message
         """
@@ -820,11 +820,11 @@ class Api(object):
                    display_coordinates=False,
                    trim_user=False):
         """Post a twitter status message from the authenticated user.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         https://dev.twitter.com/docs/api/1.1/post/statuses/update
-
+    
         Args:
           status:
             The message text to be posted.
@@ -900,7 +900,7 @@ class Api(object):
                   place_id=None,
                   display_coordinates=False):
         """Post a twitter status message from the user with a picture attached.
-
+    
         Args:
           status:
               the text of your update
@@ -919,7 +919,7 @@ class Api(object):
               A place in the world identified by a Twitter place ID. [Optional]
           display_coordinates:
               Set true if you want to display coordinates. [Optional]
-
+    
           Returns:
               A twitter.Status instance representing the message posted.
         """
@@ -966,7 +966,7 @@ class Api(object):
         """
         Post a twitter status message from the authenticated user with
         multiple pictures attached.
-
+    
         Args:
           status:
               the text of your update
@@ -983,7 +983,7 @@ class Api(object):
           place_id:
               A place in the world identified by a Twitter place ID
           display_coordinates:
-
+    
           Returns:
               A twitter.Status instance representing the message posted.
         """
@@ -1032,12 +1032,12 @@ class Api(object):
                     continuation=None,
                     **kwargs):
         """Post one or more twitter status messages from the authenticated user.
-
+    
         Unlike api.PostUpdate, this method will post multiple status updates
         if the message is longer than 140 characters.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           status:
             The message text to be posted.
@@ -1049,7 +1049,7 @@ class Api(object):
             (horizontal ellipsis) instead. [Defaults to None]
           **kwargs:
             See api.PostUpdate for a list of accepted parameters.
-
+    
         Returns:
           A of list twitter.Status instance representing the messages posted.
         """
@@ -1066,9 +1066,9 @@ class Api(object):
 
     def PostRetweet(self, original_id, trim_user=False):
         """Retweet a tweet with the Retweet API.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           original_id:
             The numerical id of the tweet that will be retweeted
@@ -1076,7 +1076,7 @@ class Api(object):
             If True the returned payload will only contain the user IDs,
             otherwise the payload will contain the full user data item.
             [Optional]
-
+    
         Returns:
           A twitter.Status instance representing the original tweet with retweet details embedded.
         """
@@ -1104,9 +1104,9 @@ class Api(object):
                         max_id=None,
                         trim_user=False):
         """Fetch the sequence of retweets made by the authenticated user.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           count:
             The number of status messages to retrieve. [Optional]
@@ -1123,7 +1123,7 @@ class Api(object):
             If True the returned payload will only contain the user IDs,
             otherwise the payload will contain the full user data item.
             [Optional]
-
+    
         Returns:
           A sequence of twitter.Status instances, one for each message up to count
         """
@@ -1138,7 +1138,7 @@ class Api(object):
         """Get a sequence of status messages representing the 20 most
         recent replies (status updates prefixed with @twitterID) to the
         authenticating user.
-
+    
         Args:
           since_id:
             Returns results with an ID greater than (that is, more recent
@@ -1153,7 +1153,7 @@ class Api(object):
             If True the returned payload will only contain the user IDs,
             otherwise the payload will contain the full user data item.
             [Optional]
-
+    
         Returns:
           A sequence of twitter.Status instances, one for each reply to the user.
         """
@@ -1166,7 +1166,7 @@ class Api(object):
                     trim_user=False):
         """Returns up to 100 of the first retweets of the tweet identified
         by statusid
-
+    
         Args:
           statusid:
             The ID of the tweet for which retweets should be searched for
@@ -1176,7 +1176,7 @@ class Api(object):
             If True the returned payload will only contain the user IDs,
             otherwise the payload will contain the full user data item.
             [Optional]
-
+    
         Returns:
           A list of twitter.Status instances, which are retweets of statusid
         """
@@ -1204,7 +1204,7 @@ class Api(object):
                       stringify_ids=None):
         """Returns a collection of up to 100 user IDs belonging to users who have
         retweeted the tweet specified by the status_id parameter.
-
+    
         Args:
           status_id:
             the tweet's numerical ID
@@ -1212,7 +1212,7 @@ class Api(object):
             breaks the ids into pages of no more than 100.
           stringify_ids:
             returns the IDs as unicode strings. [Optional]
-
+    
         Returns:
           A list of user IDs
         """
@@ -1258,7 +1258,7 @@ class Api(object):
                         include_user_entities=True):
         """Returns up to 100 of the most recent tweets of the user that have been
         retweeted by others.
-
+    
         Args:
           count:
             The number of retweets to retrieve, up to 100.
@@ -1313,9 +1313,9 @@ class Api(object):
                   skip_status=False,
                   include_user_entities=False):
         """Fetch the sequence of twitter.User instances, one for each blocked user.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           user_id:
             The twitter id of the user whose friends you are fetching.
@@ -1331,7 +1331,7 @@ class Api(object):
             [Optional]
           include_user_entities:
             When True, the user entities will be included. [Optional]
-
+    
         Returns:
           A sequence of twitter.User instances, one for each friend
         """
@@ -1368,15 +1368,15 @@ class Api(object):
     def DestroyBlock(self, id, trim_user=False):
         """Destroys the block for the user specified by the required ID
         parameter.
-
+    
         The twitter.Api instance must be authenticated and the
         authenticating user must have blocked the user specified by the
         required ID parameter.
-
+    
         Args:
           id:
             The numerical ID of the user to be un-blocked.
-
+    
         Returns:
           A twitter.User instance representing the un-blocked user.
         """
@@ -1399,9 +1399,9 @@ class Api(object):
     def GetFriends(self, user_id=None, screen_name=None, cursor=-1, count=None, skip_status=False,
                    include_user_entities=False):
         """Fetch the sequence of twitter.User instances, one for each friend.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           user_id:
             The twitter id of the user whose friends you are fetching.
@@ -1420,7 +1420,7 @@ class Api(object):
             [Optional]
           include_user_entities:
             When True, the user entities will be included. [Optional]
-
+    
         Returns:
           A sequence of twitter.User instances, one for each friend
         """
@@ -1469,7 +1469,7 @@ class Api(object):
                      count=None):
         """Returns a list of twitter user id's for every person
         the specified user is following.
-
+  
         Args:
           user_id:
             The id of the user to retrieve the id list for. [Optional]
@@ -1483,7 +1483,7 @@ class Api(object):
             [Optional]
           count:
             The number of status messages to retrieve. [Optional]
-
+  
         Returns:
           A list of integers, one for each user id.
         """
@@ -1528,7 +1528,7 @@ class Api(object):
                        total_count=None):
         """Returns a list of twitter user id's for every person
         that is following the specified user.
-
+  
         Args:
           user_id:
             The id of the user to retrieve the id list for. [Optional]
@@ -1548,7 +1548,7 @@ class Api(object):
             The total amount of UIDs to retrieve. Good if the account has many followers
             and you don't want to get rate limited. The data returned might contain more
             UIDs if total_count is not a multiple of count (5000 by default). [Optional]
-
+  
         Returns:
           A list of integers, one for each user id.
         """
@@ -1597,10 +1597,10 @@ class Api(object):
                           skip_status=False,
                           include_user_entities=False):
         """Make a cursor driven call to return the list of all followers
-
+    
         The caller is responsible for handling the cursor value and looping
         to gather all of the data
-
+    
         Args:
           user_id:
             The twitter id of the user whose followers you are fetching.
@@ -1619,7 +1619,7 @@ class Api(object):
             [Optional]
           include_user_entities:
             When True, the user entities will be included. [Optional]
-
+    
         Returns:
           next_cursor, previous_cursor, data sequence of twitter.User instances, one for each follower
         """
@@ -1662,9 +1662,9 @@ class Api(object):
                      skip_status=False,
                      include_user_entities=False):
         """Fetch the sequence of twitter.User instances, one for each follower.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           user_id:
             The twitter id of the user whose followers you are fetching.
@@ -1682,7 +1682,7 @@ class Api(object):
             If True the statuses will not be returned in the user items. [Optional]
           include_user_entities:
             When True, the user entities will be included. [Optional]
-
+    
         Returns:
           A sequence of twitter.User instances, one for each follower
         """
@@ -1710,13 +1710,13 @@ class Api(object):
                     users=None,
                     include_entities=True):
         """Fetch extended information for the specified users.
-
+    
         Users may be specified either as lists of either user_ids,
         screen_names, or twitter.User objects. The list of users that
         are queried is the union of all specified parameters.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           user_id:
             A list of user_ids to retrieve extended information. [Optional]
@@ -1728,7 +1728,7 @@ class Api(object):
           include_entities:
             The entities node that may appear within embedded statuses will be
             disincluded when set to False. [Optional]
-
+    
         Returns:
           A list of twitter.User objects for the requested users
         """
@@ -1769,9 +1769,9 @@ class Api(object):
                 screen_name=None,
                 include_entities=True):
         """Returns a single user.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           user_id:
             The id of the user to retrieve. [Optional]
@@ -1782,7 +1782,7 @@ class Api(object):
           include_entities:
             The entities node will be omitted when set to False.
             [Optional]
-
+    
         Returns:
           A twitter.User instance representing that user
         """
@@ -1812,9 +1812,9 @@ class Api(object):
                           include_entities=True,
                           skip_status=False):
         """Returns a list of the direct messages sent to the authenticating user.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           since_id:
             Returns results with an ID greater than (that is, more recent
@@ -1836,7 +1836,7 @@ class Api(object):
           skip_status:
             When set to True statuses will not be included in the returned user
             objects. [Optional]
-
+    
         Returns:
           A sequence of twitter.DirectMessage instances
         """
@@ -1871,9 +1871,9 @@ class Api(object):
                               page=None,
                               include_entities=True):
         """Returns a list of the direct messages sent by the authenticating user.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           since_id:
             Returns results with an ID greater than (that is, more recent
@@ -1895,7 +1895,7 @@ class Api(object):
           include_entities:
             The entities node will be omitted when set to False.
             [Optional]
-
+    
         Returns:
           A sequence of twitter.DirectMessage instances
         """
@@ -1928,17 +1928,17 @@ class Api(object):
                           user_id=None,
                           screen_name=None):
         """Post a twitter direct message from the authenticated user.
-
+    
         The twitter.Api instance must be authenticated. user_id or screen_name
         must be specified.
-
+    
         Args:
           text: The message text to be posted.  Must be less than 140 characters.
           user_id:
             The ID of the user who should receive the direct message. [Optional]
           screen_name:
             The screen name of the user who should receive the direct message. [Optional]
-
+    
         Returns:
           A twitter.DirectMessage instance representing the message posted
         """
@@ -1961,14 +1961,14 @@ class Api(object):
 
     def DestroyDirectMessage(self, id, include_entities=True):
         """Destroys the direct message specified in the required ID parameter.
-
+    
         The twitter.Api instance must be authenticated, and the
         authenticating user must be the recipient of the specified direct
         message.
-
+    
         Args:
           id: The id of the direct message to be destroyed
-
+    
         Returns:
           A twitter.DirectMessage instance representing the message destroyed
         """
@@ -1984,9 +1984,9 @@ class Api(object):
 
     def CreateFriendship(self, user_id=None, screen_name=None, follow=True):
         """Befriends the user specified by the user_id or screen_name.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           user_id:
             A user_id to follow [Optional]
@@ -1994,7 +1994,7 @@ class Api(object):
             A screen_name to follow [Optional]
           follow:
             Set to False to disable notifications for the target user
-
+    
         Returns:
           A twitter.User instance representing the befriended user.
         """
@@ -2018,15 +2018,15 @@ class Api(object):
 
     def DestroyFriendship(self, user_id=None, screen_name=None):
         """Discontinues friendship with a user_id or screen_name.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           user_id:
             A user_id to unfollow [Optional]
           screen_name:
             A screen_name to unfollow [Optional]
-
+    
         Returns:
           A twitter.User instance representing the discontinued friend.
         """
@@ -2046,17 +2046,17 @@ class Api(object):
 
     def LookupFriendship(self, user_id=None, screen_name=None):
         """Lookup friendship status for user specified by user_id or screen_name.
-
+    
         Currently only supports one user at a time.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           user_id:
             A user_id to lookup [Optional]
           screen_name:
             A screen_name to lookup [Optional]
-
+    
         Returns:
           A twitter.UserStatus instance representing the friendship status
         """
@@ -2082,11 +2082,11 @@ class Api(object):
                        id=None,
                        include_entities=True):
         """Favorites the specified status object or id as the authenticating user.
-
+    
         Returns the favorite status when successful.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           id:
             The id of the twitter status to mark as a favorite. [Optional]
@@ -2094,7 +2094,7 @@ class Api(object):
             The twitter.Status object to mark as a favorite. [Optional]
           include_entities:
             The entities node will be omitted when set to False. [Optional]
-
+    
         Returns:
           A twitter.Status instance representing the newly-marked favorite.
         """
@@ -2119,11 +2119,11 @@ class Api(object):
                         id=None,
                         include_entities=True):
         """Un-Favorites the specified status object or id as the authenticating user.
-
+    
         Returns the un-favorited status when successful.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           id:
             The id of the twitter status to unmark as a favorite. [Optional]
@@ -2131,7 +2131,7 @@ class Api(object):
             The twitter.Status object to unmark as a favorite. [Optional]
           include_entities:
             The entities node will be omitted when set to False. [Optional]
-
+    
         Returns:
           A twitter.Status instance representing the newly-unmarked favorite.
         """
@@ -2159,9 +2159,9 @@ class Api(object):
                      max_id=None,
                      include_entities=True):
         """Return a list of Status objects representing favorited tweets.
-
+    
         Returns up to the 20 most recent tweets for the authenticated user.
-
+    
         Args:
           user:
             The twitter name or id of the user whose favorites you are fetching.
@@ -2208,7 +2208,7 @@ class Api(object):
                     include_entities=True):
         """Returns the 20 most recent mentions (status containing @screen_name)
         for the authenticating user.
-
+    
         Args:
           count:
             Specifies the number of tweets to try and retrieve, up to a maximum of
@@ -2234,7 +2234,7 @@ class Api(object):
             default only the user_id of the contributor is included. [Optional]
           include_entities:
             The entities node will be disincluded when set to False. [Optional]
-
+    
         Returns:
           A sequence of twitter.Status instances, one for each mention of the user.
         """
@@ -2291,11 +2291,11 @@ class Api(object):
 
     def CreateList(self, name, mode=None, description=None):
         """Creates a new list with the give name for the authenticated user.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Twitter endpoint: /lists/create
-
+    
         Args:
           name:
             New name for the list
@@ -2304,7 +2304,7 @@ class Api(object):
             Defaults to 'public'. [Optional]
           description:
             Description of the list. [Optional]
-
+    
         Returns:
           A twitter.List instance representing the new list
         """
@@ -2326,11 +2326,11 @@ class Api(object):
                     list_id=None,
                     slug=None):
         """Destroys the list identified by list_id or owner_screen_name/owner_id and slug.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Twitter endpoint: /lists/destroy
-
+    
         Args:
           owner_screen_name:
             The screen_name of the user who owns the list being requested by a slug.
@@ -2342,7 +2342,7 @@ class Api(object):
             You can identify a list by its slug instead of its numerical id. If you
             decide to do so, note that you'll also have to specify the list owner
             using the owner_id or owner_screen_name parameters.
-
+    
         Returns:
           A twitter.List instance representing the removed list.
         """
@@ -2378,11 +2378,11 @@ class Api(object):
                            list_id=None,
                            slug=None):
         """Creates a subscription to a list by the authenticated user.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Twitter endpoint: /lists/subscribers/create
-
+    
         Args:
           owner_screen_name:
             The screen_name of the user who owns the list being requested by a slug.
@@ -2394,7 +2394,7 @@ class Api(object):
             You can identify a list by its slug instead of its numerical id. If you
             decide to do so, note that you'll also have to specify the list owner
             using the owner_id or owner_screen_name parameters.
-
+    
         Returns:
           A twitter.User instance representing the user subscribed
         """
@@ -2430,11 +2430,11 @@ class Api(object):
                             list_id=None,
                             slug=None):
         """Destroys the subscription to a list for the authenticated user.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Twitter endpoint: /lists/subscribers/destroy
-
+    
         Args:
           owner_screen_name:
             The screen_name of the user who owns the list being requested by a slug.
@@ -2446,7 +2446,7 @@ class Api(object):
             You can identify a list by its slug instead of its numerical id. If you
             decide to do so, note that you'll also have to specify the list owner
             using the owner_id or owner_screen_name parameters.
-
+    
         Returns:
           A twitter.List instance representing the removed list.
         """
@@ -2486,13 +2486,13 @@ class Api(object):
                          include_entities=False,
                          skip_status=False):
         """Check if the specified user is a subscriber of the specified list.
-
+    
         Returns the user if they are subscriber.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Twitter endpoint: /lists/subscribers/show
-
+    
         Args:
           owner_screen_name:
             The screen_name of the user who owns the list being requested by a slug.
@@ -2561,15 +2561,15 @@ class Api(object):
                          count=20,
                          cursor=-1):
         """Obtain a collection of the lists the specified user is subscribed to.
-
+    
         The list will contain a maximum of 20 lists per page by default.
-
+    
         Does not include the user's own lists.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Twitter endpoint: /lists/subscriptions
-
+    
         Args:
           user_id:
             The ID of the user for whom to return results for. [Optional]
@@ -2583,7 +2583,7 @@ class Api(object):
             The "page" value that Twitter will use to start building the list sequence from.
             Use the value of -1 to start at the beginning.
             Twitter will return in the result the values for next_cursor and previous_cursor. [Optional]
-
+    
         Returns:
           A sequence of twitter.List instances, one for each list
         """
@@ -2617,11 +2617,11 @@ class Api(object):
                      user_id=None,
                      reverse=False):
         """Returns a single status message, specified by the id parameter.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Twitter endpoint: /lists/list
-
+    
         Args:
           screen_name:
             Specifies the screen name of the user for whom to return the
@@ -2635,7 +2635,7 @@ class Api(object):
             If False, the owned lists will be returned first, othewise subscribed
             lists will be at the top. Returns a maximum of 100 entries regardless.
             Defaults to False. [Optional]
-
+    
         Returns:
           A list of twitter List items.
         """
@@ -2664,11 +2664,11 @@ class Api(object):
                         include_rts=True,
                         include_entities=True):
         """Fetch the sequence of Status messages for a given List ID.
-
+    
         The twitter.Api instance must be authenticated if the user is private.
-
+    
         Twitter endpoint: /lists/statuses
-
+    
         Args:
           list_id:
             Specifies the ID of the list to retrieve.
@@ -2701,7 +2701,7 @@ class Api(object):
           include_entities:
             If False, the timeline will not contain additional metadata.
             Defaults to True. [Optional]
-
+    
         Returns:
           A sequence of Status instances, one for each message up to count
         """
@@ -2756,11 +2756,11 @@ class Api(object):
                        include_entities=False):
         """Fetch the sequence of twitter.User instances, one for each member
         of the given list_id or slug.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Twitter endpoint: /lists/members
-
+    
         Args:
           list_id:
             Specifies the ID of the list to retrieve.
@@ -2784,7 +2784,7 @@ class Api(object):
           include_entities:
             If False, the timeline will not contain additional metadata.
             Defaults to True. [Optional]
-
+    
         Returns:
           A sequence of twitter.User instances, one for each follower
         """
@@ -2840,11 +2840,11 @@ class Api(object):
                           owner_screen_name=None,
                           owner_id=None):
         """Add a new member (or list of members) to a user's list.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Twitter endpoint: /lists/members/create or /lists/members/create_all
-
+    
         Args:
           list_id:
             The numerical id of the list.
@@ -2862,7 +2862,7 @@ class Api(object):
             The screen_name of the user who owns the list being requested by a slug.
           owner_id:
             The user ID of the user who owns the list being requested by a slug.
-
+    
         Returns:
           A twitter.List instance representing the list subscribed to
         """
@@ -2919,11 +2919,11 @@ class Api(object):
                            user_id=None,
                            screen_name=None):
         """Destroys the subscription to a list for the authenticated user.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Twitter endpoint: /lists/subscribers/destroy
-
+    
         Args:
           list_id:
             The numerical id of the list.
@@ -2941,7 +2941,7 @@ class Api(object):
           screen_name:
             The screen_name or a list of Screen_name's to add to the list.
             If not given, then user_id is required.
-
+    
         Returns:
           A twitter.List instance representing the removed list.
         """
@@ -2996,11 +2996,11 @@ class Api(object):
                  count=None,
                  cursor=-1):
         """Fetch the sequence of lists for a user.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Twitter endpoint: /lists/ownerships
-
+    
         Args:
           user_id:
             The ID of the user for whom to return results for. [Optional]
@@ -3014,7 +3014,7 @@ class Api(object):
             The "page" value that Twitter will use to start building the list sequence from.
             Use the value of -1 to start at the beginning.
             Twitter will return in the result the values for next_cursor and previous_cursor. [Optional]
-
+    
         Returns:
           A sequence of twitter.List instances, one for each list
         """
@@ -3056,9 +3056,9 @@ class Api(object):
                       include_entities=False,
                       skip_status=False):
         """Update's the authenticated user's profile data.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           name:
             Full name associated with the profile.
@@ -3080,7 +3080,7 @@ class Api(object):
           skip_status:
             When set to either True, t or 1 then statuses will not be included
             in the returned user objects. [Optional]
-
+    
         Returns:
           A twitter.User instance representing the modified user.
         """
@@ -3109,9 +3109,9 @@ class Api(object):
                      include_entities=False,
                      skip_status=False):
         """Updates the authenticated users profile banner.
-
+    
         The twitter.Api instance must be authenticated.
-
+    
         Args:
           image:
             Location of image in file system
@@ -3120,7 +3120,7 @@ class Api(object):
             This node offers a variety of metadata about the tweet in a
             discrete structure, including: user_mentions, urls, and hashtags.
             [Optional]
-
+    
         Returns:
           A twitter.List instance representing the list subscribed to
         """
@@ -3150,13 +3150,13 @@ class Api(object):
 
     def GetStreamSample(self, delimited=None, stall_warnings=None):
         """Returns a small sample of public statuses.
-
+    
         Args:
           delimited:
             Specifies a message length. [Optional]
           stall_warnings:
             Set to True to have Twitter deliver stall warnings. [Optional]
-
+    
         Returns:
           A Twitter stream
         """
@@ -3174,7 +3174,7 @@ class Api(object):
                         delimited=None,
                         stall_warnings=None):
         """Returns a filtered view of public statuses.
-
+    
         Args:
           follow:
             A list of user IDs to track. [Optional]
@@ -3187,7 +3187,7 @@ class Api(object):
             Specifies a message length. [Optional]
           stall_warnings:
             Set to True to have Twitter deliver stall warnings. [Optional]
-
+    
         Returns:
           A twitter stream
         """
@@ -3221,7 +3221,7 @@ class Api(object):
                       stall_warning=None,
                       stringify_friend_ids=False):
         """Returns the data from the user stream.
-
+    
         Args:
           replies:
             Specifies whether to return additional @replies in the stream.
@@ -3241,7 +3241,7 @@ class Api(object):
           stringify_friend_ids:
             Specifies whether to send the friends list preamble as an array of
             integers or an array of strings. [Optional]
-
+    
         Returns:
           A twitter stream
         """
@@ -3270,7 +3270,7 @@ class Api(object):
 
     def VerifyCredentials(self):
         """Returns a twitter.User instance if the authenticating user is valid.
-
+    
         Returns:
           A twitter.User instance representing that user if the
           credentials are valid, None otherwise.
@@ -3285,7 +3285,7 @@ class Api(object):
 
     def SetCache(self, cache):
         """Override the default cache.  Set to None to prevent caching.
-
+    
         Args:
           cache:
             An instance that supports the same API as the twitter._FileCache
@@ -3297,7 +3297,7 @@ class Api(object):
 
     def SetUrllib(self, urllib):
         """Override the default urllib implementation.
-
+    
         Args:
           urllib:
             An instance that supports the same API as the urllib2 module
@@ -3306,7 +3306,7 @@ class Api(object):
 
     def SetCacheTimeout(self, cache_timeout):
         """Override the default cache timeout.
-
+    
         Args:
           cache_timeout:
             Time, in seconds, that responses should be reused.
@@ -3315,7 +3315,7 @@ class Api(object):
 
     def SetUserAgent(self, user_agent):
         """Override the default user agent.
-
+    
         Args:
           user_agent:
             A string that should be send to the server as the user-agent.
@@ -3324,7 +3324,7 @@ class Api(object):
 
     def SetXTwitterHeaders(self, client, url, version):
         """Set the X-Twitter HTTP headers that will be sent to the server.
-
+    
         Args:
           client:
              The client name as a string.  Will be sent to the server as
@@ -3342,13 +3342,13 @@ class Api(object):
 
     def SetSource(self, source):
         """Suggest the "from source" value to be displayed on the Twitter web site.
-
+    
         The value of the 'source' parameter must be first recognized by
         the Twitter server.
-
+    
         New source values are authorized on a case by case basis by the
         Twitter development team.
-
+    
         Args:
           source:
             The source name as a string.  Will be sent to the server as
@@ -3358,12 +3358,12 @@ class Api(object):
 
     def GetRateLimitStatus(self, resource_families=None):
         """Fetch the rate limit status for the currently authorized user.
-
+    
         Args:
           resources:
             A comma seperated list of resource families you want to know the current
             rate limit disposition of. [Optional]
-
+    
         Returns:
           A dictionary containing the time the limit will reset (reset_time),
           the number of remaining hits allowed before the reset (remaining_hits),
@@ -3384,7 +3384,7 @@ class Api(object):
         """Determines the minimum number of seconds that a program must wait
         before hitting the server again without exceeding the rate_limit
         imposed for the currently authenticated user.
-
+    
         Returns:
           The average seconds that the api must have to sleep
         """
@@ -3411,7 +3411,7 @@ class Api(object):
         """Determines the minimum number of seconds that a program must wait
         before hitting the server again without exceeding the rate_limit
         imposed for the currently authenticated user.
-
+    
         Returns:
           The minimum seconds that the api must have to sleep before query again
         """
@@ -3491,14 +3491,14 @@ class Api(object):
 
     def _EncodeParameters(self, parameters):
         """Return a string in key=value&key=value form.
-
+    
         Values of None are not included in the output string.
-
+    
         Args:
           parameters:
             A dict of (key, value) tuples, where value is encoded as
             specified by self._encoding
-
+    
         Returns:
           A URL-encoded string in "key=value&key=value" form
         """
@@ -3509,15 +3509,15 @@ class Api(object):
 
     def _EncodePostData(self, post_data):
         """Return a string in key=value&key=value form.
-
+    
         Values are assumed to be encoded in the format specified by self._encoding,
         and are subsequently URL encoded.
-
+    
         Args:
           post_data:
             A dict of (key, value) tuples, where value is encoded as
             specified by self._encoding
-
+    
         Returns:
           A URL-encoded string in "key=value&key=value" form
         """
@@ -3529,7 +3529,7 @@ class Api(object):
     def _ParseAndCheckTwitter(self, json):
         """Try and parse the JSON returned from Twitter and return
         an empty dictionary if there is any error.
-
+    
         This is a purely defensive check because during some Twitter
         network outages it will return an HTML failwhale page.
         """
@@ -3549,11 +3549,11 @@ class Api(object):
 
     def _CheckForTwitterError(self, data):
         """Raises a TwitterError if twitter returns an error message.
-
+    
         Args:
           data:
             A python dict created from the Twitter json response
-
+    
         Raises:
           TwitterError wrapping the twitter error message if one exists.
         """
@@ -3566,7 +3566,7 @@ class Api(object):
 
     def _RequestUrl(self, url, verb, data=None):
         """Request a url.
-
+    
            Args:
              url:
                The web location we want to retrieve.
@@ -3574,7 +3574,7 @@ class Api(object):
                Either POST or GET.
              data:
                A dict of (str, unicode) key/value pairs.
-
+    
            Returns:
              A JSON object.
         """
@@ -3615,7 +3615,7 @@ class Api(object):
 
     def _RequestStream(self, url, verb, data=None):
         """Request a stream of data.
-
+    
            Args:
              url:
                The web location we want to retrieve.
@@ -3623,7 +3623,7 @@ class Api(object):
                Either POST or GET.
              data:
                A dict of (str, unicode) key/value pairs.
-
+    
            Returns:
              A twitter stream.
         """

@@ -1,25 +1,27 @@
 #!/usr/bin/env python
 
-from twitter import TwitterError
+from twitter import TwitterError  # import not used
+
 
 class Url(object):
-  '''A class representing an URL contained in a tweet'''
-  def __init__(self,
-               url=None,
-               expanded_url=None):
-    self.url = url
-    self.expanded_url = expanded_url
+    """A class representing an URL contained in a tweet"""
 
-  @staticmethod
-  def NewFromJsonDict(data):
-    '''Create a new instance based on a JSON dict.
+    def __init__(self,
+                 url=None,
+                 expanded_url=None):
+        self.url = url
+        self.expanded_url = expanded_url
 
-    Args:
-      data:
-        A JSON dict, as converted from the JSON in the twitter API
+    @staticmethod
+    def NewFromJsonDict(data):
+        """Create a new instance based on a JSON dict.
 
-    Returns:
-      A twitter.Url instance
-    '''
-    return Url(url=data.get('url', None),
-               expanded_url=data.get('expanded_url', None))
+        Args:
+          data:
+            A JSON dict, as converted from the JSON in the twitter API
+
+        Returns:
+          A twitter.Url instance
+        """
+        return Url(url=data.get('url', None),
+                   expanded_url=data.get('expanded_url', None))
