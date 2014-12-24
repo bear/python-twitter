@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-'''A library that provides a Python interface to the Twitter API'''
+"""A library that provides a Python interface to the Twitter API"""
 
 __author__ = 'python-twitter@googlegroups.com'
 __version__ = '2.3'
@@ -24,9 +24,9 @@ __version__ = '2.3'
 import json as simplejson
 
 try:
-  from hashlib import md5
+    from hashlib import md5
 except ImportError:
-  from md5 import md5
+    from md5 import md5
 
 from _file_cache import _FileCache
 from error import TwitterError
