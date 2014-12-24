@@ -92,9 +92,17 @@ API
 
 The API is exposed via the ``twitter.Api`` class.
 
-The python-twitter library now only supports oAuth authentication as the Twitter devs have indicated that OAuth is the only method that will be supported moving forward.
+The python-twitter library now only supports OAuth authentication as the Twitter devs have indicated that OAuth is the only method that will be supported moving forward.
 
-To create an instance of the ``twitter.Api`` with login credentials (Twitter now requires an oAuth Access Token for all API calls)::
+To generate an Access Token you have to pick what type of access your application requires and then do one of the following::
+
+- `Generate a token to access your own account <https://dev.twitter.com/oauth/overview/application-owner-access-tokens>`
+- `Generate a pin-based token <https://dev.twitter.com/oauth/pin-based>`
+- use the helper script `get_access_token.py <https://github.com/bear/python-twitter/blob/master/get_access_token.py>`
+
+For full details see the `Twitter OAuth Overview <https://dev.twitter.com/oauth/overview>`
+
+To create an instance of the ``twitter.Api`` with login credentials (Twitter now requires an OAuth Access Token for all API calls)::
 
     >>> import twitter
     >>> api = twitter.Api(consumer_key='consumer_key',
