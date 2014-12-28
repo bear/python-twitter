@@ -2160,15 +2160,34 @@ class Api(object):
                      include_entities=True):
         """Return a list of Status objects representing favorited tweets.
     
-        Returns up to the 20 most recent tweets for the authenticated user.
+        Returns up to 200 most recent tweets for the authenticated user.
     
         Args:
-          user:
-            The twitter name or id of the user whose favorites you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
-          page:
-            Specifies the page of results to retrieve.
-            Note: there are pagination limits. [Optional]
+          user_id:
+            Specifies the ID of the user for whom to return the
+            favorites. Helpful for disambiguating when a valid user ID
+            is also a valid screen name. [Optional]
+          screen_name:
+            Specifies the screen name of the user for whom to return the
+            favorites. Helpful for disambiguating when a valid screen
+            name is also a user ID. [Optional]
+          since_id:
+            Returns results with an ID greater than (that is, more recent
+            than) the specified ID. There are limits to the number of
+            Tweets which can be accessed through the API. If the limit of
+            Tweets has occurred since the since_id, the since_id will be
+            forced to the oldest ID available. [Optional]
+          max_id:
+            Returns only statuses with an ID less than (that is, older
+            than) or equal to the specified ID. [Optional]
+          count:
+            Specifies the number of statuses to retrieve. May not be
+            greater than 200. [Optional]
+          include_entities:
+            The entities node will be omitted when set to False. [Optional]
+    
+        Returns:
+          A sequence of Status instances, one for each favorited tweet up to count
         """
         parameters = {}
         url = '%s/favorites/list.json' % self.base_url
