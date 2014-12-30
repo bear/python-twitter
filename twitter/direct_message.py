@@ -3,7 +3,7 @@
 from calendar import timegm
 import rfc822
 
-from twitter import simplejson, TwitterError
+from twitter import json, TwitterError
 
 
 class DirectMessage(object):
@@ -244,7 +244,7 @@ class DirectMessage(object):
         Returns:
           A JSON string representation of this twitter.DirectMessage instance
        """
-        return simplejson.dumps(self.AsDict(), sort_keys=True)
+        return json.dumps(self.AsDict(), sort_keys=True)
 
     def AsDict(self):
         """A dict representation of this twitter.DirectMessage instance.

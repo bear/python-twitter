@@ -34,7 +34,7 @@ import requests
 from requests_oauthlib import OAuth1
 import StringIO
 
-from twitter import (__version__, _FileCache, simplejson, DirectMessage, List,
+from twitter import (__version__, _FileCache, json, DirectMessage, List,
                      Status, Trend, TwitterError, User, UserStatus)
 
 CHARACTER_LIMIT = 140
@@ -3554,7 +3554,7 @@ class Api(object):
         network outages it will return an HTML failwhale page.
         """
         try:
-            data = simplejson.loads(json_data)
+            data = json.loads(json_data)
             self._CheckForTwitterError(data)
         except ValueError:
             if "<title>Twitter / Over capacity</title>" in json_data:

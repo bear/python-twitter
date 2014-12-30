@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from twitter import simplejson, TwitterError, User
+from twitter import json, TwitterError, User
 
 
 class List(object):
@@ -294,7 +294,7 @@ class List(object):
         Returns:
           A JSON string representation of this twitter.List instance
        """
-        return simplejson.dumps(self.AsDict(), sort_keys=True)
+        return json.dumps(self.AsDict(), sort_keys=True)
 
     def AsDict(self):
         """A dict representation of this twitter.List instance.

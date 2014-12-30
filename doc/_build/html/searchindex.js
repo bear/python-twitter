@@ -49,7 +49,6 @@ Search.setIndex({
         sourc: 0,
         http: 0,
         around: 0,
-        simplejson: 0,
         get: [],
         googlegroup: 0,
         clone: 0,
