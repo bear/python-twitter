@@ -4,7 +4,7 @@ from calendar import timegm
 import rfc822
 import time
 
-from twitter import simplejson, Hashtag, TwitterError, Url
+from twitter import json, Hashtag, TwitterError, Url
 
 
 class Status(object):
@@ -583,7 +583,7 @@ class Status(object):
         Returns:
           A JSON string representation of this twitter.Status instance
        """
-        return simplejson.dumps(self.AsDict(), sort_keys=True,
+        return json.dumps(self.AsDict(), sort_keys=True,
                                 ensure_ascii=not allow_non_ascii)
 
     def AsDict(self):

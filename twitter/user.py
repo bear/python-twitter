@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from twitter import simplejson, TwitterError  # TwitterError not used
+from twitter import json, TwitterError  # TwitterError not used
 
 
 class UserStatus(object):
@@ -79,7 +79,7 @@ class UserStatus(object):
         Returns:
           A JSON string representation of this twitter.UserStatus instance
        """
-        return simplejson.dumps(self.AsDict(), sort_keys=True)
+        return json.dumps(self.AsDict(), sort_keys=True)
 
     def AsDict(self):
         """A dict representation of this twitter.UserStatus instance.
@@ -739,7 +739,7 @@ class User(object):
         Returns:
           A JSON string representation of this twitter.User instance
        """
-        return simplejson.dumps(self.AsDict(), sort_keys=True)
+        return json.dumps(self.AsDict(), sort_keys=True)
 
     def AsDict(self):
         """A dict representation of this twitter.User instance.
