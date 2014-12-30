@@ -21,7 +21,6 @@
 __author__ = 'python-twitter@googlegroups.com'
 __version__ = '2.3'
 
-#import json as simplejson
 import json
 
 try:
