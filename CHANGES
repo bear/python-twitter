@@ -1,6 +1,10 @@
+2014-12-29
+  removed reference to simplejson
+
 2014-12-24
   bump version to v2.3
   bump version to v2.2
+  PEP8 standardization
 
 2014-07-10
   bump version to v2.1
