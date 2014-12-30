@@ -21,7 +21,7 @@
 __author__ = 'python-twitter@googlegroups.com'
 
 import os
-import json as simplejson
+import json #as simplejson
 import time
 import calendar
 import unittest
@@ -154,7 +154,7 @@ class StatusTest(unittest.TestCase):
 
     def testNewFromJsonDict(self):
         '''Test the twitter.Status NewFromJsonDict method'''
-        data = simplejson.loads(StatusTest.SAMPLE_JSON)
+        data = json.loads(StatusTest.SAMPLE_JSON)
         status = twitter.Status.NewFromJsonDict(data)
         self.assertEqual(self._GetSampleStatus(), status)
 
@@ -266,7 +266,7 @@ class UserTest(unittest.TestCase):
 
     def testNewFromJsonDict(self):
         '''Test the twitter.User NewFromJsonDict method'''
-        data = simplejson.loads(UserTest.SAMPLE_JSON)
+        data = json.loads(UserTest.SAMPLE_JSON)
         user = twitter.User.NewFromJsonDict(data)
         self.assertEqual(self._GetSampleUser(), user)
 
@@ -297,7 +297,7 @@ class TrendTest(unittest.TestCase):
 
     def testNewFromJsonDict(self):
         '''Test the twitter.Trend NewFromJsonDict method'''
-        data = simplejson.loads(TrendTest.SAMPLE_JSON)
+        data = json.loads(TrendTest.SAMPLE_JSON)
         trend = twitter.Trend.NewFromJsonDict(data, timestamp='Fri Jan 26 23:17:14 +0000 2007')
         self.assertEqual(self._GetSampleTrend(), trend)
 
