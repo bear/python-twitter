@@ -3124,6 +3124,30 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
+    def UpdateImage(self,
+                    image,
+                    include_entities=False,
+                    skip_status=False):
+
+        url = '%s/account/update_profile_image.json' % (self.base_url)
+        with open(image, 'rb') as image_file:
+          encoded_image = base64.b64encode(image_file.read())
+        data = {
+          'image':encoded_image
+        }
+        if include_entities:
+          data['include_entities'] = 1
+        if skip_status:
+          data['skip_status'] = 1
+
+        json = self._RequestUrl(url, 'POST', data=data)
+        if json.status_code in [200, 201, 202]:
+          return True
+        if json.status_code == 400:
+          raise TwitterError({'message': "Image data could not be processed"})
+        if json.status_code == 422:
+          raise TwitterError({'message': "The image could not be resized or is too large."})
+
     def UpdateBanner(self,
                      image,
                      include_entities=False,
