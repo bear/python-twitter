@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-from hashlib import md5
+import errno
 import os
 import re
 import tempfile
+
+from hashlib import md5
 
 
 class _FileCacheError(Exception):
