@@ -25,6 +25,7 @@ Now it's a full-on open source project with many contributors over time:
 * Lars Weiler,
 * Sebastian Wiesinger,
 * Jake Robinson,
+* Muthu Annamalai,
 * abloch,
 * cahlan,
 * dpslwk,
