@@ -4,7 +4,12 @@ from __future__ import division
 from builtins import object
 from past.utils import old_div
 from calendar import timegm
-import rfc822
+
+try:
+    from rfc822 import parsedate
+except ImportError:
+    from email.utils import parsedate
+
 import time
 
 from twitter import simplejson, Hashtag, TwitterError, Url
@@ -152,7 +157,7 @@ class Status(object):
         Returns:
           The time this status message was posted, in seconds since the epoch.
         """
-        return timegm(rfc822.parsedate(self.created_at))
+        return timegm(parsedate(self.created_at))
 
     created_at_in_seconds = property(GetCreatedAtInSeconds,
                                      doc="The time this status message was "
