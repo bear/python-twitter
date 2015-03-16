@@ -46,6 +46,13 @@ import io
 from twitter import (__version__, _FileCache, simplejson, DirectMessage, List,
                      Status, Trend, TwitterError, User, UserStatus)
 
+try:
+  # python 3
+  urllib_version = urllib.request.__version__
+except AttributeError:
+  # python 2
+  urllib_version = urllib.__version__
+
 CHARACTER_LIMIT = 140
 
 # A singleton representing a lazily instantiated FileCache.
@@ -3468,7 +3475,7 @@ class Api(object):
 
     def _InitializeUserAgent(self):
         user_agent = 'Python-urllib/%s (python-twitter/%s)' % \
-                     (urllib.__version__, __version__)
+                     (urllib_version, __version__)
         self.SetUserAgent(user_agent)
 
     def _InitializeDefaultParameters(self):
