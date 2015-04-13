@@ -270,6 +270,7 @@ class Api(object):
                   since_id=None,
                   max_id=None,
                   until=None,
+                  since=None,
                   count=15,
                   lang=None,
                   locale=None,
@@ -291,6 +292,9 @@ class Api(object):
             than) or equal to the specified ID. [Optional]
           until:
             Returns tweets generated before the given date. Date should be
+            formatted as YYYY-MM-DD. [Optional]
+          since: 
+            Returns tweets generated since the given date. Date should be 
             formatted as YYYY-MM-DD. [Optional]
           geocode:
             Geolocation information in the form (latitude, longitude, radius)
@@ -334,6 +338,9 @@ class Api(object):
 
         if until:
             parameters['until'] = until
+            
+        if since:
+            parameters['since'] = since
 
         if lang:
             parameters['lang'] = lang
