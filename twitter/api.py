@@ -1474,7 +1474,7 @@ class Api(object):
                      screen_name=None,
                      cursor=-1,
                      stringify_ids=False,
-                     count=None):
+                     count=5000):
         """Returns a list of twitter user id's for every person
         the specified user is following.
   
@@ -1490,8 +1490,10 @@ class Api(object):
             if True then twitter will return the ids as strings instead of integers.
             [Optional]
           count:
-            The number of status messages to retrieve. [Optional]
-  
+            The number of user id's to retrieve per API request. Please be aware that
+            this might get you rate-limited if set to a small number.
+            By default Twitter will retrieve 5000 UIDs per call. [Optional]
+
         Returns:
           A list of integers, one for each user id.
         """
