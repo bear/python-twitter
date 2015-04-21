@@ -300,7 +300,8 @@ class Api(object):
             Geolocation information in the form (latitude, longitude, radius)
             [Optional]
           count:
-            Number of results to return.  Default is 15 [Optional]
+            Number of results to return.  Default is 15 and maxmimum that twitter
+            returns is 100 irrespective of what you type in. [Optional]
           lang:
             Language for results as ISO 639-1 code.  Default is None (all languages)
             [Optional]
