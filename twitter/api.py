@@ -2634,8 +2634,7 @@ class Api(object):
                          user_id=None,
                          screen_name=None,
                          count=20,
-                         cursor=-1,
-                         filter_to_owned_lists=False):
+                         cursor=-1):
         """Obtain a collection of the lists the specified user is subscribed to.
     
         The list will contain a maximum of 20 lists per page by default.
