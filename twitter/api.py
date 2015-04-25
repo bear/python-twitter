@@ -2634,7 +2634,8 @@ class Api(object):
                          user_id=None,
                          screen_name=None,
                          count=20,
-                         cursor=-1):
+                         cursor=-1,
+                         filter_to_owned_lists=False):
         """Obtain a collection of the lists the specified user is subscribed to.
     
         The list will contain a maximum of 20 lists per page by default.
@@ -2672,6 +2673,73 @@ class Api(object):
             parameters['count'] = int(count)
         except ValueError:
             raise TwitterError({'message': "count must be an integer"})
+        if user_id is not None:
+            try:
+                parameters['user_id'] = long(user_id)
+            except ValueError:
+                raise TwitterError({'message': "user_id must be an integer"})
+        elif screen_name is not None:
+            parameters['screen_name'] = screen_name
+        else:
+            raise TwitterError({'message': "Specify user_id or screen_name"})
+
+        json_data = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json_data.content)
+
+        return [List.NewFromJsonDict(x) for x in data['lists']]
+
+    def GetMemberships(self,
+                       user_id=None,
+                       screen_name=None,
+                       count=20,
+                       cursor=-1,
+                       filter_to_owned_lists=False):
+        """Obtain the lists the specified user is a member of.
+    
+        Returns a maximum of 20 lists per page by default.
+    
+        The twitter.Api instance must be authenticated.
+    
+        Twitter endpoint: /lists/memberships
+    
+        Args:
+          user_id:
+            The ID of the user for whom to return results for. [Optional]
+          screen_name:
+            The screen name of the user for whom to return results for. [Optional]
+          count:
+           The amount of results to return per page.
+           No more than 1000 results will ever be returned in a single page.
+           Defaults to 20. [Optional]
+          cursor:
+            The "page" value that Twitter will use to start building the list sequence from.
+            Use the value of -1 to start at the beginning.
+            Twitter will return in the result the values for next_cursor and previous_cursor. [Optional]
+          filter_to_owned_lists:
+            Set to True to return only the lists the authenticating user
+            owns, and the user specified by user_id or screen_name is a
+            member of.
+            Default value is False. [Optional]
+    
+        Returns:
+          A sequence of twitter.List instances, one for each list in which
+            the user specified by user_id or screen_name is a member
+        """
+        url = '%s/lists/memberships.json' % (self.base_url)
+        parameters = {}
+        try:
+            parameters['cursor'] = int(cursor)
+        except ValueError:
+            raise TwitterError({'message': "cursor must be an integer"})
+        try:
+            parameters['count'] = int(count)
+        except ValueError:
+            raise TwitterError({'message': "count must be an integer"})
+        try:
+            parameters['filter_to_owned_lists'] = bool(filter_to_owned_lists)
+        except ValueError:
+            raise TwitterError({'message': "filter_to_owned_lists \
+                                must be a boolean value"})
         if user_id is not None:
             try:
                 parameters['user_id'] = long(user_id)
