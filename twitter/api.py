@@ -2360,7 +2360,7 @@ class Api(object):
     #      POST lists/update
     #      GET lists/show
     # done GET lists/subscriptions
-    #      GET lists/memberships
+    # done GET lists/memberships
     #      GET lists/subscribers
     # done GET lists/ownerships
 
