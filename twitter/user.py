@@ -216,10 +216,6 @@ class User(object):
         """
         return self._id
 
-    @property.setter
-    def Id(self, id):
-        self._id = id
-
     @property
     def Name(self):
         """Get the real name of this user.
@@ -228,11 +224,6 @@ class User(object):
           The real name of this user
         """
         return self._name
-
-    @property.setter
-    def Name(self, name):
-        self._name = name
-
 
     @property
     def ScreenName(self):
@@ -243,10 +234,6 @@ class User(object):
         """
         return self._screen_name
 
-    @property.setter
-    def ScreenName(self, screen_name):
-        self._screen_name = screen_name
-
     @property
     def Location(self):
         """Get the geographic location of this user.
@@ -255,10 +242,6 @@ class User(object):
           The geographic location of this user
         """
         return self._location
-
-    @property.setter
-    def Location(self, location):
-        self._location = location
 
     @property
     def Description(self):
@@ -269,15 +252,6 @@ class User(object):
         """
         return self._description
 
-    @property.setter
-    def Description(self, description):
-        """Set the short text description of this user.
-
-        Args:
-          description: The short text description of this user
-        """
-        self._description = description
-
     @property
     def Url(self):
         """Get the homepage url of this user.
@@ -286,10 +260,6 @@ class User(object):
           The homepage url of this user
         """
         return self._url
-
-    @property.setter
-    def Url(self, url):
-        self._url = url
 
     @property
     def ProfileImageUrl(self):
@@ -300,10 +270,6 @@ class User(object):
         """
         return self._profile_image_url
 
-    @property.setter
-    def ProfileImageUrl(self, profile_image_url):
-        self._profile_image_url = profile_image_url
-
     @property
     def ProfileBackgroundTile(self):
         """Boolean for whether to tile the profile background image.
@@ -313,73 +279,37 @@ class User(object):
         """
         return self._profile_background_tile
 
-    @property.setter
-    def ProfileBackgroundTile(self, profile_background_tile):
-        self._profile_background_tile = profile_background_tile
-
     @property
     def ProfileBackgroundImageUrl(self):
         return self._profile_background_image_url
-
-    @property.setter
-    def ProfileBackgroundImageUrl(self, profile_background_image_url):
-        self._profile_background_image_url = profile_background_image_url
 
     @property
     def ProfileBannerUrl(self):
         return self._profile_banner_url
 
-    @property.setter
-    def ProfileBannerUrl(self, profile_banner_url):
-        self._profile_banner_url = profile_banner_url
-
     @property
     def ProfileSidebarFillColor(self):
         return self._profile_sidebar_fill_color
-
-    @property.setter
-    def ProfileSidebarFillColor(self, profile_sidebar_fill_color):
-        self._profile_sidebar_fill_color = profile_sidebar_fill_color
 
     @property
     def GetProfileBackgroundColor(self):
         return self._profile_background_color
 
-    @property.setter
-    def ProfileBackgroundColor(self, profile_background_color):
-        self._profile_background_color = profile_background_color
-
     @property
     def ProfileLinkColor(self):
         return self._profile_link_color
-
-    @property.setter
-    def ProfileLinkColor(self, profile_link_color):
-        self._profile_link_color = profile_link_color
 
     @property
     def ProfileTextColor(self):
         return self._profile_text_color
 
-    @property.setter
-    def ProfileTextColor(self, profile_text_color):
-        self._profile_text_color = profile_text_color
-
     @property
     def Protected(self):
         return self._protected
 
-    @property.setter
-    def Protected(self, protected):
-        self._protected = protected
-
     @property
     def UtcOffset(self):
         return self._utc_offset
-
-    @property.setter
-    def UtcOffset(self, utc_offset):
-        self._utc_offset = utc_offset
 
     @property
     def TimeZone(self):
@@ -390,10 +320,6 @@ class User(object):
         """
         return self._time_zone
 
-    @property.setter
-    def TimeZone(self, time_zone):
-        self._time_zone = time_zone
-
     @property
     def Status(self):
         """Get the latest twitter.Status of this user.
@@ -402,10 +328,6 @@ class User(object):
           The latest twitter.Status of this user
         """
         return self._status
-
-    @property.setter
-    def Status(self, status):
-        self._status = status
 
     @property
     def FriendsCount(self):
@@ -416,10 +338,6 @@ class User(object):
         """
         return self._friends_count
 
-    @property.setter
-    def FriendsCount(self, count):
-        self._friends_count = count
-
     @property
     def ListedCount(self):
         """Get the listed count for this user.
@@ -428,10 +346,6 @@ class User(object):
           The number of lists this user belongs to.
         """
         return self._listed_count
-
-    @property.setter
-    def ListedCount(self, count):
-        self._listed_count = count
 
     @property
     def FollowersCount(self):
@@ -442,10 +356,6 @@ class User(object):
         """
         return self._followers_count
 
-    @property.setter
-    def FollowersCount(self, count):
-        self._followers_count = count
-
     @property
     def StatusesCount(self):
         """Get the number of status updates for this user.
@@ -454,10 +364,6 @@ class User(object):
           The number of status updates for this user.
         """
         return self._statuses_count
-
-    @property.setter
-    def SetStatusesCount(self, count):
-        self._statuses_count = count
 
     @property
     def FavouritesCount(self):
@@ -468,10 +374,6 @@ class User(object):
         """
         return self._favourites_count
 
-    @property.setter
-    def FavouritesCount(self, count):
-        self._favourites_count = count
-
     @property
     def GeoEnabled(self):
         """Get the setting of geo_enabled for this user.
@@ -480,10 +382,6 @@ class User(object):
           True/False if Geo tagging is enabled
         """
         return self._geo_enabled
-
-    @property.setter
-    def SetGeoEnabled(self, geo_enabled):
-        self._geo_enabled = geo_enabled
 
     @property
     def Verified(self):
@@ -494,10 +392,6 @@ class User(object):
         """
         return self._verified
 
-    @property.setter
-    def Verified(self, verified):
-        self._verified = verified
-
     @property
     def Lang(self):
         """Get the setting of lang for this user.
@@ -506,10 +400,6 @@ class User(object):
           language code of the user
         """
         return self._lang
-
-    @property.setter
-    def Lang(self, lang):
-        self._lang = lang
 
     @property
     def Notifications(self):
@@ -520,10 +410,6 @@ class User(object):
         """
         return self._notifications
 
-    @property.setter
-    def Notifications(self, notifications):
-        self._notifications = notifications
-
     @property
     def ContributorsEnabled(self):
         """Get the setting of contributors_enabled for this user.
@@ -533,10 +419,6 @@ class User(object):
         """
         return self._contributors_enabled
 
-    @property.setter
-    def ContributorsEnabled(self, contributors_enabled):
-        self._contributors_enabled = contributors_enabled
-
     @property
     def CreatedAt(self):
         """Get the setting of created_at for this user.
@@ -545,10 +427,6 @@ class User(object):
           created_at value of the user
         """
         return self._created_at
-
-    @property.setter
-    def CreatedAt(self, created_at):
-        self._created_at = created_at
 
     def __ne__(self, other):
         return not self.__eq__(other)
