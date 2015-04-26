@@ -5,9 +5,9 @@ from twitter import json, TwitterError  # TwitterError not used
 
 class UserStatus(object):
     """A class representing the UserStatus structure used by the twitter API.
-  
+
     The UserStatus structure exposes the following properties:
-  
+
       userstatus.name
       userstatus.id_str
       userstatus.id
@@ -18,10 +18,10 @@ class UserStatus(object):
 
     def __init__(self, **kwargs):
         """An object to hold a Twitter user status message.
-    
+
         This class is normally instantiated by the twitter.Api class and
         returned in a sequence.
-    
+
         Args:
           id:
             The unique id of this status message. [Optional]
@@ -39,13 +39,16 @@ class UserStatus(object):
         for (param, default) in param_defaults.iteritems():
             setattr(self, param, kwargs.get(param, default))
 
-    def GetFollowedBy(self):
+    @property
+    def FollowedBy(self):
         return self.followed_by or False
 
-    def GetFollowing(self):
+    @property
+    def Following(self):
         return self.following or False
 
-    def GetScreenName(self):
+    @property
+    def ScreenName(self):
         return self.screen_name
 
     def __ne__(self, other):
@@ -65,9 +68,9 @@ class UserStatus(object):
 
     def __str__(self):
         """A string representation of this twitter.UserStatus instance.
-    
+
         The return value is the same as the JSON string representation.
-    
+
         Returns:
           A string representation of this twitter.UserStatus instance.
         """
@@ -75,7 +78,7 @@ class UserStatus(object):
 
     def AsJsonString(self):
         """A JSON string representation of this twitter.UserStatus instance.
-    
+
         Returns:
           A JSON string representation of this twitter.UserStatus instance
        """
@@ -83,9 +86,9 @@ class UserStatus(object):
 
     def AsDict(self):
         """A dict representation of this twitter.UserStatus instance.
-    
+
         The return value uses the same key names as the JSON representation.
-    
+
         Return:
           A dict representing this twitter.UserStatus instance
         """
@@ -107,7 +110,7 @@ class UserStatus(object):
     @staticmethod
     def NewFromJsonDict(data):
         """Create a new instance based on a JSON dict.
-    
+
         Args:
           data: A JSON dict, as converted from the JSON in the twitter API
         Returns:
@@ -131,9 +134,9 @@ class UserStatus(object):
 
 class User(object):
     """A class representing the User structure used by the twitter API.
-  
+
     The User structure exposes the following properties:
-  
+
       user.id
       user.name
       user.screen_name
@@ -204,483 +207,226 @@ class User(object):
         for (param, default) in param_defaults.iteritems():
             setattr(self, param, kwargs.get(param, default))
 
-
-    def GetId(self):
+    @property
+    def Id(self):
         """Get the unique id of this user.
-    
+
         Returns:
           The unique id of this user
         """
         return self._id
 
-    def SetId(self, id):
-        """Set the unique id of this user.
-    
-        Args:
-          id: The unique id of this user.
-        """
-        self._id = id
-
-    id = property(GetId, SetId,
-                  doc='The unique id of this user.')
-
-    def GetName(self):
+    @property
+    def Name(self):
         """Get the real name of this user.
-    
+
         Returns:
           The real name of this user
         """
         return self._name
 
-    def SetName(self, name):
-        """Set the real name of this user.
-    
-        Args:
-          name: The real name of this user
-        """
-        self._name = name
-
-    name = property(GetName, SetName,
-                    doc='The real name of this user.')
-
-    def GetScreenName(self):
+    @property
+    def ScreenName(self):
         """Get the short twitter name of this user.
-    
+
         Returns:
           The short twitter name of this user
         """
         return self._screen_name
 
-    def SetScreenName(self, screen_name):
-        """Set the short twitter name of this user.
-    
-        Args:
-          screen_name: the short twitter name of this user
-        """
-        self._screen_name = screen_name
-
-    screen_name = property(GetScreenName, SetScreenName,
-                           doc='The short twitter name of this user.')
-
-    def GetLocation(self):
+    @property
+    def Location(self):
         """Get the geographic location of this user.
-    
+
         Returns:
           The geographic location of this user
         """
         return self._location
 
-    def SetLocation(self, location):
-        """Set the geographic location of this user.
-    
-        Args:
-          location: The geographic location of this user
-        """
-        self._location = location
-
-    location = property(GetLocation, SetLocation,
-                        doc='The geographic location of this user.')
-
-    def GetDescription(self):
+    @property
+    def Description(self):
         """Get the short text description of this user.
-    
+
         Returns:
           The short text description of this user
         """
         return self._description
 
-    def SetDescription(self, description):
-        """Set the short text description of this user.
-    
-        Args:
-          description: The short text description of this user
-        """
-        self._description = description
-
-    description = property(GetDescription, SetDescription,
-                           doc='The short text description of this user.')
-
-    def GetUrl(self):
+    @property
+    def Url(self):
         """Get the homepage url of this user.
-    
+
         Returns:
           The homepage url of this user
         """
         return self._url
 
-    def SetUrl(self, url):
-        """Set the homepage url of this user.
-    
-        Args:
-          url: The homepage url of this user
-        """
-        self._url = url
-
-    url = property(GetUrl, SetUrl,
-                   doc='The homepage url of this user.')
-
-    def GetProfileImageUrl(self):
+    @property
+    def ProfileImageUrl(self):
         """Get the url of the thumbnail of this user.
-    
+
         Returns:
           The url of the thumbnail of this user
         """
         return self._profile_image_url
 
-    def SetProfileImageUrl(self, profile_image_url):
-        """Set the url of the thumbnail of this user.
-    
-        Args:
-          profile_image_url: The url of the thumbnail of this user
-        """
-        self._profile_image_url = profile_image_url
-
-    profile_image_url = property(GetProfileImageUrl, SetProfileImageUrl,
-                                 doc='The url of the thumbnail of this user.')
-
-    def GetProfileBackgroundTile(self):
+    @property
+    def ProfileBackgroundTile(self):
         """Boolean for whether to tile the profile background image.
-    
+
         Returns:
           True if the background is to be tiled, False if not, None if unset.
         """
         return self._profile_background_tile
 
-    def SetProfileBackgroundTile(self, profile_background_tile):
-        """Set the boolean flag for whether to tile the profile background image.
-    
-        Args:
-          profile_background_tile: Boolean flag for whether to tile or not.
-        """
-        self._profile_background_tile = profile_background_tile
-
-    profile_background_tile = property(GetProfileBackgroundTile, SetProfileBackgroundTile,
-                                       doc='Boolean for whether to tile the background image.')
-
-    def GetProfileBackgroundImageUrl(self):
+    @property
+    def ProfileBackgroundImageUrl(self):
         return self._profile_background_image_url
 
-    def SetProfileBackgroundImageUrl(self, profile_background_image_url):
-        self._profile_background_image_url = profile_background_image_url
-
-    profile_background_image_url = property(GetProfileBackgroundImageUrl, SetProfileBackgroundImageUrl,
-                                            doc='The url of the profile background of this user.')
-
-    def GetProfileBannerUrl(self):
+    @property
+    def ProfileBannerUrl(self):
         return self._profile_banner_url
 
-    def SetProfileBannerUrl(self, profile_banner_url):
-        self._profile_banner_url = profile_banner_url
-
-    profile_banner_url = property(GetProfileBannerUrl, SetProfileBannerUrl,
-                                  doc='The url of the profile banner of this user.')
-
-    def GetProfileSidebarFillColor(self):
+    @property
+    def ProfileSidebarFillColor(self):
         return self._profile_sidebar_fill_color
 
-    def SetProfileSidebarFillColor(self, profile_sidebar_fill_color):
-        self._profile_sidebar_fill_color = profile_sidebar_fill_color
-
-    profile_sidebar_fill_color = property(GetProfileSidebarFillColor, SetProfileSidebarFillColor)
-
+    @property
     def GetProfileBackgroundColor(self):
         return self._profile_background_color
 
-    def SetProfileBackgroundColor(self, profile_background_color):
-        self._profile_background_color = profile_background_color
-
-    profile_background_color = property(GetProfileBackgroundColor, SetProfileBackgroundColor)
-
-    def GetProfileLinkColor(self):
+    @property
+    def ProfileLinkColor(self):
         return self._profile_link_color
 
-    def SetProfileLinkColor(self, profile_link_color):
-        self._profile_link_color = profile_link_color
-
-    profile_link_color = property(GetProfileLinkColor, SetProfileLinkColor)
-
-    def GetProfileTextColor(self):
+    @property
+    def ProfileTextColor(self):
         return self._profile_text_color
 
-    def SetProfileTextColor(self, profile_text_color):
-        self._profile_text_color = profile_text_color
-
-    profile_text_color = property(GetProfileTextColor, SetProfileTextColor)
-
-    def GetProtected(self):
+    @property
+    def Protected(self):
         return self._protected
 
-    def SetProtected(self, protected):
-        self._protected = protected
-
-    protected = property(GetProtected, SetProtected)
-
-    def GetUtcOffset(self):
+    @property
+    def UtcOffset(self):
         return self._utc_offset
 
-    def SetUtcOffset(self, utc_offset):
-        self._utc_offset = utc_offset
-
-    utc_offset = property(GetUtcOffset, SetUtcOffset)
-
-    def GetTimeZone(self):
+    @property
+    def TimeZone(self):
         """Returns the current time zone string for the user.
-    
+
         Returns:
           The descriptive time zone string for the user.
         """
         return self._time_zone
 
-    def SetTimeZone(self, time_zone):
-        """Sets the user's time zone string.
-    
-        Args:
-          time_zone:
-            The descriptive time zone to assign for the user.
-        """
-        self._time_zone = time_zone
-
-    time_zone = property(GetTimeZone, SetTimeZone)
-
-    def GetStatus(self):
+    @property
+    def Status(self):
         """Get the latest twitter.Status of this user.
-    
+
         Returns:
           The latest twitter.Status of this user
         """
         return self._status
 
-    def SetStatus(self, status):
-        """Set the latest twitter.Status of this user.
-    
-        Args:
-          status:
-            The latest twitter.Status of this user
-        """
-        self._status = status
-
-    status = property(GetStatus, SetStatus,
-                      doc='The latest twitter.Status of this user.')
-
-    def GetFriendsCount(self):
+    @property
+    def FriendsCount(self):
         """Get the friend count for this user.
-    
+
         Returns:
           The number of users this user has befriended.
         """
         return self._friends_count
 
-    def SetFriendsCount(self, count):
-        """Set the friend count for this user.
-    
-        Args:
-          count:
-            The number of users this user has befriended.
-        """
-        self._friends_count = count
-
-    friends_count = property(GetFriendsCount, SetFriendsCount,
-                             doc='The number of friends for this user.')
-
-    def GetListedCount(self):
+    @property
+    def ListedCount(self):
         """Get the listed count for this user.
-    
+
         Returns:
           The number of lists this user belongs to.
         """
         return self._listed_count
 
-    def SetListedCount(self, count):
-        """Set the listed count for this user.
-    
-        Args:
-          count:
-            The number of lists this user belongs to.
-        """
-        self._listed_count = count
-
-    listed_count = property(GetListedCount, SetListedCount,
-                            doc='The number of lists this user belongs to.')
-
-    def GetFollowersCount(self):
+    @property
+    def FollowersCount(self):
         """Get the follower count for this user.
-    
+
         Returns:
           The number of users following this user.
         """
         return self._followers_count
 
-    def SetFollowersCount(self, count):
-        """Set the follower count for this user.
-    
-        Args:
-          count:
-            The number of users following this user.
-        """
-        self._followers_count = count
-
-    followers_count = property(GetFollowersCount, SetFollowersCount,
-                               doc='The number of users following this user.')
-
-    def GetStatusesCount(self):
+    @property
+    def StatusesCount(self):
         """Get the number of status updates for this user.
-    
+
         Returns:
           The number of status updates for this user.
         """
         return self._statuses_count
 
-    def SetStatusesCount(self, count):
-        """Set the status update count for this user.
-    
-        Args:
-          count:
-            The number of updates for this user.
-        """
-        self._statuses_count = count
-
-    statuses_count = property(GetStatusesCount, SetStatusesCount,
-                              doc='The number of updates for this user.')
-
-    def GetFavouritesCount(self):
+    @property
+    def FavouritesCount(self):
         """Get the number of favourites for this user.
-    
+
         Returns:
           The number of favourites for this user.
         """
         return self._favourites_count
 
-    def SetFavouritesCount(self, count):
-        """Set the favourite count for this user.
-    
-        Args:
-          count:
-            The number of favourites for this user.
-        """
-        self._favourites_count = count
-
-    favourites_count = property(GetFavouritesCount, SetFavouritesCount,
-                                doc='The number of favourites for this user.')
-
-    def GetGeoEnabled(self):
+    @property
+    def GeoEnabled(self):
         """Get the setting of geo_enabled for this user.
-    
+
         Returns:
           True/False if Geo tagging is enabled
         """
         return self._geo_enabled
 
-    def SetGeoEnabled(self, geo_enabled):
-        """Set the latest twitter.geo_enabled of this user.
-    
-        Args:
-          geo_enabled:
-            True/False if Geo tagging is to be enabled
-        """
-        self._geo_enabled = geo_enabled
-
-    geo_enabled = property(GetGeoEnabled, SetGeoEnabled,
-                           doc='The value of twitter.geo_enabled for this user.')
-
-    def GetVerified(self):
+    @property
+    def Verified(self):
         """Get the setting of verified for this user.
-    
+
         Returns:
           True/False if user is a verified account
         """
         return self._verified
 
-    def SetVerified(self, verified):
-        """Set twitter.verified for this user.
-    
-        Args:
-          verified:
-            True/False if user is a verified account
-        """
-        self._verified = verified
-
-    verified = property(GetVerified, SetVerified,
-                        doc='The value of twitter.verified for this user.')
-
-    def GetLang(self):
+    @property
+    def Lang(self):
         """Get the setting of lang for this user.
-    
+
         Returns:
           language code of the user
         """
         return self._lang
 
-    def SetLang(self, lang):
-        """Set twitter.lang for this user.
-    
-        Args:
-          lang:
-            language code for the user
-        """
-        self._lang = lang
-
-    lang = property(GetLang, SetLang,
-                    doc='The value of twitter.lang for this user.')
-
-    def GetNotifications(self):
+    @property
+    def Notifications(self):
         """Get the setting of notifications for this user.
-    
+
         Returns:
           True/False for the notifications setting of the user
         """
         return self._notifications
 
-    def SetNotifications(self, notifications):
-        """Set twitter.notifications for this user.
-    
-        Args:
-          notifications:
-            True/False notifications setting for the user
-        """
-        self._notifications = notifications
-
-    notifications = property(GetNotifications, SetNotifications,
-                             doc='The value of twitter.notifications for this user.')
-
-    def GetContributorsEnabled(self):
+    @property
+    def ContributorsEnabled(self):
         """Get the setting of contributors_enabled for this user.
-    
+
         Returns:
           True/False contributors_enabled of the user
         """
         return self._contributors_enabled
 
-    def SetContributorsEnabled(self, contributors_enabled):
-        """Set twitter.contributors_enabled for this user.
-    
-        Args:
-          contributors_enabled:
-            True/False contributors_enabled setting for the user
-        """
-        self._contributors_enabled = contributors_enabled
-
-    contributors_enabled = property(GetContributorsEnabled, SetContributorsEnabled,
-                                    doc='The value of twitter.contributors_enabled for this user.')
-
-    def GetCreatedAt(self):
+    @property
+    def CreatedAt(self):
         """Get the setting of created_at for this user.
-    
+
         Returns:
           created_at value of the user
         """
         return self._created_at
-
-    def SetCreatedAt(self, created_at):
-        """Set twitter.created_at for this user.
-    
-        Args:
-          created_at:
-            created_at value for the user
-        """
-        self._created_at = created_at
-
-    created_at = property(GetCreatedAt, SetCreatedAt,
-                          doc='The value of twitter.created_at for this user.')
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -725,9 +471,9 @@ class User(object):
 
     def __str__(self):
         """A string representation of this twitter.User instance.
-    
+
         The return value is the same as the JSON string representation.
-    
+
         Returns:
           A string representation of this twitter.User instance.
         """
@@ -735,7 +481,7 @@ class User(object):
 
     def AsJsonString(self):
         """A JSON string representation of this twitter.User instance.
-    
+
         Returns:
           A JSON string representation of this twitter.User instance
        """
@@ -743,9 +489,9 @@ class User(object):
 
     def AsDict(self):
         """A dict representation of this twitter.User instance.
-    
+
         The return value uses the same key names as the JSON representation.
-    
+
         Return:
           A dict representing this twitter.User instance
         """
@@ -818,18 +564,18 @@ class User(object):
     @staticmethod
     def NewFromJsonDict(data):
         """Create a new instance based on a JSON dict.
-    
+
         Args:
           data:
             A JSON dict, as converted from the JSON in the twitter API
-    
+
         Returns:
           A twitter.User instance
         """
         if 'status' in data:
             from twitter import Status
-            # Have to do the import here to prevent cyclic imports in the __init__.py
-            # file
+            # Have to do the import here to prevent cyclic imports
+            # in the __init__.py file
             status = Status.NewFromJsonDict(data['status'])
         else:
             status = None
