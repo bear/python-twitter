@@ -57,23 +57,6 @@ class StatusTest(unittest.TestCase):
                                 text=u'A légpárnás hajóm tele van angolnákkal.',
                                 user=self._GetSampleUser())
 
-    def testGettersAndSetters(self):
-        '''Test all of the twitter.Status getters and setters'''
-        status = twitter.Status()
-        status.SetId(4391023)
-        self.assertEqual(4391023, status.GetId())
-        created_at = calendar.timegm((2007, 1, 26, 23, 17, 14, -1, -1, -1))
-        status.SetCreatedAt('Fri Jan 26 23:17:14 +0000 2007')
-        self.assertEqual('Fri Jan 26 23:17:14 +0000 2007', status.GetCreatedAt())
-        self.assertEqual(created_at, status.GetCreatedAtInSeconds())
-        status.SetNow(created_at + 10)
-        self.assertEqual("about 10 seconds ago", status.GetRelativeCreatedAt())
-        status.SetText(u'A légpárnás hajóm tele van angolnákkal.')
-        self.assertEqual(u'A légpárnás hajóm tele van angolnákkal.',
-                         status.GetText())
-        status.SetUser(self._GetSampleUser())
-        self.assertEqual(718443, status.GetUser().id)
-
     def testProperties(self):
         '''Test all of the twitter.Status properties'''
         status = twitter.Status()
@@ -190,26 +173,6 @@ class UserTest(unittest.TestCase):
                             profile_image_url='https://twitter.com/system/user/prof'
                                               'ile_image/673483/normal/me.jpg',
                             status=self._GetSampleStatus())
-
-    def testGettersAndSetters(self):
-        '''Test all of the twitter.User getters and setters'''
-        user = twitter.User()
-        user.SetId(673483)
-        self.assertEqual(673483, user.GetId())
-        user.SetName('DeWitt')
-        self.assertEqual('DeWitt', user.GetName())
-        user.SetScreenName('dewitt')
-        self.assertEqual('dewitt', user.GetScreenName())
-        user.SetDescription('Indeterminate things')
-        self.assertEqual('Indeterminate things', user.GetDescription())
-        user.SetLocation('San Francisco, CA')
-        self.assertEqual('San Francisco, CA', user.GetLocation())
-        user.SetProfileImageUrl('https://twitter.com/system/user/profile_im'
-                                'age/673483/normal/me.jpg')
-        self.assertEqual('https://twitter.com/system/user/profile_image/673'
-                         '483/normal/me.jpg', user.GetProfileImageUrl())
-        user.SetStatus(self._GetSampleStatus())
-        self.assertEqual(4212713, user.GetStatus().id)
 
     def testProperties(self):
         '''Test all of the twitter.User properties'''
