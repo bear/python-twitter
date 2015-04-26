@@ -199,7 +199,7 @@ class Status(object):
           A human readable string representing the posting time
         """
         fudge = 1.25
-        delta = long(self.now) - long(self.created_at_in_seconds)
+        delta = long(self.now) - long(self.CreatedAtInSeconds)
 
         if delta < (1 * fudge):
             return 'about a second ago'
