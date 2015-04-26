@@ -26,8 +26,8 @@ You can install python-twitter using::
 
 Testing::
 
-    $ python twitter_test.py
-  
+    $ python test.py
+
 ================
 Getting the code
 ================
@@ -38,7 +38,7 @@ Check out the latest development version anonymously with::
 
     $ git clone git://github.com/bear/python-twitter.git
     $ cd python-twitter
-    
+
 Setup a virtual environment and install dependencies:
 
 	$ make env
@@ -46,11 +46,11 @@ Setup a virtual environment and install dependencies:
 Activate the virtual environment created:
 
 	$ source env/bin/activate
-	
+
 Run tests:
 
 	$ make test
-	
+
 To see other options available, run:
 
 	$ make help
@@ -172,13 +172,13 @@ License
 -------
 
 | Copyright 2007-2014 The Python-Twitter Developers
-| 
+|
 | Licensed under the Apache License, Version 2.0 (the 'License');
 | you may not use this file except in compliance with the License.
 | You may obtain a copy of the License at
-| 
+|
 |     http://www.apache.org/licenses/LICENSE-2.0
-| 
+|
 | Unless required by applicable law or agreed to in writing, software
 | distributed under the License is distributed on an 'AS IS' BASIS,
 | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
