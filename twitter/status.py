@@ -134,7 +134,7 @@ class Status(object):
         """
         return self._text
 
-    @property.setter
+    @Text.setter
     def Text(self, text):
         self._text = text
 
@@ -142,7 +142,7 @@ class Status(object):
     def InReplyToStatusId(self):
         return self._in_reply_to_status_id
 
-    @property.setter
+    @InReplyToStatusId.setter
     def InReplyToStatusId(self, in_reply_to_status_id):
         self._in_reply_to_status_id = in_reply_to_status_id
 
@@ -150,7 +150,7 @@ class Status(object):
     def Possibly_sensitive(self):
         return self._possibly_sensitive
 
-    @property.setter
+    @Possibly_sensitive.setter
     def Possibly_sensitive(self, possibly_sensitive):
         self._possibly_sensitive = possibly_sensitive
 
@@ -158,7 +158,7 @@ class Status(object):
     def Place(self):
         return self._place
 
-    @property.setter
+    @Place.setter
     def Place(self, place):
         self._place = place
 
@@ -166,7 +166,7 @@ class Status(object):
     def Coordinates(self):
         return self._coordinates
 
-    @property.setter
+    @Coordinates.setter
     def Coordinates(self, coordinates):
         self._coordinates = coordinates
 
@@ -316,7 +316,7 @@ class Status(object):
             self._now = time.time()
         return self._now
 
-    @property.setter
+    @Now.setter
     def Now(self, now):
         self._now = now
 
