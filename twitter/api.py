@@ -1000,6 +1000,8 @@ class Api(object):
 
         if type(media) is not list:
             raise TwitterError("Must by multiple media elements")
+        
+        del media[4:]
 
         url = '%s/media/upload.json' % self.upload_url
 
