@@ -1001,6 +1001,9 @@ class Api(object):
         if type(media) is not list:
             raise TwitterError("Must by multiple media elements")
 
+        if media.__len__() > 4:
+            raise TwitterError("Maximum of 4 media elements can be allocated to a tweet")
+
         url = '%s/media/upload.json' % self.upload_url
 
         if isinstance(status, unicode) or self._input_encoding is None:
