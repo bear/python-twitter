@@ -189,7 +189,7 @@ class Api(object):
         if consumer_key is not None and (access_token_key is None or
                                                  access_token_secret is None):
             print >> sys.stderr, 'Twitter now requires an oAuth Access Token for API calls.'
-            print >> sys.stderr, 'If your using this library from a command line utility, please'
+            print >> sys.stderr, 'If you\'re using this library from a command line utility, please'
             print >> sys.stderr, 'run the included get_access_token.py tool to generate one.'
 
             raise TwitterError({'message': "Twitter requires oAuth Access Token for all API access"})
