@@ -5,21 +5,21 @@ import rfc822
 
 from twitter import simplejson, TwitterError
 
-class Timeline(object):
-  '''A class representing the Timeline structure used by the twitter API.
+class Collection(object):
+  '''A class representing the Collection structure used by the twitter API.
 
-  The Timeline structure exposes the following properties:
+  The Collection structure exposes the following properties:
 
-    timeline.id
-    timeline.name
-    timeline.slug
-    timeline.description
-    timeline.full_name
-    timeline.mode
-    timeline.uri
-    timeline.member_count
-    timeline.subscriber_count
-    timeline.following
+    collection.id
+    collection.name
+    collection.slug
+    collection.description
+    collection.full_name
+    collection.mode
+    collection.uri
+    collection.member_count
+    collection.subscriber_count
+    collection.following
   '''
   def __init__(self, **kwargs):
     param_defaults = {
@@ -33,104 +33,104 @@ class Timeline(object):
       setattr(self, param, kwargs.get(param, default))
 
   def GetId(self):
-    '''Get the unique id of this timeline.
+    '''Get the unique id of this collection.
 
     Returns:
-      The unique id of this timeline
+      The unique id of this collection
     '''
     return self._id
 
   def SetId(self, id):
-    '''Set the unique id of this timeline.
+    '''Set the unique id of this collection.
 
     Args:
       id:
-        The unique id of this timeline.
+        The unique id of this collection.
     '''
     self._id = id
 
   id = property(GetId, SetId,
-                doc='The unique id of this timeline.')
+                doc='The unique id of this collection.')
 
   def GetName(self):
-    '''Get the real name of this timeline.
+    '''Get the real name of this collection.
 
     Returns:
-      The real name of this timeline
+      The real name of this collection
     '''
     return self._name
 
   def SetName(self, name):
-    '''Set the real name of this timeline.
+    '''Set the real name of this collection.
 
     Args:
       name:
-        The real name of this timeline
+        The real name of this collection
     '''
     self._name = name
 
   name = property(GetName, SetName,
-                  doc='The real name of this timeline.')
+                  doc='The real name of this collection.')
 
   def GetDescription(self):
-    '''Get the description of this timeline.
+    '''Get the description of this collection.
 
     Returns:
-      The description of this timeline
+      The description of this collection
     '''
     return self._description
 
   def SetDescription(self, description):
-    '''Set the description of this timeline.
+    '''Set the description of this collection.
 
     Args:
       description:
-        The description of this timeline.
+        The description of this collection.
     '''
     self._description = description
 
   description = property(GetDescription, SetDescription,
-                         doc='The description of this timeline.')
+                         doc='The description of this collection.')
 
   def GetUri(self):
-    '''Get the uri of this timeline.
+    '''Get the uri of this collection.
 
     Returns:
-      The uri of this timeline
+      The uri of this collection
     '''
     return self._uri
 
   def SetUri(self, uri):
-    '''Set the uri of this timeline.
+    '''Set the uri of this collection.
 
     Args:
       uri:
-        The uri of this timeline.
+        The uri of this collection.
     '''
     self._uri = uri
 
   uri = property(GetUri, SetUri,
-                 doc='The uri of this timeline.')
+                 doc='The uri of this collection.')
 
   def GetUser(self):
-    '''Get the user of this timeline.
+    '''Get the user of this collection.
 
     Returns:
-      The owner of this timeline
+      The owner of this collection
     '''
     return self._user
 
   def SetUser(self, user):
-    '''Set the user of this timeline.
+    '''Set the user of this collection.
 
     Args:
       user:
-        The owner of this timeline.
+        The owner of this collection.
     '''
     self._user = user
 
   user = property(GetUser, SetUser,
-                  doc='The owner of this timeline.')
+                  doc='The owner of this collection.')
 
   def __ne__(self, other):
     return not self.__eq__(other)
@@ -148,30 +148,30 @@ class Timeline(object):
       return False
 
   def __str__(self):
-    '''A string representation of this twitter.Timeline instance.
+    '''A string representation of this twitter.Collection instance.
 
     The return value is the same as the JSON string representation.
 
     Returns:
-      A string representation of this twitter.Timeline instance.
+      A string representation of this twitter.Collection instance.
     '''
     return self.AsJsonString()
 
   def AsJsonString(self):
-    '''A JSON string representation of this twitter.Timeline instance.
+    '''A JSON string representation of this twitter.Collection instance.
 
     Returns:
-      A JSON string representation of this twitter.Timeline instance
+      A JSON string representation of this twitter.Collection instance
    '''
     return simplejson.dumps(self.AsDict(), sort_keys=True)
 
   def AsDict(self):
-    '''A dict representation of this twitter.Timeline instance.
+    '''A dict representation of this twitter.Collection instance.
 
     The return value uses the same key names as the JSON representation.
 
     Return:
-      A dict representing this twitter.Timeline instance
+      A dict representing this twitter.Collection instance
     '''
     data = {}
     # if self.id:
@@ -195,7 +195,7 @@ class Timeline(object):
         A JSON dict, as converted from the JSON in the twitter API
 
     Returns:
-      A twitter.Timeline instance
+      A twitter.Collection instance
     '''
 
     # if 'user' in data:
@@ -203,7 +203,7 @@ class Timeline(object):
     # else:
     #   user = None
 
-    return Timeline(id=id,
+    return Collection(id=id,
                 name=data.get('name', None),
                 description=data.get('description', None),
                 uri=data.get('custom_timeline_url', None),
