@@ -20,6 +20,12 @@ class Collection(object):
     collection.member_count
     collection.subscriber_count
     collection.following
+    
+The Collection APIs require additional privileges to access. More information
+available on the about page: 
+
+    https://dev.twitter.com/rest/collections/about
+    
   '''
   def __init__(self, **kwargs):
     param_defaults = {
