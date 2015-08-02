@@ -2761,7 +2761,7 @@ class Api(object):
                      screen_name,
                      user_id=None,
                      reverse=False):
-        """Returns a single status message, specified by the id parameter.
+        """Returns all lists the user subscribes to, including their own. 
     
         The twitter.Api instance must be authenticated.
     
