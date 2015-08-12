@@ -3437,9 +3437,19 @@ class Api(object):
                 data = self._ParseAndCheckTwitter(line)
                 yield data
 
-    def VerifyCredentials(self):
+    def VerifyCredentials(self, include_entities=None, skip_status=None, include_email=None):
         """Returns a twitter.User instance if the authenticating user is valid.
-    
+        
+        Args:
+          include_entities:
+            Specifies whether to return additional @replies in the stream.
+          skip_status:
+            When set to either true, t or 1 statuses will not be included in the returned user object.
+          include_email:
+            Use of this parameter requires whitelisting.
+            When set to true email will be returned in the user objects as a string. If the user does 
+            not have an email address on their account, or if the email address is un-verified, 
+            null will be returned.
         Returns:
           A twitter.User instance representing that user if the
           credentials are valid, None otherwise.
@@ -3447,7 +3457,14 @@ class Api(object):
         if not self.__auth:
             raise TwitterError({'message': "Api instance must first be given user credentials."})
         url = '%s/account/verify_credentials.json' % self.base_url
-        json_data = self._RequestUrl(url, 'GET')  # No_cache
+        data = {}
+        if include_entities:
+            data['include_entities'] = str(include_entities)
+        if skip_status:
+            data['skip_status'] = str(skip_status)
+        if include_email:
+            data['include_email'] = str(include_email)
+        json_data = self._RequestUrl(url, 'GET', data)  # No_cache
         data = self._ParseAndCheckTwitter(json_data.content)
 
         return User.NewFromJsonDict(data)

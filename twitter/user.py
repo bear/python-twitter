@@ -168,6 +168,7 @@ class User(object):
       user.contributors_enabled
       user.created_at
       user.listed_count
+      user.email
     """
 
     def __init__(self, **kwargs):
@@ -202,7 +203,8 @@ class User(object):
             'notifications': None,
             'contributors_enabled': None,
             'created_at': None,
-            'listed_count': None}
+            'listed_count': None,
+            'email': None}
 
         for (param, default) in param_defaults.iteritems():
             setattr(self, param, kwargs.get(param, default))
@@ -428,6 +430,16 @@ class User(object):
         """
         return self._created_at
 
+    @property
+    def Email(self):
+        """Get the setting of email for this user.
+
+        Returns:
+          email value of the user
+        """
+        return self._email
+
+
     def __ne__(self, other):
         return not self.__eq__(other)
 
@@ -464,7 +476,8 @@ class User(object):
                    self.notifications == other.notifications and \
                    self.contributors_enabled == other.contributors_enabled and \
                    self.created_at == other.created_at and \
-                   self.listed_count == other.listed_count
+                   self.listed_count == other.listed_count and \
+                   self.email == other.email
 
         except AttributeError:
             return False
@@ -558,6 +571,8 @@ class User(object):
             data['created_at'] = self.created_at
         if self.listed_count:
             data['listed_count'] = self.listed_count
+        if self.email:
+            data['email'] = self.email
 
         return data
 
@@ -609,4 +624,5 @@ class User(object):
                     notifications=data.get('notifications', None),
                     contributors_enabled=data.get('contributors_enabled', None),
                     created_at=data.get('created_at', None),
-                    listed_count=data.get('listed_count', None))
+                    listed_count=data.get('listed_count', None),
+                    email=data.get('email', None))
