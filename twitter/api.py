@@ -3459,11 +3459,12 @@ class Api(object):
         url = '%s/account/verify_credentials.json' % self.base_url
         data = {}
         if include_entities:
-            data['include_entities'] = str(include_entities)
+          data['include_entities'] = 1
         if skip_status:
-            data['skip_status'] = str(skip_status)
+          data['skip_status'] = 1
         if include_email:
-            data['include_email'] = str(include_email)
+          # TODO: not sure why but the twitter API needs string true, not a 1
+          data['include_email'] = 'true'
         json_data = self._RequestUrl(url, 'GET', data)  # No_cache
         data = self._ParseAndCheckTwitter(json_data.content)
 
