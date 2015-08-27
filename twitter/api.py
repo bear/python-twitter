@@ -100,7 +100,6 @@ class Api(object):
         >>> api.DestroyFriendship(user)
         >>> api.CreateFriendship(user)
         >>> api.LookupFriendship(user)
-        >>> api.GetUserByEmail(email)
         >>> api.VerifyCredentials()
     """
 
