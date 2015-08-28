@@ -2434,6 +2434,56 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json.content)
     return [List.NewFromJsonDict(x) for x in data]
 
+
+  def GetList(self,
+                list_id,
+                slug,
+                owner_id=None,
+                owner_screen_name=None):
+
+    '''Returns a single list, specified by the id parameter.
+
+    The twitter.Api instance must be authenticated.
+
+    Args:
+      list_id:
+        Specifies the ID of the list to retrieve.
+      slug:
+        The slug name for the list to retrieve. If you specify None for the
+        list_id, then you have to provide either a owner_screen_name or owner_id.
+        hashtags. [Optional]
+    Returns:
+      A twitter.List instance representing that list
+    '''
+    url = '%s/lists/show.json' % (self.base_url)
+
+    if not self.__auth:
+      raise TwitterError("API must be authenticated.")
+
+    parameters = { 'slug':    slug,
+                   'list_id': list_id,
+                 }
+    url = '%s/lists/show.json' % (self.base_url)
+
+    parameters['slug']    = slug
+    parameters['list_id'] = list_id
+
+    if list_id is None:
+      if slug is None:
+        raise TwitterError('list_id or slug required')
+      if owner_id is None and not owner_screen_name:
+        raise TwitterError('if list_id is not given you have to include an owner to help identify the proper list')
+
+    if owner_id:
+      parameters['owner_id'] = owner_id
+    if owner_screen_name:
+      parameters['owner_screen_name'] = owner_screen_name
+
+    json = self._RequestUrl(url, 'GET', data=parameters)
+    data = self._ParseAndCheckTwitter(json.content)
+    
+    return List.NewFromJsonDict(data)
+
   def GetListTimeline(self,
                       list_id,
                       slug,
