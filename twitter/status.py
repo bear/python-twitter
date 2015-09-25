@@ -400,6 +400,12 @@ class Status(object):
         return self.AsJsonString()
 
     def __repr__(self):
+      """A string representation of this twitter.Status instance.
+      The return value is the ID of status, username and datetime.
+      Returns:
+        A string representation of this twitter.Status instance with 
+        the ID of status, username and datetime.
+      """
       if self.user:
         representation = "Status(ID=%s, screen_name='%s', created_at='%s')" % (
         self.id, self.user.screen_name, self.created_at)
