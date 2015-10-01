@@ -3219,6 +3219,57 @@ class Api(object):
 
     return data    
 
+  def GetCollectionsEntries(self, id, count=None):
+    '''Fetch collections for a user.
+
+    The twitter.Api instance must be authenticated.
+
+    Args:
+      id:
+        The ID of Collection to return results for. 
+      count:
+        The amount of results to return per page. Defaults to 20. No more than
+        1000 results will ever be returned in a single page.
+        [Optional]
+
+    Returns:
+      A sequence of XXX instances, one for each list
+    '''
+    if not self.__auth:
+      raise TwitterError("twitter.Api instance must be authenticated")
+
+    url = '%s/collections/entries.json' % self.base_url
+    result = []
+    parameters = {}
+    if id is not None:
+      try:
+        parameters['id'] = id
+      except ValueError:
+        raise TwitterError('user_id must be an integer')
+    else:
+      raise TwitterError('Specify id')
+    if count is not None:
+      parameters['count'] = count
+
+    cursor = None
+    while True:
+      parameters['cursor'] = cursor
+      json = self._RequestUrl(url, 'GET', data=parameters)
+      data = self._ParseAndCheckTwitter(json.content)
+      
+      if data['response'].get('timeline', None):
+        result += [int(x['tweet']['id']) for x in data['response']['timeline']]
+        
+      if 'next_cursor' in data:
+        if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+          break
+        else:
+          cursor = data['next_cursor']
+      else:
+        break
+  
+    return result
+
   def AddToCollection(self, collection, tweet):
       '''Add tweet to collection
 
