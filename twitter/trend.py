@@ -13,7 +13,7 @@ class Trend(object):
         self.url = url
 
     def __repr__(self):
-        return self.name
+        return self.name.encode('utf-8')
 
     def __str__(self):
         return 'Name: %s\nQuery: %s\nTimestamp: %s\nSearch URL: %s\n' % (
