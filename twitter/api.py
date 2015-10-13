@@ -2056,7 +2056,14 @@ class Api(object):
         Returns:
           A twitter.User instance representing the befriended user.
         """
-        url = '%s/friendships/create.json' % (self.base_url)
+        return self._AddOrEditFriendship(user_id=user_id, screen_name=screen_name, follow=follow)
+    
+    def _AddOrEditFriendship(self, user_id=None, screen_name=None, uri_end='create', follow_key='follow', follow=True):
+        """
+        Shared method for Create/Update Friendship.
+
+        """
+        url = '%s/friendships/%s.json' % (self.base_url, uri_end)
         data = {}
         if user_id:
             data['user_id'] = user_id
@@ -2064,15 +2071,34 @@ class Api(object):
             data['screen_name'] = screen_name
         else:
             raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
-        if follow:
-            data['follow'] = 'true'
-        else:
-            data['follow'] = 'false'
+        follow_json = json.dumps(follow)
+        data['{}'.format(follow_key)] = follow_json
 
         json_data = self._RequestUrl(url, 'POST', data=data)
         data = self._ParseAndCheckTwitter(json_data.content)
 
         return User.NewFromJsonDict(data)
+
+    def UpdateFriendship(self, user_id=None, screen_name=None, follow=True, **kwargs):  # api compat with Create
+        """Updates a friendship with the user specified by the user_id or screen_name.
+    
+        The twitter.Api instance must be authenticated.
+    
+        Args:
+          user_id:
+            A user_id to update [Optional]
+          screen_name:
+            A screen_name to update [Optional]
+          follow:
+            Set to False to disable notifications for the target user
+          device:
+            Set to False to disable notifications for the target user
+    
+        Returns:
+          A twitter.User instance representing the befriended user.
+        """
+        follow = kwargs.get('device', follow)
+        return self._AddOrEditFriendship(user_id=user_id, screen_name=screen_name, follow=follow, follow_key='device', uri_end='update')
 
     def DestroyFriendship(self, user_id=None, screen_name=None):
         """Discontinues friendship with a user_id or screen_name.
