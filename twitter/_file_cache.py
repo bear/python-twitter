@@ -65,7 +65,7 @@ class _FileCache(object):
                    os.getenv('USERNAME') or \
                    os.getlogin() or \
                    'nobody'
-        except (AttributeError, IOError, OSError), e:
+        except (AttributeError, IOError, OSError) as e:
             return 'nobody'
 
     def _GetTmpCachePath(self):
@@ -79,7 +79,7 @@ class _FileCache(object):
         root_directory = os.path.abspath(root_directory)
         try:
             os.mkdir(root_directory)
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.EEXIST and os.path.isdir(root_directory):
                 # directory already exists
                 pass

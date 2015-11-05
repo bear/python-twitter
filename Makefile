@@ -28,7 +28,7 @@ lint:
 	flake8 twitter > violations.flake8.txt
 
 test:
-	python twitter_test.py
+	python test.py
 
 upload: clean
 	python setup.py sdist upload

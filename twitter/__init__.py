@@ -28,14 +28,14 @@ try:
 except ImportError:
     from md5 import md5
 
-from _file_cache import _FileCache
-from error import TwitterError
-from direct_message import DirectMessage
-from hashtag import Hashtag
-from parse_tweet import ParseTweet
-from trend import Trend
-from url import Url
-from status import Status
-from user import User, UserStatus
-from list import List
-from api import Api
+from ._file_cache import _FileCache
+from .error import TwitterError
+from .direct_message import DirectMessage
+from .hashtag import Hashtag
+from .parse_tweet import ParseTweet
+from .trend import Trend
+from .url import Url
+from .status import Status
+from .user import User, UserStatus
+from .list import List
+from .api import Api
