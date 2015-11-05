@@ -22,7 +22,6 @@ From source:
 
 Install the dependencies:
 
-- `SimpleJson <http://cheeseshop.python.org/pypi/simplejson>`_
 - `Requests OAuthlib <https://requests-oauthlib.readthedocs.org/en/latest/>`_
 - `HTTPLib2 <http://code.google.com/p/httplib2/>`_
 

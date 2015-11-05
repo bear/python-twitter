@@ -1,7 +1,7 @@
 from builtins import object
 #!/usr/bin/env python
 
-from twitter import simplejson, TwitterError, User
+from twitter import json, TwitterError, User
 
 
 class List(object):
@@ -38,7 +38,8 @@ class List(object):
         for (param, default) in param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
-    def GetId(self):
+    @property
+    def Id(self):
         """Get the unique id of this list.
 
         Returns:
@@ -46,19 +47,9 @@ class List(object):
         """
         return self._id
 
-    def SetId(self, id):
-        """Set the unique id of this list.
 
-        Args:
-          id:
-            The unique id of this list.
-        """
-        self._id = id
-
-    id = property(GetId, SetId,
-                  doc='The unique id of this list.')
-
-    def GetName(self):
+    @property
+    def Name(self):
         """Get the real name of this list.
 
         Returns:
@@ -66,19 +57,8 @@ class List(object):
         """
         return self._name
 
-    def SetName(self, name):
-        """Set the real name of this list.
-
-        Args:
-          name:
-            The real name of this list
-        """
-        self._name = name
-
-    name = property(GetName, SetName,
-                    doc='The real name of this list.')
-
-    def GetSlug(self):
+    @property
+    def Slug(self):
         """Get the slug of this list.
 
         Returns:
@@ -86,19 +66,8 @@ class List(object):
         """
         return self._slug
 
-    def SetSlug(self, slug):
-        """Set the slug of this list.
-
-        Args:
-          slug:
-            The slug of this list.
-        """
-        self._slug = slug
-
-    slug = property(GetSlug, SetSlug,
-                    doc='The slug of this list.')
-
-    def GetDescription(self):
+    @property
+    def Description(self):
         """Get the description of this list.
 
         Returns:
@@ -106,19 +75,8 @@ class List(object):
         """
         return self._description
 
-    def SetDescription(self, description):
-        """Set the description of this list.
-
-        Args:
-          description:
-            The description of this list.
-        """
-        self._description = description
-
-    description = property(GetDescription, SetDescription,
-                           doc='The description of this list.')
-
-    def GetFull_name(self):
+    @property
+    def Full_name(self):
         """Get the full_name of this list.
 
         Returns:
@@ -126,19 +84,8 @@ class List(object):
         """
         return self._full_name
 
-    def SetFull_name(self, full_name):
-        """Set the full_name of this list.
-
-        Args:
-          full_name:
-            The full_name of this list.
-        """
-        self._full_name = full_name
-
-    full_name = property(GetFull_name, SetFull_name,
-                         doc='The full_name of this list.')
-
-    def GetMode(self):
+    @property
+    def Mode(self):
         """Get the mode of this list.
 
         Returns:
@@ -146,19 +93,8 @@ class List(object):
         """
         return self._mode
 
-    def SetMode(self, mode):
-        """Set the mode of this list.
-
-        Args:
-          mode:
-            The mode of this list.
-        """
-        self._mode = mode
-
-    mode = property(GetMode, SetMode,
-                    doc='The mode of this list.')
-
-    def GetUri(self):
+    @property
+    def Uri(self):
         """Get the uri of this list.
 
         Returns:
@@ -166,19 +102,8 @@ class List(object):
         """
         return self._uri
 
-    def SetUri(self, uri):
-        """Set the uri of this list.
-
-        Args:
-          uri:
-            The uri of this list.
-        """
-        self._uri = uri
-
-    uri = property(GetUri, SetUri,
-                   doc='The uri of this list.')
-
-    def GetMember_count(self):
+    @property
+    def Member_count(self):
         """Get the member_count of this list.
 
         Returns:
@@ -186,19 +111,8 @@ class List(object):
         """
         return self._member_count
 
-    def SetMember_count(self, member_count):
-        """Set the member_count of this list.
-
-        Args:
-          member_count:
-            The member_count of this list.
-        """
-        self._member_count = member_count
-
-    member_count = property(GetMember_count, SetMember_count,
-                            doc='The member_count of this list.')
-
-    def GetSubscriber_count(self):
+    @property
+    def Subscriber_count(self):
         """Get the subscriber_count of this list.
 
         Returns:
@@ -206,19 +120,8 @@ class List(object):
         """
         return self._subscriber_count
 
-    def SetSubscriber_count(self, subscriber_count):
-        """Set the subscriber_count of this list.
-
-        Args:
-          subscriber_count:
-            The subscriber_count of this list.
-        """
-        self._subscriber_count = subscriber_count
-
-    subscriber_count = property(GetSubscriber_count, SetSubscriber_count,
-                                doc='The subscriber_count of this list.')
-
-    def GetFollowing(self):
+    @property
+    def Following(self):
         """Get the following status of this list.
 
         Returns:
@@ -226,37 +129,14 @@ class List(object):
         """
         return self._following
 
-    def SetFollowing(self, following):
-        """Set the following status of this list.
-
-        Args:
-          following:
-            The following of this list.
-        """
-        self._following = following
-
-    following = property(GetFollowing, SetFollowing,
-                         doc='The following status of this list.')
-
-    def GetUser(self):
+    @property
+    def User(self):
         """Get the user of this list.
 
         Returns:
           The owner of this list
         """
         return self._user
-
-    def SetUser(self, user):
-        """Set the user of this list.
-
-        Args:
-          user:
-            The owner of this list.
-        """
-        self._user = user
-
-    user = property(GetUser, SetUser,
-                    doc='The owner of this list.')
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -295,7 +175,7 @@ class List(object):
         Returns:
           A JSON string representation of this twitter.List instance
        """
-        return simplejson.dumps(self.AsDict(), sort_keys=True)
+        return json.dumps(self.AsDict(), sort_keys=True)
 
     def AsDict(self):
         """A dict representation of this twitter.List instance.

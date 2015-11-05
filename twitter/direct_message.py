@@ -9,7 +9,7 @@ try:
 except ImportError:
     from email.utils import parsedate
 
-from twitter import simplejson, TwitterError
+from twitter import json, TwitterError
 
 
 class DirectMessage(object):
@@ -66,119 +66,10 @@ class DirectMessage(object):
         self.recipient_screen_name = recipient_screen_name
         self.text = text
 
-    def GetId(self):
-        """Get the unique id of this direct message.
+    # Functions that you should be able to set.
 
-        Returns:
-          The unique id of this direct message
-        """
-        return self._id
-
-    def SetId(self, id):
-        """Set the unique id of this direct message.
-
-        Args:
-          id:
-            The unique id of this direct message
-        """
-        self._id = id
-
-    id = property(GetId, SetId,
-                  doc='The unique id of this direct message.')
-
-    def GetCreatedAt(self):
-        """Get the time this direct message was posted.
-
-        Returns:
-          The time this direct message was posted
-        """
-        return self._created_at
-
-    def SetCreatedAt(self, created_at):
-        """Set the time this direct message was posted.
-
-        Args:
-          created_at:
-            The time this direct message was created
-        """
-        self._created_at = created_at
-
-    created_at = property(GetCreatedAt, SetCreatedAt,
-                          doc='The time this direct message was posted.')
-
-    def GetCreatedAtInSeconds(self):
-        """Get the time this direct message was posted, in seconds since the epoch.
-
-        Returns:
-          The time this direct message was posted, in seconds since the epoch.
-        """
-        return timegm(parsedate(self.created_at))
-
-    created_at_in_seconds = property(GetCreatedAtInSeconds,
-                                     doc="The time this direct message was "
-                                         "posted, in seconds since the epoch")
-
-    def GetSenderId(self):
-        """Get the unique sender id of this direct message.
-
-        Returns:
-          The unique sender id of this direct message
-        """
-        return self._sender_id
-
-    def SetSenderId(self, sender_id):
-        """Set the unique sender id of this direct message.
-
-        Args:
-          sender_id:
-            The unique sender id of this direct message
-        """
-        self._sender_id = sender_id
-
-    sender_id = property(GetSenderId, SetSenderId,
-                         doc='The unique sender id of this direct message.')
-
-    def GetSenderScreenName(self):
-        """Get the unique sender screen name of this direct message.
-
-        Returns:
-          The unique sender screen name of this direct message
-        """
-        return self._sender_screen_name
-
-    def SetSenderScreenName(self, sender_screen_name):
-        """Set the unique sender screen name of this direct message.
-
-        Args:
-          sender_screen_name:
-            The unique sender screen name of this direct message
-        """
-        self._sender_screen_name = sender_screen_name
-
-    sender_screen_name = property(GetSenderScreenName, SetSenderScreenName,
-                                  doc='The unique sender screen name of this direct message.')
-
-    def GetRecipientId(self):
-        """Get the unique recipient id of this direct message.
-
-        Returns:
-          The unique recipient id of this direct message
-        """
-        return self._recipient_id
-
-    def SetRecipientId(self, recipient_id):
-        """Set the unique recipient id of this direct message.
-
-        Args:
-          recipient_id:
-            The unique recipient id of this direct message
-        """
-        self._recipient_id = recipient_id
-
-    recipient_id = property(GetRecipientId, SetRecipientId,
-                            doc='The unique recipient id of this direct message.')
-
-    def GetRecipientScreenName(self):
+    @property
+    def RecipientScreenName(self):
         """Get the unique recipient screen name of this direct message.
 
         Returns:
@@ -186,19 +77,12 @@ class DirectMessage(object):
         """
         return self._recipient_screen_name
 
-    def SetRecipientScreenName(self, recipient_screen_name):
-        """Set the unique recipient screen name of this direct message.
-
-        Args:
-          recipient_screen_name:
-            The unique recipient screen name of this direct message
-        """
+    @RecipientScreenName.setter
+    def RecipientScreenName(self, recipient_screen_name):
         self._recipient_screen_name = recipient_screen_name
 
-    recipient_screen_name = property(GetRecipientScreenName, SetRecipientScreenName,
-                                     doc='The unique recipient screen name of this direct message.')
-
-    def GetText(self):
+    @property
+    def Text(self):
         """Get the text of this direct message.
 
         Returns:
@@ -206,17 +90,70 @@ class DirectMessage(object):
         """
         return self._text
 
-    def SetText(self, text):
-        """Set the text of this direct message.
-
-        Args:
-          text:
-            The text of this direct message
-        """
+    @Text.setter
+    def Text(self, text):
         self._text = text
 
-    text = property(GetText, SetText,
-                    doc='The text of this direct message')
+    @property
+    def RecipientId(self):
+        """Get the unique recipient id of this direct message.
+
+        Returns:
+          The unique recipient id of this direct message
+        """
+        return self._recipient_id
+
+    @RecipientId.setter
+    def RecipientId(self, recipient_id):
+        self._recipient_id = recipient_id
+
+    # Functions that are only getters.
+
+    @property
+    def Id(self):
+        """Get the unique id of this direct message.
+
+        Returns:
+          The unique id of this direct message
+        """
+        return self._id
+
+    @property
+    def CreatedAt(self):
+        """Get the time this direct message was posted.
+
+        Returns:
+          The time this direct message was posted
+        """
+        return self._created_at
+
+    @property
+    def CreatedAtInSeconds(self):
+        """Get the time this direct message was posted, in seconds since the epoch.
+
+        Returns:
+          The time this direct message was posted, in seconds since the epoch.
+        """
+        return timegm(rfc822.parsedate(self.created_at))
+
+    @property
+    def SenderScreenName(self):
+        """Get the unique sender screen name of this direct message.
+
+        Returns:
+          The unique sender screen name of this direct message
+        """
+        return self._sender_screen_name
+
+    @property
+    def SenderId(self):
+        """Get the unique sender id of this direct message.
+
+        Returns:
+          The unique sender id of this direct message
+        """
+        return self._sender_id
+
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -250,7 +187,7 @@ class DirectMessage(object):
         Returns:
           A JSON string representation of this twitter.DirectMessage instance
        """
-        return simplejson.dumps(self.AsDict(), sort_keys=True)
+        return json.dumps(self.AsDict(), sort_keys=True)
 
     def AsDict(self):
         """A dict representation of this twitter.DirectMessage instance.

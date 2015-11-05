@@ -1,165 +1,213 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
     <title>Welcome to python-twitter’s documentation! &mdash; python-twitter 1.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
+
+    <link rel="stylesheet" href="_static/default.css" type="text/css"/>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css"/>
+
     <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT: './',
+            VERSION: '1.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE: true
+        };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="python-twitter 1.0 documentation" href="#" /> 
-  </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
+    <link rel="top" title="python-twitter 1.0 documentation" href="#"/>
+</head>
+<body>
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li><a href="#">python-twitter 1.0 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+            <a href="genindex.html" title="General Index"
+               accesskey="I">index</a></li>
+        <li><a href="#">python-twitter 1.0 documentation</a> &raquo;</li>
+    </ul>
+</div>
 
-    <div class="document">
-      <div class="documentwrapper">
+<div class="document">
+    <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
-            
-  <div class="section" id="welcome-to-python-twitter-s-documentation">
-<h1>Welcome to python-twitter&#8217;s documentation!<a class="headerlink" href="#welcome-to-python-twitter-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p><strong>A Python wrapper around the Twitter API.</strong></p>
-<p>Author: The Python-Twitter Developers &lt;<a class="reference external" href="mailto:python-twitter&#37;&#52;&#48;googlegroups&#46;com">python-twitter<span>&#64;</span>googlegroups<span>&#46;</span>com</a>&gt;</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>This library provides a pure Python interface for the <a class="reference external" href="https://dev.twitter.com/">Twitter API</a>. It works with Python versions from 2.5 to 2.7. Python 3 support is under development.</p>
-<p><a class="reference external" href="http://twitter.com">Twitter</a> provides a service that allows people to connect via the web, IM, and SMS. Twitter exposes a <a class="reference external" href="http://dev.twitter.com/doc">web services API</a> and this library is intended to make it even easier for Python programmers to use.</p>
-</div>
-<div class="section" id="building">
-<h2>Building<a class="headerlink" href="#building" title="Permalink to this headline">¶</a></h2>
-<p>From source:</p>
-<p>Install the dependencies:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://cheeseshop.python.org/pypi/simplejson">SimpleJson</a></li>
-<li><a class="reference external" href="https://requests-oauthlib.readthedocs.org/en/latest/">Requests OAuthlib</a></li>
-<li><a class="reference external" href="http://code.google.com/p/httplib2/">HTTPLib2</a></li>
-</ul>
-<p>This branch is currently in development to replace the OAuth and HTTPLib2 libarays with the following:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://docs.python-requests.org/en/latest/">Requests</a></li>
-</ul>
-<p>Alternatively use <cite>pip</cite>:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ pip install -r requirements.txt
-</pre></div>
-</div>
-<p>Download the latest <cite>python-twitter</cite> library from: <a class="reference external" href="http://code.google.com/p/python-twitter/">http://code.google.com/p/python-twitter/</a></p>
-<p>Extract the source distribution and run:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ python setup.py build
+            <div class="body">
+
+                <div class="section" id="welcome-to-python-twitter-s-documentation">
+                    <h1>Welcome to python-twitter&#8217;s documentation!<a class="headerlink"
+                                                                           href="#welcome-to-python-twitter-s-documentation"
+                                                                           title="Permalink to this headline">¶</a></h1>
+
+                    <p><strong>A Python wrapper around the Twitter API.</strong></p>
+
+                    <p>Author: The Python-Twitter Developers &lt;<a class="reference external"
+                                                                    href="mailto:python-twitter&#37;&#52;&#48;googlegroups&#46;com">python-twitter<span>&#64;</span>googlegroups<span>&#46;</span>com</a>&gt;
+                    </p>
+
+                    <div class="section" id="introduction">
+                        <h2>Introduction<a class="headerlink" href="#introduction"
+                                           title="Permalink to this headline">¶</a></h2>
+
+                        <p>This library provides a pure Python interface for the <a class="reference external"
+                                                                                    href="https://dev.twitter.com/">Twitter
+                            API</a>. It works with Python versions from 2.5 to 2.7. Python 3 support is under
+                            development.</p>
+
+                        <p><a class="reference external" href="http://twitter.com">Twitter</a> provides a service that
+                            allows people to connect via the web, IM, and SMS. Twitter exposes a <a
+                                    class="reference external" href="http://dev.twitter.com/doc">web services API</a>
+                            and this library is intended to make it even easier for Python programmers to use.</p>
+                    </div>
+                    <div class="section" id="building">
+                        <h2>Building<a class="headerlink" href="#building" title="Permalink to this headline">¶</a></h2>
+
+                        <p>From source:</p>
+
+                        <p>Install the dependencies:</p>
+                        <ul class="simple">
+                            <li><a class="reference external"
+                                   href="https://requests-oauthlib.readthedocs.org/en/latest/">Requests OAuthlib</a>
+                            </li>
+                            <li><a class="reference external" href="http://code.google.com/p/httplib2/">HTTPLib2</a>
+                            </li>
+                        </ul>
+                        <p>This branch is currently in development to replace the OAuth and HTTPLib2 libarays with the
+                            following:</p>
+                        <ul class="simple">
+                            <li><a class="reference external"
+                                   href="http://docs.python-requests.org/en/latest/">Requests</a></li>
+                        </ul>
+                        <p>Alternatively use <cite>pip</cite>:</p>
+
+                        <div class="highlight-python">
+                            <div class="highlight"><pre>$ pip install -r requirements.txt
+</pre>
+                            </div>
+                        </div>
+                        <p>Download the latest <cite>python-twitter</cite> library from: <a class="reference external"
+                                                                                            href="http://code.google.com/p/python-twitter/">http://code.google.com/p/python-twitter/</a>
+                        </p>
+
+                        <p>Extract the source distribution and run:</p>
+
+                        <div class="highlight-python">
+                            <div class="highlight"><pre>$ python setup.py build
 $ python setup.py install
-</pre></div>
-</div>
-</div>
-<div class="section" id="testing">
-<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
-<p>With setuptools installed:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ python setup.py test
-</pre></div>
-</div>
-<p>Without setuptools installed:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ python twitter_test.py
-</pre></div>
-</div>
-</div>
-<div class="section" id="getting-the-code">
-<h2>Getting the code<a class="headerlink" href="#getting-the-code" title="Permalink to this headline">¶</a></h2>
-<p>The code is hosted at <a class="reference external" href="https://github.com/bear/python-twitter">Github</a>.</p>
-<p>Check out the latest development version anonymously with:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ git clone git://github.com/bear/python-twitter.git
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section" id="testing">
+                        <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+
+                        <p>With setuptools installed:</p>
+
+                        <div class="highlight-python">
+                            <div class="highlight"><pre>$ python setup.py test
+</pre>
+                            </div>
+                        </div>
+                        <p>Without setuptools installed:</p>
+
+                        <div class="highlight-python">
+                            <div class="highlight"><pre>$ python twitter_test.py
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section" id="getting-the-code">
+                        <h2>Getting the code<a class="headerlink" href="#getting-the-code"
+                                               title="Permalink to this headline">¶</a></h2>
+
+                        <p>The code is hosted at <a class="reference external"
+                                                    href="https://github.com/bear/python-twitter">Github</a>.</p>
+
+                        <p>Check out the latest development version anonymously with:</p>
+
+                        <div class="highlight-python">
+                            <div class="highlight"><pre>$ git clone git://github.com/bear/python-twitter.git
 $ cd python-twitter
-</pre></div>
-</div>
-<div class="toctree-wrapper compound">
-<ul class="simple">
-</ul>
-</div>
-</div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
-<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
-<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
-</ul>
-</div>
+</pre>
+                            </div>
+                        </div>
+                        <div class="toctree-wrapper compound">
+                            <ul class="simple">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="section" id="indices-and-tables">
+                    <h1>Indices and tables<a class="headerlink" href="#indices-and-tables"
+                                             title="Permalink to this headline">¶</a></h1>
+                    <ul class="simple">
+                        <li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+                        <li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+                        <li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+                    </ul>
+                </div>
 
 
-          </div>
+            </div>
         </div>
-      </div>
-      <div class="sphinxsidebar">
+    </div>
+    <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Welcome to python-twitter&#8217;s documentation!</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#building">Building</a></li>
-<li><a class="reference internal" href="#testing">Testing</a></li>
-<li><a class="reference internal" href="#getting-the-code">Getting the code</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
+            <h3><a href="#">Table Of Contents</a></h3>
+            <ul>
+                <li><a class="reference internal" href="#">Welcome to python-twitter&#8217;s documentation!</a>
+                    <ul>
+                        <li><a class="reference internal" href="#introduction">Introduction</a></li>
+                        <li><a class="reference internal" href="#building">Building</a></li>
+                        <li><a class="reference internal" href="#testing">Testing</a></li>
+                        <li><a class="reference internal" href="#getting-the-code">Getting the code</a></li>
+                    </ul>
+                </li>
+                <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+            </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/index.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+                <li><a href="_sources/index.txt"
+                       rel="nofollow">Show Source</a></li>
+            </ul>
+            <div id="searchbox" style="display: none">
+                <h3>Quick search</h3>
+
+                <form class="search" action="search.html" method="get">
+                    <input type="text" name="q"/>
+                    <input type="submit" value="Go"/>
+                    <input type="hidden" name="check_keywords" value="yes"/>
+                    <input type="hidden" name="area" value="default"/>
+                </form>
+                <p class="searchtip" style="font-size: 90%">
+                    Enter search terms or a module, class or function name.
+                </p>
+            </div>
+            <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
-      </div>
-      <div class="clearer"></div>
     </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
+    <div class="clearer"></div>
+</div>
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li><a href="#">python-twitter 1.0 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2013, python-twitter@googlegroups.com.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
-    </div>
-  </body>
+            <a href="genindex.html" title="General Index"
+                    >index</a></li>
+        <li><a href="#">python-twitter 1.0 documentation</a> &raquo;</li>
+    </ul>
+</div>
+<div class="footer">
+    &copy; Copyright 2013, python-twitter@googlegroups.com.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+</div>
+</body>
 </html>

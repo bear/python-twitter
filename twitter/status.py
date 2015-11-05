@@ -12,7 +12,7 @@ except ImportError:
 
 import time
 
-from twitter import simplejson, Hashtag, TwitterError, Url
+from twitter import json, Hashtag, TwitterError, Url
 
 
 class Status(object):
@@ -131,173 +131,10 @@ class Status(object):
         for (param, default) in param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
-    def GetCreatedAt(self):
-        """Get the time this status message was posted.
+    # Properties that you should be able to set yourself.
 
-        Returns:
-          The time this status message was posted
-        """
-        return self._created_at
-
-    def SetCreatedAt(self, created_at):
-        """Set the time this status message was posted.
-
-        Args:
-          created_at:
-            The time this status message was created
-        """
-        self._created_at = created_at
-
-    created_at = property(GetCreatedAt, SetCreatedAt,
-                          doc='The time this status message was posted.')
-
-    def GetCreatedAtInSeconds(self):
-        """Get the time this status message was posted, in seconds since the epoch.
-
-        Returns:
-          The time this status message was posted, in seconds since the epoch.
-        """
-        return timegm(parsedate(self.created_at))
-
-    created_at_in_seconds = property(GetCreatedAtInSeconds,
-                                     doc="The time this status message was "
-                                         "posted, in seconds since the epoch")
-
-    def GetFavorited(self):
-        """Get the favorited setting of this status message.
-
-        Returns:
-          True if this status message is favorited; False otherwise
-        """
-        return self._favorited
-
-    def SetFavorited(self, favorited):
-        """Set the favorited state of this status message.
-
-        Args:
-          favorited:
-            boolean True/False favorited state of this status message
-        """
-        self._favorited = favorited
-
-    favorited = property(GetFavorited, SetFavorited,
-                         doc='The favorited state of this status message.')
-
-    def GetFavoriteCount(self):
-        """Get the favorite count of this status message.
-
-        Returns:
-          number of times this status message has been favorited
-        """
-        return self._favorite_count
-
-    def SetFavoriteCount(self, favorite_count):
-        """Set the favorited state of this status message.
-
-        Args:
-          favorite_count:
-            int number of favorites for this status message
-        """
-        self._favorite_count = favorite_count
-
-    favorite_count = property(GetFavoriteCount, SetFavoriteCount,
-                              doc='The number of favorites for this status message.')
-
-    def GetId(self):
-        """Get the unique id of this status message.
-
-        Returns:
-          The unique id of this status message
-        """
-        return self._id
-
-    def SetId(self, id):
-        """Set the unique id of this status message.
-
-        Args:
-          id:
-            The unique id of this status message
-        """
-        self._id = id
-
-    id = property(GetId, SetId,
-                  doc='The unique id of this status message.')
-
-    def GetIdStr(self):
-        """Get the unique id_str of this status message.
-
-        Returns:
-          The unique id_str of this status message
-        """
-        return self._id_str
-
-    def SetIdStr(self, id_str):
-        """Set the unique id_str of this status message.
-
-        Args:
-          id:
-            The unique id_str of this status message
-        """
-        self._id_str = id_str
-
-    id_str = property(GetIdStr, SetIdStr,
-                      doc='The unique id_str of this status message.')
-
-    def GetInReplyToScreenName(self):
-        return self._in_reply_to_screen_name
-
-    def SetInReplyToScreenName(self, in_reply_to_screen_name):
-        self._in_reply_to_screen_name = in_reply_to_screen_name
-
-    in_reply_to_screen_name = property(GetInReplyToScreenName, SetInReplyToScreenName,
-                                       doc='')
-
-    def GetInReplyToUserId(self):
-        return self._in_reply_to_user_id
-
-    def SetInReplyToUserId(self, in_reply_to_user_id):
-        self._in_reply_to_user_id = in_reply_to_user_id
-
-    in_reply_to_user_id = property(GetInReplyToUserId, SetInReplyToUserId,
-                                   doc='')
-
-    def GetInReplyToStatusId(self):
-        return self._in_reply_to_status_id
-
-    def SetInReplyToStatusId(self, in_reply_to_status_id):
-        self._in_reply_to_status_id = in_reply_to_status_id
-
-    in_reply_to_status_id = property(GetInReplyToStatusId, SetInReplyToStatusId,
-                                     doc='')
-
-    def GetTruncated(self):
-        return self._truncated
-
-    def SetTruncated(self, truncated):
-        self._truncated = truncated
-
-    truncated = property(GetTruncated, SetTruncated,
-                         doc='')
-
-    def GetRetweeted(self):
-        return self._retweeted
-
-    def SetRetweeted(self, retweeted):
-        self._retweeted = retweeted
-
-    retweeted = property(GetRetweeted, SetRetweeted,
-                         doc='')
-
-    def GetSource(self):
-        return self._source
-
-    def SetSource(self, source):
-        self._source = source
-
-    source = property(GetSource, SetSource,
-                      doc='')
-
-    def GetText(self):
+    @property
+    def Text(self):
         """Get the text of this status message.
 
         Returns:
@@ -305,19 +142,148 @@ class Status(object):
         """
         return self._text
 
-    def SetText(self, text):
-        """Set the text of this status message.
-
-        Args:
-          text:
-            The text of this status message
-        """
+    @Text.setter
+    def Text(self, text):
         self._text = text
 
-    text = property(GetText, SetText,
-                    doc='The text of this status message')
+    @property
+    def InReplyToStatusId(self):
+        return self._in_reply_to_status_id
 
-    def GetLang(self):
+    @InReplyToStatusId.setter
+    def InReplyToStatusId(self, in_reply_to_status_id):
+        self._in_reply_to_status_id = in_reply_to_status_id
+
+    @property
+    def Possibly_sensitive(self):
+        return self._possibly_sensitive
+
+    @Possibly_sensitive.setter
+    def Possibly_sensitive(self, possibly_sensitive):
+        self._possibly_sensitive = possibly_sensitive
+
+    @property
+    def Place(self):
+        return self._place
+
+    @Place.setter
+    def Place(self, place):
+        self._place = place
+
+    @property
+    def Coordinates(self):
+        return self._coordinates
+
+    @Coordinates.setter
+    def Coordinates(self, coordinates):
+        self._coordinates = coordinates
+
+    # Missing the following, media_ids, trim_user, display_coordinates,
+    # lat and long
+
+    @property
+    def CreatedAt(self):
+        """Get the time this status message was posted.
+
+        Returns:
+          The time this status message was posted
+        """
+        return self._created_at
+
+    @property
+    def CreatedAtInSeconds(self):
+        """Get the time this status message was posted, in seconds since the epoch.
+
+        Returns:
+          The time this status message was posted, in seconds since the epoch.
+        """
+        return timegm(parsedate(self.created_at))
+
+    @property
+    def RelativeCreatedAt(self):
+        """Get a human readable string representing the posting time
+
+        Returns:
+          A human readable string representing the posting time
+        """
+        fudge = 1.25
+        delta = long(self.now) - long(self.CreatedAtInSeconds)
+
+        if delta < (1 * fudge):
+            return 'about a second ago'
+        elif delta < (60 * (1 / fudge)):
+            return 'about %d seconds ago' % (delta)
+        elif delta < (60 * fudge):
+            return 'about a minute ago'
+        elif delta < (60 * 60 * (1 / fudge)):
+            return 'about %d minutes ago' % (delta / 60)
+        elif delta < (60 * 60 * fudge) or delta / (60 * 60) == 1:
+            return 'about an hour ago'
+        elif delta < (60 * 60 * 24 * (1 / fudge)):
+            return 'about %d hours ago' % (delta / (60 * 60))
+        elif delta < (60 * 60 * 24 * fudge) or delta / (60 * 60 * 24) == 1:
+            return 'about a day ago'
+        else:
+            return 'about %d days ago' % (delta / (60 * 60 * 24))
+
+    @property
+    def Favorited(self):
+        """Get the favorited setting of this status message.
+
+        Returns:
+          True if this status message is favorited; False otherwise
+        """
+        return self._favorited
+
+    @property
+    def FavoriteCount(self):
+        """Get the favorite count of this status message.
+
+        Returns:
+          number of times this status message has been favorited
+        """
+        return self._favorite_count
+
+    @property
+    def Id(self):
+        """Get the unique id of this status message.
+
+        Returns:
+          The unique id of this status message
+        """
+        return self._id
+
+    @property
+    def IdStr(self):
+        """Get the unique id_str of this status message.
+
+        Returns:
+          The unique id_str of this status message
+        """
+        return self._id_str
+
+    @property
+    def InReplyToScreenName(self):
+        return self._in_reply_to_screen_name
+
+    @property
+    def InReplyToUserId(self):
+        return self._in_reply_to_user_id
+
+    @property
+    def Truncated(self):
+        return self._truncated
+
+    @property
+    def Retweeted(self):
+        return self._retweeted
+
+    @property
+    def Source(self):
+        return self._source
+
+    @property
+    def Lang(self):
         """Get the machine-detected language of this status message
 
         Returns:
@@ -325,14 +291,8 @@ class Status(object):
         """
         return self._lang
 
-    """
-    don't think that there will be a Setter....
-    def SetLang(selfm lang):
-        self._lang = lang
-
-    """
-
-    def GetLocation(self):
+    @property
+    def Location(self):
         """Get the geolocation associated with this status message
 
         Returns:
@@ -382,7 +342,8 @@ class Status(object):
                                    doc='Get a human readable string representing '
                                        'the posting time')
 
-    def GetUser(self):
+    @property
+    def User(self):
         """Get a twitter.User representing the entity posting this status message.
 
         Returns:
@@ -390,20 +351,8 @@ class Status(object):
         """
         return self._user
 
-    def SetUser(self, user):
-        """Set a twitter.User representing the entity posting this status message.
-
-        Args:
-          user:
-            A twitter.User representing the entity posting this status message
-        """
-        self._user = user
-
-    user = property(GetUser, SetUser,
-                    doc='A twitter.User representing the entity posting this '
-                        'status message')
-
-    def GetNow(self):
+    @property
+    def Now(self):
         """Get the wallclock time for this status message.
 
         Used to calculate relative_created_at.  Defaults to the time
@@ -417,127 +366,45 @@ class Status(object):
             self._now = time.time()
         return self._now
 
-    def SetNow(self, now):
-        """Set the wallclock time for this status message.
-
-        Used to calculate relative_created_at.  Defaults to the time
-        the object was instantiated.
-
-        Args:
-          now:
-            The wallclock time for this instance.
-        """
+    @Now.setter
+    def Now(self, now):
         self._now = now
 
-    now = property(GetNow, SetNow,
-                   doc='The wallclock time for this status instance.')
-
-    def GetGeo(self):
+    @property
+    def Geo(self):
         return self._geo
 
-    def SetGeo(self, geo):
-        self._geo = geo
-
-    geo = property(GetGeo, SetGeo,
-                   doc='')
-
-    def GetPlace(self):
-        return self._place
-
-    def SetPlace(self, place):
-        self._place = place
-
-    place = property(GetPlace, SetPlace,
-                     doc='')
-
-    def GetCoordinates(self):
-        return self._coordinates
-
-    def SetCoordinates(self, coordinates):
-        self._coordinates = coordinates
-
-    coordinates = property(GetCoordinates, SetCoordinates,
-                           doc='')
-
-    def GetContributors(self):
+    @property
+    def Contributors(self):
         return self._contributors
 
-    def SetContributors(self, contributors):
-        self._contributors = contributors
-
-    contributors = property(GetContributors, SetContributors,
-                            doc='')
-
-    def GetRetweeted_status(self):
+    @property
+    def Retweeted_status(self):
         return self._retweeted_status
 
-    def SetRetweeted_status(self, retweeted_status):
-        self._retweeted_status = retweeted_status
-
-    retweeted_status = property(GetRetweeted_status, SetRetweeted_status,
-                                doc='')
-
-    def GetRetweetCount(self):
+    @property
+    def RetweetCount(self):
         return self._retweet_count
 
-    def SetRetweetCount(self, retweet_count):
-        self._retweet_count = retweet_count
-
-    retweet_count = property(GetRetweetCount, SetRetweetCount,
-                             doc='')
-
-    def GetCurrent_user_retweet(self):
+    @property
+    def Current_user_retweet(self):
         return self._current_user_retweet
 
-    def SetCurrent_user_retweet(self, current_user_retweet):
-        self._current_user_retweet = current_user_retweet
-
-    current_user_retweet = property(GetCurrent_user_retweet, SetCurrent_user_retweet,
-                                    doc='')
-
-    def GetPossibly_sensitive(self):
-        return self._possibly_sensitive
-
-    def SetPossibly_sensitive(self, possibly_sensitive):
-        self._possibly_sensitive = possibly_sensitive
-
-    possibly_sensitive = property(GetPossibly_sensitive, SetPossibly_sensitive,
-                                  doc='')
-
-    def GetScopes(self):
+    @property
+    def Scopes(self):
         return self._scopes
 
-    def SetScopes(self, scopes):
-        self._scopes = scopes
-
-    scopes = property(GetScopes, SetScopes, doc='')
-
-    def GetWithheld_copyright(self):
+    @property
+    def Withheld_copyright(self):
         return self._withheld_copyright
 
-    def SetWithheld_copyright(self, withheld_copyright):
-        self._withheld_copyright = withheld_copyright
-
-    withheld_copyright = property(GetWithheld_copyright, SetWithheld_copyright,
-                                  doc='')
-
-    def GetWithheld_in_countries(self):
+    @property
+    def Withheld_in_countries(self):
         return self._withheld_in_countries
 
-    def SetWithheld_in_countries(self, withheld_in_countries):
-        self._withheld_in_countries = withheld_in_countries
-
-    withheld_in_countries = property(GetWithheld_in_countries, SetWithheld_in_countries,
-                                     doc='')
-
-    def GetWithheld_scope(self):
+    @property
+    def Withheld_scope(self):
         return self._withheld_scope
-
-    def SetWithheld_scope(self, withheld_scope):
-        self._withheld_scope = withheld_scope
-
-    withheld_scope = property(GetWithheld_scope, SetWithheld_scope,
-                              doc='')
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -575,7 +442,6 @@ class Status(object):
 
     def __str__(self):
         """A string representation of this twitter.Status instance.
-
         The return value is the same as the JSON string representation.
 
         Returns:
@@ -583,20 +449,33 @@ class Status(object):
         """
         return self.AsJsonString()
 
+    def __repr__(self):
+      """A string representation of this twitter.Status instance.
+      The return value is the ID of status, username and datetime.
+      Returns:
+        A string representation of this twitter.Status instance with 
+        the ID of status, username and datetime.
+      """
+      if self.user:
+        representation = "Status(ID=%s, screen_name='%s', created_at='%s')" % (
+        self.id, self.user.screen_name, self.created_at)
+      else:
+        representation = "Status(ID=%s,  created_at='%s')" % (
+        self.id, self.created_at)
+      return representation
+
     def AsJsonString(self, allow_non_ascii=False):
         """A JSON string representation of this twitter.Status instance.
-
         To output non-ascii, set keyword allow_non_ascii=True.
 
         Returns:
           A JSON string representation of this twitter.Status instance
        """
-        return simplejson.dumps(self.AsDict(), sort_keys=True,
-                                ensure_ascii=not allow_non_ascii)
+        return json.dumps(self.AsDict(), sort_keys=True,
+                          ensure_ascii=not allow_non_ascii)
 
     def AsDict(self):
         """A dict representation of this twitter.Status instance.
-
         The return value uses the same key names as the JSON representation.
 
         Return:

@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,10 +20,12 @@ import os
 
 from setuptools import setup, find_packages
 
+
 def read(*paths):
     """Build a file path from *paths* and return the contents."""
     with open(os.path.join(*paths), 'r') as f:
         return f.read()
+
 
 setup(
     name='python-twitter',
@@ -38,7 +40,7 @@ setup(
                       read('AUTHORS.rst') + '\n\n' +
                       read('CHANGES')),
     packages=find_packages(exclude=['tests*']),
-    install_requires = ['requests', 'requests-oauthlib'],
+    install_requires=['requests', 'requests-oauthlib'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',

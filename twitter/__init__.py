@@ -22,7 +22,7 @@ from __future__ import absolute_import
 __author__ = 'python-twitter@googlegroups.com'
 __version__ = '2.3'
 
-import json as simplejson
+import json
 
 try:
     from hashlib import md5

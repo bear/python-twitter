@@ -1,9 +1,11 @@
 from builtins import object
 #!/usr/bin/env python
-from hashlib import md5
+import errno
 import os
 import re
 import tempfile
+
+from hashlib import md5
 
 
 class _FileCacheError(Exception):
@@ -77,11 +79,15 @@ class _FileCache(object):
         if not root_directory:
             root_directory = self._GetTmpCachePath()
         root_directory = os.path.abspath(root_directory)
-        if not os.path.exists(root_directory):
+        try:
             os.mkdir(root_directory)
-        if not os.path.isdir(root_directory):
-            raise _FileCacheError('%s exists but is not a directory' %
-                                  root_directory)
+        except OSError, e:
+            if e.errno == errno.EEXIST and os.path.isdir(root_directory):
+                # directory already exists
+                pass
+            else:
+                # exists but is a file, or no permissions, or...
+                raise
         self._root_directory = root_directory
 
     def _GetPath(self, key):
