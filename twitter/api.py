@@ -265,6 +265,7 @@ class Api(object):
 
     def GetSearch(self,
                   term=None,
+                  who=None,
                   geocode=None,
                   since_id=None,
                   max_id=None,
@@ -280,6 +281,8 @@ class Api(object):
         Args:
           term:
             Term to search by. Optional if you include geocode.
+          who:
+            Handle of user's tweets you want. Optional.
           since_id:
             Returns results with an ID greater than (that is, more recent
             than) the specified ID. There are limits to the number of
@@ -348,11 +351,14 @@ class Api(object):
         if locale:
             parameters['locale'] = locale
 
-        if term is None and geocode is None:
+        if term is None and geocode is None and who is None:
             return []
 
         if term is not None:
             parameters['q'] = term
+
+        if who is not None:
+            parameters['q'] = "from:%s" % (who)
 
         if geocode is not None:
             parameters['geocode'] = ','.join(map(str, geocode))
