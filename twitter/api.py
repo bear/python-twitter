@@ -20,13 +20,10 @@
 """A library that provides a Python interface to the Twitter API"""
 from __future__ import division
 from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
 from builtins import map
 from builtins import str
 from builtins import range
 from builtins import object
-from past.utils import old_div
 
 import base64
 from calendar import timegm
