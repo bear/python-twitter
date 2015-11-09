@@ -491,6 +491,24 @@ class Api(object):
             categories.append(Category.NewFromJsonDict(category))
         return categories
 
+    def GetUserSuggestion(self, category):
+        """ Returns a list of users in a category
+        Args:
+            category:
+                The Category object to limit the search by
+        Returns:
+            A list of users in that category
+        """
+        url = '%s/users/suggestions/%s.json' % (self.base_url, category.Slug)
+
+        json_data = self._RequestUrl(url, verb='GET')
+        data = self._ParseAndCheckTwitter(json_data.content)
+
+        users = []
+        for user in data.users:
+            users.append(User.NewFromJsonDict(user))
+        return users
+
     def GetHomeTimeline(self,
                         count=None,
                         since_id=None,
