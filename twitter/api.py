@@ -505,7 +505,7 @@ class Api(object):
         data = self._ParseAndCheckTwitter(json_data.content)
 
         users = []
-        for user in data.users:
+        for user in data['users']:
             users.append(User.NewFromJsonDict(user))
         return users
 
