@@ -19,7 +19,7 @@
 """A library that provides a Python interface to the Twitter API"""
 
 __author__ = 'python-twitter@googlegroups.com'
-__version__ = '2.3'
+__version__ = '2.3.1'
 
 import json
 
@@ -37,5 +37,6 @@ from .trend import Trend
 from .url import Url
 from .status import Status
 from .user import User, UserStatus
+from .category import Category
 from .list import List
 from .api import Api
