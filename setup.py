@@ -29,7 +29,7 @@ def read(*paths):
 
 setup(
     name='python-twitter',
-    version='2.3.1',
+    version='2.3',
     author='The Python-Twitter Developers',
     author_email='python-twitter@googlegroups.com',
     license='Apache License 2.0',
