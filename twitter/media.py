@@ -26,6 +26,7 @@ class Media(object):
             'media_url_https': None,
             'media_url': None,
             'type': None,
+            'variants': None
         }
 
         for (param, default) in param_defaults.iteritems():
@@ -51,6 +52,10 @@ class Media(object):
     def Type(self):
         return self.type or False
 
+    @property
+    def Variants(self):
+        return self.variants or False
+
     def __eq__(self, other):
         return other.Media_url == self.Media_url and other.Type == self.Type
 
@@ -64,12 +69,17 @@ class Media(object):
         Args:
           data: A JSON dict, as converted from the JSON in the twitter API
         Returns:
-          A twitter.Category instance
+          A twitter.Media instance
         """
+        variants = None
+        if 'video_info' in data:
+            variants = data['video_info']['variants']
+
         return Media(expanded_url=data.get('expanded_url', None),
                      display_url=data.get('display_url', None),
                      url=data.get('url', None),
                      media_url_https=data.get('media_url_https', None),
                      media_url=data.get('media_url', None),
                      type=data.get('type', None),
+                     variants=variants
                      )
