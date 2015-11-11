@@ -62,6 +62,32 @@ class Media(object):
     def __hash__(self):
         return hash((self.Media_url, self.Type))
 
+    def AsDict(self):
+        """A dict representation of this twitter.Media instance.
+
+        The return value uses the same key names as the JSON representation.
+
+        Return:
+          A dict representing this twitter.Media instance
+        """
+        data = {}
+        if self.expanded_url:
+            data['expanded_url'] = self.expanded_url
+        if self.display_url:
+            data['display_url'] = self.display_url
+        if self.url:
+            data['url'] = self.url
+        if self.media_url_https:
+            data['media_url_https'] = self.media_url_https
+        if self.media_url:
+            data['media_url'] = self.media_url
+        if self.type:
+            data['type'] = self.type
+        if self.variants:
+            data['variants'] = self.variants
+        return data
+
+
     @staticmethod
     def NewFromJsonDict(data):
         """Create a new instance based on a JSON dict.
