@@ -1,4 +1,3 @@
-from builtins import object
 #!/usr/bin/env python
 
 from twitter import json, TwitterError  # TwitterError not used

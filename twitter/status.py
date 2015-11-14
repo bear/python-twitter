@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from __future__ import division
-from builtins import object
 from calendar import timegm
 
 try:

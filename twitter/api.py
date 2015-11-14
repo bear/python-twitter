@@ -20,10 +20,6 @@
 """A library that provides a Python interface to the Twitter API"""
 from __future__ import division
 from __future__ import print_function
-from builtins import map
-from builtins import str
-from builtins import range
-from builtins import object
 
 import base64
 from calendar import timegm
@@ -33,23 +29,24 @@ import gzip
 import sys
 import textwrap
 import types
-import urllib.request
-import urllib.error
-import urllib.parse
 import requests
 from requests_oauthlib import OAuth1
 import io
 
+try:
+  #python 3
+  from urllib.parse import urlparse, urlunparse, urlencode
+  from urllib.request import urlopen
+  from urllib.request import __version__ as urllib_version
+except ImportError:
+  from urlparse import urlparse, urlunparse
+  from urllib2 import urlopen
+  from urllib import urlencode
+  from urllib import __version__ as urllib_version
+
 from twitter import (__version__, _FileCache, json, DirectMessage, List,
                      Status, Trend, TwitterError, User, UserStatus)
 from twitter.category import Category
-
-try:
-  # python 3
-  urllib_version = urllib.request.__version__
-except AttributeError:
-  # python 2
-  urllib_version = urllib.__version__
 
 CHARACTER_LIMIT = 140
 
@@ -995,7 +992,7 @@ class Api(object):
         data = {'status': status}
         if not hasattr(media, 'read'):
             if media.startswith('http'):
-                data['media'] = urllib.request.urlopen(media).read()
+                data['media'] = urlopen(media).read()
             else:
                 with open(str(media), 'rb') as f:
                     data['media'] = f.read()
@@ -1068,7 +1065,7 @@ class Api(object):
             data = {}
             if not hasattr(media[m], 'read'):
                 if media[m].startswith('http'):
-                    data['media'] = urllib.request.urlopen(media[m]).read()
+                    data['media'] = urlopen(media[m]).read()
                 else:
                     data['media'] = open(str(media[m]), 'rb').read()
             else:
@@ -3679,7 +3676,7 @@ class Api(object):
 
     def _BuildUrl(self, url, path_elements=None, extra_params=None):
         # Break url into constituent parts
-        (scheme, netloc, path, params, query, fragment) = urllib.parse.urlparse(url)
+        (scheme, netloc, path, params, query, fragment) = urlparse(url)
 
         # Add any additional path elements to the path
         if path_elements:
@@ -3699,7 +3696,7 @@ class Api(object):
                 query = extra_query
 
         # Return the rebuilt URL
-        return urllib.parse.urlunparse((scheme, netloc, path, params, query, fragment))
+        return urlunparse((scheme, netloc, path, params, query, fragment))
 
     def _InitializeRequestHeaders(self, request_headers):
         if request_headers:
@@ -3745,7 +3742,7 @@ class Api(object):
         if parameters is None:
             return None
         else:
-            return urllib.parse.urlencode(dict([(k, self._Encode(v)) for k, v in list(parameters.items()) if v is not None]))
+            return urlencode(dict([(k, self._Encode(v)) for k, v in list(parameters.items()) if v is not None]))
 
     def _EncodePostData(self, post_data):
         """Return a string in key=value&key=value form.
@@ -3764,7 +3761,7 @@ class Api(object):
         if post_data is None:
             return None
         else:
-            return urllib.parse.urlencode(dict([(k, self._Encode(v)) for k, v in list(post_data.items())]))
+            return urlencode(dict([(k, self._Encode(v)) for k, v in list(post_data.items())]))
 
     def _ParseAndCheckTwitter(self, json_data):
         """Try and parse the JSON returned from Twitter and return

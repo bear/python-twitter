@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from builtins import object
-
 from calendar import timegm
 
 try:

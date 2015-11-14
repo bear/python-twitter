@@ -1,4 +1,3 @@
-from builtins import object
 #!/usr/bin/env python
 import errno
 import os
