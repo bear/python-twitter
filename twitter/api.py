@@ -1685,16 +1685,8 @@ class Api(object):
             count = total_count
 
         while True:
-<<<<<<< HEAD
-            if total_count and total_count < count:
-                parameters['count'] = total_count
-            parameters['cursor'] = cursor
-            json = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(json.content.decode('utf-8').decode("utf-8"))
-=======
             next_cursor, previous_cursor, data = self.GetFollowerIDsPaged(user_id, screen_name, cursor, stringify_ids,
                                                                           count)
->>>>>>> master
             result += [x for x in data['ids']]
             if next_cursor == 0 or next_cursor == previous_cursor:
                 break

@@ -10,7 +10,11 @@ except ImportError:
     from email.utils import parsedate
 
 import time
-from sets import Set
+# TODO remove this if/when v2.7+ is ever deprecated
+try:
+  from sets import Set
+except ImportError:
+  Set = set
 
 from twitter import json, Hashtag, TwitterError, Url
 from twitter.media import Media
