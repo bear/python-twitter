@@ -36,6 +36,7 @@ import StringIO
 
 from twitter import (__version__, _FileCache, json, DirectMessage, List,
                      Status, Trend, TwitterError, User, UserStatus)
+from twitter.category import Category
 
 CHARACTER_LIMIT = 140
 
@@ -341,7 +342,7 @@ class Api(object):
 
         if until:
             parameters['until'] = until
-            
+
         if since:
             parameters['since'] = since
 
@@ -474,6 +475,40 @@ class Api(object):
             trends.append(Trend.NewFromJsonDict(trend, timestamp=timestamp))
         return trends
 
+    def GetUserSuggestionCategories(self):
+        """ Return the list of suggested user categories, this can be used in
+            GetUserSuggestion function
+        Returns:
+            A list of categories
+        """
+        url = '%s/users/suggestions.json' % (self.base_url)
+        json_data = self._RequestUrl(url, verb='GET')
+        data = self._ParseAndCheckTwitter(json_data.content)
+
+        categories = []
+
+        for category in data:
+            categories.append(Category.NewFromJsonDict(category))
+        return categories
+
+    def GetUserSuggestion(self, category):
+        """ Returns a list of users in a category
+        Args:
+            category:
+                The Category object to limit the search by
+        Returns:
+            A list of users in that category
+        """
+        url = '%s/users/suggestions/%s.json' % (self.base_url, category.Slug)
+
+        json_data = self._RequestUrl(url, verb='GET')
+        data = self._ParseAndCheckTwitter(json_data.content)
+
+        users = []
+        for user in data['users']:
+            users.append(User.NewFromJsonDict(user))
+        return users
+
     def GetHomeTimeline(self,
                         count=None,
                         since_id=None,
@@ -557,7 +592,6 @@ class Api(object):
             parameters['include_entities'] = 'false'
         json_data = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(json_data.content)
-
         return [Status.NewFromJsonDict(x) for x in data]
 
     def GetUserTimeline(self,
@@ -1579,12 +1613,12 @@ class Api(object):
         if count is not None:
             parameters['count'] = count
         result = []
-    
+
         parameters['cursor'] = cursor
-    
+
         json = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(json.content)
-    
+
         if 'next_cursor' in data:
             next_cursor = data['next_cursor']
         else:
@@ -1593,7 +1627,7 @@ class Api(object):
             previous_cursor = data['previous_cursor']
         else:
             previous_cursor = 0
-    
+
         return next_cursor, previous_cursor, data
 
     def GetFollowerIDs(self,
@@ -1632,13 +1666,14 @@ class Api(object):
         url = '%s/followers/ids.json' % self.base_url
         if not self.__auth:
             raise TwitterError({'message': "twitter.Api instance must be authenticated"})
-  
+
         result = []
         if total_count and total_count < count:
             count = total_count
-  
+
         while True:
-            next_cursor, previous_cursor, data = self.GetFollowerIDsPaged(user_id, screen_name, cursor, stringify_ids, count)
+            next_cursor, previous_cursor, data = self.GetFollowerIDsPaged(user_id, screen_name, cursor, stringify_ids,
+                                                                          count)
             result += [x for x in data['ids']]
             if next_cursor == 0 or next_cursor == previous_cursor:
                 break
@@ -1650,7 +1685,7 @@ class Api(object):
                     break
             sec = self.GetSleepTime('/followers/ids')
             time.sleep(sec)
-  
+
         return result
 
     def GetFollowersPaged(self,
@@ -2063,7 +2098,7 @@ class Api(object):
           A twitter.User instance representing the befriended user.
         """
         return self._AddOrEditFriendship(user_id=user_id, screen_name=screen_name, follow=follow)
-    
+
     def _AddOrEditFriendship(self, user_id=None, screen_name=None, uri_end='create', follow_key='follow', follow=True):
         """
         Shared method for Create/Update Friendship.
@@ -2104,7 +2139,8 @@ class Api(object):
           A twitter.User instance representing the befriended user.
         """
         follow = kwargs.get('device', follow)
-        return self._AddOrEditFriendship(user_id=user_id, screen_name=screen_name, follow=follow, follow_key='device', uri_end='update')
+        return self._AddOrEditFriendship(user_id=user_id, screen_name=screen_name, follow=follow, follow_key='device',
+                                         uri_end='update')
 
     def DestroyFriendship(self, user_id=None, screen_name=None):
         """Discontinues friendship with a user_id or screen_name.
@@ -2883,7 +2919,7 @@ class Api(object):
         """
         parameters = {'slug': slug,
                       'list_id': list_id,
-        }
+                      }
         url = '%s/lists/statuses.json' % (self.base_url)
         parameters['slug'] = slug
         parameters['list_id'] = list_id
@@ -2892,7 +2928,7 @@ class Api(object):
                 raise TwitterError({'message': "list_id or slug required"})
             if owner_id is None and not owner_screen_name:
                 raise TwitterError({
-                'message': "if list_id is not given you have to include an owner to help identify the proper list"})
+                    'message': "if list_id is not given you have to include an owner to help identify the proper list"})
         if owner_id:
             parameters['owner_id'] = owner_id
         if owner_screen_name:
@@ -2966,7 +3002,7 @@ class Api(object):
         """
         parameters = {'slug': slug,
                       'list_id': list_id,
-        }
+                      }
         url = '%s/lists/members.json' % (self.base_url)
         parameters['slug'] = slug
         parameters['list_id'] = list_id
@@ -2975,7 +3011,7 @@ class Api(object):
                 raise TwitterError({'message': "list_id or slug required"})
             if owner_id is None and not owner_screen_name:
                 raise TwitterError({
-                'message': "if list_id is not given you have to include an owner to help identify the proper list"})
+                    'message': "if list_id is not given you have to include an owner to help identify the proper list"})
         if owner_id:
             parameters['owner_id'] = owner_id
         if owner_screen_name:
@@ -3287,22 +3323,22 @@ class Api(object):
 
         url = '%s/account/update_profile_image.json' % (self.base_url)
         with open(image, 'rb') as image_file:
-          encoded_image = base64.b64encode(image_file.read())
+            encoded_image = base64.b64encode(image_file.read())
         data = {
-          'image':encoded_image
+            'image': encoded_image
         }
         if include_entities:
-          data['include_entities'] = 1
+            data['include_entities'] = 1
         if skip_status:
-          data['skip_status'] = 1
+            data['skip_status'] = 1
 
         json = self._RequestUrl(url, 'POST', data=data)
         if json.status_code in [200, 201, 202]:
-          return True
+            return True
         if json.status_code == 400:
-          raise TwitterError({'message': "Image data could not be processed"})
+            raise TwitterError({'message': "Image data could not be processed"})
         if json.status_code == 422:
-          raise TwitterError({'message': "The image could not be resized or is too large."})
+            raise TwitterError({'message': "The image could not be resized or is too large."})
 
     def UpdateBanner(self,
                      image,
@@ -3832,7 +3868,7 @@ class Api(object):
                 return requests.post(url, data=data, stream=True,
                                      auth=self.__auth,
                                      timeout=self._timeout
-                )
+                                     )
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         if verb == 'GET':
@@ -3840,7 +3876,7 @@ class Api(object):
             try:
                 return requests.get(url, stream=True, auth=self.__auth,
                                     timeout=self._timeout
-                )
+                                    )
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         return 0  # if not a POST or GET request
