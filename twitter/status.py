@@ -1,9 +1,17 @@
 #!/usr/bin/env python
 
 from calendar import timegm
-import rfc822
+try:
+    from rfc822 import parsedate
+except ImportError:
+    from email.utils import parsedate
+
 import time
-from sets import Set
+# TODO remove this if/when v2.7+ is ever deprecated
+try:
+  from sets import Set
+except ImportError:
+  Set = set
 
 from twitter import json, Hashtag, TwitterError, Url
 from twitter.media import Media
@@ -192,7 +200,7 @@ class Status(object):
         Returns:
           The time this status message was posted, in seconds since the epoch.
         """
-        return timegm(rfc822.parsedate(self.created_at))
+        return timegm(parsedate(self.created_at))
 
     @property
     def RelativeCreatedAt(self):

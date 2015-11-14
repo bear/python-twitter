@@ -132,7 +132,7 @@ class DirectMessage(object):
         Returns:
           The time this direct message was posted, in seconds since the epoch.
         """
-        return timegm(rfc822.parsedate(self.created_at))
+        return timegm(parsedate(self.created_at))
 
     @property
     def SenderScreenName(self):
