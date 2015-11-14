@@ -1,4 +1,3 @@
-.PHONY: docs test
 
 help:
 	@echo "  env         create a development environment using virtualenv"

@@ -43,14 +43,19 @@ Activate the virtual environment created:
 
 	$ source env/bin/activate
 
+=============
+Running tests
+=============
+
+Note: Under Python v2.7 you will need to install `nose` and optionally `coverage`
+
 Run tests:
 
 	$ make test
 
-To see other options available, run:
+Run tests with code-coverage:
 
-	$ make help
-
+    $ make coverage
 
 =============
 Documentation
