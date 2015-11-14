@@ -24,10 +24,6 @@ You can install python-twitter using::
 
     $ pip install python-twitter
 
-Testing::
-
-    $ python test.py
-
 ================
 Getting the code
 ================
@@ -171,7 +167,7 @@ Now it's a full-on open source project with many contributors over time. See AUT
 License
 -------
 
-| Copyright 2007-2014 The Python-Twitter Developers
+| Copyright 2007-2015 The Python-Twitter Developers
 |
 | Licensed under the Apache License, Version 2.0 (the 'License');
 | you may not use this file except in compliance with the License.
