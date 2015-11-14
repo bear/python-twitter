@@ -10,8 +10,10 @@ except ImportError:
     from email.utils import parsedate
 
 import time
+from sets import Set
 
 from twitter import json, Hashtag, TwitterError, Url
+from twitter.media import Media
 
 
 class Status(object):
@@ -125,7 +127,8 @@ class Status(object):
             'media': None,
             'withheld_copyright': None,
             'withheld_in_countries': None,
-            'withheld_scope': None}
+            'withheld_scope': None,
+        }
 
         for (param, default) in param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
@@ -407,19 +410,19 @@ class Status(object):
         return self.AsJsonString()
 
     def __repr__(self):
-      """A string representation of this twitter.Status instance.
+        """A string representation of this twitter.Status instance.
       The return value is the ID of status, username and datetime.
       Returns:
         A string representation of this twitter.Status instance with 
         the ID of status, username and datetime.
       """
-      if self.user:
-        representation = "Status(ID=%s, screen_name='%s', created_at='%s')" % (
-        self.id, self.user.screen_name, self.created_at)
-      else:
-        representation = "Status(ID=%s,  created_at='%s')" % (
-        self.id, self.created_at)
-      return representation
+        if self.user:
+            representation = "Status(ID=%s, screen_name='%s', created_at='%s')" % (
+                self.id, self.user.screen_name, self.created_at)
+        else:
+            representation = "Status(ID=%s,  created_at='%s')" % (
+                self.id, self.created_at)
+        return representation
 
     def AsJsonString(self, allow_non_ascii=False):
         """A JSON string representation of this twitter.Status instance.
@@ -532,7 +535,7 @@ class Status(object):
         urls = None
         user_mentions = None
         hashtags = None
-        media = None
+        media = Set()
         if 'entities' in data:
             if 'urls' in data['entities']:
                 urls = [Url.NewFromJsonDict(u) for u in data['entities']['urls']]
@@ -543,14 +546,14 @@ class Status(object):
             if 'hashtags' in data['entities']:
                 hashtags = [Hashtag.NewFromJsonDict(h) for h in data['entities']['hashtags']]
             if 'media' in data['entities']:
-                media = data['entities']['media']
-            else:
-                media = []
+                for m in data['entities']['media']:
+                    media.add(Media.NewFromJsonDict(m))
 
         # the new extended entities
         if 'extended_entities' in data:
             if 'media' in data['extended_entities']:
-                media = [m for m in data['extended_entities']['media']]
+                for m in data['extended_entities']['media']:
+                    media.add(Media.NewFromJsonDict(m))
 
         return Status(created_at=data.get('created_at', None),
                       favorited=data.get('favorited', None),
@@ -581,4 +584,5 @@ class Status(object):
                       scopes=data.get('scopes', None),
                       withheld_copyright=data.get('withheld_copyright', None),
                       withheld_in_countries=data.get('withheld_in_countries', None),
-                      withheld_scope=data.get('withheld_scope', None))
+                      withheld_scope=data.get('withheld_scope', None),
+                      )

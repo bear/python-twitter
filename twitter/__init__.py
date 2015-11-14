@@ -38,5 +38,7 @@ from .trend import Trend
 from .url import Url
 from .status import Status
 from .user import User, UserStatus
+from .category import Category
+from .media import Media
 from .list import List
 from .api import Api
