@@ -4,9 +4,13 @@ A Python wrapper around the Twitter API.
 
 By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
 
-.. image:: https://pypip.in/wheel/python-twitter/badge.png
-    :target: https://pypi.python.org/pypi/python-twitter/
-    :alt: Wheel Status
+.. image:: https://travis-ci.org/bear/python-twitter.svg?branch=master
+    :target: https://travis-ci.org/bear/python-twitter
+    :alt: Travis CI
+
+.. image:: http://codecov.io/github/bear/python-twitter/coverage.svg?branch=master
+    :target: http://codecov.io/github/bear/python-twitter
+    :alt: Codecov
 
 ============
 Introduction
