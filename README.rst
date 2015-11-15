@@ -24,10 +24,6 @@ You can install python-twitter using::
 
     $ pip install python-twitter
 
-Testing::
-
-    $ python test.py
-
 ================
 Getting the code
 ================
@@ -47,14 +43,19 @@ Activate the virtual environment created:
 
 	$ source env/bin/activate
 
+=============
+Running tests
+=============
+
+Note: Under Python v2.7 you will need to install `nose` and optionally `coverage`
+
 Run tests:
 
 	$ make test
 
-To see other options available, run:
+Run tests with code-coverage:
 
-	$ make help
-
+    $ make coverage
 
 =============
 Documentation
@@ -171,7 +172,7 @@ Now it's a full-on open source project with many contributors over time. See AUT
 License
 -------
 
-| Copyright 2007-2014 The Python-Twitter Developers
+| Copyright 2007-2015 The Python-Twitter Developers
 |
 | Licensed under the Apache License, Version 2.0 (the 'License');
 | you may not use this file except in compliance with the License.

@@ -1,4 +1,5 @@
 # encoding: utf-8
+from __future__ import print_function
 
 import twitter
 import time
@@ -22,7 +23,7 @@ class ApiTest(unittest.TestCase):
                           cache=None)
         api.SetUrllib(self._urllib)
         self._api = api
-        print "Testing the API class. This test is time controlled"
+        print("Testing the API class. This test is time controlled")
 
     def testTwitterError(self):
         '''Test that twitter responses containing an error message are wrapped.'''
@@ -40,7 +41,7 @@ class ApiTest(unittest.TestCase):
     def testGetUserTimeline(self):
         '''Test the twitter.Api GetUserTimeline method'''
         time.sleep(8)
-        print 'Testing GetUserTimeline'
+        print('Testing GetUserTimeline')
         self._AddHandler('https://api.twitter.com/1.1/statuses/user_timeline.json?count=1&screen_name=kesuke',
                          curry(self._OpenTestData, 'user_timeline-kesuke.json'))
         statuses = self._api.GetUserTimeline(screen_name='kesuke', count=1)
@@ -60,7 +61,7 @@ class ApiTest(unittest.TestCase):
     def testGetStatus(self):
         '''Test the twitter.Api GetStatus method'''
         time.sleep(8)
-        print 'Testing GetStatus'
+        print('Testing GetStatus')
         self._AddHandler('https://api.twitter.com/1.1/statuses/show.json?include_my_retweet=1&id=89512102',
                          curry(self._OpenTestData, 'show-89512102.json'))
         status = self._api.GetStatus(89512102)
@@ -70,7 +71,7 @@ class ApiTest(unittest.TestCase):
     def testDestroyStatus(self):
         '''Test the twitter.Api DestroyStatus method'''
         time.sleep(8)
-        print 'Testing DestroyStatus'
+        print('Testing DestroyStatus')
         self._AddHandler('https://api.twitter.com/1.1/statuses/destroy/103208352.json',
                          curry(self._OpenTestData, 'status-destroy.json'))
         status = self._api.DestroyStatus(103208352)
@@ -79,7 +80,7 @@ class ApiTest(unittest.TestCase):
     def testPostUpdate(self):
         '''Test the twitter.Api PostUpdate method'''
         time.sleep(8)
-        print 'Testing PostUpdate'
+        print('Testing PostUpdate')
         self._AddHandler('https://api.twitter.com/1.1/statuses/update.json',
                          curry(self._OpenTestData, 'update.json'))
         status = self._api.PostUpdate(u'Моё судно на воздушной подушке полно угрей'.encode('utf8'))
@@ -89,7 +90,7 @@ class ApiTest(unittest.TestCase):
     def testPostRetweet(self):
         '''Test the twitter.Api PostRetweet method'''
         time.sleep(8)
-        print 'Testing PostRetweet'
+        print('Testing PostRetweet')
         self._AddHandler('https://api.twitter.com/1.1/statuses/retweet/89512102.json',
                          curry(self._OpenTestData, 'retweet.json'))
         status = self._api.PostRetweet(89512102)
@@ -98,7 +99,7 @@ class ApiTest(unittest.TestCase):
     def testPostUpdateLatLon(self):
         '''Test the twitter.Api PostUpdate method, when used in conjunction with latitude and longitude'''
         time.sleep(8)
-        print 'Testing PostUpdateLatLon'
+        print('Testing PostUpdateLatLon')
         self._AddHandler('https://api.twitter.com/1.1/statuses/update.json',
                          curry(self._OpenTestData, 'update_latlong.json'))
         #test another update with geo parameters, again test somewhat arbitrary
@@ -112,7 +113,7 @@ class ApiTest(unittest.TestCase):
     def testGetReplies(self):
         '''Test the twitter.Api GetReplies method'''
         time.sleep(8)
-        print 'Testing GetReplies'
+        print('Testing GetReplies')
         self._AddHandler('https://api.twitter.com/1.1/statuses/user_timeline.json',
                          curry(self._OpenTestData, 'replies.json'))
         statuses = self._api.GetReplies()
@@ -121,7 +122,7 @@ class ApiTest(unittest.TestCase):
     def testGetRetweetsOfMe(self):
         '''Test the twitter.API GetRetweetsOfMe method'''
         time.sleep(8)
-        print 'Testing GetRetweetsOfMe'
+        print('Testing GetRetweetsOfMe')
         self._AddHandler('https://api.twitter.com/1.1/statuses/retweets_of_me.json',
                          curry(self._OpenTestData, 'retweets_of_me.json'))
         retweets = self._api.GetRetweetsOfMe()
@@ -130,7 +131,7 @@ class ApiTest(unittest.TestCase):
     def testGetFriends(self):
         '''Test the twitter.Api GetFriends method'''
         time.sleep(8)
-        print 'Testing GetFriends'
+        print('Testing GetFriends')
         self._AddHandler('https://api.twitter.com/1.1/friends/list.json?cursor=123',
                          curry(self._OpenTestData, 'friends.json'))
         users = self._api.GetFriends(cursor=123)
@@ -140,7 +141,7 @@ class ApiTest(unittest.TestCase):
     def testGetFollowers(self):
         '''Test the twitter.Api GetFollowers method'''
         time.sleep(8)
-        print 'Testing GetFollowers'
+        print('Testing GetFollowers')
         self._AddHandler('https://api.twitter.com/1.1/followers/list.json?cursor=-1',
                          curry(self._OpenTestData, 'followers.json'))
         users = self._api.GetFollowers()
@@ -160,7 +161,7 @@ class ApiTest(unittest.TestCase):
     def testGetDirectMessages(self):
         '''Test the twitter.Api GetDirectMessages method'''
         time.sleep(8)
-        print 'Testing GetDirectMessages'
+        print('Testing GetDirectMessages')
         self._AddHandler('https://api.twitter.com/1.1/direct_messages.json',
                          curry(self._OpenTestData, 'direct_messages.json'))
         statuses = self._api.GetDirectMessages()
@@ -169,7 +170,7 @@ class ApiTest(unittest.TestCase):
     def testPostDirectMessage(self):
         '''Test the twitter.Api PostDirectMessage method'''
         time.sleep(8)
-        print 'Testing PostDirectMessage'
+        print('Testing PostDirectMessage')
         self._AddHandler('https://api.twitter.com/1.1/direct_messages/new.json',
                          curry(self._OpenTestData, 'direct_messages-new.json'))
         status = self._api.PostDirectMessage('test', u'Моё судно на воздушной подушке полно угрей'.encode('utf8'))
@@ -179,7 +180,7 @@ class ApiTest(unittest.TestCase):
     def testDestroyDirectMessage(self):
         '''Test the twitter.Api DestroyDirectMessage method'''
         time.sleep(8)
-        print 'Testing DestroyDirectMessage'
+        print('Testing DestroyDirectMessage')
         self._AddHandler('https://api.twitter.com/1.1/direct_messages/destroy.json',
                          curry(self._OpenTestData, 'direct_message-destroy.json'))
         status = self._api.DestroyDirectMessage(3496342)
@@ -189,7 +190,7 @@ class ApiTest(unittest.TestCase):
     def testCreateFriendship(self):
         '''Test the twitter.Api CreateFriendship method'''
         time.sleep(8)
-        print 'Testing CreateFriendship'
+        print('Testing CreateFriendship')
         self._AddHandler('https://api.twitter.com/1.1/friendships/create.json',
                          curry(self._OpenTestData, 'friendship-create.json'))
         user = self._api.CreateFriendship('dewitt')
@@ -199,7 +200,7 @@ class ApiTest(unittest.TestCase):
     def testDestroyFriendship(self):
         '''Test the twitter.Api DestroyFriendship method'''
         time.sleep(8)
-        print 'Testing Destroy Friendship'
+        print('Testing Destroy Friendship')
         self._AddHandler('https://api.twitter.com/1.1/friendships/destroy.json',
                          curry(self._OpenTestData, 'friendship-destroy.json'))
         user = self._api.DestroyFriendship('dewitt')
@@ -209,7 +210,7 @@ class ApiTest(unittest.TestCase):
     def testGetUser(self):
         '''Test the twitter.Api GetUser method'''
         time.sleep(8)
-        print 'Testing GetUser'
+        print('Testing GetUser')
         self._AddHandler('https://api.twitter.com/1.1/users/show.json?user_id=dewitt',
                          curry(self._OpenTestData, 'show-dewitt.json'))
         user = self._api.GetUser('dewitt')
@@ -285,8 +286,8 @@ class MockOpener(object):
             self._opened = True
             return self._handlers[url]()
         else:
-            print url
-            print self._handlers
+            print(url)
+            print(self._handlers)
 
             raise Exception('Unexpected URL %s (Checked: %s)' % (url, self._handlers))
 

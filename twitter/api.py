@@ -27,12 +27,20 @@ import gzip
 import sys
 import textwrap
 import types
-import urllib
-import urllib2
-import urlparse
 import requests
 from requests_oauthlib import OAuth1
 import StringIO
+
+try:
+  #python 3
+  from urllib.parse import urlparse, urlunparse, urlencode
+  from urllib.request import urlopen
+  from urllib.request import __version__ as urllib_version
+except ImportError:
+  from urlparse import urlparse, urlunparse
+  from urllib2 import urlopen
+  from urllib import urlencode
+  from urllib import __version__ as urllib_version
 
 from twitter import (__version__, _FileCache, json, DirectMessage, List,
                      Status, Trend, TwitterError, User, UserStatus)
@@ -1853,7 +1861,7 @@ class Api(object):
         json_data = self._RequestUrl(url, 'GET', data=parameters)
         try:
             data = self._ParseAndCheckTwitter(json_data.content)
-        except TwitterError, e:
+        except TwitterError as e:
             _, e, _ = sys.exc_info()
             t = e.args[0]
             if len(t) == 1 and ('code' in t[0]) and (t[0]['code'] == 34):
