@@ -27,12 +27,20 @@ import gzip
 import sys
 import textwrap
 import types
-import urllib
-import urllib2
-import urlparse
 import requests
 from requests_oauthlib import OAuth1
 import StringIO
+
+try:
+  #python 3
+  from urllib.parse import urlparse, urlunparse, urlencode
+  from urllib.request import urlopen
+  from urllib.request import __version__ as urllib_version
+except ImportError:
+  from urlparse import urlparse, urlunparse
+  from urllib2 import urlopen
+  from urllib import urlencode
+  from urllib import __version__ as urllib_version
 
 from twitter import (__version__, _FileCache, json, DirectMessage, List,
                      Status, Trend, TwitterError, User, UserStatus)
