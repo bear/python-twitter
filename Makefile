@@ -1,10 +1,10 @@
-.PHONY: docs test
 
 help:
 	@echo "  env         create a development environment using virtualenv"
 	@echo "  deps        install dependencies"
 	@echo "  clean       remove unwanted stuff"
 	@echo "  lint        check style with flake8"
+	@echo "  coverage    run tests with code coverage"
 	@echo "  test        run tests"
 
 env:
@@ -27,8 +27,15 @@ clean:
 lint:
 	flake8 twitter > violations.flake8.txt
 
+coverage:
+	nosetests --with-coverage --cover-package=twitter
+
 test:
-	python test.py
+	nosetests
+
+build: clean
+	python setup.py sdist
+	python setup.py bdist_wheel
 
 upload: clean
 	python setup.py sdist upload

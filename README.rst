@@ -24,10 +24,6 @@ You can install python-twitter using::
 
     $ pip install python-twitter
 
-Testing::
-
-    $ python test.py
-
 ================
 Getting the code
 ================
@@ -47,14 +43,18 @@ Activate the virtual environment created:
 
 	$ source env/bin/activate
 
-Run tests:
+=============
+Running Tests
+=============
+Note that tests require ```pip install nose``` and optionally ```pip install coverage```:
+
+To run the unit tests:
 
 	$ make test
 
-To see other options available, run:
+to also run code coverage:
 
-	$ make help
-
+    $ make coverage
 
 =============
 Documentation
