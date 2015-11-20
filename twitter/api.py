@@ -1571,6 +1571,46 @@ class Api(object):
 
         return result
 
+    def _GetIDsPaged(self,
+                    url, # must be the url for followers/ids.json or friends/ids.json
+                    user_id,
+                    screen_name,
+                    cursor,
+                    stringify_ids,
+                    count):
+        """
+        See GetFollowerIDs for an explanation of the inpout arguments.
+        """
+        # assert(url.endswith('followers/ids.json') or url.endswith('friends/ids.json'))
+        if not self.__auth:
+            raise TwitterError({'message': "twitter.Api instance must be authenticated"})
+        parameters = {}
+        if user_id is not None:
+            parameters['user_id'] = user_id
+        if screen_name is not None:
+            parameters['screen_name'] = screen_name
+        if stringify_ids:
+            parameters['stringify_ids'] = True
+        if count is not None:
+            parameters['count'] = count
+        result = []
+
+        parameters['cursor'] = cursor
+
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content)
+
+        if 'next_cursor' in data:
+            next_cursor = data['next_cursor']
+        else:
+            next_cursor = 0
+        if 'previous_cursor' in data:
+            previous_cursor = data['previous_cursor']
+        else:
+            previous_cursor = 0
+
+        return next_cursor, previous_cursor, data
+
     def GetFollowerIDsPaged(self,
                             user_id=None,
                             screen_name=None,
@@ -1601,34 +1641,19 @@ class Api(object):
           next_cursor, previous_cursor, data sequence of twitter.User instances, one for each follower
         """
         url = '%s/followers/ids.json' % self.base_url
-        if not self.__auth:
-            raise TwitterError({'message': "twitter.Api instance must be authenticated"})
-        parameters = {}
-        if user_id is not None:
-            parameters['user_id'] = user_id
-        if screen_name is not None:
-            parameters['screen_name'] = screen_name
-        if stringify_ids:
-            parameters['stringify_ids'] = True
-        if count is not None:
-            parameters['count'] = count
-        result = []
+        return self._GetIDsPaged(url, user_id, screen_name, cursor, stringify_ids, count)
 
-        parameters['cursor'] = cursor
-
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content)
-
-        if 'next_cursor' in data:
-            next_cursor = data['next_cursor']
-        else:
-            next_cursor = 0
-        if 'previous_cursor' in data:
-            previous_cursor = data['previous_cursor']
-        else:
-            previous_cursor = 0
-
-        return next_cursor, previous_cursor, data
+    def GetFriendIDsPaged(self,
+                            user_id=None,
+                            screen_name=None,
+                            cursor=-1,
+                            stringify_ids=False,
+                            count=5000):
+        """
+        See GetFollowerIDs for an explanation of the inpout arguments.
+        """
+        url = '%s/friends/ids.json' % self.base_url
+        return self._GetIDsPaged(url, user_id, screen_name, cursor, stringify_ids, count)
 
     def GetFollowerIDs(self,
                        user_id=None,
