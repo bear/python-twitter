@@ -3304,6 +3304,7 @@ class Api(object):
                       profileURL=None,
                       location=None,
                       description=None,
+                      profile_link_color=None,
                       include_entities=False,
                       skip_status=False):
         """Update's the authenticated user's profile data.
@@ -3345,6 +3346,8 @@ class Api(object):
             data['location'] = location
         if description:
             data['description'] = description
+        if profile_link_color:
+            data['profile_link_color'] = profile_link_color
         if include_entities:
             data['include_entities'] = include_entities
         if skip_status:
@@ -3354,6 +3357,34 @@ class Api(object):
         data = self._ParseAndCheckTwitter(json_data.content)
 
         return User.NewFromJsonDict(data)
+    
+    def UpdateBackgroundImage(self,
+                    image,
+                    tile=False,
+                    include_entities=False,
+                    skip_status=False):
+        
+        url = '%s/account/update_profile_background_image.json' % (self.base_url)
+        with open(image, 'rb') as image_file:
+            encoded_image = base64.b64encode(image_file.read())
+        data = {
+            'image': encoded_image
+        }
+        if tile:
+            data['tile'] = 1
+        if include_entities:
+            data['include_entities'] = 1
+        if skip_status:
+            data['skip_status'] = 1
+            
+        json = self._RequestUrl(url, 'POST', data=data)
+        if json.status_code in [200, 201, 202]:
+            return True
+        if json.status_code == 400:
+            raise TwitterError({'message': "Image data could not be processed"})
+        if json.status_code == 422:
+            raise TwitterError({'message': "The image could not be resized or is too large."})
+
 
     def UpdateImage(self,
                     image,
