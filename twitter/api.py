@@ -3326,6 +3326,9 @@ class Api(object):
           description:
             A description of the user owning the account.
             Maximum of 160 characters. [Optional]
+          profile_link_color:
+            hex value of profile color theme. formated without '#' or '0x'. Ex:  FF00FF
+            [Optional]
           include_entities:
             The entities node will be omitted when set to False.
             [Optional]
