@@ -24,7 +24,7 @@ SIGNIN_URL = 'https://api.twitter.com/oauth/authenticate'
 
 
 def get_access_token(consumer_key, consumer_secret):
-    oauth_client = OAuth1Session(consumer_key, client_secret=consumer_secret)
+    oauth_client = OAuth1Session(consumer_key, client_secret=consumer_secret, callback_uri='oob')
 
     print 'Requesting temp token from Twitter'
 
