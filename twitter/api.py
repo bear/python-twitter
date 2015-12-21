@@ -1948,7 +1948,8 @@ class Api(object):
                           max_id=None,
                           count=None,
                           include_entities=True,
-                          skip_status=False):
+                          skip_status=False,
+                          full_text=False):
         """Returns a list of the direct messages sent to the authenticating user.
     
         The twitter.Api instance must be authenticated.
@@ -1974,6 +1975,9 @@ class Api(object):
           skip_status:
             When set to True statuses will not be included in the returned user
             objects. [Optional]
+          full_text:
+            When set to True full message will be included in the returned message
+            object if message length is bigger than 140 characters. [Optional]
     
         Returns:
           A sequence of twitter.DirectMessage instances
@@ -1996,6 +2000,8 @@ class Api(object):
             parameters['include_entities'] = 'false'
         if skip_status:
             parameters['skip_status'] = 1
+        if full_text:
+            parameters['full_text'] = 'true'
 
         json_data = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(json_data.content)
