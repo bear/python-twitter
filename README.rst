@@ -4,6 +4,10 @@ A Python wrapper around the Twitter API.
 
 By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
 
+.. image:: https://img.shields.io/pypi/v/python-twitter.svg
+    :target: https://pypi.python.org/pypi/parsedatetime/
+    :alt: Downloads
+
 .. image:: https://travis-ci.org/bear/python-twitter.svg?branch=master
     :target: https://travis-ci.org/bear/python-twitter
     :alt: Travis CI
