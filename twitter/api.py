@@ -166,6 +166,7 @@ class Api(object):
         self._debugHTTP = debugHTTP
         self._shortlink_size = 19
         self._timeout = timeout
+        self.__auth = None
 
         self._InitializeRequestHeaders(request_headers)
         self._InitializeUserAgent()
