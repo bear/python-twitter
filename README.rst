@@ -12,6 +12,10 @@ By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
     :target: http://codecov.io/github/bear/python-twitter
     :alt: Codecov
 
+.. image:: https://requires.io/github/bear/python-twitter/requirements.svg?branch=master
+     :target: https://requires.io/github/bear/python-twitter/requirements/?branch=master
+     :alt: Requirements Status
+
 ============
 Introduction
 ============
