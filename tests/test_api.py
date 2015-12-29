@@ -33,7 +33,7 @@ class ApiTest(unittest.TestCase):
         # Manually try/catch so we can check the exception's value
         try:
             self._api.GetUserTimeline()
-        except twitter.TwitterError, error:
+        except twitter.TwitterError as error:
             # If the error message matches, the test passes
             self.assertEqual('test error', error.message)
         else:
