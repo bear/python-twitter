@@ -4,9 +4,21 @@ A Python wrapper around the Twitter API.
 
 By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
 
-.. image:: https://pypip.in/wheel/python-twitter/badge.png
-    :target: https://pypi.python.org/pypi/python-twitter/
-    :alt: Wheel Status
+.. image:: https://img.shields.io/pypi/v/python-twitter.svg
+    :target: https://pypi.python.org/pypi/parsedatetime/
+    :alt: Downloads
+
+.. image:: https://travis-ci.org/bear/python-twitter.svg?branch=master
+    :target: https://travis-ci.org/bear/python-twitter
+    :alt: Travis CI
+
+.. image:: http://codecov.io/github/bear/python-twitter/coverage.svg?branch=master
+    :target: http://codecov.io/github/bear/python-twitter
+    :alt: Codecov
+
+.. image:: https://requires.io/github/bear/python-twitter/requirements.svg?branch=master
+     :target: https://requires.io/github/bear/python-twitter/requirements/?branch=master
+     :alt: Requirements Status
 
 ============
 Introduction
@@ -23,10 +35,6 @@ Installing
 You can install python-twitter using::
 
     $ pip install python-twitter
-
-Testing::
-
-    $ python test.py
 
 ================
 Getting the code
@@ -47,14 +55,18 @@ Activate the virtual environment created:
 
 	$ source env/bin/activate
 
-Run tests:
+=============
+Running Tests
+=============
+Note that tests require ```pip install nose``` and optionally ```pip install coverage```:
+
+To run the unit tests:
 
 	$ make test
 
-To see other options available, run:
+to also run code coverage:
 
-	$ make help
-
+    $ make coverage
 
 =============
 Documentation
