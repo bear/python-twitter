@@ -29,7 +29,7 @@ def read(*paths):
 
 setup(
     name='python-twitter',
-    version='2.3',
+    version='3.0',
     author='The Python-Twitter Developers',
     author_email='python-twitter@googlegroups.com',
     license='Apache License 2.0',
@@ -40,7 +40,7 @@ setup(
                       read('AUTHORS.rst') + '\n\n' +
                       read('CHANGES')),
     packages=find_packages(exclude=['tests*']),
-    install_requires=['requests', 'requests-oauthlib'],
+    install_requires=['future', 'requests', 'requests-oauthlib'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
@@ -53,6 +53,6 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.5',
     ],
 )

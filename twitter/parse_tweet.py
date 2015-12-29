@@ -27,7 +27,7 @@ class Emoticons:
                 "[:", ";]"
                 ]
 
-class ParseTweet:
+class ParseTweet(object):
     # compile once on import
     regexp = {"RT": "^RT", "MT": r"^MT", "ALNUM": r"(@[a-zA-Z0-9_]+)",
               "HASHTAG": r"(#[\w\d]+)", "URL": r"([https://|http://]?[a-zA-Z\d\/]+[\.]+[a-zA-Z\d\/\.]+)",

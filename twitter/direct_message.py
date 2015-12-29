@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 from calendar import timegm
-import rfc822
+
+try:
+    from rfc822 import parsedate
+except ImportError:
+    from email.utils import parsedate
 
 from twitter import json
 

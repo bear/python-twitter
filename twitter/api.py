@@ -18,21 +18,33 @@
 # limitations under the License.
 
 """A library that provides a Python interface to the Twitter API"""
+from __future__ import division
+from __future__ import print_function
 
-import base64
-from calendar import timegm
-import time
-import datetime
-import gzip
 import sys
-import textwrap
+import gzip
+import time
 import types
-import urllib
-import urllib2
-import urlparse
+import base64
+import textwrap
+import datetime
+from calendar import timegm
 import requests
 from requests_oauthlib import OAuth1
-import StringIO
+import io
+
+from past.utils import old_div
+
+try:
+  # python 3
+  from urllib.parse import urlparse, urlunparse, urlencode
+  from urllib.request import urlopen
+  from urllib.request import __version__ as urllib_version
+except ImportError:
+  from urlparse import urlparse, urlunparse
+  from urllib2 import urlopen
+  from urllib import urlencode
+  from urllib import __version__ as urllib_version
 
 from twitter import (__version__, _FileCache, json, DirectMessage, List,
                      Status, Trend, TwitterError, User, UserStatus)
@@ -159,7 +171,6 @@ class Api(object):
             requests lib default will be used.  Defaults to None. [Optional]
         """
         self.SetCache(cache)
-        self._urllib = urllib2
         self._cache_timeout = Api.DEFAULT_CACHE_TIMEOUT
         self._input_encoding = input_encoding
         self._use_gzip = use_gzip_compression
@@ -199,9 +210,9 @@ class Api(object):
 
         if debugHTTP:
             import logging
-            import httplib
+            import http.client
 
-            httplib.HTTPConnection.debuglevel = 1
+            http.client.HTTPConnection.debuglevel = 1
 
             logging.basicConfig()  # you need to initialize logging, otherwise you will not see anything from requests
             logging.getLogger().setLevel(logging.DEBUG)
@@ -244,8 +255,8 @@ class Api(object):
     def GetHelpConfiguration(self):
         if self._config is None:
             url = '%s/help/configuration.json' % self.base_url
-            json_data = self._RequestUrl(url, 'GET')
-            data = self._ParseAndCheckTwitter(json_data.content)
+            json = self._RequestUrl(url, 'GET')
+            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
             self._config = data
         return self._config
 
@@ -331,13 +342,13 @@ class Api(object):
 
         if since_id:
             try:
-                parameters['since_id'] = long(since_id)
+                parameters['since_id'] = int(since_id)
             except ValueError:
                 raise TwitterError({'message': "since_id must be an integer"})
 
         if max_id:
             try:
-                parameters['max_id'] = long(max_id)
+                parameters['max_id'] = int(max_id)
             except ValueError:
                 raise TwitterError({'message': "max_id must be an integer"})
 
@@ -378,8 +389,8 @@ class Api(object):
 
         # Make and send requests
         url = '%s/search/tweets.json' % self.base_url
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         # Return built list of statuses
         return [Status.NewFromJsonDict(x) for x in data['statuses']]
@@ -429,8 +440,8 @@ class Api(object):
 
         # Make and send requests
         url = '%s/users/search.json' % self.base_url
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
         return [User.NewFromJsonDict(x) for x in data]
 
     def GetTrendsCurrent(self, exclude=None):
@@ -466,9 +477,8 @@ class Api(object):
         if exclude:
             parameters['exclude'] = exclude
 
-        json_data = self._RequestUrl(url, verb='GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
-
+        json = self._RequestUrl(url, verb='GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
         trends = []
         timestamp = data[0]['as_of']
 
@@ -575,12 +585,12 @@ class Api(object):
             parameters['count'] = count
         if since_id:
             try:
-                parameters['since_id'] = long(since_id)
+                parameters['since_id'] = int(since_id)
             except ValueError:
                 raise TwitterError({'message': "'since_id' must be an integer"})
         if max_id:
             try:
-                parameters['max_id'] = long(max_id)
+                parameters['max_id'] = int(max_id)
             except ValueError:
                 raise TwitterError({'message': "'max_id' must be an integer"})
         if trim_user:
@@ -591,8 +601,9 @@ class Api(object):
             parameters['contributor_details'] = 1
         if not include_entities:
             parameters['include_entities'] = 'false'
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+
         return [Status.NewFromJsonDict(x) for x in data]
 
     def GetUserTimeline(self,
@@ -655,12 +666,12 @@ class Api(object):
             parameters['screen_name'] = screen_name
         if since_id:
             try:
-                parameters['since_id'] = long(since_id)
+                parameters['since_id'] = int(since_id)
             except ValueError:
                 raise TwitterError({'message': "since_id must be an integer"})
         if max_id:
             try:
-                parameters['max_id'] = long(max_id)
+                parameters['max_id'] = int(max_id)
             except ValueError:
                 raise TwitterError({'message': "max_id must be an integer"})
         if count:
@@ -675,8 +686,8 @@ class Api(object):
         if exclude_replies:
             parameters['exclude_replies'] = 1
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(x) for x in data]
 
@@ -717,7 +728,7 @@ class Api(object):
         parameters = {}
 
         try:
-            parameters['id'] = long(id)
+            parameters['id'] = int(id)
         except ValueError:
             raise TwitterError({'message': "'id' must be an integer."})
 
@@ -728,8 +739,8 @@ class Api(object):
         if not include_entities:
             parameters['include_entities'] = 'none'
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -786,7 +797,7 @@ class Api(object):
 
         if id is not None:
             try:
-                parameters['id'] = long(id)
+                parameters['id'] = int(id)
             except ValueError:
                 raise TwitterError({'message': "'id' must be an integer."})
         elif url is not None:
@@ -815,8 +826,8 @@ class Api(object):
                 raise TwitterError({'message': "'lang' should be string instance"})
             parameters['lang'] = lang
 
-        json_data = self._RequestUrl(request_url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(request_url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return data
 
@@ -837,15 +848,15 @@ class Api(object):
             raise TwitterError({'message': "API must be authenticated."})
 
         try:
-            post_data = {'id': long(id)}
+            post_data = {'id': int(id)}
         except ValueError:
             raise TwitterError({'message': "id must be an integer"})
         url = '%s/statuses/destroy/%s.json' % (self.base_url, id)
         if trim_user:
             post_data['trim_user'] = 1
 
-        json_data = self._RequestUrl(url, 'POST', data=post_data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=post_data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -911,10 +922,10 @@ class Api(object):
 
         url = '%s/statuses/update.json' % self.base_url
 
-        if isinstance(status, unicode) or self._input_encoding is None:
+        if isinstance(status, str) or self._input_encoding is None:
             u_status = status
         else:
-            u_status = unicode(status, self._input_encoding)
+            u_status = str(status, self._input_encoding)
 
         # if self._calculate_status_length(u_status, self._shortlink_size) > CHARACTER_LIMIT:
         #  raise TwitterError("Text must be less than or equal to %d characters. "
@@ -933,8 +944,8 @@ class Api(object):
         if trim_user:
             data['trim_user'] = 'true'
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -976,15 +987,15 @@ class Api(object):
 
         url = '%s/statuses/update_with_media.json' % self.base_url
 
-        if isinstance(status, unicode) or self._input_encoding is None:
+        if isinstance(status, str) or self._input_encoding is None:
             u_status = status
         else:
-            u_status = unicode(status, self._input_encoding)
+            u_status = str(status, self._input_encoding)
 
         data = {'status': u_status}
         if not hasattr(media, 'read'):
             if media.startswith('http'):
-                data['media'] = urllib2.urlopen(media).read()
+                data['media'] = urlopen(media).read()
             else:
                 with open(str(media), 'rb') as f:
                     data['media'] = f.read()
@@ -1002,8 +1013,8 @@ class Api(object):
         if display_coordinates:
             data['display_coordinates'] = 'true'
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -1046,10 +1057,10 @@ class Api(object):
 
         url = '%s/media/upload.json' % self.upload_url
 
-        if isinstance(status, unicode) or self._input_encoding is None:
+        if isinstance(status, str) or self._input_encoding is None:
             u_status = status
         else:
-            u_status = unicode(status, self._input_encoding)
+            u_status = str(status, self._input_encoding)
 
         media_ids = ''
         for m in range(0, len(media)):
@@ -1057,14 +1068,14 @@ class Api(object):
             data = {}
             if not hasattr(media[m], 'read'):
                 if media[m].startswith('http'):
-                    data['media'] = urllib2.urlopen(media[m]).read()
+                    data['media'] = urlopen(media[m]).read()
                 else:
                     data['media'] = open(str(media[m]), 'rb').read()
             else:
                 data['media'] = media[m].read()
 
-            json_data = self._RequestUrl(url, 'POST', data=data)
-            data = self._ParseAndCheckTwitter(json_data.content)
+            json = self._RequestUrl(url, 'POST', data=data)
+            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
             media_ids += str(data['media_id_string'])
             if m is not len(media) - 1:
@@ -1074,8 +1085,9 @@ class Api(object):
 
         url = '%s/statuses/update.json' % self.base_url
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+
         return Status.NewFromJsonDict(data)
 
     def PostUpdates(self,
@@ -1144,8 +1156,8 @@ class Api(object):
         data = {'id': original_id}
         if trim_user:
             data['trim_user'] = 'true'
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -1244,8 +1256,8 @@ class Api(object):
             except ValueError:
                 raise TwitterError({'message': "count must be an integer"})
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(s) for s in data]
 
@@ -1285,8 +1297,8 @@ class Api(object):
                 except ValueError:
                     raise TwitterError({'message': "cursor must be an integer"})
                     break
-            json_data = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(json_data.content)
+            json = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
             result += [x for x in data['ids']]
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -1353,8 +1365,8 @@ class Api(object):
         if not include_user_entities:
             parameters['include_user_entities'] = include_user_entities
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(s) for s in data]
 
@@ -1404,8 +1416,8 @@ class Api(object):
 
         while True:
             parameters['cursor'] = cursor
-            json_data = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(json_data.content)
+            json = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
             result += [User.NewFromJsonDict(x) for x in data['users']]
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -1436,15 +1448,15 @@ class Api(object):
             raise TwitterError({'message': "API must be authenticated."})
 
         try:
-            post_data = {'user_id': long(id)}
+            post_data = {'user_id': int(id)}
         except ValueError:
             raise TwitterError({'message': "id must be an integer"})
         url = '%s/blocks/destroy.json' % (self.base_url)
         if trim_user:
             post_data['trim_user'] = 1
 
-        json_data = self._RequestUrl(url, 'POST', data=post_data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=post_data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -1498,8 +1510,8 @@ class Api(object):
 
         while True:
             parameters['cursor'] = cursor
-            json_data = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(json_data.content)
+            json = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
             result += [User.NewFromJsonDict(x) for x in data['users']]
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -1530,6 +1542,7 @@ class Api(object):
         # assert(url.endswith('followers/ids.json') or url.endswith('friends/ids.json'))
         if not self.__auth:
             raise TwitterError({'message': "twitter.Api instance must be authenticated"})
+        result = []
         parameters = {}
         if user_id is not None:
             parameters['user_id'] = user_id
@@ -1540,20 +1553,22 @@ class Api(object):
         if count is not None:
             parameters['count'] = count
 
-        parameters['cursor'] = cursor
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content)
+        while True:
+            parameters['cursor'] = cursor
+            json = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+            result += [x for x in data['ids']]
+            if 'next_cursor' in data:
+                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+                    break
+                else:
+                    cursor = data['next_cursor']
+            else:
+                break
+            sec = self.GetSleepTime('/friends/ids')
+            time.sleep(sec)
 
-        if 'next_cursor' in data:
-            next_cursor = data['next_cursor']
-        else:
-            next_cursor = 0
-        if 'previous_cursor' in data:
-            previous_cursor = data['previous_cursor']
-        else:
-            previous_cursor = 0
-
-        return next_cursor, previous_cursor, data
+        return data['next_cursor'], data['previous_cursor'], result
 
     def GetFollowerIDsPaged(self,
                             user_id=None,
@@ -1777,8 +1792,8 @@ class Api(object):
             parameters['include_user_entities'] = True
         parameters['cursor'] = cursor
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         if 'next_cursor' in data:
             next_cursor = data['next_cursor']
@@ -1889,15 +1904,14 @@ class Api(object):
 
         json_data = self._RequestUrl(url, 'GET', data=parameters)
         try:
-            data = self._ParseAndCheckTwitter(json_data.content)
-        except TwitterError, e:
+            data = self._ParseAndCheckTwitter(json_data.content.decode('utf-8'))
+        except TwitterError as e:
             _, e, _ = sys.exc_info()
             t = e.args[0]
             if len(t) == 1 and ('code' in t[0]) and (t[0]['code'] == 34):
                 data = []
             else:
                 raise
-
         return [User.NewFromJsonDict(u) for u in data]
 
     def GetUser(self,
@@ -1936,8 +1950,8 @@ class Api(object):
         if not include_entities:
             parameters['include_entities'] = 'false'
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -2009,8 +2023,8 @@ class Api(object):
         if page:
             parameters['page'] = page
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return [DirectMessage.NewFromJsonDict(x) for x in data]
 
@@ -2068,8 +2082,8 @@ class Api(object):
         if not include_entities:
             parameters['include_entities'] = 'false'
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return [DirectMessage.NewFromJsonDict(x) for x in data]
 
@@ -2104,8 +2118,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return DirectMessage.NewFromJsonDict(data)
 
@@ -2127,8 +2141,8 @@ class Api(object):
         if not include_entities:
             data['include_entities'] = 'false'
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return DirectMessage.NewFromJsonDict(data)
 
@@ -2167,7 +2181,7 @@ class Api(object):
         data['{}'.format(follow_key)] = follow_json
 
         json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        data = self._ParseAndCheckTwitter(json_data.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -2216,8 +2230,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -2246,8 +2260,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
 
-        json_data = self._RequestUrl(url, 'GET', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         if len(data) >= 1:
             return UserStatus.NewFromJsonDict(data[0])
@@ -2286,8 +2300,8 @@ class Api(object):
         if not include_entities:
             data['include_entities'] = 'false'
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -2323,8 +2337,8 @@ class Api(object):
         if not include_entities:
             data['include_entities'] = 'false'
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -2374,12 +2388,12 @@ class Api(object):
             parameters['screen_name'] = screen_name
         if since_id:
             try:
-                parameters['since_id'] = long(since_id)
+                parameters['since_id'] = int(since_id)
             except ValueError:
                 raise TwitterError({'message': "since_id must be an integer"})
         if max_id:
             try:
-                parameters['max_id'] = long(max_id)
+                parameters['max_id'] = int(max_id)
             except ValueError:
                 raise TwitterError({'message': "max_id must be an integer"})
         if count:
@@ -2390,8 +2404,8 @@ class Api(object):
         if include_entities:
             parameters['include_entities'] = True
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(x) for x in data]
 
@@ -2444,12 +2458,12 @@ class Api(object):
                 raise TwitterError({'message': "count must be an integer"})
         if since_id:
             try:
-                parameters['since_id'] = long(since_id)
+                parameters['since_id'] = int(since_id)
             except ValueError:
                 raise TwitterError({'message': "since_id must be an integer"})
         if max_id:
             try:
-                parameters['max_id'] = long(max_id)
+                parameters['max_id'] = int(max_id)
             except ValueError:
                 raise TwitterError({'message': "max_id must be an integer"})
         if trim_user:
@@ -2459,8 +2473,8 @@ class Api(object):
         if not include_entities:
             parameters['include_entities'] = 'false'
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(x) for x in data]
 
@@ -2511,8 +2525,8 @@ class Api(object):
         if description is not None:
             parameters['description'] = description
 
-        json_data = self._RequestUrl(url, 'POST', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
 
@@ -2546,14 +2560,14 @@ class Api(object):
         data = {}
         if list_id:
             try:
-                data['list_id'] = long(list_id)
+                data['list_id'] = int(list_id)
             except ValueError:
                 raise TwitterError({'message': "list_id must be an integer"})
         elif slug:
             data['slug'] = slug
             if owner_id:
                 try:
-                    data['owner_id'] = long(owner_id)
+                    data['owner_id'] = int(owner_id)
                 except ValueError:
                     raise TwitterError({'message': "owner_id must be an integer"})
             elif owner_screen_name:
@@ -2563,8 +2577,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
 
@@ -2598,14 +2612,14 @@ class Api(object):
         data = {}
         if list_id:
             try:
-                data['list_id'] = long(list_id)
+                data['list_id'] = int(list_id)
             except ValueError:
                 raise TwitterError({'message': "list_id must be an integer"})
         elif slug:
             data['slug'] = slug
             if owner_id:
                 try:
-                    data['owner_id'] = long(owner_id)
+                    data['owner_id'] = int(owner_id)
                 except ValueError:
                     raise TwitterError({'message': "owner_id must be an integer"})
             elif owner_screen_name:
@@ -2615,8 +2629,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -2650,14 +2664,14 @@ class Api(object):
         data = {}
         if list_id:
             try:
-                data['list_id'] = long(list_id)
+                data['list_id'] = int(list_id)
             except ValueError:
                 raise TwitterError({'message': "list_id must be an integer"})
         elif slug:
             data['slug'] = slug
             if owner_id:
                 try:
-                    data['owner_id'] = long(owner_id)
+                    data['owner_id'] = int(owner_id)
                 except ValueError:
                     raise TwitterError({'message': "owner_id must be an integer"})
             elif owner_screen_name:
@@ -2667,8 +2681,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
 
@@ -2718,14 +2732,14 @@ class Api(object):
         data = {}
         if list_id:
             try:
-                data['list_id'] = long(list_id)
+                data['list_id'] = int(list_id)
             except ValueError:
                 raise TwitterError({'message': "list_id must be an integer"})
         elif slug:
             data['slug'] = slug
             if owner_id:
                 try:
-                    data['owner_id'] = long(owner_id)
+                    data['owner_id'] = int(owner_id)
                 except ValueError:
                     raise TwitterError({'message': "owner_id must be an integer"})
             elif owner_screen_name:
@@ -2736,7 +2750,7 @@ class Api(object):
             raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
         if user_id:
             try:
-                data['user_id'] = long(user_id)
+                data['user_id'] = int(user_id)
             except ValueError:
                 raise TwitterError({'message': "user_id must be an integer"})
         elif screen_name:
@@ -2746,8 +2760,8 @@ class Api(object):
         if include_entities:
             data['include_entities'] = True
 
-        json_data = self._RequestUrl(url, 'GET', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -2795,7 +2809,7 @@ class Api(object):
             raise TwitterError({'message': "count must be an integer"})
         if user_id is not None:
             try:
-                parameters['user_id'] = long(user_id)
+                parameters['user_id'] = int(user_id)
             except ValueError:
                 raise TwitterError({'message': "user_id must be an integer"})
         elif screen_name is not None:
@@ -2803,8 +2817,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Specify user_id or screen_name"})
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return [List.NewFromJsonDict(x) for x in data['lists']]
 
@@ -2911,8 +2925,8 @@ class Api(object):
         if reverse:
             parameters['reverse'] = 'true'
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return [List.NewFromJsonDict(x) for x in data]
 
@@ -2986,12 +3000,12 @@ class Api(object):
             parameters['owner_screen_name'] = owner_screen_name
         if since_id:
             try:
-                parameters['since_id'] = long(since_id)
+                parameters['since_id'] = int(since_id)
             except ValueError:
                 raise TwitterError({'message': "since_id must be an integer"})
         if max_id:
             try:
-                parameters['max_id'] = long(max_id)
+                parameters['max_id'] = int(max_id)
             except ValueError:
                 raise TwitterError({'message': "max_id must be an integer"})
         if count:
@@ -3004,8 +3018,8 @@ class Api(object):
         if not include_entities:
             parameters['include_entities'] = 'false'
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(x) for x in data]
 
@@ -3080,8 +3094,8 @@ class Api(object):
 
         while True:
             parameters['cursor'] = cursor
-            json_data = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(json_data.content)
+            json = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
             result += [User.NewFromJsonDict(x) for x in data['users']]
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3133,14 +3147,14 @@ class Api(object):
         data = {}
         if list_id:
             try:
-                data['list_id'] = long(list_id)
+                data['list_id'] = int(list_id)
             except ValueError:
                 raise TwitterError({'message': "list_id must be an integer"})
         elif slug:
             data['slug'] = slug
             if owner_id:
                 try:
-                    data['owner_id'] = long(owner_id)
+                    data['owner_id'] = int(owner_id)
                 except ValueError:
                     raise TwitterError({'message': "owner_id must be an integer"})
             elif owner_screen_name:
@@ -3155,7 +3169,7 @@ class Api(object):
                     isList = True
                     data['user_id'] = '%s' % ','.join(user_id)
                 else:
-                    data['user_id'] = long(user_id)
+                    data['user_id'] = int(user_id)
             except ValueError:
                 raise TwitterError({'message': "user_id must be an integer"})
         elif screen_name:
@@ -3169,8 +3183,8 @@ class Api(object):
         else:
             url = '%s/lists/members/create.json' % self.base_url
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
 
@@ -3212,14 +3226,14 @@ class Api(object):
         data = {}
         if list_id:
             try:
-                data['list_id'] = long(list_id)
+                data['list_id'] = int(list_id)
             except ValueError:
                 raise TwitterError({'message': "list_id must be an integer"})
         elif slug:
             data['slug'] = slug
             if owner_id:
                 try:
-                    data['owner_id'] = long(owner_id)
+                    data['owner_id'] = int(owner_id)
                 except ValueError:
                     raise TwitterError({'message': "owner_id must be an integer"})
             elif owner_screen_name:
@@ -3234,7 +3248,7 @@ class Api(object):
                     isList = True
                     data['user_id'] = '%s' % ','.join(user_id)
                 else:
-                    data['user_id'] = long(user_id)
+                    data['user_id'] = int(user_id)
             except ValueError:
                 raise TwitterError({'message': "user_id must be an integer"})
         elif screen_name:
@@ -3248,8 +3262,8 @@ class Api(object):
         else:
             url = '%s/lists/members/destroy.json' % (self.base_url)
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
 
@@ -3286,7 +3300,7 @@ class Api(object):
         parameters = {}
         if user_id is not None:
             try:
-                parameters['user_id'] = long(user_id)
+                parameters['user_id'] = int(user_id)
             except ValueError:
                 raise TwitterError({'message': "user_id must be an integer"})
         elif screen_name is not None:
@@ -3298,8 +3312,8 @@ class Api(object):
 
         while True:
             parameters['cursor'] = cursor
-            json_data = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(json_data.content)
+            json = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
             result += [List.NewFromJsonDict(x) for x in data['lists']]
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3368,8 +3382,8 @@ class Api(object):
         if skip_status:
             data['skip_status'] = skip_status
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -3598,8 +3612,8 @@ class Api(object):
         if not self.__auth:
             raise TwitterError({'message': "Api instance must first be given user credentials."})
         url = '%s/account/verify_credentials.json' % self.base_url
-        json_data = self._RequestUrl(url, 'GET')  # No_cache
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET')  # No_cache
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -3695,8 +3709,8 @@ class Api(object):
         if resource_families is not None:
             parameters['resources'] = resource_families
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)  # No-Cache
-        data = self._ParseAndCheckTwitter(json_data.content)
+        json = self._RequestUrl(url, 'GET', data=parameters)  # No-Cache
+        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
 
         return data
 
@@ -3725,7 +3739,7 @@ class Api(object):
         if remaining == 0:
             return remaining
         else:
-            return delta / remaining
+            return old_div(delta, remaining)
 
     def GetSleepTime(self, resources):
         """Determines the minimum number of seconds that a program must wait
@@ -3759,7 +3773,7 @@ class Api(object):
 
     def _BuildUrl(self, url, path_elements=None, extra_params=None):
         # Break url into constituent parts
-        (scheme, netloc, path, params, query, fragment) = urlparse.urlparse(url)
+        (scheme, netloc, path, params, query, fragment) = urlparse(url)
 
         # Add any additional path elements to the path
         if path_elements:
@@ -3779,7 +3793,7 @@ class Api(object):
                 query = extra_query
 
         # Return the rebuilt URL
-        return urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
+        return urlunparse((scheme, netloc, path, params, query, fragment))
 
     def _InitializeRequestHeaders(self, request_headers):
         if request_headers:
@@ -3789,7 +3803,7 @@ class Api(object):
 
     def _InitializeUserAgent(self):
         user_agent = 'Python-urllib/%s (python-twitter/%s)' % \
-                     (self._urllib.__version__, __version__)
+                     (urllib_version, __version__)
         self.SetUserAgent(user_agent)
 
     def _InitializeDefaultParameters(self):
@@ -3798,16 +3812,16 @@ class Api(object):
     def _DecompressGzippedResponse(self, response):
         raw_data = response.read()
         if response.headers.get('content-encoding', None) == 'gzip':
-            url_data = gzip.GzipFile(fileobj=StringIO.StringIO(raw_data)).read()
+            url_data = gzip.GzipFile(fileobj=io.StringIO(raw_data)).read()
         else:
             url_data = raw_data
         return url_data
 
     def _Encode(self, s):
         if self._input_encoding:
-            return unicode(s, self._input_encoding).encode('utf-8')
+            return str(s, self._input_encoding).encode('utf-8')
         else:
-            return unicode(s).encode('utf-8')
+            return str(s).encode('utf-8')
 
     def _EncodeParameters(self, parameters):
         """Return a string in key=value&key=value form.
@@ -3825,7 +3839,7 @@ class Api(object):
         if parameters is None:
             return None
         else:
-            return urllib.urlencode(dict([(k, self._Encode(v)) for k, v in parameters.items() if v is not None]))
+            return urlencode(dict([(k, self._Encode(v)) for k, v in list(parameters.items()) if v is not None]))
 
     def _EncodePostData(self, post_data):
         """Return a string in key=value&key=value form.
@@ -3844,7 +3858,7 @@ class Api(object):
         if post_data is None:
             return None
         else:
-            return urllib.urlencode(dict([(k, self._Encode(v)) for k, v in post_data.items()]))
+            return urlencode(dict([(k, self._Encode(v)) for k, v in list(post_data.items())]))
 
     def _ParseAndCheckTwitter(self, json_data):
         """Try and parse the JSON returned from Twitter and return

@@ -1,9 +1,19 @@
 #!/usr/bin/env python
 
+from __future__ import division
 from calendar import timegm
-import rfc822
+
+try:
+    from rfc822 import parsedate
+except ImportError:
+    from email.utils import parsedate
+
 import time
-from sets import Set
+# TODO remove this if/when v2.7+ is ever deprecated
+try:
+  from sets import Set
+except ImportError:
+  Set = set
 
 from twitter import json, Hashtag, Url
 from twitter.media import Media
@@ -123,7 +133,7 @@ class Status(object):
             'withheld_scope': None,
         }
 
-        for (param, default) in param_defaults.iteritems():
+        for (param, default) in param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
     # Properties that you should be able to set yourself.
@@ -192,7 +202,7 @@ class Status(object):
         Returns:
           The time this status message was posted, in seconds since the epoch.
         """
-        return timegm(rfc822.parsedate(self.created_at))
+        return timegm(parsedate(self.created_at))
 
     @property
     def RelativeCreatedAt(self):
@@ -202,7 +212,7 @@ class Status(object):
           A human readable string representing the posting time
         """
         fudge = 1.25
-        delta = long(self.now) - long(self.CreatedAtInSeconds)
+        delta = int(self.now) - int(self.CreatedAtInSeconds)
 
         if delta < (1 * fudge):
             return 'about a second ago'

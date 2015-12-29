@@ -20,7 +20,8 @@ class _FileCache(object):
     def Get(self, key):
         path = self._GetPath(key)
         if os.path.exists(path):
-            return open(path).read()
+            with open(path) as f:
+                return f.read()
         else:
             return None
 
@@ -90,7 +91,7 @@ class _FileCache(object):
 
     def _GetPath(self, key):
         try:
-            hashed_key = md5(key).hexdigest()
+            hashed_key = md5(key.encode('utf-8')).hexdigest()
         except TypeError:
             hashed_key = md5.new(key).hexdigest()
 
@@ -102,11 +103,11 @@ class _FileCache(object):
         return os.path.sep.join(hashed_key[0:_FileCache.DEPTH])
 
 
-class ParseTweet:
+class ParseTweet(object):
     # compile once on import
     regexp = {"RT": "^RT", "MT": r"^MT", "ALNUM": r"(@[a-zA-Z0-9_]+)",
               "HASHTAG": r"(#[\w\d]+)", "URL": r"([http://]?[a-zA-Z\d\/]+[\.]+[a-zA-Z\d\/\.]+)"}
-    regexp = dict((key, re.compile(value)) for key, value in regexp.items())
+    regexp = dict((key, re.compile(value)) for key, value in list(regexp.items()))
 
     def __init__(self, timeline_owner, tweet):
         """ timeline_owner : twitter handle of user account. tweet - 140 chars from feed; object does all computation on construction
