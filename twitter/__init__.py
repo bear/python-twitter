@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 
 __author__ = 'python-twitter@googlegroups.com'
-__version__ = '2.3'
+__version__ = '3.0rc1'
 
 import json                                 # noqa
 

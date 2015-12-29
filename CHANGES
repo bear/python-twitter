@@ -1,3 +1,26 @@
+2015-12-28
+  Large number of changes related to making the code Python v3 compatible.
+  See the messy details at https://github.com/bear/python-twitter/pull/251
+
+  Pull Requests
+      #267 initialize Api.__auth fixes #119 by rbpasker
+      #266 Add full_text and page options in GetDirectMessages function by mistersalmon
+      #264 Updates Media object with new methods, adds id param, adds tests by jeremylow
+      #262 Update get_access_token.py by lababidi
+      #261 Adding Collections by ryankicks
+      #260 Added UpdateBackgroundImage method and added profile_link_color argument to UpdateProfile by BrandonBielicki
+      #259 Added GetFriendIDsPaged by RockHoward
+      #254 Adding api methods for suggestions and suggestions/:slug by trentstollery
+      #253 Added who parameter to api.GetSearch by wilsonand1
+      #250 adds UpdateFriendship (shared Add/Edit friendship) by jheld
+      #249 Fixed Non-ASCII printable representation in Trend by der-Daniel
+      #246 Add __repr__ for status by era
+      #245 Python-3 Fix: decode bytestreams for json load by ligthyear
+      #243 Remove references to outdated API functionality: GetUserByEmail by Vector919
+      #239 Correct GetListsList docstring by tedmiston
+
+  Probably a whole lot that I missed - ugh!
+
 2015-10-05
   Added who to api.GetSearch
 
@@ -57,7 +80,7 @@ need to backfill commit log entries!
 2013-06-07
   changed version to 1.0.1
   added README bit about Python version requirement
-  
+
 2013-06-04
   changed version to 1.0
   removed doc directory until we can update docs for v1.1 API
@@ -74,7 +97,7 @@ need to backfill commit log entries!
 
   removed GetPublicTimeline from the docs so as to stop confusing
   new folks since it was the first example given ... d'oh!
-  
+
 2013-02-10
   bumped version to 0.8.6
 
@@ -98,7 +121,7 @@ need to backfill commit log entries!
   to push to PyPI and other places
 
   all work now will be on getting the v1.1 API supported
-  
+
 2012-11-04
   https://github.com/bear/python-twitter/issues/4
   Api.UserLookUp() throws attribute error when corresponding screen_name is not found
