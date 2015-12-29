@@ -15,7 +15,7 @@ try:
 except ImportError:
   Set = set
 
-from twitter import json, Hashtag, TwitterError, Url
+from twitter import json, Hashtag, Url
 from twitter.media import Media
 
 
@@ -416,15 +416,14 @@ class Status(object):
         """A string representation of this twitter.Status instance.
       The return value is the ID of status, username and datetime.
       Returns:
-        A string representation of this twitter.Status instance with 
+        A string representation of this twitter.Status instance with
         the ID of status, username and datetime.
       """
         if self.user:
-            representation = "Status(ID=%s, screen_name='%s', created_at='%s')" % (
-                self.id, self.user.screen_name, self.created_at)
+            representation = "Status(ID=%s, screen_name='%s', created_at='%s')" % \
+                             (self.id, self.user.screen_name, self.created_at)
         else:
-            representation = "Status(ID=%s,  created_at='%s')" % (
-                self.id, self.created_at)
+            representation = "Status(ID=%s,  created_at='%s')" % (self.id, self.created_at)
         return representation
 
     def AsJsonString(self, allow_non_ascii=False):
@@ -434,8 +433,7 @@ class Status(object):
         Returns:
           A JSON string representation of this twitter.Status instance
        """
-        return json.dumps(self.AsDict(), sort_keys=True,
-                          ensure_ascii=not allow_non_ascii)
+        return json.dumps(self.AsDict(), sort_keys=True, ensure_ascii=not allow_non_ascii)
 
     def AsDict(self):
         """A dict representation of this twitter.Status instance.

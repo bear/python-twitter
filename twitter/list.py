@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from twitter import json, TwitterError, User
+from twitter import json, User
 
 
 class List(object):
@@ -45,7 +45,6 @@ class List(object):
           The unique id of this list
         """
         return self._id
-
 
     @property
     def Name(self):

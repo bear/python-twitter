@@ -23,17 +23,15 @@ class UserTest(unittest.TestCase):
                                               'ile_image/673483/normal/me.jpg',
                             status=self._GetSampleStatus())
 
-
     def testInit(self):
         '''Test the twitter.User constructor'''
-        user = twitter.User(id=673483,
-                            name='DeWitt',
-                            screen_name='dewitt',
-                            description=u'Indeterminate things',
-                            url='https://twitter.com/dewitt',
-                            profile_image_url='https://twitter.com/system/user/prof'
-                                              'ile_image/673483/normal/me.jpg',
-                            status=self._GetSampleStatus())
+        twitter.User(id=673483,
+                     name='DeWitt',
+                     screen_name='dewitt',
+                     description=u'Indeterminate things',
+                     url='https://twitter.com/dewitt',
+                     profile_image_url='https://twitter.com/system/user/profile_image/673483/normal/me.jpg',
+                     status=self._GetSampleStatus())
 
     def testProperties(self):
         '''Test all of the twitter.User properties'''
@@ -48,10 +46,8 @@ class UserTest(unittest.TestCase):
         self.assertEqual('Indeterminate things', user.description)
         user.location = 'San Francisco, CA'
         self.assertEqual('San Francisco, CA', user.location)
-        user.profile_image_url = 'https://twitter.com/system/user/profile_i' \
-                                 'mage/673483/normal/me.jpg'
-        self.assertEqual('https://twitter.com/system/user/profile_image/6734'
-                         '83/normal/me.jpg', user.profile_image_url)
+        user.profile_image_url = 'https://twitter.com/system/user/profile_image/673483/normal/me.jpg'
+        self.assertEqual('https://twitter.com/system/user/profile_image/673483/normal/me.jpg', user.profile_image_url)
         self.status = self._GetSampleStatus()
         self.assertEqual(4212713, self.status.id)
 

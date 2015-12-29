@@ -66,7 +66,7 @@ class _FileCache(object):
                    os.getenv('USERNAME') or \
                    os.getlogin() or \
                    'nobody'
-        except (AttributeError, IOError, OSError) as e:
+        except (AttributeError, IOError, OSError):
             return 'nobody'
 
     def _GetTmpCachePath(self):
@@ -132,17 +132,18 @@ class ParseTweet(object):
     def __str__(self):
         """ for display method """
         return "owner %s, urls: %d, hashtags %d, user_handles %d, len_tweet %d, RT = %s, MT = %s" % (
-        self.Owner, len(self.URLs), len(self.Hashtags), len(self.UserHandles), len(self.tweet), self.RT, self.MT)
+                self.Owner, len(self.URLs), len(self.Hashtags), len(self.UserHandles),
+                len(self.tweet), self.RT, self.MT)
 
     @staticmethod
     def getAttributeRT(tweet):
         """ see if tweet is a RT """
-        return re.search(ParseTweet.regexp["RT"], tweet.strip()) != None
+        return re.search(ParseTweet.regexp["RT"], tweet.strip()) is not None
 
     @staticmethod
     def getAttributeMT(tweet):
         """ see if tweet is a MT """
-        return re.search(ParseTweet.regexp["MT"], tweet.strip()) != None
+        return re.search(ParseTweet.regexp["MT"], tweet.strip()) is not None
 
     @staticmethod
     def getUserHandles(tweet):

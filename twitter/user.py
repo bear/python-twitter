@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from twitter import json, TwitterError  # TwitterError not used
+from twitter import json
 
 
 class UserStatus(object):

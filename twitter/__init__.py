@@ -22,23 +22,23 @@ from __future__ import absolute_import
 __author__ = 'python-twitter@googlegroups.com'
 __version__ = '2.3'
 
-import json
+import json                                 # noqa
 
 try:
-    from hashlib import md5
+    from hashlib import md5                 # noqa
 except ImportError:
-    from md5 import md5
+    from md5 import md5                     # noqa
 
-from ._file_cache import _FileCache
-from .error import TwitterError
-from .direct_message import DirectMessage
-from .hashtag import Hashtag
-from .parse_tweet import ParseTweet
-from .trend import Trend
-from .url import Url
-from .status import Status
-from .user import User, UserStatus
-from .category import Category
-from .media import Media
-from .list import List
-from .api import Api
+from ._file_cache import _FileCache         # noqa
+from .error import TwitterError             # noqa
+from .direct_message import DirectMessage   # noqa
+from .hashtag import Hashtag                # noqa
+from .parse_tweet import ParseTweet         # noqa
+from .trend import Trend                    # noqa
+from .url import Url                        # noqa
+from .status import Status                  # noqa
+from .user import User, UserStatus          # noqa
+from .category import Category              # noqa
+from .media import Media                    # noqa
+from .list import List                      # noqa
+from .api import Api                        # noqa
