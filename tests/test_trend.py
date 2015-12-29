@@ -13,9 +13,9 @@ class TrendTest(unittest.TestCase):
 
     def testInit(self):
         '''Test the twitter.Trend constructor'''
-        trend = twitter.Trend(name='Kesuke Miyagi',
-                              query='Kesuke Miyagi',
-                              timestamp='Fri Jan 26 23:17:14 +0000 2007')
+        twitter.Trend(name='Kesuke Miyagi',
+                      query='Kesuke Miyagi',
+                      timestamp='Fri Jan 26 23:17:14 +0000 2007')
 
     def testProperties(self):
         '''Test all of the twitter.Trend properties'''

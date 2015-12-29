@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from twitter import TwitterError
-
 
 class Trend(object):
     """ A class representing a trending topic """
@@ -16,8 +14,8 @@ class Trend(object):
         return self.name.encode('utf-8')
 
     def __str__(self):
-        return 'Name: %s\nQuery: %s\nTimestamp: %s\nSearch URL: %s\n' % (
-        self.name, self.query, self.timestamp, self.url)
+        return 'Name: %s\nQuery: %s\nTimestamp: %s\nSearch URL: %s\n' % \
+               (self.name, self.query, self.timestamp, self.url)
 
     def __ne__(self, other):
         return not self.__eq__(other)

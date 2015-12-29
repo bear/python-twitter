@@ -17,9 +17,7 @@ class StatusTest(unittest.TestCase):
                             description=u'Canvas. JC Penny. Three ninety-eight.',
                             location='Okinawa, Japan',
                             url='https://twitter.com/kesuke',
-                            profile_image_url='https://twitter.com/system/user/pro'
-                                              'file_image/718443/normal/kesuke.pn'
-                                              'g')
+                            profile_image_url='https://twitter.com/system/user/profile_image/718443/normal/kesuke.png')
 
     def _GetSampleStatus(self):
         return twitter.Status(created_at='Fri Jan 26 23:17:14 +0000 2007',
@@ -29,10 +27,10 @@ class StatusTest(unittest.TestCase):
 
     def testInit(self):
         '''Test the twitter.Status constructor'''
-        status = twitter.Status(created_at='Fri Jan 26 23:17:14 +0000 2007',
-                                id=4391023,
-                                text=u'A légpárnás hajóm tele van angolnákkal.',
-                                user=self._GetSampleUser())
+        twitter.Status(created_at='Fri Jan 26 23:17:14 +0000 2007',
+                       id=4391023,
+                       text=u'A légpárnás hajóm tele van angolnákkal.',
+                       user=self._GetSampleUser())
 
     def testProperties(self):
         '''Test all of the twitter.Status properties'''
@@ -117,7 +115,7 @@ class StatusTest(unittest.TestCase):
         data = json.loads(StatusTest.SAMPLE_JSON)
         status = twitter.Status.NewFromJsonDict(data)
         self.assertEqual(self._GetSampleStatus(), status)
-    
+
     def testStatusRepresentation(self):
         status = self._GetSampleStatus()
         self.assertEqual("Status(ID=4391023, screen_name='kesuke', created_at='Fri Jan 26 23:17:14 +0000 2007')", status.__repr__())

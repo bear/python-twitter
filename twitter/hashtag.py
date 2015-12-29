@@ -15,7 +15,7 @@ class Hashtag(object):
         Args:
           data:
             A JSON dict, as converted from the JSON in the twitter API
-    
+
         Returns:
           A twitter.Hashtag instance
         """

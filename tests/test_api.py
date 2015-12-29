@@ -1,8 +1,10 @@
 # encoding: utf-8
 
-import twitter
+import os
 import time
+import urllib
 import unittest
+import twitter
 
 from apikey import (CONSUMER_KEY,
                     CONSUMER_SECRET,
@@ -30,7 +32,7 @@ class ApiTest(unittest.TestCase):
                          curry(self._OpenTestData, 'public_timeline_error.json'))
         # Manually try/catch so we can check the exception's value
         try:
-            statuses = self._api.GetUserTimeline()
+            self._api.GetUserTimeline()
         except twitter.TwitterError, error:
             # If the error message matches, the test passes
             self.assertEqual('test error', error.message)
@@ -48,7 +50,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(89512102, statuses[0].id)
         self.assertEqual(718443, statuses[0].user.id)
 
-    #def testGetFriendsTimeline(self):
+    # def testGetFriendsTimeline(self):
     #  '''Test the twitter.Api GetFriendsTimeline method'''
     #  self._AddHandler('https://api.twitter.com/1.1/statuses/friends_timeline/kesuke.json',
     #                   curry(self._OpenTestData, 'friends_timeline-kesuke.json'))
@@ -101,7 +103,7 @@ class ApiTest(unittest.TestCase):
         print 'Testing PostUpdateLatLon'
         self._AddHandler('https://api.twitter.com/1.1/statuses/update.json',
                          curry(self._OpenTestData, 'update_latlong.json'))
-        #test another update with geo parameters, again test somewhat arbitrary
+        # test another update with geo parameters, again test somewhat arbitrary
         status = self._api.PostUpdate(u'Моё судно на воздушной подушке полно угрей'.encode('utf8'), latitude=54.2,
                                       longitude=-2)
         self.assertEqual(u'Моё судно на воздушной подушке полно угрей', status.text)
@@ -148,7 +150,7 @@ class ApiTest(unittest.TestCase):
         alexkingorg = [u.status for u in users if u.screen_name == 'alexkingorg']
         self.assertEqual(89554432, alexkingorg[0].id)
 
-    #def testGetFeatured(self):
+    # def testGetFeatured(self):
     #  '''Test the twitter.Api GetFeatured method'''
     #  self._AddHandler('https://api.twitter.com/1.1/statuses/featured.json',
     #                   curry(self._OpenTestData, 'featured.json'))
@@ -322,4 +324,3 @@ class MockHTTPBasicAuthHandler(object):
     def add_password(self, realm, uri, user, passwd):
         # TODO(dewitt): Add verification that the proper args are passed
         pass
-

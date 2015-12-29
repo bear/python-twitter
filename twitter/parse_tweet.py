@@ -2,38 +2,36 @@
 
 import re
 
-from twitter import TwitterError  # import not used?
-
 class Emoticons:
-    POSITIVE = ["*O","*-*","*O*","*o*","* *",
-                ":P",":D",":d",":p",
-                ";P",";D",";d",";p",
-                ":-)",";-)",":=)",";=)",
-                ":<)",":>)",";>)",";=)",
-                "=}",":)","(:;)",
-                "(;",":}","{:",";}",
+    POSITIVE = ["*O", "*-*", "*O*", "*o*", "* *",
+                ":P", ":D", ":d", ":p",
+                ";P", ";D", ";d", ";p",
+                ":-)", ";-)", ":=)", ";=)",
+                ":<)", ":>)", ";>)", ";=)",
+                "=}", ":)", "(:;)",
+                "(;", ":}", "{:", ";}",
                 "{;:]",
-                "[;",":')",";')",":-3",
-                "{;",":]",
-                ";-3",":-x",";-x",":-X",
-                ";-X",":-}",";-=}",":-]",
-                ";-]",":-.)",
-                "^_^","^-^"]
+                "[;", ":')", ";')", ":-3",
+                "{;", ":]",
+                ";-3", ":-x", ";-x", ":-X",
+                ";-X", ":-}", ";-=}", ":-]",
+                ";-]", ":-.)",
+                "^_^", "^-^"]
 
-    NEGATIVE = [":(",";(",":'(",
-                "=(","={","):",");",
-                ")':",")';",")=","}=",
-                ";-{{",";-{",":-{{",":-{",
-                ":-(",";-(",
-                ":,)",":'{",
-                "[:",";]"
+    NEGATIVE = [":(", ";(", ":'(",
+                "=(", "={", "):", ");",
+                ")':", ")';", ")=", "}=",
+                ";-{{", ";-{", ":-{{", ":-{",
+                ":-(", ";-(",
+                ":,)", ":'{",
+                "[:", ";]"
                 ]
 
 class ParseTweet:
     # compile once on import
     regexp = {"RT": "^RT", "MT": r"^MT", "ALNUM": r"(@[a-zA-Z0-9_]+)",
               "HASHTAG": r"(#[\w\d]+)", "URL": r"([https://|http://]?[a-zA-Z\d\/]+[\.]+[a-zA-Z\d\/\.]+)",
-              "SPACES":r"\s+"}
+              "SPACES": r"\s+"}
     regexp = dict((key, re.compile(value)) for key, value in regexp.items())
 
     def __init__(self, timeline_owner, tweet):
@@ -51,7 +49,7 @@ class ParseTweet:
         self.RT = ParseTweet.getAttributeRT(tweet)
         self.MT = ParseTweet.getAttributeMT(tweet)
         self.Emoticon = ParseTweet.getAttributeEmoticon(tweet)
-        
+
         # additional intelligence
         if ( self.RT and len(self.UserHandles) > 0 ):  # change the owner of tweet?
             self.Owner = self.UserHandles[0]
@@ -59,30 +57,30 @@ class ParseTweet:
 
     def __str__(self):
         """ for display method """
-        return "owner %s, urls: %d, hashtags %d, user_handles %d, len_tweet %d, RT = %s, MT = %s" % (
-        self.Owner, len(self.URLs), len(self.Hashtags), len(self.UserHandles), len(self.tweet), self.RT, self.MT)
+        return "owner %s, urls: %d, hashtags %d, user_handles %d, len_tweet %d, RT = %s, MT = %s" % \
+               (self.Owner, len(self.URLs), len(self.Hashtags), len(self.UserHandles), len(self.tweet), self.RT, self.MT)
 
     @staticmethod
     def getAttributeEmoticon(tweet):
         """ see if tweet is contains any emoticons, +ve, -ve or neutral """
         emoji = list()
-        for tok in re.split(ParseTweet.regexp["SPACES"],tweet.strip()):
+        for tok in re.split(ParseTweet.regexp["SPACES"], tweet.strip()):
             if tok in Emoticons.POSITIVE:
                 emoji.append( tok )
                 continue
             if tok in Emoticons.NEGATIVE:
                 emoji.append( tok )
         return emoji
-    
+
     @staticmethod
     def getAttributeRT(tweet):
         """ see if tweet is a RT """
-        return re.search(ParseTweet.regexp["RT"], tweet.strip()) != None
+        return re.search(ParseTweet.regexp["RT"], tweet.strip()) is not None
 
     @staticmethod
     def getAttributeMT(tweet):
         """ see if tweet is a MT """
-        return re.search(ParseTweet.regexp["MT"], tweet.strip()) != None
+        return re.search(ParseTweet.regexp["MT"], tweet.strip()) is not None
 
     @staticmethod
     def getUserHandles(tweet):

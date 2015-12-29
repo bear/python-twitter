@@ -3,7 +3,7 @@
 from calendar import timegm
 import rfc822
 
-from twitter import json, TwitterError
+from twitter import json
 
 
 class DirectMessage(object):
@@ -147,7 +147,6 @@ class DirectMessage(object):
           The unique sender id of this direct message
         """
         return self._sender_id
-
 
     def __ne__(self, other):
         return not self.__eq__(other)

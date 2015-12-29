@@ -87,7 +87,6 @@ class Media(object):
             data['variants'] = self.variants
         return data
 
-
     @staticmethod
     def NewFromJsonDict(data):
         """Create a new instance based on a JSON dict.
