@@ -33,8 +33,6 @@ import requests
 from requests_oauthlib import OAuth1
 import io
 
-from past.utils import old_div
-
 try:
   # python 3
   from urllib.parse import urlparse, urlunparse, urlencode
@@ -3739,7 +3737,7 @@ class Api(object):
         if remaining == 0:
             return remaining
         else:
-            return old_div(delta, remaining)
+            return delta // remaining
 
     def GetSleepTime(self, resources):
         """Determines the minimum number of seconds that a program must wait
