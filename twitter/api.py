@@ -255,8 +255,8 @@ class Api(object):
     def GetHelpConfiguration(self):
         if self._config is None:
             url = '%s/help/configuration.json' % self.base_url
-            json = self._RequestUrl(url, 'GET')
-            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+            resp = self._RequestUrl(url, 'GET')
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             self._config = data
         return self._config
 
@@ -389,8 +389,8 @@ class Api(object):
 
         # Make and send requests
         url = '%s/search/tweets.json' % self.base_url
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         # Return built list of statuses
         return [Status.NewFromJsonDict(x) for x in data['statuses']]
@@ -440,8 +440,8 @@ class Api(object):
 
         # Make and send requests
         url = '%s/users/search.json' % self.base_url
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
         return [User.NewFromJsonDict(x) for x in data]
 
     def GetTrendsCurrent(self, exclude=None):
@@ -477,8 +477,8 @@ class Api(object):
         if exclude:
             parameters['exclude'] = exclude
 
-        json = self._RequestUrl(url, verb='GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, verb='GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
         trends = []
         timestamp = data[0]['as_of']
 
@@ -493,8 +493,8 @@ class Api(object):
             A list of categories
         """
         url = '%s/users/suggestions.json' % (self.base_url)
-        json_data = self._RequestUrl(url, verb='GET')
-        data = self._ParseAndCheckTwitter(json_data.content)
+        resp = self._RequestUrl(url, verb='GET')
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         categories = []
 
@@ -512,8 +512,8 @@ class Api(object):
         """
         url = '%s/users/suggestions/%s.json' % (self.base_url, category.Slug)
 
-        json_data = self._RequestUrl(url, verb='GET')
-        data = self._ParseAndCheckTwitter(json_data.content)
+        resp = self._RequestUrl(url, verb='GET')
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         users = []
         for user in data['users']:
@@ -601,8 +601,8 @@ class Api(object):
             parameters['contributor_details'] = 1
         if not include_entities:
             parameters['include_entities'] = 'false'
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(x) for x in data]
 
@@ -686,8 +686,8 @@ class Api(object):
         if exclude_replies:
             parameters['exclude_replies'] = 1
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(x) for x in data]
 
@@ -739,8 +739,8 @@ class Api(object):
         if not include_entities:
             parameters['include_entities'] = 'none'
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -826,8 +826,8 @@ class Api(object):
                 raise TwitterError({'message': "'lang' should be string instance"})
             parameters['lang'] = lang
 
-        json = self._RequestUrl(request_url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(request_url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return data
 
@@ -855,8 +855,8 @@ class Api(object):
         if trim_user:
             post_data['trim_user'] = 1
 
-        json = self._RequestUrl(url, 'POST', data=post_data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=post_data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -944,8 +944,8 @@ class Api(object):
         if trim_user:
             data['trim_user'] = 'true'
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -1013,8 +1013,8 @@ class Api(object):
         if display_coordinates:
             data['display_coordinates'] = 'true'
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -1074,8 +1074,8 @@ class Api(object):
             else:
                 data['media'] = media[m].read()
 
-            json = self._RequestUrl(url, 'POST', data=data)
-            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+            resp = self._RequestUrl(url, 'POST', data=data)
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
             media_ids += str(data['media_id_string'])
             if m is not len(media) - 1:
@@ -1085,8 +1085,8 @@ class Api(object):
 
         url = '%s/statuses/update.json' % self.base_url
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -1156,8 +1156,8 @@ class Api(object):
         data = {'id': original_id}
         if trim_user:
             data['trim_user'] = 'true'
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -1256,8 +1256,8 @@ class Api(object):
             except ValueError:
                 raise TwitterError({'message': "count must be an integer"})
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(s) for s in data]
 
@@ -1297,8 +1297,8 @@ class Api(object):
                 except ValueError:
                     raise TwitterError({'message': "cursor must be an integer"})
                     break
-            json = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+            resp = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [x for x in data['ids']]
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -1365,8 +1365,8 @@ class Api(object):
         if not include_user_entities:
             parameters['include_user_entities'] = include_user_entities
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(s) for s in data]
 
@@ -1416,8 +1416,8 @@ class Api(object):
 
         while True:
             parameters['cursor'] = cursor
-            json = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+            resp = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [User.NewFromJsonDict(x) for x in data['users']]
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -1455,8 +1455,8 @@ class Api(object):
         if trim_user:
             post_data['trim_user'] = 1
 
-        json = self._RequestUrl(url, 'POST', data=post_data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=post_data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -1510,8 +1510,8 @@ class Api(object):
 
         while True:
             parameters['cursor'] = cursor
-            json = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+            resp = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [User.NewFromJsonDict(x) for x in data['users']]
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -1555,8 +1555,8 @@ class Api(object):
 
         while True:
             parameters['cursor'] = cursor
-            json = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+            resp = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [x for x in data['ids']]
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -1792,8 +1792,8 @@ class Api(object):
             parameters['include_user_entities'] = True
         parameters['cursor'] = cursor
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if 'next_cursor' in data:
             next_cursor = data['next_cursor']
@@ -1902,9 +1902,9 @@ class Api(object):
         if not include_entities:
             parameters['include_entities'] = 'false'
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
+        resp = self._RequestUrl(url, 'GET', data=parameters)
         try:
-            data = self._ParseAndCheckTwitter(json_data.content.decode('utf-8'))
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
         except TwitterError as e:
             _, e, _ = sys.exc_info()
             t = e.args[0]
@@ -1950,8 +1950,8 @@ class Api(object):
         if not include_entities:
             parameters['include_entities'] = 'false'
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -2023,8 +2023,8 @@ class Api(object):
         if page:
             parameters['page'] = page
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [DirectMessage.NewFromJsonDict(x) for x in data]
 
@@ -2082,8 +2082,8 @@ class Api(object):
         if not include_entities:
             parameters['include_entities'] = 'false'
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [DirectMessage.NewFromJsonDict(x) for x in data]
 
@@ -2118,8 +2118,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return DirectMessage.NewFromJsonDict(data)
 
@@ -2141,8 +2141,8 @@ class Api(object):
         if not include_entities:
             data['include_entities'] = 'false'
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return DirectMessage.NewFromJsonDict(data)
 
@@ -2180,8 +2180,8 @@ class Api(object):
         follow_json = json.dumps(follow)
         data['{}'.format(follow_key)] = follow_json
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json_data.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -2230,8 +2230,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -2260,8 +2260,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
 
-        json = self._RequestUrl(url, 'GET', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if len(data) >= 1:
             return UserStatus.NewFromJsonDict(data[0])
@@ -2300,8 +2300,8 @@ class Api(object):
         if not include_entities:
             data['include_entities'] = 'false'
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -2337,8 +2337,8 @@ class Api(object):
         if not include_entities:
             data['include_entities'] = 'false'
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
@@ -2404,8 +2404,8 @@ class Api(object):
         if include_entities:
             parameters['include_entities'] = True
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(x) for x in data]
 
@@ -2473,8 +2473,8 @@ class Api(object):
         if not include_entities:
             parameters['include_entities'] = 'false'
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(x) for x in data]
 
@@ -2525,8 +2525,8 @@ class Api(object):
         if description is not None:
             parameters['description'] = description
 
-        json = self._RequestUrl(url, 'POST', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
 
@@ -2577,8 +2577,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
 
@@ -2629,8 +2629,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -2681,8 +2681,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
 
@@ -2760,8 +2760,8 @@ class Api(object):
         if include_entities:
             data['include_entities'] = True
 
-        json = self._RequestUrl(url, 'GET', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -2817,8 +2817,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Specify user_id or screen_name"})
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [List.NewFromJsonDict(x) for x in data['lists']]
 
@@ -2884,8 +2884,8 @@ class Api(object):
         else:
             raise TwitterError({'message': "Specify user_id or screen_name"})
 
-        json_data = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json_data.content)
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content)
 
         return [List.NewFromJsonDict(x) for x in data['lists']]
 
@@ -2925,8 +2925,8 @@ class Api(object):
         if reverse:
             parameters['reverse'] = 'true'
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [List.NewFromJsonDict(x) for x in data]
 
@@ -2982,9 +2982,7 @@ class Api(object):
         Returns:
           A sequence of Status instances, one for each message up to count
         """
-        parameters = {'slug': slug,
-                      'list_id': list_id,
-                      }
+        parameters = {}
         url = '%s/lists/statuses.json' % (self.base_url)
         parameters['slug'] = slug
         parameters['list_id'] = list_id
@@ -3018,8 +3016,8 @@ class Api(object):
         if not include_entities:
             parameters['include_entities'] = 'false'
 
-        json = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(x) for x in data]
 
@@ -3065,9 +3063,7 @@ class Api(object):
         Returns:
           A sequence of twitter.User instances, one for each follower
         """
-        parameters = {'slug': slug,
-                      'list_id': list_id,
-                      }
+        parameters = {}
         url = '%s/lists/members.json' % (self.base_url)
         parameters['slug'] = slug
         parameters['list_id'] = list_id
@@ -3094,8 +3090,8 @@ class Api(object):
 
         while True:
             parameters['cursor'] = cursor
-            json = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+            resp = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [User.NewFromJsonDict(x) for x in data['users']]
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3183,8 +3179,8 @@ class Api(object):
         else:
             url = '%s/lists/members/create.json' % self.base_url
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
 
@@ -3262,8 +3258,8 @@ class Api(object):
         else:
             url = '%s/lists/members/destroy.json' % (self.base_url)
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
 
@@ -3312,8 +3308,8 @@ class Api(object):
 
         while True:
             parameters['cursor'] = cursor
-            json = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+            resp = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [List.NewFromJsonDict(x) for x in data['lists']]
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -3382,8 +3378,8 @@ class Api(object):
         if skip_status:
             data['skip_status'] = skip_status
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'POST', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -3406,12 +3402,12 @@ class Api(object):
         if skip_status:
             data['skip_status'] = 1
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        if json.status_code in [200, 201, 202]:
+        resp = self._RequestUrl(url, 'POST', data=data)
+        if resp.status_code in [200, 201, 202]:
             return True
-        if json.status_code == 400:
+        if resp.status_code == 400:
             raise TwitterError({'message': "Image data could not be processed"})
-        if json.status_code == 422:
+        if resp.status_code == 422:
             raise TwitterError({'message': "The image could not be resized or is too large."})
 
     def UpdateImage(self,
@@ -3430,12 +3426,12 @@ class Api(object):
         if skip_status:
             data['skip_status'] = 1
 
-        json = self._RequestUrl(url, 'POST', data=data)
-        if json.status_code in [200, 201, 202]:
+        resp = self._RequestUrl(url, 'POST', data=data)
+        if resp.status_code in [200, 201, 202]:
             return True
-        if json.status_code == 400:
+        if resp.status_code == 400:
             raise TwitterError({'message': "Image data could not be processed"})
-        if json.status_code == 422:
+        if resp.status_code == 422:
             raise TwitterError({'message': "The image could not be resized or is too large."})
 
     def UpdateBanner(self,
@@ -3472,12 +3468,12 @@ class Api(object):
         if skip_status:
             data['skip_status'] = 1
 
-        json_data = self._RequestUrl(url, 'POST', data=data)
-        if json_data.status_code in [200, 201, 202]:
+        resp = self._RequestUrl(url, 'POST', data=data)
+        if resp.status_code in [200, 201, 202]:
             return True
-        if json_data.status_code == 400:
+        if resp.status_code == 400:
             raise TwitterError({'message': "Image data could not be processed"})
-        if json_data.status_code == 422:
+        if resp.status_code == 422:
             raise TwitterError({'message': "The image could not be resized or is too large."})
 
         raise TwitterError({'message': "Unkown banner image upload issue"})
@@ -3495,8 +3491,8 @@ class Api(object):
           A Twitter stream
         """
         url = '%s/statuses/sample.json' % self.stream_url
-        json_data = self._RequestStream(url, 'GET')
-        for line in json_data.iter_lines():
+        resp = self._RequestStream(url, 'GET')
+        for line in resp.iter_lines():
             if line:
                 data = self._ParseAndCheckTwitter(line)
                 yield data
@@ -3540,8 +3536,8 @@ class Api(object):
         if stall_warnings is not None:
             data['stall_warnings'] = str(stall_warnings)
 
-        json_data = self._RequestStream(url, 'POST', data=data)
-        for line in json_data.iter_lines():
+        resp = self._RequestStream(url, 'POST', data=data)
+        for line in resp.iter_lines():
             if line:
                 data = self._ParseAndCheckTwitter(line)
                 yield data
@@ -3596,8 +3592,8 @@ class Api(object):
         if delimited is not None:
             data['stall_warning'] = str(stall_warning)
 
-        r = self._RequestStream(url, 'POST', data=data)
-        for line in r.iter_lines():
+        resp = self._RequestStream(url, 'POST', data=data)
+        for line in resp.iter_lines():
             if line:
                 data = self._ParseAndCheckTwitter(line)
                 yield data
@@ -3612,8 +3608,8 @@ class Api(object):
         if not self.__auth:
             raise TwitterError({'message': "Api instance must first be given user credentials."})
         url = '%s/account/verify_credentials.json' % self.base_url
-        json = self._RequestUrl(url, 'GET')  # No_cache
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET')  # No_cache
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
@@ -3709,8 +3705,8 @@ class Api(object):
         if resource_families is not None:
             parameters['resources'] = resource_families
 
-        json = self._RequestUrl(url, 'GET', data=parameters)  # No-Cache
-        data = self._ParseAndCheckTwitter(json.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)  # No-Cache
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return data
 
@@ -3965,16 +3961,14 @@ class Api(object):
             try:
                 return requests.post(url, data=data, stream=True,
                                      auth=self.__auth,
-                                     timeout=self._timeout
-                                     )
+                                     timeout=self._timeout)
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         if verb == 'GET':
             url = self._BuildUrl(url, extra_params=data)
             try:
                 return requests.get(url, stream=True, auth=self.__auth,
-                                    timeout=self._timeout
-                                    )
+                                    timeout=self._timeout)
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         return 0  # if not a POST or GET request
