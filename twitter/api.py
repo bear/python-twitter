@@ -26,7 +26,7 @@ import gzip
 import time
 import types
 import base64
-import textwrap
+import re
 import datetime
 from calendar import timegm
 import requests
@@ -49,6 +49,8 @@ except ImportError:
 from twitter import (__version__, _FileCache, json, DirectMessage, List,
                      Status, Trend, TwitterError, User, UserStatus)
 from twitter.category import Category
+
+from twitter.twitter_utils import calc_expected_status_length, is_url
 
 CHARACTER_LIMIT = 140
 
@@ -860,16 +862,6 @@ class Api(object):
 
         return Status.NewFromJsonDict(data)
 
-    @classmethod
-    def _calculate_status_length(cls, status, linksize=19):
-        dummy_link_replacement = 'https://-%d-chars%s/' % (linksize, '-' * (linksize - 18))
-        shortened = ' '.join([x if not (x.startswith('http://') or
-                                        x.startswith('https://'))
-                              else
-                              dummy_link_replacement
-                              for x in status.split(' ')])
-        return len(shortened)
-
     def PostUpdate(self,
                    status,
                    in_reply_to_status_id=None,
@@ -877,7 +869,8 @@ class Api(object):
                    longitude=None,
                    place_id=None,
                    display_coordinates=False,
-                   trim_user=False):
+                   trim_user=False,
+                   verify_status_length=True):
         """Post a twitter status message from the authenticated user.
 
         The twitter.Api instance must be authenticated.
@@ -914,6 +907,10 @@ class Api(object):
             If True the returned payload will only contain the user IDs,
             otherwise the payload will contain the full user data item.
             [Optional]
+          verify_status_length:
+            If True, api throws a hard error that the status is over
+            140 characters. If False, Api will attempt to post the
+            status. [Optional]
         Returns:
           A twitter.Status instance representing the message posted.
         """
@@ -927,9 +924,8 @@ class Api(object):
         else:
             u_status = str(status, self._input_encoding)
 
-        # if self._calculate_status_length(u_status, self._shortlink_size) > CHARACTER_LIMIT:
-        #  raise TwitterError("Text must be less than or equal to %d characters. "
-        #                     "Consider using PostUpdates." % CHARACTER_LIMIT)
+        if verify_status_length and calc_expected_status_length(u_status) > 140:
+            raise TwitterError("Text must be less than or equal to 140 characters.")
 
         data = {'status': u_status}
         if in_reply_to_status_id:
@@ -1090,6 +1086,46 @@ class Api(object):
 
         return Status.NewFromJsonDict(data)
 
+    def _TweetTextWrap(self,
+                       status,
+                       char_lim=140):
+
+        if not self._config:
+            self.GetHelpConfiguration()
+
+        tweets = []
+        line = []
+        line_length = 0
+        words = re.split(r'\s', status)
+
+        if len(words) == 1 and not is_url(words):
+            if len(words[0]) > 140:
+                raise TwitterError({"message": "Unable to split status into tweetable parts. Word was: {0}/{1}".format(len(words[0]), char_lim)})
+            else:
+                tweets.append(words[0])
+                return tweets
+
+        for word in words:
+            if len(word) > char_lim:
+                raise TwitterError({"message": "Unable to split status into tweetable parts. Word was: {0}/{1}".format(len(word), char_lim)})
+            new_len = line_length
+
+            if is_url(word):
+                new_len = line_length + self._config['short_url_length_https'] + 1
+            else:
+                new_len += len(word) + 1
+
+            if new_len > 140:
+                tweets.append(' '.join(line))
+                line = [word]
+                line_length = new_len - line_length
+            else:
+                line.append(word)
+                line_length = new_len
+
+        tweets.append(' '.join(line))
+        return tweets
+
     def PostUpdates(self,
                     status,
                     continuation=None,
@@ -1117,13 +1153,21 @@ class Api(object):
           A of list twitter.Status instance representing the messages posted.
         """
         results = list()
+
         if continuation is None:
             continuation = ''
-        line_length = CHARACTER_LIMIT - len(continuation)
-        lines = textwrap.wrap(status, line_length)
-        for line in lines[0:-1]:
-            results.append(self.PostUpdate(line + continuation, **kwargs))
-        results.append(self.PostUpdate(lines[-1], **kwargs))
+        char_limit = CHARACTER_LIMIT - len(continuation)
+
+        tweets = self._TweetTextWrap(status=status, char_lim=char_limit)
+
+        if len(tweets) == 1:
+            results.append(self.PostUpdate(status=tweets[0]))
+            return results
+
+        for tweet in tweets[0:-1]:
+            print('tweeting', tweet)
+            results.append(self.PostUpdate(status=tweet + continuation, **kwargs))
+        results.append(self.PostUpdate(status=tweets[-1], **kwargs))
 
         return results
 
