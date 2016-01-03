@@ -15,7 +15,7 @@ env:
 	make deps
 
 deps:
-	pip install -r requirements.txt --use-mirrors
+	pip install -r requirements.tests.txt --use-mirrors
 
 clean:
 	rm -fr build
