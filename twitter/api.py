@@ -74,7 +74,7 @@ class Api(object):
       a Twitter "short name" or their user id.
 
         >>> statuses = api.GetUserTimeline(user)
-        >>> print [s.text for s in statuses]
+        >>> print([s.text for s in statuses])
 
       To use authentication, instantiate the twitter.Api class with a
       consumer key and secret; and the oAuth key and secret:
@@ -87,12 +87,12 @@ class Api(object):
       To fetch your friends (after being authenticated):
 
         >>> users = api.GetFriends()
-        >>> print [u.name for u in users]
+        >>> print([u.name for u in users])
 
       To post a twitter status message (after being authenticated):
 
         >>> status = api.PostUpdate('I love python-twitter!')
-        >>> print status.text
+        >>> print(status.text)
         I love python-twitter!
 
       There are many other methods, including:
@@ -202,9 +202,10 @@ class Api(object):
 
         if consumer_key is not None and (access_token_key is None or
                                          access_token_secret is None):
-            print >> sys.stderr, 'Twitter now requires an oAuth Access Token for API calls.'
-            print >> sys.stderr, 'If you\'re using this library from a command line utility, please'
-            print >> sys.stderr, 'run the included get_access_token.py tool to generate one.'
+            print('Twitter now requires an oAuth Access Token for API calls. '
+                  'If you\'re using this library from a command line utility, '
+                  'please run the included get_access_token.py tool to '
+                  'generate one.', file=sys.stderr)
 
             raise TwitterError({'message': "Twitter requires oAuth Access Token for all API access"})
 
