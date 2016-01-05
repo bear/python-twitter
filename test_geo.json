@@ -1,0 +1,2801 @@
+{
+  "statuses": [
+    {
+      "id": 676518074279788544,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "fr",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              33,
+              44
+            ],
+            "text": "Pleasanton"
+          },
+          {
+            "indices": [
+              74,
+              77
+            ],
+            "text": "IT"
+          },
+          {
+            "indices": [
+              78,
+              82
+            ],
+            "text": "Job"
+          },
+          {
+            "indices": [
+              83,
+              88
+            ],
+            "text": "Jobs"
+          },
+          {
+            "indices": [
+              89,
+              96
+            ],
+            "text": "Hiring"
+          },
+          {
+            "indices": [
+              97,
+              107
+            ],
+            "text": "CareerArc"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              50,
+              73
+            ],
+            "url": "https://t.co/kMfUfzQH3n",
+            "expanded_url": "http://bit.ly/1JIH78A",
+            "display_url": "bit.ly/1JIH78A"
+          }
+        ],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "676518074279788544",
+      "source": "<a href=\"http://www.tweetmyjobs.com\" rel=\"nofollow\">TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -121.8746789,
+          37.6624312
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "fr",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "ad4876a662119b74",
+        "url": "https://api.twitter.com/1.1/geo/id/ad4876a662119b74.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "Pleasanton, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -121.956864,
+                37.621859
+              ],
+              [
+                -121.7986057,
+                37.621859
+              ],
+              [
+                -121.7986057,
+                37.704036
+              ],
+              [
+                -121.956864,
+                37.704036
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "Pleasanton",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 23880153,
+        "url": "https://t.co/DByWt45HZj",
+        "utc_offset": -18000,
+        "default_profile_image": false,
+        "followers_count": 514,
+        "protected": false,
+        "friends_count": 329,
+        "contributors_enabled": false,
+        "location": "San Jose, CA",
+        "profile_use_background_image": true,
+        "screen_name": "tmj_sjc_it1",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/315559665/Twitter-BG_2_bg-image.jpg",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/DByWt45HZj",
+                "expanded_url": "http://www.careerarc.com/job-seeker",
+                "display_url": "careerarc.com/job-seeker"
+              }
+            ]
+          }
+        },
+        "id_str": "23880153",
+        "profile_background_color": "253956",
+        "geo_enabled": true,
+        "description": "Follow this account for geo-targeted Software Dev. - General/IT job tweets in San Jose, CA. Need help? Tweet us at @CareerArc!",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/23880153/1447954904",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/667397350097158144/YpaKFs_w_normal.jpg",
+        "profile_text_color": "000000",
+        "profile_sidebar_border_color": "000000",
+        "statuses_count": 694,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/315559665/Twitter-BG_2_bg-image.jpg",
+        "listed_count": 77,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/667397350097158144/YpaKFs_w_normal.jpg",
+        "following": false,
+        "created_at": "Thu Mar 12 02:43:56 +0000 2009",
+        "profile_sidebar_fill_color": "407DB0",
+        "profile_link_color": "4A913C",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "TMJ - SJC IT Jobs",
+        "time_zone": "Eastern Time (US & Canada)"
+      },
+      "text": "Oracle: Senior Python Developer (#Pleasanton, CA) https://t.co/kMfUfzQH3n #IT #Job #Jobs #Hiring #CareerArc",
+      "created_at": "Mon Dec 14 21:44:12 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          37.6624312,
+          -121.8746789
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 676451346581577728,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              0,
+              12
+            ],
+            "text": "Engineering"
+          },
+          {
+            "indices": [
+              68,
+              74
+            ],
+            "text": "Davis"
+          },
+          {
+            "indices": [
+              103,
+              112
+            ],
+            "text": "SunPower"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              79,
+              102
+            ],
+            "url": "https://t.co/0Uys2e19u0",
+            "expanded_url": "http://bit.ly/1SRrJwI",
+            "display_url": "bit.ly/1SRrJwI"
+          }
+        ],
+        "user_mentions": [],
+        "media": [
+          {
+            "indices": [
+              113,
+              136
+            ],
+            "id": 676451346308984832,
+            "id_str": "676451346308984832",
+            "media_url_https": "https://pbs.twimg.com/media/CWM86lyU8AAbkT3.jpg",
+            "expanded_url": "http://twitter.com/SunPowerTalent/status/676451346581577728/photo/1",
+            "media_url": "http://pbs.twimg.com/media/CWM86lyU8AAbkT3.jpg",
+            "sizes": {
+              "large": {
+                "h": 512,
+                "resize": "fit",
+                "w": 1024
+              },
+              "small": {
+                "h": 170,
+                "resize": "fit",
+                "w": 340
+              },
+              "medium": {
+                "h": 300,
+                "resize": "fit",
+                "w": 600
+              },
+              "thumb": {
+                "h": 150,
+                "resize": "crop",
+                "w": 150
+              }
+            },
+            "type": "photo",
+            "url": "https://t.co/33fPk5iDIU",
+            "display_url": "pic.twitter.com/33fPk5iDIU"
+          }
+        ],
+        "symbols": []
+      },
+      "id_str": "676451346581577728",
+      "source": "<a href=\"http://tweetmyjobs.com\" rel=\"nofollow\">SafeTweet by TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -121.7405167,
+          38.5449065
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "1994142e26ba7127",
+        "url": "https://api.twitter.com/1.1/geo/id/1994142e26ba7127.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "Davis, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -121.803252,
+                38.526843
+              ],
+              [
+                -121.675074,
+                38.526843
+              ],
+              [
+                -121.675074,
+                38.590264
+              ],
+              [
+                -121.803252,
+                38.590264
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "Davis",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 601302756,
+        "url": "http://t.co/rjfGDdk5kt",
+        "utc_offset": -21600,
+        "default_profile_image": false,
+        "followers_count": 213,
+        "protected": false,
+        "friends_count": 87,
+        "contributors_enabled": false,
+        "location": "San Jose, CA",
+        "profile_use_background_image": false,
+        "screen_name": "SunPowerTalent",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/573662326/ezdenok7vw1t0pkwa71h.gif",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  22
+                ],
+                "url": "http://t.co/rjfGDdk5kt",
+                "expanded_url": "http://us.sunpower.com/company/careers/",
+                "display_url": "us.sunpower.com/company/career\u2026"
+              }
+            ]
+          }
+        },
+        "id_str": "601302756",
+        "profile_background_color": "FFFFFF",
+        "geo_enabled": true,
+        "description": "Do you want to change the way our world is powered? We do, too. Join our team of 7,000 passionate, brilliant people around the globe reshaping our energy future",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/601302756/1417014993",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/545746314097459200/AScvGgcs_normal.png",
+        "profile_text_color": "333333",
+        "profile_sidebar_border_color": "C0DEED",
+        "statuses_count": 276,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/573662326/ezdenok7vw1t0pkwa71h.gif",
+        "listed_count": 155,
+        "notifications": false,
+        "is_translation_enabled": true,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/545746314097459200/AScvGgcs_normal.png",
+        "following": false,
+        "created_at": "Wed Jun 06 19:20:33 +0000 2012",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_link_color": "3B94D9",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "SunPower Talent",
+        "time_zone": "Central Time (US & Canada)"
+      },
+      "text": "#Engineering alert: Software Engineer - Python Full... | SunPower | #Davis, CA https://t.co/0Uys2e19u0 #SunPower https://t.co/33fPk5iDIU",
+      "created_at": "Mon Dec 14 17:19:03 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          38.5449065,
+          -121.7405167
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 676171868093603840,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              5,
+              8
+            ],
+            "text": "IT"
+          },
+          {
+            "indices": [
+              9,
+              13
+            ],
+            "text": "job"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              115,
+              138
+            ],
+            "url": "https://t.co/9uu8jcibZQ",
+            "expanded_url": "http://bit.ly/1R1rmkn",
+            "display_url": "bit.ly/1R1rmkn"
+          }
+        ],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "676171868093603840",
+      "source": "<a href=\"http://www.tweetmyjobs.com\" rel=\"nofollow\">TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -122.1575745,
+          37.4457966
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "3ad0f706b3fa62a8",
+        "url": "https://api.twitter.com/1.1/geo/id/3ad0f706b3fa62a8.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "Palo Alto, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -122.190523,
+                37.362824
+              ],
+              [
+                -122.097537,
+                37.362824
+              ],
+              [
+                -122.097537,
+                37.465918
+              ],
+              [
+                -122.190523,
+                37.465918
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "Palo Alto",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 20827150,
+        "url": "https://t.co/DByWt45HZj",
+        "utc_offset": -18000,
+        "default_profile_image": false,
+        "followers_count": 705,
+        "protected": false,
+        "friends_count": 360,
+        "contributors_enabled": false,
+        "location": "San Francisco, CA",
+        "profile_use_background_image": true,
+        "screen_name": "tmj_sfo_it",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/315565691/Twitter-BG_2_bg-image.jpg",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/DByWt45HZj",
+                "expanded_url": "http://www.careerarc.com/job-seeker",
+                "display_url": "careerarc.com/job-seeker"
+              }
+            ]
+          }
+        },
+        "id_str": "20827150",
+        "profile_background_color": "253956",
+        "geo_enabled": true,
+        "description": "Follow this account for geo-targeted Software Dev. - General/IT job tweets in San Francisco, CA. Need help? Tweet us at @CareerArc!",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/20827150/1447890103",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/667125554395516928/6irWJWH2_normal.jpg",
+        "profile_text_color": "000000",
+        "profile_sidebar_border_color": "000000",
+        "statuses_count": 957,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/315565691/Twitter-BG_2_bg-image.jpg",
+        "listed_count": 110,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/667125554395516928/6irWJWH2_normal.jpg",
+        "following": false,
+        "created_at": "Sat Feb 14 02:46:00 +0000 2009",
+        "profile_sidebar_fill_color": "407DB0",
+        "profile_link_color": "4A913C",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "San Francisco IT Job",
+        "time_zone": "Eastern Time (US & Canada)"
+      },
+      "text": "This #IT #job might be a great fit for you: NSX - Senior Quality Software Developer - Python and Networking -... - https://t.co/9uu8jcibZQ",
+      "created_at": "Sun Dec 13 22:48:30 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          37.4457966,
+          -122.1575745
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 676089021005701120,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [],
+        "urls": [],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "676089021005701120",
+      "source": "<a href=\"http://www.zorrotron.com\" rel=\"nofollow\">Zorrotron</a>",
+      "coordinates": {
+        "coordinates": [
+          -123.01234704,
+          37.69899055
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "fbd6d2f5a4e4a15e",
+        "url": "https://api.twitter.com/1.1/geo/id/fbd6d2f5a4e4a15e.json",
+        "country_code": "US",
+        "place_type": "admin",
+        "contained_within": [],
+        "full_name": "California, USA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -124.482003,
+                32.528832
+              ],
+              [
+                -114.131212,
+                32.528832
+              ],
+              [
+                -114.131212,
+                42.009519
+              ],
+              [
+                -124.482003,
+                42.009519
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "California",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 3196742670,
+        "url": null,
+        "utc_offset": null,
+        "default_profile_image": false,
+        "followers_count": 80,
+        "protected": false,
+        "friends_count": 0,
+        "contributors_enabled": false,
+        "location": "",
+        "profile_use_background_image": true,
+        "screen_name": "bubusher",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme5/bg.gif",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          }
+        },
+        "id_str": "3196742670",
+        "profile_background_color": "352726",
+        "geo_enabled": true,
+        "description": "",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/3196742670/1431736674",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/599373277715271680/P_KQbOj3_normal.png",
+        "profile_text_color": "3E4415",
+        "profile_sidebar_border_color": "829D5E",
+        "statuses_count": 23720,
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme5/bg.gif",
+        "listed_count": 14,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/599373277715271680/P_KQbOj3_normal.png",
+        "following": false,
+        "created_at": "Sat May 16 00:34:28 +0000 2015",
+        "profile_sidebar_fill_color": "99CC33",
+        "profile_link_color": "D02B55",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "Bash Org",
+        "time_zone": null
+      },
+      "text": "&lt;iMike&gt; monty python would be funny if nerds hadnt invented an entire subculture devoted to quoting it",
+      "created_at": "Sun Dec 13 17:19:18 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          37.69899055,
+          -123.01234704
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 675850559581110272,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              87,
+              101
+            ],
+            "text": "RedwoodShores"
+          },
+          {
+            "indices": [
+              131,
+              134
+            ],
+            "text": "IT"
+          },
+          {
+            "indices": [
+              135,
+              139
+            ],
+            "text": "Job"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              107,
+              130
+            ],
+            "url": "https://t.co/65QkXHJ7qf",
+            "expanded_url": "http://bit.ly/1WNbvbz",
+            "display_url": "bit.ly/1WNbvbz"
+          }
+        ],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "675850559581110272",
+      "source": "<a href=\"http://www.tweetmyjobs.com\" rel=\"nofollow\">TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -122.2455364,
+          37.5364134
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "a409256339a7c6a1",
+        "url": "https://api.twitter.com/1.1/geo/id/a409256339a7c6a1.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "Redwood City, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -122.28853,
+                37.443954
+              ],
+              [
+                -122.177339,
+                37.443954
+              ],
+              [
+                -122.177339,
+                37.550633
+              ],
+              [
+                -122.28853,
+                37.550633
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "Redwood City",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 112596930,
+        "url": "https://t.co/DByWt4njnT",
+        "utc_offset": -18000,
+        "default_profile_image": false,
+        "followers_count": 451,
+        "protected": false,
+        "friends_count": 332,
+        "contributors_enabled": false,
+        "location": "California",
+        "profile_use_background_image": true,
+        "screen_name": "tmj_CA_it",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/315392399/Twitter-BG_2_bg-image.jpg",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/DByWt4njnT",
+                "expanded_url": "http://www.careerarc.com/job-seeker",
+                "display_url": "careerarc.com/job-seeker"
+              }
+            ]
+          }
+        },
+        "id_str": "112596930",
+        "profile_background_color": "253956",
+        "geo_enabled": true,
+        "description": "Follow this account for geo-targeted Software Dev. - General/IT job tweets in California Non-Metro. Need help? Tweet us at @CareerArc!",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/112596930/1447959712",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/667417513819533312/M3J7nCzZ_normal.jpg",
+        "profile_text_color": "000000",
+        "profile_sidebar_border_color": "000000",
+        "statuses_count": 588,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/315392399/Twitter-BG_2_bg-image.jpg",
+        "listed_count": 87,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/667417513819533312/M3J7nCzZ_normal.jpg",
+        "following": false,
+        "created_at": "Tue Feb 09 02:21:37 +0000 2010",
+        "profile_sidebar_fill_color": "407DB0",
+        "profile_link_color": "4A913C",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "TMJ-CA IT Jobs",
+        "time_zone": "Eastern Time (US & Canada)"
+      },
+      "text": "Oracle: Principal Cloud Platform DevOps Engineer: Chef, Puppet, Python, Scripting,... (#RedwoodShores, CA) https://t.co/65QkXHJ7qf #IT #Job",
+      "created_at": "Sun Dec 13 01:31:44 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          37.5364134,
+          -122.2455364
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 1,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 675839317302861825,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              39,
+              51
+            ],
+            "text": "Engineering"
+          },
+          {
+            "indices": [
+              52,
+              56
+            ],
+            "text": "job"
+          },
+          {
+            "indices": [
+              95,
+              108
+            ],
+            "text": "SanFrancisco"
+          },
+          {
+            "indices": [
+              113,
+              120
+            ],
+            "text": "Hiring"
+          },
+          {
+            "indices": [
+              121,
+              131
+            ],
+            "text": "CareerArc"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              71,
+              94
+            ],
+            "url": "https://t.co/KJTfF1UHqh",
+            "expanded_url": "http://bit.ly/1LRB3Px",
+            "display_url": "bit.ly/1LRB3Px"
+          }
+        ],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "675839317302861825",
+      "source": "<a href=\"http://www.tweetmyjobs.com\" rel=\"nofollow\">TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -122.4194155,
+          37.7749295
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "5a110d312052166f",
+        "url": "https://api.twitter.com/1.1/geo/id/5a110d312052166f.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "San Francisco, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -122.514926,
+                37.708075
+              ],
+              [
+                -122.357031,
+                37.708075
+              ],
+              [
+                -122.357031,
+                37.833238
+              ],
+              [
+                -122.514926,
+                37.833238
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "San Francisco",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 23314658,
+        "url": "https://t.co/DByWt45HZj",
+        "utc_offset": -18000,
+        "default_profile_image": false,
+        "followers_count": 444,
+        "protected": false,
+        "friends_count": 259,
+        "contributors_enabled": false,
+        "location": "San Francisco, CA",
+        "profile_use_background_image": true,
+        "screen_name": "tmj_sfo_eng",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/315523778/Twitter-BG_2_bg-image.jpg",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/DByWt45HZj",
+                "expanded_url": "http://www.careerarc.com/job-seeker",
+                "display_url": "careerarc.com/job-seeker"
+              }
+            ]
+          }
+        },
+        "id_str": "23314658",
+        "profile_background_color": "253956",
+        "geo_enabled": true,
+        "description": "Follow this account for geo-targeted Engineering job tweets in San Francisco, CA. Need help? Tweet us at @CareerArc!",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/23314658/1448575605",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/670000761846128640/bEwS4xmj_normal.jpg",
+        "profile_text_color": "000000",
+        "profile_sidebar_border_color": "000000",
+        "statuses_count": 196,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/315523778/Twitter-BG_2_bg-image.jpg",
+        "listed_count": 71,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/670000761846128640/bEwS4xmj_normal.jpg",
+        "following": false,
+        "created_at": "Sun Mar 08 14:54:07 +0000 2009",
+        "profile_sidebar_fill_color": "407DB0",
+        "profile_link_color": "4A913C",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "TMJ-SFO Engin. Jobs",
+        "time_zone": "Eastern Time (US & Canada)"
+      },
+      "text": "Join the Cloudera team! See our latest #Engineering #job opening here: https://t.co/KJTfF1UHqh #SanFrancisco, CA #Hiring #CareerArc",
+      "created_at": "Sun Dec 13 00:47:04 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          37.7749295,
+          -122.4194155
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 675777960842932224,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              6,
+              13
+            ],
+            "text": "hiring"
+          },
+          {
+            "indices": [
+              130,
+              133
+            ],
+            "text": "IT"
+          },
+          {
+            "indices": [
+              134,
+              138
+            ],
+            "text": "Job"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              106,
+              129
+            ],
+            "url": "https://t.co/u0LZgn9XRo",
+            "expanded_url": "http://bit.ly/1JlOVBc",
+            "display_url": "bit.ly/1JlOVBc"
+          }
+        ],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "675777960842932224",
+      "source": "<a href=\"http://www.tweetmyjobs.com\" rel=\"nofollow\">TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -122.2455364,
+          37.5364134
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "a409256339a7c6a1",
+        "url": "https://api.twitter.com/1.1/geo/id/a409256339a7c6a1.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "Redwood City, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -122.28853,
+                37.443954
+              ],
+              [
+                -122.177339,
+                37.443954
+              ],
+              [
+                -122.177339,
+                37.550633
+              ],
+              [
+                -122.28853,
+                37.550633
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "Redwood City",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 112596930,
+        "url": "https://t.co/DByWt4njnT",
+        "utc_offset": -18000,
+        "default_profile_image": false,
+        "followers_count": 451,
+        "protected": false,
+        "friends_count": 332,
+        "contributors_enabled": false,
+        "location": "California",
+        "profile_use_background_image": true,
+        "screen_name": "tmj_CA_it",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/315392399/Twitter-BG_2_bg-image.jpg",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/DByWt4njnT",
+                "expanded_url": "http://www.careerarc.com/job-seeker",
+                "display_url": "careerarc.com/job-seeker"
+              }
+            ]
+          }
+        },
+        "id_str": "112596930",
+        "profile_background_color": "253956",
+        "geo_enabled": true,
+        "description": "Follow this account for geo-targeted Software Dev. - General/IT job tweets in California Non-Metro. Need help? Tweet us at @CareerArc!",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/112596930/1447959712",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/667417513819533312/M3J7nCzZ_normal.jpg",
+        "profile_text_color": "000000",
+        "profile_sidebar_border_color": "000000",
+        "statuses_count": 588,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/315392399/Twitter-BG_2_bg-image.jpg",
+        "listed_count": 87,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/667417513819533312/M3J7nCzZ_normal.jpg",
+        "following": false,
+        "created_at": "Tue Feb 09 02:21:37 +0000 2010",
+        "profile_sidebar_fill_color": "407DB0",
+        "profile_link_color": "4A913C",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "TMJ-CA IT Jobs",
+        "time_zone": "Eastern Time (US & Canada)"
+      },
+      "text": "We're #hiring! Click to apply: Senior Cloud Test Automation Engineer: Java, Python, Chef, Hudson, Maven - https://t.co/u0LZgn9XRo #IT #Job",
+      "created_at": "Sat Dec 12 20:43:15 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          37.5364134,
+          -122.2455364
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 675744811689775104,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              0,
+              3
+            ],
+            "text": "IT"
+          },
+          {
+            "indices": [
+              7,
+              21
+            ],
+            "text": "RedwoodShores"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              111,
+              134
+            ],
+            "url": "https://t.co/BtkyJXbkHa",
+            "expanded_url": "http://bit.ly/1i1knKS",
+            "display_url": "bit.ly/1i1knKS"
+          }
+        ],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "675744811689775104",
+      "source": "<a href=\"http://www.tweetmyjobs.com\" rel=\"nofollow\">TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -122.2455364,
+          37.5364134
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "a409256339a7c6a1",
+        "url": "https://api.twitter.com/1.1/geo/id/a409256339a7c6a1.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "Redwood City, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -122.28853,
+                37.443954
+              ],
+              [
+                -122.177339,
+                37.443954
+              ],
+              [
+                -122.177339,
+                37.550633
+              ],
+              [
+                -122.28853,
+                37.550633
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "Redwood City",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 112596930,
+        "url": "https://t.co/DByWt4njnT",
+        "utc_offset": -18000,
+        "default_profile_image": false,
+        "followers_count": 451,
+        "protected": false,
+        "friends_count": 332,
+        "contributors_enabled": false,
+        "location": "California",
+        "profile_use_background_image": true,
+        "screen_name": "tmj_CA_it",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/315392399/Twitter-BG_2_bg-image.jpg",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/DByWt4njnT",
+                "expanded_url": "http://www.careerarc.com/job-seeker",
+                "display_url": "careerarc.com/job-seeker"
+              }
+            ]
+          }
+        },
+        "id_str": "112596930",
+        "profile_background_color": "253956",
+        "geo_enabled": true,
+        "description": "Follow this account for geo-targeted Software Dev. - General/IT job tweets in California Non-Metro. Need help? Tweet us at @CareerArc!",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/112596930/1447959712",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/667417513819533312/M3J7nCzZ_normal.jpg",
+        "profile_text_color": "000000",
+        "profile_sidebar_border_color": "000000",
+        "statuses_count": 588,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/315392399/Twitter-BG_2_bg-image.jpg",
+        "listed_count": 87,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/667417513819533312/M3J7nCzZ_normal.jpg",
+        "following": false,
+        "created_at": "Tue Feb 09 02:21:37 +0000 2010",
+        "profile_sidebar_fill_color": "407DB0",
+        "profile_link_color": "4A913C",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "TMJ-CA IT Jobs",
+        "time_zone": "Eastern Time (US & Canada)"
+      },
+      "text": "#IT in #RedwoodShores, CA: Sr. Principal Cloud Platform DevOps Engineer: Chef/Puppet/python/shell... at Oracle https://t.co/BtkyJXbkHa",
+      "created_at": "Sat Dec 12 18:31:32 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          37.5364134,
+          -122.2455364
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 675718110742118400,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              15,
+              21
+            ],
+            "text": "Davis"
+          },
+          {
+            "indices": [
+              26,
+              30
+            ],
+            "text": "job"
+          },
+          {
+            "indices": [
+              125,
+              137
+            ],
+            "text": "Engineering"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              101,
+              124
+            ],
+            "url": "https://t.co/dRI6r5E4DJ",
+            "expanded_url": "http://bit.ly/1NoPske",
+            "display_url": "bit.ly/1NoPske"
+          }
+        ],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "675718110742118400",
+      "source": "<a href=\"http://www.tweetmyjobs.com\" rel=\"nofollow\">TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -121.7405167,
+          38.5449065
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "1994142e26ba7127",
+        "url": "https://api.twitter.com/1.1/geo/id/1994142e26ba7127.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "Davis, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -121.803252,
+                38.526843
+              ],
+              [
+                -121.675074,
+                38.526843
+              ],
+              [
+                -121.675074,
+                38.590264
+              ],
+              [
+                -121.803252,
+                38.590264
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "Davis",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 23372352,
+        "url": "https://t.co/DByWt45HZj",
+        "utc_offset": -18000,
+        "default_profile_image": false,
+        "followers_count": 294,
+        "protected": false,
+        "friends_count": 228,
+        "contributors_enabled": false,
+        "location": "Sacramento, CA",
+        "profile_use_background_image": true,
+        "screen_name": "tmj_sac_eng",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/315521922/Twitter-BG_2_bg-image.jpg",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/DByWt45HZj",
+                "expanded_url": "http://www.careerarc.com/job-seeker",
+                "display_url": "careerarc.com/job-seeker"
+              }
+            ]
+          }
+        },
+        "id_str": "23372352",
+        "profile_background_color": "253956",
+        "geo_enabled": true,
+        "description": "Follow this account for geo-targeted Engineering job tweets in Sacramento, CA. Need help? Tweet us at @CareerArc!",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/23372352/1448340164",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/669013249556262912/kiu-aoXf_normal.jpg",
+        "profile_text_color": "000000",
+        "profile_sidebar_border_color": "000000",
+        "statuses_count": 166,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/315521922/Twitter-BG_2_bg-image.jpg",
+        "listed_count": 26,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/669013249556262912/kiu-aoXf_normal.jpg",
+        "following": false,
+        "created_at": "Sun Mar 08 23:44:09 +0000 2009",
+        "profile_sidebar_fill_color": "407DB0",
+        "profile_link_color": "4A913C",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "TMJ-SAC Engin. Jobs",
+        "time_zone": "Eastern Time (US & Canada)"
+      },
+      "text": "See our latest #Davis, CA #job and click to apply: Software Engineer - Python Full Stack Developer - https://t.co/dRI6r5E4DJ #Engineering",
+      "created_at": "Sat Dec 12 16:45:26 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          38.5449065,
+          -121.7405167
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 675507337805729792,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              6,
+              13
+            ],
+            "text": "hiring"
+          },
+          {
+            "indices": [
+              37,
+              41
+            ],
+            "text": "job"
+          },
+          {
+            "indices": [
+              131,
+              134
+            ],
+            "text": "IT"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              107,
+              130
+            ],
+            "url": "https://t.co/YNZqq7JYHU",
+            "expanded_url": "http://bit.ly/1QMPB3Z",
+            "display_url": "bit.ly/1QMPB3Z"
+          }
+        ],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "675507337805729792",
+      "source": "<a href=\"http://tweetmyjobs.com\" rel=\"nofollow\">SafeTweet by TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -122.1575745,
+          37.4457966
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "3ad0f706b3fa62a8",
+        "url": "https://api.twitter.com/1.1/geo/id/3ad0f706b3fa62a8.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "Palo Alto, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -122.190523,
+                37.362824
+              ],
+              [
+                -122.097537,
+                37.362824
+              ],
+              [
+                -122.097537,
+                37.465918
+              ],
+              [
+                -122.190523,
+                37.465918
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "Palo Alto",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 2180401488,
+        "url": "http://t.co/PLQ8eLYjD2",
+        "utc_offset": null,
+        "default_profile_image": false,
+        "followers_count": 1504,
+        "protected": false,
+        "friends_count": 21,
+        "contributors_enabled": false,
+        "location": "Worldwide",
+        "profile_use_background_image": true,
+        "screen_name": "VMwareJobs",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/378800000116888419/bfc2345d93c1c7d4797c5c558b6c027d.png",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  22
+                ],
+                "url": "http://t.co/PLQ8eLYjD2",
+                "expanded_url": "http://vmware.com/careers",
+                "display_url": "vmware.com/careers"
+              }
+            ]
+          }
+        },
+        "id_str": "2180401488",
+        "profile_background_color": "C0DEED",
+        "geo_enabled": true,
+        "description": "The official VMware, Inc. page for info on the most recent job openings at VMware, Inc.",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/2180401488/1398811259",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/378800000772289935/b3ae6194419e750db17c91100e848c1f_normal.png",
+        "profile_text_color": "333333",
+        "profile_sidebar_border_color": "FFFFFF",
+        "statuses_count": 3714,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/378800000116888419/bfc2345d93c1c7d4797c5c558b6c027d.png",
+        "listed_count": 374,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/378800000772289935/b3ae6194419e750db17c91100e848c1f_normal.png",
+        "following": false,
+        "created_at": "Thu Nov 07 16:19:15 +0000 2013",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_link_color": "0084B4",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "VMware Jobs",
+        "time_zone": null
+      },
+      "text": "We're #hiring! Read about our latest #job opening here: NSX QE Python Developer - Network Virtualization - https://t.co/YNZqq7JYHU #IT",
+      "created_at": "Sat Dec 12 02:47:54 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          37.4457966,
+          -122.1575745
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "retweeted_status": {
+        "id": 675110205311606785,
+        "possibly_sensitive": false,
+        "in_reply_to_user_id": null,
+        "retweeted": false,
+        "lang": "en",
+        "in_reply_to_status_id": null,
+        "is_quote_status": false,
+        "entities": {
+          "hashtags": [
+            {
+              "indices": [
+                0,
+                3
+              ],
+              "text": "IT"
+            },
+            {
+              "indices": [
+                4,
+                8
+              ],
+              "text": "Job"
+            },
+            {
+              "indices": [
+                12,
+                21
+              ],
+              "text": "PALOALTO"
+            },
+            {
+              "indices": [
+                125,
+                130
+              ],
+              "text": "Jobs"
+            },
+            {
+              "indices": [
+                131,
+                138
+              ],
+              "text": "Hiring"
+            }
+          ],
+          "urls": [
+            {
+              "indices": [
+                101,
+                124
+              ],
+              "url": "https://t.co/H5F85XsP2P",
+              "expanded_url": "http://bit.ly/219bPDA",
+              "display_url": "bit.ly/219bPDA"
+            }
+          ],
+          "user_mentions": [],
+          "symbols": []
+        },
+        "id_str": "675110205311606785",
+        "source": "<a href=\"http://www.tweetmyjobs.com\" rel=\"nofollow\">TweetMyJOBS</a>",
+        "coordinates": {
+          "coordinates": [
+            -122.1575745,
+            37.4457966
+          ],
+          "type": "Point"
+        },
+        "in_reply_to_status_id_str": null,
+        "metadata": {
+          "iso_language_code": "en",
+          "result_type": "recent"
+        },
+        "place": {
+          "country": "United States",
+          "id": "3ad0f706b3fa62a8",
+          "url": "https://api.twitter.com/1.1/geo/id/3ad0f706b3fa62a8.json",
+          "country_code": "US",
+          "place_type": "city",
+          "contained_within": [],
+          "full_name": "Palo Alto, CA",
+          "bounding_box": {
+            "coordinates": [
+              [
+                [
+                  -122.190523,
+                  37.362824
+                ],
+                [
+                  -122.097537,
+                  37.362824
+                ],
+                [
+                  -122.097537,
+                  37.465918
+                ],
+                [
+                  -122.190523,
+                  37.465918
+                ]
+              ]
+            ],
+            "type": "Polygon"
+          },
+          "name": "Palo Alto",
+          "attributes": {}
+        },
+        "user": {
+          "default_profile": false,
+          "id": 20827150,
+          "url": "https://t.co/DByWt45HZj",
+          "utc_offset": -18000,
+          "default_profile_image": false,
+          "followers_count": 705,
+          "protected": false,
+          "friends_count": 360,
+          "contributors_enabled": false,
+          "location": "San Francisco, CA",
+          "profile_use_background_image": true,
+          "screen_name": "tmj_sfo_it",
+          "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/315565691/Twitter-BG_2_bg-image.jpg",
+          "follow_request_sent": false,
+          "entities": {
+            "description": {
+              "urls": []
+            },
+            "url": {
+              "urls": [
+                {
+                  "indices": [
+                    0,
+                    23
+                  ],
+                  "url": "https://t.co/DByWt45HZj",
+                  "expanded_url": "http://www.careerarc.com/job-seeker",
+                  "display_url": "careerarc.com/job-seeker"
+                }
+              ]
+            }
+          },
+          "id_str": "20827150",
+          "profile_background_color": "253956",
+          "geo_enabled": true,
+          "description": "Follow this account for geo-targeted Software Dev. - General/IT job tweets in San Francisco, CA. Need help? Tweet us at @CareerArc!",
+          "profile_banner_url": "https://pbs.twimg.com/profile_banners/20827150/1447890103",
+          "profile_image_url_https": "https://pbs.twimg.com/profile_images/667125554395516928/6irWJWH2_normal.jpg",
+          "profile_text_color": "000000",
+          "profile_sidebar_border_color": "000000",
+          "statuses_count": 957,
+          "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/315565691/Twitter-BG_2_bg-image.jpg",
+          "listed_count": 110,
+          "notifications": false,
+          "is_translation_enabled": false,
+          "verified": false,
+          "is_translator": false,
+          "profile_image_url": "http://pbs.twimg.com/profile_images/667125554395516928/6irWJWH2_normal.jpg",
+          "following": false,
+          "created_at": "Sat Feb 14 02:46:00 +0000 2009",
+          "profile_sidebar_fill_color": "407DB0",
+          "profile_link_color": "4A913C",
+          "profile_background_tile": false,
+          "lang": "en",
+          "has_extended_profile": false,
+          "favourites_count": 0,
+          "name": "San Francisco IT Job",
+          "time_zone": "Eastern Time (US & Canada)"
+        },
+        "text": "#IT #Job in #PALOALTO, CA: NSX Quality Software Developer - Perl or Python with Networking at VMware https://t.co/H5F85XsP2P #Jobs #Hiring",
+        "created_at": "Fri Dec 11 00:29:50 +0000 2015",
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "truncated": false,
+        "geo": {
+          "coordinates": [
+            37.4457966,
+            -122.1575745
+          ],
+          "type": "Point"
+        },
+        "retweet_count": 1,
+        "favorite_count": 1,
+        "favorited": false,
+        "contributors": null
+      },
+      "id": 675124333967245314,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              16,
+              19
+            ],
+            "text": "IT"
+          },
+          {
+            "indices": [
+              20,
+              24
+            ],
+            "text": "Job"
+          },
+          {
+            "indices": [
+              28,
+              37
+            ],
+            "text": "PALOALTO"
+          },
+          {
+            "indices": [
+              139,
+              140
+            ],
+            "text": "Jobs"
+          },
+          {
+            "indices": [
+              139,
+              140
+            ],
+            "text": "Hiring"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              117,
+              140
+            ],
+            "url": "https://t.co/H5F85XsP2P",
+            "expanded_url": "http://bit.ly/219bPDA",
+            "display_url": "bit.ly/219bPDA"
+          }
+        ],
+        "user_mentions": [
+          {
+            "indices": [
+              3,
+              14
+            ],
+            "id": 20827150,
+            "id_str": "20827150",
+            "screen_name": "tmj_sfo_it",
+            "name": "San Francisco IT Job"
+          }
+        ],
+        "symbols": []
+      },
+      "id_str": "675124333967245314",
+      "source": "<a href=\"https://roundteam.co\" rel=\"nofollow\">RoundTeam</a>",
+      "coordinates": null,
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": null,
+      "user": {
+        "default_profile": true,
+        "id": 623053184,
+        "url": null,
+        "utc_offset": null,
+        "default_profile_image": false,
+        "followers_count": 573,
+        "protected": false,
+        "friends_count": 184,
+        "contributors_enabled": false,
+        "location": "",
+        "profile_use_background_image": true,
+        "screen_name": "IVMUG",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          }
+        },
+        "id_str": "623053184",
+        "profile_background_color": "C0DEED",
+        "geo_enabled": false,
+        "description": "Bringing you all the Independent VMUG news and events",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/623053184/1410266962",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/509323042825068545/09LwfIGv_normal.png",
+        "profile_text_color": "333333",
+        "profile_sidebar_border_color": "C0DEED",
+        "statuses_count": 21585,
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "listed_count": 411,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/509323042825068545/09LwfIGv_normal.png",
+        "following": false,
+        "created_at": "Sat Jun 30 19:00:20 +0000 2012",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_link_color": "0084B4",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 102,
+        "name": "IVMUG",
+        "time_zone": null
+      },
+      "text": "RT @tmj_sfo_it: #IT #Job in #PALOALTO, CA: NSX Quality Software Developer - Perl or Python with Networking at VMware https://t.co/H5F85XsP2\u2026",
+      "created_at": "Fri Dec 11 01:25:59 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": null,
+      "retweet_count": 1,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 675113304902213632,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              39,
+              51
+            ],
+            "text": "Engineering"
+          },
+          {
+            "indices": [
+              52,
+              56
+            ],
+            "text": "job"
+          },
+          {
+            "indices": [
+              95,
+              103
+            ],
+            "text": "BigData"
+          },
+          {
+            "indices": [
+              104,
+              110
+            ],
+            "text": "noSQL"
+          },
+          {
+            "indices": [
+              111,
+              120
+            ],
+            "text": "DataStax"
+          },
+          {
+            "indices": [
+              121,
+              132
+            ],
+            "text": "SantaClara"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              71,
+              94
+            ],
+            "url": "https://t.co/lhzxZOgfuz",
+            "expanded_url": "http://bit.ly/21T7wg6",
+            "display_url": "bit.ly/21T7wg6"
+          }
+        ],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "675113304902213632",
+      "source": "<a href=\"http://www.tweetmyjobs.com\" rel=\"nofollow\">TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -121.9643745,
+          37.3986039
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "4b58830723ec6371",
+        "url": "https://api.twitter.com/1.1/geo/id/4b58830723ec6371.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "Santa Clara, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -122.005597,
+                37.322943
+              ],
+              [
+                -121.930045,
+                37.322943
+              ],
+              [
+                -121.930045,
+                37.419037
+              ],
+              [
+                -122.005597,
+                37.419037
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "Santa Clara",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 23363279,
+        "url": "https://t.co/DByWt45HZj",
+        "utc_offset": -18000,
+        "default_profile_image": false,
+        "followers_count": 518,
+        "protected": false,
+        "friends_count": 245,
+        "contributors_enabled": false,
+        "location": "San Jose, CA",
+        "profile_use_background_image": true,
+        "screen_name": "tmj_sjc_eng",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/315522826/Twitter-BG_2_bg-image.jpg",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/DByWt45HZj",
+                "expanded_url": "http://www.careerarc.com/job-seeker",
+                "display_url": "careerarc.com/job-seeker"
+              }
+            ]
+          }
+        },
+        "id_str": "23363279",
+        "profile_background_color": "253956",
+        "geo_enabled": true,
+        "description": "Follow this account for geo-targeted Engineering job tweets in San Jose, CA. Need help? Tweet us at @CareerArc!",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/23363279/1448028432",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/667705749988966400/ovIW1NGB_normal.jpg",
+        "profile_text_color": "000000",
+        "profile_sidebar_border_color": "000000",
+        "statuses_count": 554,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/315522826/Twitter-BG_2_bg-image.jpg",
+        "listed_count": 66,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/667705749988966400/ovIW1NGB_normal.jpg",
+        "following": false,
+        "created_at": "Sun Mar 08 22:23:07 +0000 2009",
+        "profile_sidebar_fill_color": "407DB0",
+        "profile_link_color": "4A913C",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "San Jose Eng. Jobs",
+        "time_zone": "Eastern Time (US & Canada)"
+      },
+      "text": "Join the DataStax team! See our latest #Engineering #job opening here: https://t.co/lhzxZOgfuz #BigData #noSQL #DataStax #SantaClara, CA",
+      "created_at": "Fri Dec 11 00:42:09 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          37.3986039,
+          -121.9643745
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 675110205311606785,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              0,
+              3
+            ],
+            "text": "IT"
+          },
+          {
+            "indices": [
+              4,
+              8
+            ],
+            "text": "Job"
+          },
+          {
+            "indices": [
+              12,
+              21
+            ],
+            "text": "PALOALTO"
+          },
+          {
+            "indices": [
+              125,
+              130
+            ],
+            "text": "Jobs"
+          },
+          {
+            "indices": [
+              131,
+              138
+            ],
+            "text": "Hiring"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              101,
+              124
+            ],
+            "url": "https://t.co/H5F85XsP2P",
+            "expanded_url": "http://bit.ly/219bPDA",
+            "display_url": "bit.ly/219bPDA"
+          }
+        ],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "675110205311606785",
+      "source": "<a href=\"http://www.tweetmyjobs.com\" rel=\"nofollow\">TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -122.1575745,
+          37.4457966
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "3ad0f706b3fa62a8",
+        "url": "https://api.twitter.com/1.1/geo/id/3ad0f706b3fa62a8.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "Palo Alto, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -122.190523,
+                37.362824
+              ],
+              [
+                -122.097537,
+                37.362824
+              ],
+              [
+                -122.097537,
+                37.465918
+              ],
+              [
+                -122.190523,
+                37.465918
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "Palo Alto",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 20827150,
+        "url": "https://t.co/DByWt45HZj",
+        "utc_offset": -18000,
+        "default_profile_image": false,
+        "followers_count": 705,
+        "protected": false,
+        "friends_count": 360,
+        "contributors_enabled": false,
+        "location": "San Francisco, CA",
+        "profile_use_background_image": true,
+        "screen_name": "tmj_sfo_it",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/315565691/Twitter-BG_2_bg-image.jpg",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/DByWt45HZj",
+                "expanded_url": "http://www.careerarc.com/job-seeker",
+                "display_url": "careerarc.com/job-seeker"
+              }
+            ]
+          }
+        },
+        "id_str": "20827150",
+        "profile_background_color": "253956",
+        "geo_enabled": true,
+        "description": "Follow this account for geo-targeted Software Dev. - General/IT job tweets in San Francisco, CA. Need help? Tweet us at @CareerArc!",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/20827150/1447890103",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/667125554395516928/6irWJWH2_normal.jpg",
+        "profile_text_color": "000000",
+        "profile_sidebar_border_color": "000000",
+        "statuses_count": 957,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/315565691/Twitter-BG_2_bg-image.jpg",
+        "listed_count": 110,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/667125554395516928/6irWJWH2_normal.jpg",
+        "following": false,
+        "created_at": "Sat Feb 14 02:46:00 +0000 2009",
+        "profile_sidebar_fill_color": "407DB0",
+        "profile_link_color": "4A913C",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "San Francisco IT Job",
+        "time_zone": "Eastern Time (US & Canada)"
+      },
+      "text": "#IT #Job in #PALOALTO, CA: NSX Quality Software Developer - Perl or Python with Networking at VMware https://t.co/H5F85XsP2P #Jobs #Hiring",
+      "created_at": "Fri Dec 11 00:29:50 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          37.4457966,
+          -122.1575745
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 1,
+      "favorite_count": 1,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 675109501184434177,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              34,
+              38
+            ],
+            "text": "job"
+          },
+          {
+            "indices": [
+              105,
+              113
+            ],
+            "text": "BigData"
+          },
+          {
+            "indices": [
+              114,
+              120
+            ],
+            "text": "noSQL"
+          },
+          {
+            "indices": [
+              121,
+              132
+            ],
+            "text": "SantaClara"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              81,
+              104
+            ],
+            "url": "https://t.co/l2WK5x4CQD",
+            "expanded_url": "http://bit.ly/1SR80NK",
+            "display_url": "bit.ly/1SR80NK"
+          }
+        ],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "675109501184434177",
+      "source": "<a href=\"http://www.tweetmyjobs.com\" rel=\"nofollow\">TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -121.9643745,
+          37.3986039
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "4b58830723ec6371",
+        "url": "https://api.twitter.com/1.1/geo/id/4b58830723ec6371.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "Santa Clara, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -122.005597,
+                37.322943
+              ],
+              [
+                -121.930045,
+                37.322943
+              ],
+              [
+                -121.930045,
+                37.419037
+              ],
+              [
+                -122.005597,
+                37.419037
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "Santa Clara",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 23363279,
+        "url": "https://t.co/DByWt45HZj",
+        "utc_offset": -18000,
+        "default_profile_image": false,
+        "followers_count": 518,
+        "protected": false,
+        "friends_count": 245,
+        "contributors_enabled": false,
+        "location": "San Jose, CA",
+        "profile_use_background_image": true,
+        "screen_name": "tmj_sjc_eng",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/315522826/Twitter-BG_2_bg-image.jpg",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/DByWt45HZj",
+                "expanded_url": "http://www.careerarc.com/job-seeker",
+                "display_url": "careerarc.com/job-seeker"
+              }
+            ]
+          }
+        },
+        "id_str": "23363279",
+        "profile_background_color": "253956",
+        "geo_enabled": true,
+        "description": "Follow this account for geo-targeted Engineering job tweets in San Jose, CA. Need help? Tweet us at @CareerArc!",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/23363279/1448028432",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/667705749988966400/ovIW1NGB_normal.jpg",
+        "profile_text_color": "000000",
+        "profile_sidebar_border_color": "000000",
+        "statuses_count": 554,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/315522826/Twitter-BG_2_bg-image.jpg",
+        "listed_count": 66,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/667705749988966400/ovIW1NGB_normal.jpg",
+        "following": false,
+        "created_at": "Sun Mar 08 22:23:07 +0000 2009",
+        "profile_sidebar_fill_color": "407DB0",
+        "profile_link_color": "4A913C",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "San Jose Eng. Jobs",
+        "time_zone": "Eastern Time (US & Canada)"
+      },
+      "text": "Can you recommend anyone for this #job? Software Developer - Drivers Python/C# - https://t.co/l2WK5x4CQD #BigData #noSQL #SantaClara, CA",
+      "created_at": "Fri Dec 11 00:27:02 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          37.3986039,
+          -121.9643745
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    },
+    {
+      "id": 675109065039749120,
+      "possibly_sensitive": false,
+      "in_reply_to_user_id": null,
+      "retweeted": false,
+      "lang": "en",
+      "in_reply_to_status_id": null,
+      "is_quote_status": false,
+      "entities": {
+        "hashtags": [
+          {
+            "indices": [
+              37,
+              40
+            ],
+            "text": "IT"
+          },
+          {
+            "indices": [
+              41,
+              45
+            ],
+            "text": "job"
+          },
+          {
+            "indices": [
+              84,
+              93
+            ],
+            "text": "PALOALTO"
+          },
+          {
+            "indices": [
+              98,
+              105
+            ],
+            "text": "Hiring"
+          },
+          {
+            "indices": [
+              106,
+              116
+            ],
+            "text": "CareerArc"
+          }
+        ],
+        "urls": [
+          {
+            "indices": [
+              60,
+              83
+            ],
+            "url": "https://t.co/qqr2N9pr2A",
+            "expanded_url": "http://bit.ly/1ioflHO",
+            "display_url": "bit.ly/1ioflHO"
+          }
+        ],
+        "user_mentions": [],
+        "symbols": []
+      },
+      "id_str": "675109065039749120",
+      "source": "<a href=\"http://www.tweetmyjobs.com\" rel=\"nofollow\">TweetMyJOBS</a>",
+      "coordinates": {
+        "coordinates": [
+          -122.1575745,
+          37.4457966
+        ],
+        "type": "Point"
+      },
+      "in_reply_to_status_id_str": null,
+      "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+      },
+      "place": {
+        "country": "United States",
+        "id": "3ad0f706b3fa62a8",
+        "url": "https://api.twitter.com/1.1/geo/id/3ad0f706b3fa62a8.json",
+        "country_code": "US",
+        "place_type": "city",
+        "contained_within": [],
+        "full_name": "Palo Alto, CA",
+        "bounding_box": {
+          "coordinates": [
+            [
+              [
+                -122.190523,
+                37.362824
+              ],
+              [
+                -122.097537,
+                37.362824
+              ],
+              [
+                -122.097537,
+                37.465918
+              ],
+              [
+                -122.190523,
+                37.465918
+              ]
+            ]
+          ],
+          "type": "Polygon"
+        },
+        "name": "Palo Alto",
+        "attributes": {}
+      },
+      "user": {
+        "default_profile": false,
+        "id": 20827150,
+        "url": "https://t.co/DByWt45HZj",
+        "utc_offset": -18000,
+        "default_profile_image": false,
+        "followers_count": 705,
+        "protected": false,
+        "friends_count": 360,
+        "contributors_enabled": false,
+        "location": "San Francisco, CA",
+        "profile_use_background_image": true,
+        "screen_name": "tmj_sfo_it",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/315565691/Twitter-BG_2_bg-image.jpg",
+        "follow_request_sent": false,
+        "entities": {
+          "description": {
+            "urls": []
+          },
+          "url": {
+            "urls": [
+              {
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/DByWt45HZj",
+                "expanded_url": "http://www.careerarc.com/job-seeker",
+                "display_url": "careerarc.com/job-seeker"
+              }
+            ]
+          }
+        },
+        "id_str": "20827150",
+        "profile_background_color": "253956",
+        "geo_enabled": true,
+        "description": "Follow this account for geo-targeted Software Dev. - General/IT job tweets in San Francisco, CA. Need help? Tweet us at @CareerArc!",
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/20827150/1447890103",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/667125554395516928/6irWJWH2_normal.jpg",
+        "profile_text_color": "000000",
+        "profile_sidebar_border_color": "000000",
+        "statuses_count": 957,
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/315565691/Twitter-BG_2_bg-image.jpg",
+        "listed_count": 110,
+        "notifications": false,
+        "is_translation_enabled": false,
+        "verified": false,
+        "is_translator": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/667125554395516928/6irWJWH2_normal.jpg",
+        "following": false,
+        "created_at": "Sat Feb 14 02:46:00 +0000 2009",
+        "profile_sidebar_fill_color": "407DB0",
+        "profile_link_color": "4A913C",
+        "profile_background_tile": false,
+        "lang": "en",
+        "has_extended_profile": false,
+        "favourites_count": 0,
+        "name": "San Francisco IT Job",
+        "time_zone": "Eastern Time (US & Canada)"
+      },
+      "text": "Join the VMware team! See our latest #IT #job opening here: https://t.co/qqr2N9pr2A #PALOALTO, CA #Hiring #CareerArc",
+      "created_at": "Fri Dec 11 00:25:18 +0000 2015",
+      "in_reply_to_user_id_str": null,
+      "in_reply_to_screen_name": null,
+      "truncated": false,
+      "geo": {
+        "coordinates": [
+          37.4457966,
+          -122.1575745
+        ],
+        "type": "Point"
+      },
+      "retweet_count": 0,
+      "favorite_count": 0,
+      "favorited": false,
+      "contributors": null
+    }
+  ],
+  "search_metadata": {
+    "completed_in": 0.042,
+    "count": 15,
+    "max_id_str": "676518074279788544",
+    "since_id": 0,
+    "max_id": 676518074279788544,
+    "since_id_str": "0",
+    "query": "python",
+    "refresh_url": "?since_id=676518074279788544&q=python&geocode=37.781157%2C-122.398720%2C100mi&include_entities=1",
+    "next_results": "?max_id=675109065039749119&q=python&geocode=37.781157%2C-122.398720%2C100mi&include_entities=1"
+  }
+}

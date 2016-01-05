@@ -1,0 +1,4 @@
+future
+requests
+requests_oauthlib
+responses
