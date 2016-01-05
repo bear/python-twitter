@@ -1588,7 +1588,7 @@ class Api(object):
         # assert(url.endswith('followers/ids.json') or url.endswith('friends/ids.json'))
         if not self.__auth:
             raise TwitterError({'message': "twitter.Api instance must be authenticated"})
-        result = []
+        result_list = []
         parameters = {}
         if user_id is not None:
             parameters['user_id'] = user_id
@@ -1603,8 +1603,8 @@ class Api(object):
             parameters['cursor'] = cursor
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-            result += [x for x in data['ids']]
-            if count is not None and len(result) >= count:
+            result_list += [x for x in data['ids']]
+            if count is not None and len(result_list) >= count:
                 break
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -1616,7 +1616,7 @@ class Api(object):
             sec = self.GetSleepTime('/friends/ids')
             time.sleep(sec)
 
-        return data['next_cursor'], data['previous_cursor'], result
+        return data['next_cursor'], data['previous_cursor'], result_list
 
     def GetFollowerIDsPaged(self,
                             user_id=None,
@@ -1774,15 +1774,15 @@ class Api(object):
             count = total_count
 
         while True:
-            next_cursor, previous_cursor, data = self.GetFriendIDsPaged(user_id, screen_name,
+            next_cursor, previous_cursor, id_list = self.GetFriendIDsPaged(user_id, screen_name,
                                                                         cursor, stringify_ids, count)
-            result += [x for x in data['ids']]
+            result += [x for x in id_list]
             if next_cursor == 0 or next_cursor == previous_cursor:
                 break
             else:
                 cursor = next_cursor
             if total_count is not None:
-                total_count -= len(data['ids'])
+                total_count -= len(id_list)
                 if total_count < 1:
                     break
             sec = self.GetSleepTime('/followers/ids')
