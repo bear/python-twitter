@@ -1557,7 +1557,7 @@ class Api(object):
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [User.NewFromJsonDict(x) for x in data['users']]
-            if count is not None and len(result) > count:
+            if count is not None and len(result) >= count:
                 break
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -1604,7 +1604,7 @@ class Api(object):
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [x for x in data['ids']]
-            if count is not None and len(result) > count:
+            if count is not None and len(result) >= count:
                 break
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
@@ -1893,7 +1893,7 @@ class Api(object):
             next_cursor, previous_cursor, data = self.GetFollowersPaged(user_id, screen_name, cursor, count,
                                                                         skip_status, include_user_entities)
             result += [User.NewFromJsonDict(x) for x in data['users']]
-            if count is not None and len(result) > count:
+            if count is not None and len(result) >= count:
                 break
             if next_cursor == 0 or next_cursor == previous_cursor:
                 break
