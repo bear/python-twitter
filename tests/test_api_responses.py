@@ -368,7 +368,7 @@ class ApiTest(unittest.TestCase):
     @responses.activate
     def testGetBlocks(self):
         with open('testdata/new/get_blocks.json') as f:
-                resp_data = f.read()
+            resp_data = f.read()
         responses.add(
             responses.GET,
             'https://api.twitter.com/1.1/blocks/list.json?cursor=-1',
