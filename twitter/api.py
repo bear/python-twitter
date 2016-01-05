@@ -1522,8 +1522,7 @@ class Api(object):
             Should be set to -1 for the initial call and then is used to
             control what result page Twitter returns.
           count:
-            The number of users to return per page, up to a maximum of 200.
-            Defaults to 20. [Optional]
+            The maximum number of users to return.
           skip_status:
             If True the statuses will not be returned in the user items.
             [Optional]
@@ -1558,6 +1557,8 @@ class Api(object):
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [User.NewFromJsonDict(x) for x in data['users']]
+            if count is not None and len(result) > count:
+                break
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
                     break
@@ -1603,6 +1604,8 @@ class Api(object):
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [x for x in data['ids']]
+            if count is not None and len(result) > count:
+                break
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
                     break
@@ -1873,8 +1876,7 @@ class Api(object):
             Should be set to -1 for the initial call and then is used to
             control what result page Twitter returns.
           count:
-            The number of users to return per page, up to a maximum of 200.
-            Defaults to 200. [Optional]
+            The number of users to return, defaults to 200.
           skip_status:
             If True the statuses will not be returned in the user items. [Optional]
           include_user_entities:
@@ -1891,6 +1893,8 @@ class Api(object):
             next_cursor, previous_cursor, data = self.GetFollowersPaged(user_id, screen_name, cursor, count,
                                                                         skip_status, include_user_entities)
             result += [User.NewFromJsonDict(x) for x in data['users']]
+            if count is not None and len(result) > count:
+                break
             if next_cursor == 0 or next_cursor == previous_cursor:
                 break
             else:
