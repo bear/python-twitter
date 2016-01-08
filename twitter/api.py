@@ -1653,12 +1653,7 @@ class Api(object):
             except KeyError:
                 break
 
-            if 'next_cursor' in data:
-                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
-                    break
-                else:
-                    cursor = data['next_cursor']
-            else:
+            if next_cursor == 0 or next_cursor == previous_cursor:
                 break
 
         return result
@@ -1680,7 +1675,7 @@ class Api(object):
         # assert(url.endswith('followers/ids.json') or url.endswith('friends/ids.json'))
         if not self.__auth:
             raise TwitterError({'message': "twitter.Api instance must be authenticated"})
-        result_list = []
+        result = []
         parameters = {}
         if user_id is not None:
             parameters['user_id'] = user_id
@@ -1695,9 +1690,15 @@ class Api(object):
             parameters['cursor'] = cursor
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-            result_list += [x for x in data['ids']]
-            if count is not None and len(result_list) >= count:
+
+            try:
+                result += [x for x in data['ids']]
+            except KeyError:
                 break
+
+            if count is not None and len(result) >= count:
+                break
+
             if 'next_cursor' in data:
                 if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
                     break
@@ -1705,10 +1706,11 @@ class Api(object):
                     cursor = data['next_cursor']
             else:
                 break
+
             sec = self.GetSleepTime('/friends/ids')
             time.sleep(sec)
 
-        return data['next_cursor'], data['previous_cursor'], result_list
+        return data['next_cursor'], data['previous_cursor'], result
 
     def GetFollowerIDsPaged(self,
                             user_id=None,
@@ -1779,7 +1781,7 @@ class Api(object):
                        screen_name=None,
                        cursor=-1,
                        stringify_ids=False,
-                       count=None,
+                       count=5000,
                        total_count=None):
         """Returns a list of twitter user id's for every person
         that is following the specified user.
@@ -1808,21 +1810,41 @@ class Api(object):
           A list of integers, one for each user id.
         """
         result = []
+
+        if count:
+            try:
+                count = int(count)
+            except ValueError:
+                raise TwitterError({'message': "count must be an integer"})
+
+        if total_count:
+            try:
+                total_count = int(total_count)
+            except ValueError:
+                raise TwitterError({'message': "total_count must be an integer"})
+
         if total_count and total_count < count:
             count = total_count
 
         while True:
-            next_cursor, previous_cursor, data = self.GetFollowerIDsPaged(user_id, screen_name, cursor, stringify_ids,
-                                                                          count)
-            result += [x for x in data['ids']]
+            next_cursor, previous_cursor, data = self.GetFollowerIDsPaged(
+                                                        user_id,
+                                                        screen_name,
+                                                        cursor,
+                                                        stringify_ids,
+                                                        count)
+            result += [x for x in data]
+
             if next_cursor == 0 or next_cursor == previous_cursor:
                 break
             else:
                 cursor = next_cursor
+
             if total_count is not None:
-                total_count -= len(data['ids'])
+                total_count -= len(data)
                 if total_count < 1:
                     break
+
             sec = self.GetSleepTime('/followers/ids')
             time.sleep(sec)
 
@@ -1862,21 +1884,41 @@ class Api(object):
           A list of integers, one for each user id.
         """
         result = []
+
+        if count:
+            try:
+                count = int(count)
+            except ValueError:
+                raise TwitterError({'message': "count must be an integer"})
+
+        if total_count:
+            try:
+                total_count = int(total_count)
+            except ValueError:
+                raise TwitterError({'message': "total_count must be an integer"})
+
         if total_count and total_count < count:
             count = total_count
 
         while True:
-            next_cursor, previous_cursor, id_list = self.GetFriendIDsPaged(user_id, screen_name,
-                                                                        cursor, stringify_ids, count)
-            result += [x for x in id_list]
+            next_cursor, previous_cursor, data = self.GetFriendIDsPaged(
+                                                        user_id,
+                                                        screen_name,
+                                                        cursor,
+                                                        stringify_ids,
+                                                        count)
+            result += [x for x in data]
+
             if next_cursor == 0 or next_cursor == previous_cursor:
                 break
             else:
                 cursor = next_cursor
+
             if total_count is not None:
-                total_count -= len(id_list)
+                total_count -= len(data['ids'])
                 if total_count < 1:
                     break
+
             sec = self.GetSleepTime('/followers/ids')
             time.sleep(sec)
 
@@ -2038,12 +2080,7 @@ class Api(object):
             except KeyError:
                 break
 
-            if 'next_cursor' in data:
-                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
-                    break
-                else:
-                    cursor = data['next_cursor']
-            else:
+            if next_cursor == 0 or next_cursor == previous_cursor:
                 break
 
         return result
