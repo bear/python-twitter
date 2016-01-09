@@ -187,10 +187,7 @@ class Api(object):
         self._InitializeUserAgent()
         self._InitializeDefaultParameters()
 
-        if sleep_on_rate_limit:
-            self.sleep_on_rate_limit = True
-        else:
-            self.sleep_on_rate_limit = False
+        self.sleep_on_rate_limit = sleep_on_rate_limit
 
         if base_url is None:
             self.base_url = 'https://api.twitter.com/1.1'
@@ -2062,25 +2059,14 @@ class Api(object):
             if limit_users is not None and len(result) + count > limit_users:
                 break
 
-            if endpoint == '/friends/list':
-                next_cursor, previous_cursor, data = self.GetFriendsPaged(
-                    user_id=user_id,
-                    screen_name=screen_name,
-                    count=count,
-                    cursor=cursor,
-                    skip_status=skip_status,
-                    include_user_entities=include_user_entities)
-
-            elif endpoint == '/followers/list':
-                next_cursor, previous_cursor, data = self.GetFollowersPaged(
-                    user_id=user_id,
-                    screen_name=screen_name,
-                    count=count,
-                    cursor=cursor,
-                    skip_status=skip_status,
-                    include_user_entities=include_user_entities)
-            else:
-                break
+            next_cursor, previous_cursor, data = self._GetFriendsFollowersPaged(
+                endpoint=endpoint,
+                user_id=user_id,
+                screen_name=screen_name,
+                count=count,
+                cursor=cursor,
+                skip_status=skip_status,
+                include_user_entities=include_user_entities)
 
             if next_cursor:
                 cursor = next_cursor
