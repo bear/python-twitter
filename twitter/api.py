@@ -136,7 +136,8 @@ class Api(object):
                  upload_url=None,
                  use_gzip_compression=False,
                  debugHTTP=False,
-                 timeout=None):
+                 timeout=None,
+                 sleep_on_rate_limit=True):
         """Instantiate a new twitter.Api object.
 
         Args:
@@ -185,6 +186,11 @@ class Api(object):
         self._InitializeRequestHeaders(request_headers)
         self._InitializeUserAgent()
         self._InitializeDefaultParameters()
+
+        if sleep_on_rate_limit:
+            self.sleep_on_rate_limit = True
+        else:
+            self.sleep_on_rate_limit = False
 
         if base_url is None:
             self.base_url = 'https://api.twitter.com/1.1'
@@ -4007,6 +4013,10 @@ class Api(object):
         Returns:
           The minimum seconds that the api must have to sleep before query again
         """
+
+        if self.sleep_on_rate_limit is False:
+            return 0
+
         if resources[0] == '/':
             resources = resources[1:]
         resource_families = resources[:resources.find('/')] if '/' in resources else resources
