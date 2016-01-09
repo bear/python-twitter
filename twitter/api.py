@@ -1560,6 +1560,10 @@ class Api(object):
                    include_user_entities=True):
         """Fetch the sequence of twitter.User instances, one for each friend.
 
+        If both user_id and screen_name are specified, this call will return
+        the followers of the user specified by screen_name, however this
+        behavior is undocumented by Twitter and may change without warning.
+
         The twitter.Api instance must be authenticated.
 
         Args:
@@ -2085,7 +2089,7 @@ class Api(object):
                      count=None,
                      limit_users=None,
                      skip_status=False,
-                     include_user_entities=False):
+                     include_user_entities=True):
         """Fetch the sequence of twitter.User instances, one for each follower.
 
         If both user_id and screen_name are specified, this call will return
