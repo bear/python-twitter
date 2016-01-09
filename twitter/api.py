@@ -1569,16 +1569,22 @@ class Api(object):
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
+        if 'users' in data:
+            users = [User.NewFromJsonDict(user) for user in data['users']]
+        else:
+            users = []
+
         if 'next_cursor' in data:
             next_cursor = data['next_cursor']
         else:
             next_cursor = 0
+
         if 'previous_cursor' in data:
             previous_cursor = data['previous_cursor']
         else:
             previous_cursor = 0
 
-        return next_cursor, previous_cursor, data
+        return next_cursor, previous_cursor, users
 
     def GetFriends(self,
                    user_id=None,
@@ -1626,6 +1632,7 @@ class Api(object):
                 DeprecationWarning, stacklevel=2)
 
         count = 200
+        cursor = -1
         result = []
 
         if limit_users:
@@ -1645,13 +1652,14 @@ class Api(object):
                 user_id=user_id,
                 screen_name=screen_name,
                 count=count,
+                cursor=cursor,
                 skip_status=skip_status,
                 include_user_entities=include_user_entities)
 
-            try:
-                result += [User.NewFromJsonDict(x) for x in data['users']]
-            except KeyError:
-                break
+            if next_cursor:
+                cursor = next_cursor
+
+            result.extend(data)
 
             if next_cursor == 0 or next_cursor == previous_cursor:
                 break
@@ -1853,12 +1861,14 @@ class Api(object):
     def GetFriendIDs(self,
                      user_id=None,
                      screen_name=None,
-                     cursor=-1,
+                     cursor=None,
                      stringify_ids=False,
                      count=None,
                      total_count=None):
-        """Returns a list of twitter user id's for every person
-        that is followed by the specified user.
+        """ Fetch a sequence of user ids, one for each friend.
+        Returns a list of all the given user's friends' IDs. If no user_id or
+        screen_name is given, the friends will be those of the authenticated
+        user.
 
         Args:
           user_id:
@@ -1885,11 +1895,14 @@ class Api(object):
         """
         result = []
 
-        if count:
-            try:
-                count = int(count)
-            except ValueError:
-                raise TwitterError({'message': "count must be an integer"})
+        if cursor is not None or count is not None:
+            warnings.warn(
+                "Use of 'cursor' and 'count' parameters are deprecated as of "
+                "python-twitter 3.0. Please use GetFriendsPaged instead.",
+                DeprecationWarning, stacklevel=2)
+
+        count = 5000
+        cursor = -1
 
         if total_count:
             try:
@@ -1994,6 +2007,11 @@ class Api(object):
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
+        if 'users' in data:
+            users = [User.NewFromJsonDict(user) for user in data['users']]
+        else:
+            users = []
+
         if 'next_cursor' in data:
             next_cursor = data['next_cursor']
         else:
@@ -2003,7 +2021,7 @@ class Api(object):
         else:
             previous_cursor = 0
 
-        return next_cursor, previous_cursor, data
+        return next_cursor, previous_cursor, users
 
     def GetFollowers(self,
                      user_id=None,
@@ -2076,7 +2094,7 @@ class Api(object):
                 include_user_entities=include_user_entities)
 
             try:
-                result += [User.NewFromJsonDict(x) for x in data['users']]
+                result.extend(data)
             except KeyError:
                 break
 
