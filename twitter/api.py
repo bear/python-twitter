@@ -1512,7 +1512,7 @@ class Api(object):
                         cursor=-1,
                         count=200,
                         skip_status=False,
-                        include_user_entities=False):
+                        include_user_entities=True):
         """Make a cursor driven call to return the list of all friends.
 
         Args:
@@ -1557,10 +1557,17 @@ class Api(object):
             parameters['count'] = int(count)
         except ValueError:
             raise TwitterError({'message': "count must be an integer"})
+
         if skip_status:
             parameters['skip_status'] = True
+        else:
+            parameters['skip_status'] = False
+
         if include_user_entities:
             parameters['include_user_entities'] = True
+        else:
+            parameters['include_user_entities'] = False
+
         parameters['cursor'] = cursor
 
         sec = self.GetSleepTime('/friends/list')
@@ -1943,7 +1950,7 @@ class Api(object):
                           cursor=-1,
                           count=200,
                           skip_status=False,
-                          include_user_entities=False):
+                          include_user_entities=True):
         """Make a cursor driven call to return the list of all followers
 
         The caller is responsible for handling the cursor value and looping
@@ -1995,10 +2002,17 @@ class Api(object):
             parameters['count'] = int(count)
         except ValueError:
             raise TwitterError({'message': "count must be an integer"})
+
         if skip_status:
             parameters['skip_status'] = True
+        else:
+            parameters['skip_status'] = False
+
         if include_user_entities:
             parameters['include_user_entities'] = True
+        else:
+            parameters['include_user_entities'] = False
+
         parameters['cursor'] = cursor
 
         sec = self.GetSleepTime('/followers/list')
