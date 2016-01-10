@@ -4194,7 +4194,6 @@ class Api(object):
                     raise TwitterError(str(e))
         if verb == 'GET':
             url = self._BuildUrl(url, extra_params=data)
-            print('GETing URL', url)
             try:
                 return requests.get(
                     url,
