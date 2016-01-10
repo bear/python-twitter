@@ -1936,7 +1936,7 @@ class Api(object):
                              screen_name=None,
                              cursor=None,
                              count=None,
-                             limit_users=None,
+                             total_count=None,
                              skip_status=False,
                              include_user_entities=True):
 
@@ -1944,9 +1944,9 @@ class Api(object):
         or follower.
 
         Args:
-          endpoint:
-            Either '/followers/list' or '/friends/list' depending on which you
-            want to return.
+          url:
+            URL to get. Either base_url + ('/followers/list.json' or
+            '/friends/list.json').
           user_id:
             The twitter id of the user whose friends you are fetching.
             If not specified, defaults to the authenticated user. [Optional]
@@ -1959,7 +1959,7 @@ class Api(object):
           count:
             The number of users to return per page, up to a maximum of 200.
             Defaults to 200. [Optional]
-          limit_users:
+          total_count:
             The upper bound of number of users to return, defaults to None.
           skip_status:
             If True the statuses will not be returned in the user items.
@@ -1981,17 +1981,17 @@ class Api(object):
         cursor = -1
         result = []
 
-        if limit_users:
+        if total_count:
             try:
-                limit_users = int(limit_users)
+                total_count = int(total_count)
             except ValueError:
-                raise TwitterError({'message': "limit_users must be an integer"})
+                raise TwitterError({'message': "total_count must be an integer"})
 
-            if limit_users <= 200:
-                count = limit_users
+            if total_count <= 200:
+                count = total_count
 
         while True:
-            if limit_users is not None and len(result) + count > limit_users:
+            if total_count is not None and len(result) + count > total_count:
                 break
 
             next_cursor, previous_cursor, data = self._GetFriendsFollowersPaged(
@@ -2018,7 +2018,7 @@ class Api(object):
                      screen_name=None,
                      cursor=None,
                      count=None,
-                     limit_users=None,
+                     total_count=None,
                      skip_status=False,
                      include_user_entities=True):
         """Fetch the sequence of twitter.User instances, one for each follower.
@@ -2042,7 +2042,7 @@ class Api(object):
           count:
             The number of users to return per page, up to a maximum of 200.
             Defaults to 200. [Optional]
-          limit_users:
+          total_count:
             The upper bound of number of users to return, defaults to None.
           skip_status:
             If True the statuses will not be returned in the user items. [Optional]
@@ -2058,7 +2058,7 @@ class Api(object):
                                          screen_name,
                                          cursor,
                                          count,
-                                         limit_users,
+                                         total_count,
                                          skip_status,
                                          include_user_entities)
 
@@ -2067,7 +2067,7 @@ class Api(object):
                    screen_name=None,
                    cursor=None,
                    count=None,
-                   limit_users=None,
+                   total_count=None,
                    skip_status=False,
                    include_user_entities=True):
         """Fetch the sequence of twitter.User instances, one for each friend.
@@ -2091,7 +2091,7 @@ class Api(object):
           count:
             The number of users to return per page, up to a maximum of 200.
             Defaults to 200. [Optional]
-          limit_users:
+          total_count:
             The upper bound of number of users to return, defaults to None.
           skip_status:
             If True the statuses will not be returned in the user items.
@@ -2108,7 +2108,7 @@ class Api(object):
                                          screen_name,
                                          cursor,
                                          count,
-                                         limit_users,
+                                         total_count,
                                          skip_status,
                                          include_user_entities)
 

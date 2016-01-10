@@ -178,14 +178,14 @@ class ApiTest(unittest.TestCase):
             match_querystring=True,
             status=200)
 
-        resp = self.api.GetFriends(screen_name='codebear', limit_users=200)
+        resp = self.api.GetFriends(screen_name='codebear', total_count=200)
         self.assertEqual(len(resp), 200)
 
     def testFriendsErrorChecking(self):
         self.assertRaises(
             twitter.TwitterError,
             lambda: self.api.GetFriends(screen_name='jack',
-                                        limit_users='infinity'))
+                                        total_count='infinity'))
         self.assertRaises(
             twitter.TwitterError,
             lambda: self.api.GetFriendsPaged(screen_name='jack',
