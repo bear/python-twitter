@@ -1509,99 +1509,7 @@ class Api(object):
 
         return Status.NewFromJsonDict(data)
 
-    def GetFriendsPaged(self,
-                        user_id=None,
-                        screen_name=None,
-                        cursor=-1,
-                        count=200,
-                        skip_status=False,
-                        include_user_entities=True):
-        """Make a cursor driven call to return the list of all friends.
-
-        Args:
-          user_id:
-            The twitter id of the user whose friends you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
-          screen_name:
-            The twitter name of the user whose friends you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
-          cursor:
-            Should be set to -1 for the initial call and then is used to
-            control what result page Twitter returns.
-          count:
-            The number of users to return per page, up to a current maximum of
-            200. Defaults to 200. [Optional]
-          skip_status:
-            If True the statuses will not be returned in the user items.
-            [Optional]
-          include_user_entities:
-            When True, the user entities will be included. [Optional]
-
-        Returns:
-          next_cursor, previous_cursor, data sequence of twitter.User
-          instances, one for each follower
-        """
-
-        return self._GetFriendsFollowersPaged('/friends/list',
-                                              user_id,
-                                              screen_name,
-                                              cursor,
-                                              count,
-                                              skip_status,
-                                              include_user_entities)
-
-    def GetFriends(self,
-                   user_id=None,
-                   screen_name=None,
-                   cursor=None,
-                   count=None,
-                   limit_users=None,
-                   skip_status=False,
-                   include_user_entities=True):
-        """Fetch the sequence of twitter.User instances, one for each friend.
-
-        If both user_id and screen_name are specified, this call will return
-        the followers of the user specified by screen_name, however this
-        behavior is undocumented by Twitter and may change without warning.
-
-        The twitter.Api instance must be authenticated.
-
-        Args:
-          user_id:
-            The twitter id of the user whose friends you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
-          screen_name:
-            The twitter name of the user whose friends you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
-          cursor:
-            Should be set to -1 for the initial call and then is used to
-            control what result page Twitter returns.
-          count:
-            The number of users to return per page, up to a maximum of 200.
-            Defaults to 200. [Optional]
-          limit_users:
-            The upper bound of number of users to return, defaults to None.
-          skip_status:
-            If True the statuses will not be returned in the user items.
-            [Optional]
-          include_user_entities:
-            When True, the user entities will be included. [Optional]
-
-        Returns:
-          A sequence of twitter.User instances, one for each friend
-        """
-
-        return self._GetFriendsFollowers('/friends/list',
-                                         user_id,
-                                         screen_name,
-                                         cursor,
-                                         count,
-                                         limit_users,
-                                         skip_status,
-                                         include_user_entities)
-
     def _GetIDsPaged(self,
-                     # must be the url for followers/ids.json or friends/ids.json
                      url,
                      user_id,
                      screen_name,
@@ -1609,50 +1517,35 @@ class Api(object):
                      stringify_ids,
                      count):
         """
-        This is the lowlest level paging logic for fetching IDs. It is used soley by
-        GetFollowerIDsPaged and GetFriendIDsPaged. It is not intended for other use.
+        This is the lowest level paging logic for fetching IDs. It is used
+        solely by GetFollowerIDsPaged and GetFriendIDsPaged. It is not intended
+        for other use.
 
-        See GetFollowerIDsPaged or GetFriendIDsPaged for an explanation of the input arguments.
+        See GetFollowerIDsPaged or GetFriendIDsPaged for an explanation of the
+        input arguments.
         """
-        # assert(url.endswith('followers/ids.json') or url.endswith('friends/ids.json'))
-        if not self.__auth:
-            raise TwitterError({'message': "twitter.Api instance must be authenticated"})
         result = []
+
         parameters = {}
         if user_id is not None:
             parameters['user_id'] = user_id
         if screen_name is not None:
             parameters['screen_name'] = screen_name
-        if stringify_ids:
-            parameters['stringify_ids'] = True
         if count is not None:
             parameters['count'] = count
+        parameters['stringify_ids'] = stringify_ids
+        parameters['cursor'] = cursor
 
-        while True:
-            parameters['cursor'] = cursor
-            resp = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-            try:
-                result += [x for x in data['ids']]
-            except KeyError:
-                break
+        if 'ids' in data:
+            result.extend([x for x in data['ids']])
 
-            if count is not None and len(result) >= count:
-                break
+        next_cursor = data.get('next_cursor', 0)
+        previous_cursor = data.get('previous_cursor', 0)
 
-            if 'next_cursor' in data:
-                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
-                    break
-                else:
-                    cursor = data['next_cursor']
-            else:
-                break
-
-            sec = self.GetSleepTime('/friends/ids')
-            time.sleep(sec)
-
-        return data['next_cursor'], data['previous_cursor'], result
+        return next_cursor, previous_cursor, result
 
     def GetFollowerIDsPaged(self,
                             user_id=None,
@@ -1660,7 +1553,7 @@ class Api(object):
                             cursor=-1,
                             stringify_ids=False,
                             count=5000):
-        """Make a cursor driven call to return the list of all followers
+        """Make a cursor driven call to return a list of one page followers.
 
         The caller is responsible for handling the cursor value and looping
         to gather all of the data
@@ -1675,16 +1568,25 @@ class Api(object):
           cursor:
             Should be set to -1 for the initial call and then is used to
             control what result page Twitter returns.
+          stringify_ids:
+            if True then twitter will return the ids as strings instead of
+            integers. [Optional]
           count:
-            The number of user id's to retrieve per API request. Please be aware that
-            this might get you rate-limited if set to a small number.
+            The number of user id's to retrieve per API request. Please be aware
+            that this might get you rate-limited if set to a small number.
             By default Twitter will retrieve 5000 UIDs per call. [Optional]
 
         Returns:
-          next_cursor, previous_cursor, data sequence of twitter.User instances, one for each follower
+          next_cursor, previous_cursor, data sequence of user ids,
+          one for each follower
         """
         url = '%s/followers/ids.json' % self.base_url
-        return self._GetIDsPaged(url, user_id, screen_name, cursor, stringify_ids, count)
+        return self._GetIDsPaged(url,
+                                 user_id,
+                                 screen_name,
+                                 cursor,
+                                 stringify_ids,
+                                 count)
 
     def GetFriendIDsPaged(self,
                           user_id=None,
@@ -1707,23 +1609,83 @@ class Api(object):
           cursor:
             Should be set to -1 for the initial call and then is used to
             control what result page Twitter returns.
+          stringify_ids:
+            if True then twitter will return the ids as strings instead of
+            integers. [Optional]
           count:
-            The number of user id's to retrieve per API request. Please be aware that
-            this might get you rate-limited if set to a small number.
+            The number of user id's to retrieve per API request. Please be aware
+            that this might get you rate-limited if set to a small number.
             By default Twitter will retrieve 5000 UIDs per call. [Optional]
 
         Returns:
-          next_cursor, previous_cursor, data sequence of twitter.User instances, one for each friend
+          next_cursor, previous_cursor, data sequence of twitter.User instances,
+          one for each friend
         """
         url = '%s/friends/ids.json' % self.base_url
-        return self._GetIDsPaged(url, user_id, screen_name, cursor, stringify_ids, count)
+        return self._GetIDsPaged(url,
+                                 user_id,
+                                 screen_name,
+                                 cursor,
+                                 stringify_ids,
+                                 count)
+
+    def _GetFriendFollowerIDs(self,
+                              url=None,
+                              user_id=None,
+                              screen_name=None,
+                              cursor=None,
+                              count=None,
+                              stringify_ids=False,
+                              total_count=None):
+        """ Common method for GetFriendIDs and GetFollowerIDs """
+
+        if cursor is not None or count is not None:
+            warnings.warn(
+                "Use of 'cursor' and 'count' parameters are deprecated as of "
+                "python-twitter 3.0. Please use GetFriendIDsPaged or "
+                "GetFollowerIDsPaged instead.",
+                DeprecationWarning, stacklevel=2)
+
+        count = 5000
+        cursor = -1
+        result = []
+
+        if total_count:
+            try:
+                total_count = int(total_count)
+            except ValueError:
+                raise TwitterError({'message': "total_count must be an integer"})
+
+        if total_count and total_count < count:
+            count = total_count
+
+        while True:
+            if total_count is not None and len(result) + count > total_count:
+                break
+
+            next_cursor, previous_cursor, data = self._GetIDsPaged(
+                url,
+                user_id,
+                screen_name,
+                cursor,
+                stringify_ids,
+                count)
+
+            result.extend([x for x in data])
+
+            if next_cursor == 0 or next_cursor == previous_cursor:
+                break
+            else:
+                cursor = next_cursor
+
+        return result
 
     def GetFollowerIDs(self,
                        user_id=None,
                        screen_name=None,
-                       cursor=-1,
+                       cursor=None,
                        stringify_ids=False,
-                       count=5000,
+                       count=None,
                        total_count=None):
         """Returns a list of twitter user id's for every person
         that is following the specified user.
@@ -1737,67 +1699,36 @@ class Api(object):
             Specifies the Twitter API Cursor location to start at.
             Note: there are pagination limits. [Optional]
           stringify_ids:
-            if True then twitter will return the ids as strings instead of integers.
-            [Optional]
+            if True then twitter will return the ids as strings instead of
+            integers. [Optional]
           count:
-            The number of user id's to retrieve per API request. Please be aware that
-            this might get you rate-limited if set to a small number.
+            The number of user id's to retrieve per API request. Please be aware
+            that this might get you rate-limited if set to a small number.
             By default Twitter will retrieve 5000 UIDs per call. [Optional]
           total_count:
-            The total amount of UIDs to retrieve. Good if the account has many followers
-            and you don't want to get rate limited. The data returned might contain more
-            UIDs if total_count is not a multiple of count (5000 by default). [Optional]
+            The total amount of UIDs to retrieve. Good if the account has many
+            followers and you don't want to get rate limited. The data returned
+            might contain more UIDs if total_count is not a multiple of count
+            (5000 by default). [Optional]
 
         Returns:
           A list of integers, one for each user id.
         """
-        result = []
-
-        if count:
-            try:
-                count = int(count)
-            except ValueError:
-                raise TwitterError({'message': "count must be an integer"})
-
-        if total_count:
-            try:
-                total_count = int(total_count)
-            except ValueError:
-                raise TwitterError({'message': "total_count must be an integer"})
-
-        if total_count and total_count < count:
-            count = total_count
-
-        while True:
-            next_cursor, previous_cursor, data = self.GetFollowerIDsPaged(
-                user_id,
-                screen_name,
-                cursor,
-                stringify_ids,
-                count)
-            result += [x for x in data]
-
-            if next_cursor == 0 or next_cursor == previous_cursor:
-                break
-            else:
-                cursor = next_cursor
-
-            if total_count is not None:
-                total_count -= len(data)
-                if total_count < 1:
-                    break
-
-            sec = self.GetSleepTime('/followers/ids')
-            time.sleep(sec)
-
-        return result
+        url = '%s/followers/ids.json' % self.base_url
+        return self._GetFriendFollowerIDs(url,
+                                          user_id,
+                                          screen_name,
+                                          cursor,
+                                          stringify_ids,
+                                          count,
+                                          total_count)
 
     def GetFriendIDs(self,
                      user_id=None,
                      screen_name=None,
                      cursor=None,
-                     stringify_ids=False,
                      count=None,
+                     stringify_ids=False,
                      total_count=None):
         """ Fetch a sequence of user ids, one for each friend.
         Returns a list of all the given user's friends' IDs. If no user_id or
@@ -1827,93 +1758,17 @@ class Api(object):
         Returns:
           A list of integers, one for each user id.
         """
-        result = []
-
-        if cursor is not None or count is not None:
-            warnings.warn(
-                "Use of 'cursor' and 'count' parameters are deprecated as of "
-                "python-twitter 3.0. Please use GetFriendsPaged instead.",
-                DeprecationWarning, stacklevel=2)
-
-        count = 5000
-        cursor = -1
-
-        if total_count:
-            try:
-                total_count = int(total_count)
-            except ValueError:
-                raise TwitterError({'message': "total_count must be an integer"})
-
-        if total_count and total_count < count:
-            count = total_count
-
-        while True:
-            next_cursor, previous_cursor, data = self.GetFriendIDsPaged(
-                user_id,
-                screen_name,
-                cursor,
-                stringify_ids,
-                count)
-            result += [x for x in data]
-
-            if next_cursor == 0 or next_cursor == previous_cursor:
-                break
-            else:
-                cursor = next_cursor
-
-            if total_count is not None:
-                total_count -= len(data['ids'])
-                if total_count < 1:
-                    break
-
-            sec = self.GetSleepTime('/followers/ids')
-            time.sleep(sec)
-
-        return result
-
-    def GetFollowersPaged(self,
-                          user_id=None,
-                          screen_name=None,
-                          cursor=-1,
-                          count=200,
-                          skip_status=False,
-                          include_user_entities=True):
-        """Make a cursor driven call to return the list of all followers
-
-        Args:
-          user_id:
-            The twitter id of the user whose followers you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
-          screen_name:
-            The twitter name of the user whose followers you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
-          cursor:
-            Should be set to -1 for the initial call and then is used to
-            control what result page Twitter returns.
-          count:
-            The number of users to return per page, up to a maximum of 200.
-            Defaults to 200. [Optional]
-          skip_status:
-            If True the statuses will not be returned in the user items.
-            [Optional]
-          include_user_entities:
-            When True, the user entities will be included. [Optional]
-
-        Returns:
-          next_cursor, previous_cursor, data sequence of twitter.User
-          instances, one for each follower
-        """
-
-        return self._GetFriendsFollowersPaged('/followers/list',
-                                              user_id,
-                                              screen_name,
-                                              cursor,
-                                              count,
-                                              skip_status,
-                                              include_user_entities)
+        url = '%s/friends/ids.json' % self.base_url
+        return self._GetFriendFollowerIDs(url,
+                                          user_id,
+                                          screen_name,
+                                          cursor,
+                                          count,
+                                          stringify_ids,
+                                          total_count)
 
     def _GetFriendsFollowersPaged(self,
-                                  endpoint=None,
+                                  url=None,
                                   user_id=None,
                                   screen_name=None,
                                   cursor=-1,
@@ -1925,8 +1780,9 @@ class Api(object):
         or followers.
 
         Args:
-          endpoint:
-
+          url:
+            Endpoint from which to get data. Either
+            base_url+'/followers/list.json' or base_url+'/friends/list.json'.
           user_id:
             The twitter id of the user whose followers you are fetching.
             If not specified, defaults to the authenticated user. [Optional]
@@ -1956,13 +1812,6 @@ class Api(object):
                 "return the followers of the user specified by screen_name, "
                 "however this behavior is undocumented by Twitter and might "
                 "change without warning.", stacklevel=2)
-
-        if endpoint == '/friends/list':
-            url = '%s/friends/list.json' % self.base_url
-        elif endpoint == '/followers/list':
-            url = '%s/followers/list.json' % self.base_url
-        else:
-            raise TwitterError({'message': 'endpoint must be either /friends/list or /followers/list'})
 
         parameters = {}
 
@@ -1999,8 +1848,90 @@ class Api(object):
 
         return next_cursor, previous_cursor, users
 
+    def GetFollowersPaged(self,
+                          user_id=None,
+                          screen_name=None,
+                          cursor=-1,
+                          count=200,
+                          skip_status=False,
+                          include_user_entities=True):
+        """Make a cursor driven call to return the list of all followers
+
+        Args:
+          user_id:
+            The twitter id of the user whose followers you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          screen_name:
+            The twitter name of the user whose followers you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          cursor:
+            Should be set to -1 for the initial call and then is used to
+            control what result page Twitter returns.
+          count:
+            The number of users to return per page, up to a maximum of 200.
+            Defaults to 200. [Optional]
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          next_cursor, previous_cursor, data sequence of twitter.User
+          instances, one for each follower
+        """
+        url = '%s/followers/list.json' % self.base_url
+        return self._GetFriendsFollowersPaged(url,
+                                              user_id,
+                                              screen_name,
+                                              cursor,
+                                              count,
+                                              skip_status,
+                                              include_user_entities)
+
+    def GetFriendsPaged(self,
+                        user_id=None,
+                        screen_name=None,
+                        cursor=-1,
+                        count=200,
+                        skip_status=False,
+                        include_user_entities=True):
+        """Make a cursor driven call to return the list of all friends.
+
+        Args:
+          user_id:
+            The twitter id of the user whose friends you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          screen_name:
+            The twitter name of the user whose friends you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          cursor:
+            Should be set to -1 for the initial call and then is used to
+            control what result page Twitter returns.
+          count:
+            The number of users to return per page, up to a current maximum of
+            200. Defaults to 200. [Optional]
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          next_cursor, previous_cursor, data sequence of twitter.User
+          instances, one for each follower
+        """
+        url = '%s/friends/list.json' % self.base_url
+        return self._GetFriendsFollowersPaged(url,
+                                              user_id,
+                                              screen_name,
+                                              cursor,
+                                              count,
+                                              skip_status,
+                                              include_user_entities)
+
     def _GetFriendsFollowers(self,
-                             endpoint=None,
+                             url=None,
                              user_id=None,
                              screen_name=None,
                              cursor=None,
@@ -2064,13 +1995,13 @@ class Api(object):
                 break
 
             next_cursor, previous_cursor, data = self._GetFriendsFollowersPaged(
-                endpoint=endpoint,
-                user_id=user_id,
-                screen_name=screen_name,
-                count=count,
-                cursor=cursor,
-                skip_status=skip_status,
-                include_user_entities=include_user_entities)
+                url,
+                user_id,
+                screen_name,
+                cursor,
+                count,
+                skip_status,
+                include_user_entities)
 
             if next_cursor:
                 cursor = next_cursor
@@ -2121,7 +2052,58 @@ class Api(object):
         Returns:
           A sequence of twitter.User instances, one for each follower
         """
-        return self._GetFriendsFollowers('/followers/list',
+        url = '%s/followers/list.json' % self.base_url
+        return self._GetFriendsFollowers(url,
+                                         user_id,
+                                         screen_name,
+                                         cursor,
+                                         count,
+                                         limit_users,
+                                         skip_status,
+                                         include_user_entities)
+
+    def GetFriends(self,
+                   user_id=None,
+                   screen_name=None,
+                   cursor=None,
+                   count=None,
+                   limit_users=None,
+                   skip_status=False,
+                   include_user_entities=True):
+        """Fetch the sequence of twitter.User instances, one for each friend.
+
+        If both user_id and screen_name are specified, this call will return
+        the followers of the user specified by screen_name, however this
+        behavior is undocumented by Twitter and may change without warning.
+
+        The twitter.Api instance must be authenticated.
+
+        Args:
+          user_id:
+            The twitter id of the user whose friends you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          screen_name:
+            The twitter name of the user whose friends you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          cursor:
+            Should be set to -1 for the initial call and then is used to
+            control what result page Twitter returns.
+          count:
+            The number of users to return per page, up to a maximum of 200.
+            Defaults to 200. [Optional]
+          limit_users:
+            The upper bound of number of users to return, defaults to None.
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          A sequence of twitter.User instances, one for each friend
+        """
+        url = '%s/friends/list.json' % self.base_url
+        return self._GetFriendsFollowers(url,
                                          user_id,
                                          screen_name,
                                          cursor,
@@ -4212,6 +4194,7 @@ class Api(object):
                     raise TwitterError(str(e))
         if verb == 'GET':
             url = self._BuildUrl(url, extra_params=data)
+            print('GETing URL', url)
             try:
                 return requests.get(
                     url,
