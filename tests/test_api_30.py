@@ -41,7 +41,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            '{base_url}/friends/ids.json?screen_name=EricHolthaus&count=5000&cursor=-1'.format(
+            '{base_url}/friends/ids.json?screen_name=EricHolthaus&count=5000&stringify_ids=False&cursor=-1'.format(
                 base_url=self.api.base_url),
             body=resp_data,
             match_querystring=True,
@@ -52,7 +52,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            '{base_url}/friends/ids.json?count=5000&screen_name=EricHolthaus&cursor=1417903878302254556'.format(
+            '{base_url}/friends/ids.json?count=5000&screen_name=EricHolthaus&stringify_ids=False&cursor=1417903878302254556'.format(
                 base_url=self.api.base_url),
             body=resp_data,
             match_querystring=True,
@@ -63,13 +63,18 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(len(resp), 6452)
         self.assertTrue(type(resp[0]) is int)
 
+        # Error checking
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.GetFriendIDs(total_count='infinity'))
+
     @responses.activate
     def testGetFriendIDsPaged(self):
         with open('testdata/get_friend_ids_0.json') as f:
             resp_data = f.read()
         responses.add(
             responses.GET,
-            '{base_url}/friends/ids.json?count=5000&cursor=-1&screen_name=EricHolthaus'.format(
+            '{base_url}/friends/ids.json?count=5000&cursor=-1&screen_name=EricHolthaus&stringify_ids=False'.format(
                 base_url=self.api.base_url),
             body=resp_data,
             match_querystring=True,
@@ -215,6 +220,14 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(len(resp), 7885)
         self.assertTrue(type(resp[0]) is int)
 
+        # Error checking
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.GetFollowerIDs(count='infinity'))
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.GetFollowerIDs(total_count='infinity'))
+
     @responses.activate
     def testGetFollowers(self):
         # First request for first 200 followers
@@ -260,3 +273,43 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(type(resp) is list)
         self.assertTrue(type(resp[0]) is twitter.User)
         self.assertEqual(len(resp), 200)
+
+    @responses.activate
+    def testGetFollowerIDsPaged(self):
+        with open('testdata/get_follower_ids_0.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            '{base_url}/followers/ids.json?count=5000&stringify_ids=False&screen_name=himawari8bot&cursor=-1'.format(
+                base_url=self.api.base_url),
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+
+        ncursor, pcursor, resp = self.api.GetFollowerIDsPaged(
+            screen_name='himawari8bot')
+
+        self.assertTrue(type(resp) is list)
+        self.assertTrue(type(resp[0]) is int)
+        self.assertEqual(len(resp), 5000)
+
+        with open('testdata/get_follower_ids_stringify.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            '{base_url}/followers/ids.json?count=5000&stringify_ids=True&user_id=12&cursor=-1'.format(
+                base_url=self.api.base_url),
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+
+        ncursor, pcursor, resp = self.api.GetFollowerIDsPaged(
+            user_id=12,
+            stringify_ids=True)
+
+        self.assertTrue(type(resp) is list)
+        if sys.version_info.major >= 3:
+            self.assertTrue(type(resp[0]) is str)
+        else:
+            self.assertTrue(type(resp[0]) is unicode)
+        self.assertEqual(len(resp), 5000)
