@@ -540,8 +540,6 @@ class Api(object):
 
         The home timeline is central to how most users interact with Twitter.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           count:
             Specifies the number of statuses to retrieve. May not be
@@ -580,8 +578,6 @@ class Api(object):
         """
         url = '%s/statuses/home_timeline.json' % self.base_url
 
-        if not self.__auth:
-            raise TwitterError({'message': "API must be authenticated."})
         parameters = {}
         if count is not None:
             try:
@@ -705,8 +701,6 @@ class Api(object):
                   include_entities=True):
         """Returns a single status message, specified by the id parameter.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           id:
             The numeric ID of the status you are trying to retrieve.
@@ -728,9 +722,6 @@ class Api(object):
           A twitter.Status instance representing that status message
         """
         url = '%s/statuses/show.json' % (self.base_url)
-
-        if not self.__auth:
-            raise TwitterError({'message': "API must be authenticated."})
 
         parameters = {}
 
@@ -766,8 +757,6 @@ class Api(object):
 
         Specify tweet by the id or url parameter.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           id:
             The numeric ID of the status you are trying to embed.
@@ -796,9 +785,6 @@ class Api(object):
           A dictionary with the response.
         """
         request_url = '%s/statuses/oembed.json' % (self.base_url)
-
-        if not self.__auth:
-            raise TwitterError({'message': "API must be authenticated."})
 
         parameters = {}
 
@@ -841,8 +827,8 @@ class Api(object):
     def DestroyStatus(self, id, trim_user=False):
         """Destroys the status specified by the required ID parameter.
 
-        The twitter.Api instance must be authenticated and the
-        authenticating user must be the author of the specified status.
+        The authenticating user must be the author of the specified
+        status.
 
         Args:
           id:
@@ -851,9 +837,6 @@ class Api(object):
         Returns:
           A twitter.Status instance representing the destroyed status message
         """
-        if not self.__auth:
-            raise TwitterError({'message': "API must be authenticated."})
-
         try:
             post_data = {'id': int(id)}
         except ValueError:
@@ -877,8 +860,6 @@ class Api(object):
                    trim_user=False,
                    verify_status_length=True):
         """Post a twitter status message from the authenticated user.
-
-        The twitter.Api instance must be authenticated.
 
         https://dev.twitter.com/docs/api/1.1/post/statuses/update
 
@@ -919,9 +900,6 @@ class Api(object):
         Returns:
           A twitter.Status instance representing the message posted.
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         url = '%s/statuses/update.json' % self.base_url
 
         if isinstance(status, str) or self._input_encoding is None:
@@ -983,9 +961,6 @@ class Api(object):
           Returns:
               A twitter.Status instance representing the message posted.
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         url = '%s/statuses/update_with_media.json' % self.base_url
 
         if isinstance(status, str) or self._input_encoding is None:
@@ -1047,9 +1022,6 @@ class Api(object):
           Returns:
               A twitter.Status instance representing the message posted.
         """
-        if not self.__auth:
-            raise TwitterError("The twitter.Api instance must be authenticated.")
-
         if type(media) is not list:
             raise TwitterError("Must by multiple media elements")
 
@@ -1140,8 +1112,6 @@ class Api(object):
         Unlike api.PostUpdate, this method will post multiple status updates
         if the message is longer than 140 characters.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           status:
             The message text to be posted.
@@ -1179,8 +1149,6 @@ class Api(object):
     def PostRetweet(self, original_id, trim_user=False):
         """Retweet a tweet with the Retweet API.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           original_id:
             The numerical id of the tweet that will be retweeted
@@ -1192,9 +1160,6 @@ class Api(object):
         Returns:
           A twitter.Status instance representing the original tweet with retweet details embedded.
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         try:
             if int(original_id) <= 0:
                 raise TwitterError({'message': "'original_id' must be a positive number"})
@@ -1216,8 +1181,6 @@ class Api(object):
                         max_id=None,
                         trim_user=False):
         """Fetch the sequence of retweets made by the authenticated user.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           count:
@@ -1292,9 +1255,6 @@ class Api(object):
         Returns:
           A list of twitter.Status instances, which are retweets of statusid
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instsance must be authenticated."})
-
         url = '%s/statuses/retweets/%s.json' % (self.base_url, statusid)
         parameters = {}
         if trim_user:
@@ -1328,9 +1288,6 @@ class Api(object):
         Returns:
           A list of user IDs
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instsance must be authenticated."})
-
         url = '%s/statuses/retweeters/ids.json' % (self.base_url)
         parameters = {}
         parameters['id'] = status_id
@@ -1390,9 +1347,6 @@ class Api(object):
           include_user_entities:
             When True, the user entities will be included. [Optional]
         """
-        if not self.__auth:
-            raise TwitterError({'error': "The twitter.Api instance must be authenticated."})
-
         url = '%s/statuses/retweets_of_me.json' % self.base_url
         parameters = {}
         if count is not None:
@@ -1427,8 +1381,6 @@ class Api(object):
                   include_user_entities=False):
         """Fetch the sequence of twitter.User instances, one for each blocked user.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           user_id:
             The twitter id of the user whose friends you are fetching.
@@ -1448,9 +1400,6 @@ class Api(object):
         Returns:
           A sequence of twitter.User instances, one for each friend
         """
-        if not self.__auth:
-            raise TwitterError({'message': "twitter.Api instance must be authenticated"})
-
         url = '%s/blocks/list.json' % self.base_url
         result = []
         parameters = {}
@@ -1482,8 +1431,7 @@ class Api(object):
         """Destroys the block for the user specified by the required ID
         parameter.
 
-        The twitter.Api instance must be authenticated and the
-        authenticating user must have blocked the user specified by the
+        The authenticating user must have blocked the user specified by the
         required ID parameter.
 
         Args:
@@ -1493,9 +1441,6 @@ class Api(object):
         Returns:
           A twitter.User instance representing the un-blocked user.
         """
-        if not self.__auth:
-            raise TwitterError({'message': "API must be authenticated."})
-
         try:
             post_data = {'user_id': int(id)}
         except ValueError:
@@ -2027,8 +1972,6 @@ class Api(object):
         the followers of the user specified by screen_name, however this
         behavior is undocumented by Twitter and may change without warning.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           user_id:
             The twitter id of the user whose followers you are fetching.
@@ -2076,8 +2019,6 @@ class Api(object):
         the followers of the user specified by screen_name, however this
         behavior is undocumented by Twitter and may change without warning.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           user_id:
             The twitter id of the user whose friends you are fetching.
@@ -2123,8 +2064,6 @@ class Api(object):
         screen_names, or twitter.User objects. The list of users that
         are queried is the union of all specified parameters.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           user_id:
             A list of user_ids to retrieve extended information. [Optional]
@@ -2140,8 +2079,6 @@ class Api(object):
         Returns:
           A list of twitter.User objects for the requested users
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
         if not user_id and not screen_name and not users:
             raise TwitterError({'message': "Specify at least one of user_id, screen_name, or users."})
 
@@ -2177,8 +2114,6 @@ class Api(object):
                 include_entities=True):
         """Returns a single user.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           user_id:
             The id of the user to retrieve. [Optional]
@@ -2193,9 +2128,6 @@ class Api(object):
         Returns:
           A twitter.User instance representing that user
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         url = '%s/users/show.json' % (self.base_url)
         parameters = {}
         if user_id:
@@ -2221,8 +2153,6 @@ class Api(object):
                           full_text=False,
                           page=None):
         """Returns a list of the direct messages sent to the authenticating user.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           since_id:
@@ -2257,9 +2187,6 @@ class Api(object):
         Returns:
           A sequence of twitter.DirectMessage instances
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         url = '%s/direct_messages.json' % self.base_url
         parameters = {}
         if since_id:
@@ -2293,8 +2220,6 @@ class Api(object):
                               include_entities=True):
         """Returns a list of the direct messages sent by the authenticating user.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           since_id:
             Returns results with an ID greater than (that is, more recent
@@ -2320,9 +2245,6 @@ class Api(object):
         Returns:
           A sequence of twitter.DirectMessage instances
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         url = '%s/direct_messages/sent.json' % self.base_url
         parameters = {}
         if since_id:
@@ -2350,9 +2272,6 @@ class Api(object):
                           screen_name=None):
         """Post a twitter direct message from the authenticated user.
 
-        The twitter.Api instance must be authenticated. user_id or screen_name
-        must be specified.
-
         Args:
           text: The message text to be posted.  Must be less than 140 characters.
           user_id:
@@ -2363,9 +2282,6 @@ class Api(object):
         Returns:
           A twitter.DirectMessage instance representing the message posted
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         url = '%s/direct_messages/new.json' % self.base_url
         data = {'text': text}
         if user_id:
@@ -2406,8 +2322,6 @@ class Api(object):
     def CreateFriendship(self, user_id=None, screen_name=None, follow=True):
         """Befriends the user specified by the user_id or screen_name.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           user_id:
             A user_id to follow [Optional]
@@ -2445,8 +2359,6 @@ class Api(object):
     def UpdateFriendship(self, user_id=None, screen_name=None, follow=True, **kwargs):  # api compat with Create
         """Updates a friendship with the user specified by the user_id or screen_name.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           user_id:
             A user_id to update [Optional]
@@ -2466,8 +2378,6 @@ class Api(object):
 
     def DestroyFriendship(self, user_id=None, screen_name=None):
         """Discontinues friendship with a user_id or screen_name.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           user_id:
@@ -2496,8 +2406,6 @@ class Api(object):
         """Lookup friendship status for user specified by user_id or screen_name.
 
         Currently only supports one user at a time.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           user_id:
@@ -2533,8 +2441,6 @@ class Api(object):
 
         Returns the favorite status when successful.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           id:
             The id of the twitter status to mark as a favorite. [Optional]
@@ -2569,8 +2475,6 @@ class Api(object):
         """Un-Favorites the specified status object or id as the authenticating user.
 
         Returns the un-favorited status when successful.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           id:
@@ -2759,8 +2663,6 @@ class Api(object):
     def CreateList(self, name, mode=None, description=None):
         """Creates a new list with the give name for the authenticated user.
 
-        The twitter.Api instance must be authenticated.
-
         Twitter endpoint: /lists/create
 
         Args:
@@ -2793,8 +2695,6 @@ class Api(object):
                     list_id=None,
                     slug=None):
         """Destroys the list identified by list_id or owner_screen_name/owner_id and slug.
-
-        The twitter.Api instance must be authenticated.
 
         Twitter endpoint: /lists/destroy
 
@@ -2846,8 +2746,6 @@ class Api(object):
                            slug=None):
         """Creates a subscription to a list by the authenticated user.
 
-        The twitter.Api instance must be authenticated.
-
         Twitter endpoint: /lists/subscribers/create
 
         Args:
@@ -2897,8 +2795,6 @@ class Api(object):
                             list_id=None,
                             slug=None):
         """Destroys the subscription to a list for the authenticated user.
-
-        The twitter.Api instance must be authenticated.
 
         Twitter endpoint: /lists/subscribers/destroy
 
@@ -2955,8 +2851,6 @@ class Api(object):
         """Check if the specified user is a subscriber of the specified list.
 
         Returns the user if they are subscriber.
-
-        The twitter.Api instance must be authenticated.
 
         Twitter endpoint: /lists/subscribers/show
 
@@ -3033,8 +2927,6 @@ class Api(object):
 
         Does not include the user's own lists.
 
-        The twitter.Api instance must be authenticated.
-
         Twitter endpoint: /lists/subscriptions
 
         Args:
@@ -3088,8 +2980,6 @@ class Api(object):
         """Obtain the lists the specified user is a member of.
 
         Returns a maximum of 20 lists per page by default.
-
-        The twitter.Api instance must be authenticated.
 
         Twitter endpoint: /lists/memberships
 
@@ -3151,8 +3041,6 @@ class Api(object):
                      user_id=None,
                      reverse=False):
         """Returns all lists the user subscribes to, including their own.
-
-        The twitter.Api instance must be authenticated.
 
         Twitter endpoint: /lists/list
 
@@ -3289,8 +3177,6 @@ class Api(object):
         """Fetch the sequence of twitter.User instances, one for each member
         of the given list_id or slug.
 
-        The twitter.Api instance must be authenticated.
-
         Twitter endpoint: /lists/members
 
         Args:
@@ -3371,8 +3257,6 @@ class Api(object):
                           owner_id=None):
         """Add a new member (or list of members) to a user's list.
 
-        The twitter.Api instance must be authenticated.
-
         Twitter endpoint: /lists/members/create or /lists/members/create_all
 
         Args:
@@ -3450,8 +3334,6 @@ class Api(object):
                            screen_name=None):
         """Destroys the subscription to a list for the authenticated user.
 
-        The twitter.Api instance must be authenticated.
-
         Twitter endpoint: /lists/subscribers/destroy
 
         Args:
@@ -3527,8 +3409,6 @@ class Api(object):
                  cursor=-1):
         """Fetch the sequence of lists for a user.
 
-        The twitter.Api instance must be authenticated.
-
         Twitter endpoint: /lists/ownerships
 
         Args:
@@ -3587,8 +3467,6 @@ class Api(object):
                       include_entities=False,
                       skip_status=False):
         """Update's the authenticated user's profile data.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           name:
@@ -3696,8 +3574,6 @@ class Api(object):
                      include_entities=False,
                      skip_status=False):
         """Updates the authenticated users profile banner.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           image:
@@ -3862,8 +3738,6 @@ class Api(object):
           A twitter.User instance representing that user if the
           credentials are valid, None otherwise.
         """
-        if not self.__auth:
-            raise TwitterError({'message': "Api instance must first be given user credentials."})
         url = '%s/account/verify_credentials.json' % self.base_url
         resp = self._RequestUrl(url, 'GET')  # No_cache
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -4158,17 +4032,20 @@ class Api(object):
     def _RequestUrl(self, url, verb, data=None):
         """Request a url.
 
-           Args:
-             url:
-               The web location we want to retrieve.
-             verb:
-               Either POST or GET.
-             data:
-               A dict of (str, unicode) key/value pairs.
+        Args:
+            url:
+                The web location we want to retrieve.
+            verb:
+                Either POST or GET.
+            data:
+                A dict of (str, unicode) key/value pairs.
 
-           Returns:
-             A JSON object.
+        Returns:
+            A JSON object.
         """
+        if not self.__auth:
+            raise TwitterError({'error': "The twitter.Api instance must be authenticated."})
+
         if verb == 'POST':
             if 'media_ids' in data:
                 url = self._BuildUrl(url, extra_params={'media_ids': data['media_ids']})
