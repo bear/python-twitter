@@ -928,6 +928,39 @@ class Api(object):
 
         return Status.NewFromJsonDict(data)
 
+    def UploadMediaSimple(self,
+                          media,
+                          additional_owners=None):
+
+        """ Upload a media file to Twitter in one request. Used for small file
+        uploads that do not require chunked uploads.
+
+        Args:
+            media:
+                File-like object to upload.
+            additional_owners: additional Twitter users that are allowed to use
+                The uploaded media. Should be a list of integers. Maximum
+                number of additional owners is capped at 100 by Twitter.
+
+        Returns:
+            media_id:
+                ID of the uploaded media returned by the Twitter API or 0.
+
+        """
+        url = '%s/media/upload.json' % self.upload_url
+        parameters = {}
+
+        parameters['media'] = media.read()
+        if len(additional_owners) > 100:
+            raise TwitterError({'message': 'Maximum of 100 additional owners may be specified for a Media object'})
+        if additional_owners:
+            parameters['additional_owners'] = additional_owners
+
+        resp = self._RequestUrl(url, 'POST', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return data.get('media_id', 0)
+
     def PostMedia(self,
                   status,
                   media,
