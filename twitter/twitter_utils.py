@@ -1,5 +1,15 @@
 # encoding: utf-8
+import mimetypes
+import os
 import re
+from tempfile import mkstemp
+
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib import urlencode
+
+from twitter import TwitterError
 
 TLDS = [
     "ac", "ad", "ae", "af", "ag", "ai", "al", "am", "an", "ao", "aq", "ar",
@@ -148,3 +158,42 @@ def is_url(text):
         return True
     else:
         return False
+
+
+def parse_media_file(passed_media):
+    img_formats = ['image/jpeg',
+                   'image/png',
+                   'image/gif',
+                   'image/bmp',
+                   'image/webp']
+    video_formats = ['video/mp4']
+
+    # If passed_media is a string, check if it points to a URL, otherwise,
+    # it should point to local file. Create a file object for each case
+    # (just has to have a read() method).
+    if not hasattr(passed_media, 'read'):
+        if passed_media.startswith('http'):
+            filename = passed_media
+            data = urlopen(passed_media).read()
+        else:
+            with open(os.path.realpath(passed_media), 'rb') as f:
+                filename = passed_media
+                data = f.read()
+
+    # Otherwise, if a file object was passed in the first place,
+    # create the standard reference to media_file (i.e., rename it to fp).
+    else:
+        filename = passed_media.name
+        data = passed_media.read()
+
+    file_size = len(data)
+
+    media_type = mimetypes.guess_type(os.path.basename(filename))[0]
+    if media_type in img_formats and file_size > 5 * 1048576:
+        raise TwitterError({'message': 'Images must be less than 5MB.'})
+    elif media_type in video_formats and file_size > 15 * 1048576:
+        raise TwitterError({'message': 'Videos must be less than 15MB.'})
+    elif media_type not in img_formats and media_type not in video_formats:
+        raise TwitterError({'message': 'Media type could not be deterimined.'})
+
+    return data, file_size, media_type
