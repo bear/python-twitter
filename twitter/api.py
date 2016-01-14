@@ -211,6 +211,13 @@ class Api(object):
 
         self.chunk_size = chunk_size
 
+        if self.chunk_size < 1024 * 16:
+            warnings.warn((
+                "A chunk size lower than 16384 may result in too many "
+                "requests to the Twitter API when uploading videos. You are "
+                "strongly advised to increase it above 16384"
+            ))
+
         if consumer_key is not None and (access_token_key is None or
                                          access_token_secret is None):
             print('Twitter now requires an oAuth Access Token for API calls. '
