@@ -866,6 +866,9 @@ class Api(object):
 
     def PostUpdate(self,
                    status,
+                   media=None,
+                   media_additional_owners=None,
+                   media_category=None,
                    in_reply_to_status_id=None,
                    latitude=None,
                    longitude=None,
@@ -924,27 +927,59 @@ class Api(object):
         if verify_status_length and calc_expected_status_length(u_status) > 140:
             raise TwitterError("Text must be less than or equal to 140 characters.")
 
-        data = {'status': u_status}
-        if in_reply_to_status_id:
-            data['in_reply_to_status_id'] = in_reply_to_status_id
-        if latitude is not None and longitude is not None:
-            data['lat'] = str(latitude)
-            data['long'] = str(longitude)
-        if place_id is not None:
-            data['place_id'] = str(place_id)
-        if display_coordinates:
-            data['display_coordinates'] = 'true'
-        if trim_user:
-            data['trim_user'] = 'true'
+        parameters = {'status': u_status}
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        if media:
+            if len(media) > 1:
+                media_ids = []
+                for media_file in media:
+                    _, _, file_size, media_type = parse_media_file(media_file)
+                    if media_type == 'image/gif' or media_type == 'video/mp4':
+                        raise TwitterError({'message': 'You cannot post more than 1 GIF or 1 video in a single status.'})
+                    if file_size > self.chunk_size:
+                        media_id = self.UploadMediaChunked(
+                            media=media_file,
+                            additional_owners=media_additional_owners,
+                            media_category=media_category)
+                    else:
+                        media_id = self.UploadMediaSimple(
+                            media=media_file,
+                            additional_owners=media_additional_owners,
+                            media_category=media_category)
+                    media_ids.append(media_id)
+            else:
+                _, _, file_size, _ = parse_media_file(media)
+                if file_size > self.chunk_size:
+                    media_ids = self.UploadMediaChunked(
+                        media,
+                        media_additional_owners)
+                else:
+                    media_ids = self.UploadMediaSimple(
+                        media,
+                        media_additional_owners)
+            parameters['media_ids'] = media_ids
+
+        if in_reply_to_status_id:
+            parameters['in_reply_to_status_id'] = in_reply_to_status_id
+        if latitude is not None and longitude is not None:
+            parameters['lat'] = str(latitude)
+            parameters['long'] = str(longitude)
+        if place_id is not None:
+            parameters['place_id'] = str(place_id)
+        if display_coordinates:
+            parameters['display_coordinates'] = 'true'
+        if trim_user:
+            parameters['trim_user'] = 'true'
+
+        resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
 
     def UploadMediaSimple(self,
                           media,
-                          additional_owners=None):
+                          additional_owners=None,
+                          media_category=None):
 
         """ Upload a media file to Twitter in one request. Used for small file
         uploads that do not require chunked uploads.
@@ -955,6 +990,9 @@ class Api(object):
             additional_owners: additional Twitter users that are allowed to use
                 The uploaded media. Should be a list of integers. Maximum
                 number of additional owners is capped at 100 by Twitter.
+            media_category:
+                Category with which to identify media upload. Only use with Ads
+                API & video files.
 
         Returns:
             media_id:
@@ -969,11 +1007,16 @@ class Api(object):
             raise TwitterError({'message': 'Maximum of 100 additional owners may be specified for a Media object'})
         if additional_owners:
             parameters['additional_owners'] = additional_owners
+        if media_category:
+            parameters['media_category'] = media_category
 
         resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        return data.get('media_id', 0)
+        try:
+            return data['media_id']
+        except KeyError:
+            raise TwitterError({'message': 'Media could not be uploaded.'})
 
     def UploadMediaChunked(self,
                            media,
@@ -1080,7 +1123,10 @@ class Api(object):
         resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        return data
+        try:
+            return data['media_id']
+        except KeyError:
+            raise TwitterError({'message': 'Media could not be uploaded.'})
 
     def PostMedia(self,
                   status,
@@ -1115,6 +1161,15 @@ class Api(object):
           Returns:
               A twitter.Status instance representing the message posted.
         """
+
+        warnings.warn((
+            "This endpoint has been deprecated by Twitter. Please use "
+            "PostUpdate() instead. Details of Twitter's deprecation can be "
+            "found at: "
+            "dev.twitter.com/rest/reference/post/statuses/update_with_media",
+            DeprecationWarning
+        ))
+
         url = '%s/statuses/update_with_media.json' % self.base_url
 
         if isinstance(status, str) or self._input_encoding is None:
