@@ -3681,7 +3681,7 @@ class Api(object):
                       track=None,
                       locations=None,
                       delimited=None,
-                      stall_warning=None,
+                      stall_warnings=None,
                       stringify_friend_ids=False):
         """Returns the data from the user stream.
 
@@ -3722,8 +3722,8 @@ class Api(object):
             data['locations'] = ','.join(locations)
         if delimited is not None:
             data['delimited'] = str(delimited)
-        if delimited is not None:
-            data['stall_warning'] = str(stall_warning)
+        if stall_warnings is not None:
+            data['stall_warnings'] = str(stall_warnings)
 
         resp = self._RequestStream(url, 'POST', data=data)
         for line in resp.iter_lines():
