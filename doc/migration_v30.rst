@@ -19,11 +19,19 @@ GetFollowersPaged():
 * The third value of the tuple returned by this method is now a list of twitter.User objects in accordance with its doc string rather than the raw data from API. Closes #277 
 * The kwarg `include_user_entities` now defaults to True. This was set to False previously, but would not be included in query parameters sent to Twitter. Without the query parameter in the URL, Twitter would default to returning user_entities, so this change makes this behavior explicit and consistent with the previously ambiguous behavior.
 
-GetSeach():
+GetSearch():
 * You can now specify a user for whom you wish to limit the search. For example, to only get tweets from the user `twitterapi`, you can call `GetSearch(who='twitterapi')` and only that account's tweets will be returned.
+
+GetUserStream():
+* Parameter 'stall_warning' is now 'stall_warnings' in line with GetStreamFilter and Twitter's naming convention.
+
+
+Deprecation
+===========
 
 PostMedia():
 * This endpoint is deprecated by Twitter. Python-twitter will throw a warning about using the method and advise you to use PostUpdate() instead. There is no schedule for when this will be removed from Twitter.
+
 
 New Methods
 ===========
