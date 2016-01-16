@@ -57,6 +57,8 @@ from twitter.twitter_utils import (
     is_url,
     parse_media_file)
 
+warnings.simplefilter('always', DeprecationWarning)
+
 CHARACTER_LIMIT = 140
 
 # A singleton representing a lazily instantiated FileCache.
@@ -1242,7 +1244,7 @@ class Api(object):
         warnings.warn((
             "This method is deprecated. Please use PostUpdate instead, "
             "passing a list of media that you would like to associate "
-            "with the updated.", DeprecationWarning))
+            "with the updated."), DeprecationWarning, stacklevel=2)
         if type(media) is not list:
             raise TwitterError("Must by multiple media elements")
 
