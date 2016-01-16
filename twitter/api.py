@@ -959,7 +959,7 @@ class Api(object):
                     media_ids = self.UploadMediaSimple(
                         media,
                         media_additional_owners)
-            parameters['media_ids'] = media_ids
+            parameters['media_ids'] = ','.join([str(mid) for mid in media_ids])
 
         if in_reply_to_status_id:
             parameters['in_reply_to_status_id'] = in_reply_to_status_id
@@ -1004,8 +1004,11 @@ class Api(object):
         url = '%s/media/upload.json' % self.upload_url
         parameters = {}
 
-        parameters['media'] = media.read()
-        if len(additional_owners) > 100:
+        media_fp, filename, file_size, media_type = parse_media_file(media)
+
+        parameters['media'] = media_fp.read()
+
+        if additional_owners and len(additional_owners) > 100:
             raise TwitterError({'message': 'Maximum of 100 additional owners may be specified for a Media object'})
         if additional_owners:
             parameters['additional_owners'] = additional_owners
