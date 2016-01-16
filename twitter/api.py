@@ -930,7 +930,7 @@ class Api(object):
         parameters = {'status': u_status}
 
         if media:
-            if len(media) > 1:
+            if type(media) is list and len(media) > 1:
                 media_ids = []
                 for media_file in media:
                     _, _, file_size, media_type = parse_media_file(media_file)
@@ -1075,7 +1075,10 @@ class Api(object):
 
         segment_id = 0
         while True:
-            data = media_fp.read(self.chunk_size)
+            try:
+                data = media_fp.read(self.chunk_size)
+            except ValueError:
+                break
             if not data:
                 break
             body = [
@@ -1100,7 +1103,6 @@ class Api(object):
             ]
             body_data = b'\r\n'.join(body)
             headers['Content-Length'] = str(len(body_data))
-            print(body_data)
 
             resp = self._RequestChunkedUpload(url=url,
                                               headers=headers,
@@ -1113,6 +1115,11 @@ class Api(object):
                 return self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
             segment_id += 1
+
+        try:
+            media_fp.close()
+        except:
+            pass
 
         # Finalizing the upload:
         parameters = {

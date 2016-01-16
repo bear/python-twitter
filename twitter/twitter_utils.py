@@ -176,15 +176,16 @@ def parse_media_file(passed_media):
             data_file = urlopen(passed_media)
             file_size = data_file.length
         else:
-            with open(os.path.realpath(passed_media), 'rb') as f:
-                filename = os.path.basename(passed_media)
-                data_file = f
-                data_file.seek(0, 2)
-                file_size = data_file.tell()
+            data_file = open(os.path.realpath(passed_media), 'rb')
+            filename = os.path.basename(passed_media)
+            data_file.seek(0, 2)
+            file_size = data_file.tell()
 
     # Otherwise, if a file object was passed in the first place,
     # create the standard reference to media_file (i.e., rename it to fp).
     else:
+        if passed_media.mode != 'rb':
+            raise TwitterError({'message': 'File mode must be "rb".'})
         filename = passed_media.name
         data_file = passed_media
         data_file.seek(0, 2)
