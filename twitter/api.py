@@ -1166,9 +1166,9 @@ class Api(object):
             "This endpoint has been deprecated by Twitter. Please use "
             "PostUpdate() instead. Details of Twitter's deprecation can be "
             "found at: "
-            "dev.twitter.com/rest/reference/post/statuses/update_with_media",
+            "dev.twitter.com/rest/reference/post/statuses/update_with_media"),
             DeprecationWarning
-        ))
+        )
 
         url = '%s/statuses/update_with_media.json' % self.base_url
 
@@ -1231,6 +1231,11 @@ class Api(object):
           Returns:
               A twitter.Status instance representing the message posted.
         """
+
+        warnings.warn((
+            "This method is deprecated. Please use PostUpdate instead, "
+            "passing a list of media that you would like to associate "
+            "with the updated.", DeprecationWarning))
         if type(media) is not list:
             raise TwitterError("Must by multiple media elements")
 
