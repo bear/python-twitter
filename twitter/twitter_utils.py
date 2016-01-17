@@ -186,7 +186,7 @@ def parse_media_file(passed_media):
     else:
         if passed_media.mode != 'rb':
             raise TwitterError({'message': 'File mode must be "rb".'})
-        filename = passed_media.name
+        filename = os.path.basename(passed_media.name)
         data_file = passed_media
         data_file.seek(0, 2)
         file_size = data_file.tell()
