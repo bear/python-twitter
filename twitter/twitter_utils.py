@@ -1,5 +1,14 @@
 # encoding: utf-8
+import mimetypes
+import os
 import re
+
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib import urlopen
+
+from twitter import TwitterError
 
 TLDS = [
     "ac", "ad", "ae", "af", "ag", "ai", "al", "am", "an", "ao", "aq", "ar",
@@ -148,3 +157,51 @@ def is_url(text):
         return True
     else:
         return False
+
+
+def parse_media_file(passed_media):
+    img_formats = ['image/jpeg',
+                   'image/png',
+                   'image/gif',
+                   'image/bmp',
+                   'image/webp']
+    video_formats = ['video/mp4']
+
+    # If passed_media is a string, check if it points to a URL, otherwise,
+    # it should point to local file. Create a reference to a file obj for
+    #  each case such that data_file ends up with a read() method.
+    if not hasattr(passed_media, 'read'):
+        if passed_media.startswith('http'):
+            filename = os.path.basename(passed_media)
+            data_file = urlopen(passed_media)
+            file_size = data_file.length
+        else:
+            data_file = open(os.path.realpath(passed_media), 'rb')
+            filename = os.path.basename(passed_media)
+            data_file.seek(0, 2)
+            file_size = data_file.tell()
+
+    # Otherwise, if a file object was passed in the first place,
+    # create the standard reference to media_file (i.e., rename it to fp).
+    else:
+        if passed_media.mode != 'rb':
+            raise TwitterError({'message': 'File mode must be "rb".'})
+        filename = passed_media.name
+        data_file = passed_media
+        data_file.seek(0, 2)
+        file_size = data_file.tell()
+
+    try:
+        data_file.seek(0)
+    except:
+        pass
+
+    media_type = mimetypes.guess_type(os.path.basename(filename))[0]
+    if media_type in img_formats and file_size > 5 * 1048576:
+        raise TwitterError({'message': 'Images must be less than 5MB.'})
+    elif media_type in video_formats and file_size > 15 * 1048576:
+        raise TwitterError({'message': 'Videos must be less than 15MB.'})
+    elif media_type not in img_formats and media_type not in video_formats:
+        raise TwitterError({'message': 'Media type could not be determined.'})
+
+    return data_file, filename, file_size, media_type
