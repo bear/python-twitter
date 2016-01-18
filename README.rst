@@ -84,7 +84,7 @@ The library provides a Python wrapper around the Twitter API and the Twitter dat
 Using with Django
 ----
 
-Additional template tags that expand tweet urls and urlize tweet text. See the django template tags available for use with python-twitter: https://github.com/radlws/python-twitter-django-tags
+Additional template tags that expand tweet urls and urlize tweet text. See the django template tags available for use with python-twitter: https://github.com/radzhome/python-twitter-django-tags
 
 -----
 Model
