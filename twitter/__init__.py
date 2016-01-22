@@ -38,14 +38,19 @@ except ImportError:
 
 from ._file_cache import _FileCache         # noqa
 from .error import TwitterError             # noqa
-from .direct_message import DirectMessage   # noqa
-from .hashtag import Hashtag                # noqa
 from .parse_tweet import ParseTweet         # noqa
-from .trend import Trend                    # noqa
-from .url import Url                        # noqa
+
+from .models import (
+    Category,
+    DirectMessage,
+    Hashtag,
+    List,
+    Media,
+    Trend,
+    Url,
+    User,
+    UserStatus,
+)
+
 from .status import Status                  # noqa
-from .user import User, UserStatus          # noqa
-from .category import Category              # noqa
-from .media import Media                    # noqa
-from .list import List                      # noqa
 from .api import Api                        # noqa

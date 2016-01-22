@@ -44,8 +44,7 @@ except ImportError:
     from urllib import __version__ as urllib_version
 
 from twitter import (__version__, _FileCache, json, DirectMessage, List,
-                     Status, Trend, TwitterError, User, UserStatus)
-from twitter.category import Category
+                     Status, Trend, TwitterError, User, UserStatus, Category)
 
 from twitter.ratelimit import RateLimit
 
