@@ -301,7 +301,7 @@ class Api(object):
 
     def GetSearch(self,
                   term=None,
-                  who=None,
+                  raw_query=None,
                   geocode=None,
                   since_id=None,
                   max_id=None,
@@ -317,8 +317,6 @@ class Api(object):
         Args:
           term:
             Term to search by. Optional if you include geocode.
-          who:
-            Handle of user's tweets you want. Optional.
           since_id:
             Returns results with an ID greater than (that is, more recent
             than) the specified ID. There are limits to the number of
@@ -361,6 +359,8 @@ class Api(object):
           the term
         """
         # Build request parameters
+
+        url = '%s/search/tweets.json' % self.base_url
         parameters = {}
 
         if since_id:
@@ -387,14 +387,11 @@ class Api(object):
         if locale:
             parameters['locale'] = locale
 
-        if term is None and geocode is None and who is None:
+        if term is None and geocode is None and raw_query is None:
             return []
 
         if term is not None:
             parameters['q'] = term
-
-        if who is not None:
-            parameters['q'] = "from:%s" % (who)
 
         if geocode is not None:
             parameters['geocode'] = ','.join(map(str, geocode))
@@ -410,9 +407,14 @@ class Api(object):
         if result_type in ["mixed", "popular", "recent"]:
             parameters['result_type'] = result_type
 
-        # Make and send requests
-        url = '%s/search/tweets.json' % self.base_url
-        resp = self._RequestUrl(url, 'GET', data=parameters)
+        if raw_query is not None:
+            url = "{url}?{raw_query}".format(
+                url=url,
+                raw_query=raw_query)
+            resp = self._RequestUrl(url, 'GET')
+        else:
+            resp = self._RequestUrl(url, 'GET', data=parameters)
+
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         # Return built list of statuses
