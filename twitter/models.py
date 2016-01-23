@@ -164,7 +164,11 @@ class Trend(TwitterModel):
             'name': None,
             'query': None,
             'timestamp': None,
-            'url': None}
+            'url': None,
+            'volume': None,
+            'events': None,
+            'promoted_content': None
+        }
 
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
