@@ -133,6 +133,20 @@ class ApiTest(unittest.TestCase):
         self.assertFalse(self.api.GetSearch())
 
     @responses.activate
+    def testGetSeachRawQuery(self):
+        with open('testdata/get_search_raw.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/search/tweets.json?q=twitter%20&result_type=recent&since=2014-07-19&count=100',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetSearch(raw_query="q=twitter%20&result_type=recent&since=2014-07-19&count=100")
+        self.assertTrue([type(status) is twitter.Status for status in resp])
+        self.assertTrue(['twitter' in status.text for status in resp])
+
+    @responses.activate
     def testGetSearchGeocode(self):
         with open('testdata/get_search_geocode.json') as f:
             resp_data = f.read()
