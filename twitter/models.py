@@ -67,13 +67,8 @@ class Media(TwitterModel):
             setattr(self, param, kwargs.get(param, default))
 
     def __repr__(self):
-        """ Representation of this twitter.Media instance.
-
-        Returns:
-            Media(ID=XXX, type=YYY, display_url='ZZZ')
-        """
-        return "Media(ID={mid}, Type={type}, DisplayURL='{url}')".format(
-            mid=self.id,
+        return "Media(ID={media_id}, Type={type}, DisplayURL='{url}')".format(
+            media_id=self.id,
             type=self.type,
             url=self.display_url)
 
@@ -99,6 +94,16 @@ class List(TwitterModel):
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
+        if 'user' in kwargs:
+            self.user = User.NewFromJsonDict(kwargs.get('user'))
+
+    def __repr__(self):
+        return "List(ID={list_id}, FullName={full_name}, Slug={slug}, User={user})".format(
+            list_id=self.id,
+            full_name=self.full_name,
+            slug=self.slug,
+            user=self.user.screen_name)
+
 
 class Category(TwitterModel):
 
@@ -113,6 +118,12 @@ class Category(TwitterModel):
 
         for (param, default) in self.param_defaults.iteritems():
             setattr(self, param, kwargs.get(param, default))
+
+    def __repr__(self):
+        return "Category(Name={name}, Slug={slug}, Size={size})".format(
+            name=self.name,
+            slug=self.slug,
+            size=self.size)
 
 
 class DirectMessage(TwitterModel):
@@ -132,6 +143,17 @@ class DirectMessage(TwitterModel):
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
+    def __repr__(self):
+        if self.text and len(self.text) > 140:
+            text = self.text[:140] + "[...]"
+        else:
+            text = self.text
+        return "DirectMessage(ID={dm_id}, Sender={sender}, Time={time}, Text={text})".format(
+            dm_id=self.id,
+            sender=self.sender_screen_name,
+            time=self.created_at,
+            text=text)
+
 
 class Trend(TwitterModel):
 
@@ -147,6 +169,12 @@ class Trend(TwitterModel):
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
+    def __repr__(self):
+        return "Trend(Name={name}, Time={ts}, URL={url})".format(
+            name=self.name,
+            ts=self.timestamp,
+            url=self.url)
+
 
 class Hashtag(TwitterModel):
 
@@ -160,6 +188,10 @@ class Hashtag(TwitterModel):
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
+    def __repr__(self):
+        return "Hashtag(Text={text})".format(
+            text=self.text)
+
 
 class Url(TwitterModel):
 
@@ -172,6 +204,11 @@ class Url(TwitterModel):
 
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
+
+    def __repr__(self):
+        return "URL(URL={url}, ExpandedURL={eurl})".format(
+            url=self.url,
+            eurl=self.expanded_url)
 
 
 class UserStatus(TwitterModel):
@@ -190,6 +227,13 @@ class UserStatus(TwitterModel):
 
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
+
+    def __repr__(self):
+        return "UserStatus(ID={uid}, Name={sn}, Following={fng}, Followed={fed})".format(
+            uid=self.id,
+            sn=self.screen_name,
+            fng=self.following,
+            fed=self.followed_by)
 
 
 class User(TwitterModel):
