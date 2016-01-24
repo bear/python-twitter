@@ -17,6 +17,7 @@ Contents:
    models.rst
    searching.rst
    with_django.rst
+   twitter.rst
 
 
 Introduction
