@@ -37,3 +37,6 @@ pip-log.txt
 
 #Environment
 env
+
+# Built docs
+doc/_build/**
