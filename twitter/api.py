@@ -886,8 +886,20 @@ class Api(object):
 
         Args:
           status:
-            The message text to be posted.
-            Must be less than or equal to 140 characters.
+            The message text to be posted. Must be less than or equal to 140
+            characters.
+          media:
+            A URL, a local file, or a file-like object (something with a read()
+            method), or a list of any combination of the above.
+          media_additional_owners:
+            A list of user ids representing Twitter users that should be able
+            to use the uploaded media in their tweets. If you pass a list of
+            media, then additional_owners will apply to each object. If you
+            need more granular control, please use the UploadMedia* methods.
+          media_category:
+            Only for use with the AdsAPI. See
+            https://dev.twitter.com/ads/creative/promoted-video-overview if
+            this applies to your application.
           in_reply_to_status_id:
             The ID of an existing status that the status to be posted is
             in reply to.  This implicitly sets the in_reply_to_user_id

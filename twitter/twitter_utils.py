@@ -143,6 +143,17 @@ URL_REGEXP = re.compile(r'(?i)((?:https?://|www\\.)*(?:[\w+-_]+[.])(?:' + r'\b|'
 
 
 def calc_expected_status_length(status, short_url_length=23):
+    """ Calculates the length of a tweet, taking into account Twitter's
+    replacement of URLs with https://t.co links.
+
+    Args:
+        status: text of the status message to be posted.
+        short_url_length: the current published https://t.co links
+
+    Returns:
+        Expected length of the status message as an integer.
+
+    """
     replaced_chars = 0
     status_length = len(status)
     match = re.findall(URL_REGEXP, status)
@@ -153,6 +164,14 @@ def calc_expected_status_length(status, short_url_length=23):
 
 
 def is_url(text):
+    """ Checks to see if a bit of text is a URL.
+
+    Args:
+        text: text to check.
+
+    Returns:
+        Boolean of whether the text should be treated as a URL or not.
+    """
     if re.findall(URL_REGEXP, text):
         return True
     else:
@@ -160,6 +179,16 @@ def is_url(text):
 
 
 def parse_media_file(passed_media):
+    """ Parses a media file and attempts to return a file-like object and
+    information about the media file.
+
+    Args:
+        passed_media: media file which to parse.
+
+    Returns:
+        file-like object, the filename of the media file, the file size, and
+        the type of media.
+    """
     img_formats = ['image/jpeg',
                    'image/png',
                    'image/gif',
