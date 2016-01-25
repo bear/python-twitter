@@ -13,6 +13,7 @@ Contents:
    :maxdepth: 1
 
    installation.rst
+   getting_started.rst
    migration_v30.rst
    models.rst
    searching.rst
