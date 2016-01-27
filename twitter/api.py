@@ -1683,6 +1683,76 @@ class Api(object):
 
         return result
 
+    def GetBlocksIDsPaged(self,
+                          cursor=None,
+                          skip_status=None,
+                          include_user_entities=None):
+        """ Fetch a page of the users (as user ids (integers)),
+        blocked by the currently authenticated user.
+
+        Args:
+          cursor:
+            Should be set to -1 if you want the first page, thereafter denotes
+            the page of blocked users that you want to return.
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          next_cursor, previous_cursor, data sequence of twitter.User
+          instances, one for each blocked user.
+        """
+        url = '%s/blocks/ids.json' % self.base_url
+        result = []
+        parameters = {}
+        if skip_status:
+            parameters['skip_status'] = True
+        if include_user_entities:
+            parameters['include_user_entities'] = True
+        parameters['cursor'] = cursor
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        result += [user for user in data.get('users', [])]
+        next_cursor = data.get('next_cursor', 0)
+        previous_cursor = data.get('previous_cursor', 0)
+
+        return next_cursor, previous_cursor, result
+
+    def GetBlocksIDs(self,
+                     skip_status=None,
+                     include_user_entities=None):
+        """ Fetch the sequence of all users (as integer user ids),
+        blocked by the currently authenticated user.
+
+        Args:
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          A sequence of twitter.User instances, one for each blocked user.
+        """
+        result = []
+        cursor = -1
+
+        while True:
+            next_cursor, previous_cursor, user_ids = self.GetBlocksIDsPaged(
+                cursor=cursor,
+                skip_status=skip_status,
+                include_user_entities=include_user_entities)
+            result += user_ids
+            if next_cursor == 0 or next_cursor == previous_cursor:
+                break
+            else:
+                cursor = next_cursor
+
+        return result
+
     def DestroyBlock(self, id, trim_user=False):
         """Destroys the block for the user specified by the required ID
         parameter.
