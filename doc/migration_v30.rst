@@ -41,6 +41,11 @@ PostUpdate()
 * ``media_additional_owners`` should be a list of user ids representing Twitter users that should be able to use the uploaded media in their tweets. If you pass a list of media, then **additional owners will apply to each object.** If you need more granular control, please use the UploadMedia* methods.
 * ``media_category``: Only for use with the AdsAPI. See https://dev.twitter.com/ads/creative/promoted-video-overview if this applies to your application.
 
+GetBlocks()
++++++++++++
+* Method no longer accepts parameters ``user_id`` or ``screen_name`` as these are not honored by Twitter. The data returned will be for the authenticated user only.
+* Parameter ``cursor`` is no longer accepted -- this method will return **all** users being blocked by the currently authenticated user. If you need paging, please use :py:func:`twitter.api.Api.GetBlocksPaged` instead.
+
 
 Deprecation
 ===========
@@ -68,3 +73,15 @@ UploadMediaSimple()
 ++++++++++++++++++++++++++++
 * Provides the ability to upload a single media file to Twitter without using the ChunkedUpload endpoint. This method should be used on smaller files and reduces the roundtrips from Twitter from three (for UploadMediaChunked) to one.
 * Return value is the ``media_id`` of the uploaded file.
+
+GetBlocksPaged()
+++++++++++++++++
+* Allows you to page through the currently authenticated user's blocked users. Method returns three values: the next cursor, the previous cursor, and a list of ``twitter.User`` instances representing the blocked users.
+
+GetBlocksIDs()
+++++++++++++++
+* Returns **all** the users currently blocked by the authenticated user as user IDs. The user IDs will be integers.
+
+GetBlocksIDsPaged()
++++++++++++++++++++
+* Returns one page, specified by the cursor parameter, of the users currently blocked by the authenticated user as user IDs.
