@@ -290,7 +290,7 @@ class ApiTest(unittest.TestCase):
 
     @responses.activate
     def testGetBlocks(self):
-        with open('testdata/get_blocks.json') as f:
+        with open('testdata/get_blocks_0.json') as f:
             resp_data = f.read()
         responses.add(
             responses.GET,
@@ -298,11 +298,108 @@ class ApiTest(unittest.TestCase):
             body=resp_data,
             match_querystring=True,
             status=200)
+        with open('testdata/get_blocks_1.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/blocks/list.json?cursor=1524574483549312671',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
         resp = self.api.GetBlocks()
-        self.assertTrue(type(resp) is list)
-        self.assertTrue(type(resp[0]) is twitter.User)
-        self.assertEqual(len(resp), 1)
-        self.assertEqual(resp[0].screen_name, 'RedScareBot')
+        self.assertTrue(
+            isinstance(resp, list),
+            "Expected resp type to be list, got {0}".format(type(resp)))
+        self.assertTrue(
+            isinstance(resp[0], twitter.User),
+            "Expected type of first obj in resp to be twitter.User, got {0}".format(
+                type(resp[0])))
+        self.assertEqual(
+            len(resp), 2,
+            "Expected len of resp to be 2, got {0}".format(len(resp)))
+        self.assertEqual(
+            resp[0].screen_name, 'RedScareBot',
+            "Expected screen_name of 1st blocked user to be RedScareBot, was {0}".format(
+                resp[0].screen_name))
+        self.assertEqual(
+            resp[0].screen_name, 'RedScareBot',
+            "Expected screen_name of 2nd blocked user to be RedScareBot, was {0}".format(
+                resp[0].screen_name))
+
+    @responses.activate
+    def testGetBlocksPaged(self):
+        with open('testdata/get_blocks_1.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/blocks/list.json?cursor=1524574483549312671',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        ncur, pcur, resp = self.api.GetBlocksPaged(cursor=1524574483549312671)
+        self.assertTrue(
+            isinstance(resp, list),
+            "Expected list, got {0}".format(type(resp)))
+        self.assertTrue(
+            isinstance(resp[0], twitter.User),
+            "Expected twitter.User, got {0}".format(type(resp[0])))
+        self.assertEqual(
+            len(resp), 1,
+            "Expected len of resp to be 1, got {0}".format(len(resp)))
+        self.assertEqual(
+            resp[0].screen_name, 'RedScareBot',
+            "Expected username of blocked user to be RedScareBot, got {0}".format(
+                resp[0].screen_name))
+
+    @responses.activate
+    def testGetBlocksIDs(self):
+        with open('testdata/get_blocks_ids_0.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/blocks/ids.json?cursor=-1',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        with open('testdata/get_blocks_ids_1.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/blocks/ids.json?cursor=1524566179872860311',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetBlocksIDs()
+        self.assertTrue(
+            isinstance(resp, list),
+            "Expected list, got {0}".format(type(resp)))
+        self.assertTrue(
+            isinstance(resp[0], int),
+            "Expected list, got {0}".format(type(resp)))
+        self.assertEqual(
+            len(resp), 2,
+            "Expected len of resp to be 2, got {0}".format(len(resp)))
+
+    @responses.activate
+    def testGetBlocksIDsPaged(self):
+        with open('testdata/get_blocks_ids_1.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/blocks/ids.json?cursor=1524566179872860311',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        _, _, resp = self.api.GetBlocksIDsPaged(cursor=1524566179872860311)
+        self.assertTrue(
+            isinstance(resp, list),
+            "Expected list, got {0}".format(type(resp)))
+        self.assertTrue(
+            isinstance(resp[0], int),
+            "Expected list, got {0}".format(type(resp)))
+        self.assertEqual(
+            len(resp), 1,
+            "Expected len of resp to be 1, got {0}".format(len(resp)))
 
     @responses.activate
     def testGetFriendIDs(self):
