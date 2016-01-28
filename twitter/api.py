@@ -1613,24 +1613,17 @@ class Api(object):
 
         return [Status.NewFromJsonDict(s) for s in data]
 
-    def GetBlocks(self,
-                  user_id=None,
-                  screen_name=None,
-                  cursor=-1,
-                  skip_status=False,
-                  include_user_entities=False):
-        """Fetch the sequence of twitter.User instances, one for each blocked user.
+    def GetBlocksPaged(self,
+                       cursor=-1,
+                       skip_status=False,
+                       include_user_entities=False):
+        """ Fetch a page of the users (as twitter.User instances)
+        blocked by the currently authenticated user.
 
         Args:
-          user_id:
-            The twitter id of the user whose friends you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
-          screen_name:
-            The twitter name of the user whose friends you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
           cursor:
-            Should be set to -1 for the initial call and then is used to
-            control what result page Twitter returns.
+            Should be set to -1 if you want the first page, thereafter denotes
+            the page of blocked users that you want to return.
           skip_status:
             If True the statuses will not be returned in the user items.
             [Optional]
@@ -1638,32 +1631,123 @@ class Api(object):
             When True, the user entities will be included. [Optional]
 
         Returns:
-          A sequence of twitter.User instances, one for each friend
+          next_cursor, previous_cursor, list of twitter.User instances,
+          one for each blocked user.
         """
         url = '%s/blocks/list.json' % self.base_url
         result = []
         parameters = {}
-        if user_id is not None:
-            parameters['user_id'] = user_id
-        if screen_name is not None:
-            parameters['screen_name'] = screen_name
         if skip_status:
             parameters['skip_status'] = True
         if include_user_entities:
             parameters['include_user_entities'] = True
+        parameters['cursor'] = cursor
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        result += [User.NewFromJsonDict(x) for x in data['users']]
+        next_cursor = data.get('next_cursor', 0)
+        previous_cursor = data.get('previous_cursor', 0)
+
+        return next_cursor, previous_cursor, result
+
+    def GetBlocks(self,
+                  skip_status=False,
+                  include_user_entities=False):
+        """ Fetch the sequence of all users (as twitter.User instances),
+        blocked by the currently authenticated user.
+
+        Args:
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          A list of twitter.User instances, one for each blocked user.
+        """
+        result = []
+        cursor = -1
 
         while True:
-            parameters['cursor'] = cursor
-            resp = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-            result += [User.NewFromJsonDict(x) for x in data['users']]
-            if 'next_cursor' in data:
-                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
-                    break
-                else:
-                    cursor = data['next_cursor']
-            else:
+            next_cursor, previous_cursor, users = self.GetBlocksPaged(
+                cursor=cursor,
+                skip_status=skip_status,
+                include_user_entities=include_user_entities)
+            result += users
+            if next_cursor == 0 or next_cursor == previous_cursor:
                 break
+            else:
+                cursor = next_cursor
+
+        return result
+
+    def GetBlocksIDsPaged(self,
+                          cursor=-1,
+                          skip_status=None,
+                          include_user_entities=None):
+        """ Fetch a page of the user IDs (integers) blocked by the currently
+        authenticated user.
+
+        Args:
+          cursor:
+            Should be set to -1 if you want the first page, thereafter denotes
+            the page of blocked users that you want to return.
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          next_cursor, previous_cursor, list of user IDs of blocked users.
+        """
+        url = '%s/blocks/ids.json' % self.base_url
+        parameters = {}
+        if skip_status:
+            parameters['skip_status'] = True
+        if include_user_entities:
+            parameters['include_user_entities'] = True
+        parameters['cursor'] = cursor
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        user_ids = data.get('ids', [])
+        next_cursor = data.get('next_cursor', 0)
+        previous_cursor = data.get('previous_cursor', 0)
+
+        return next_cursor, previous_cursor, user_ids
+
+    def GetBlocksIDs(self,
+                     skip_status=None,
+                     include_user_entities=None):
+        """ Fetch the sequence of all users (as integer user ids),
+        blocked by the currently authenticated user.
+
+        Args:
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          A list of user IDs for all blocked users.
+        """
+        result = []
+        cursor = -1
+
+        while True:
+            next_cursor, previous_cursor, user_ids = self.GetBlocksIDsPaged(
+                cursor=cursor,
+                skip_status=skip_status,
+                include_user_entities=include_user_entities)
+            result += user_ids
+            if next_cursor == 0 or next_cursor == previous_cursor:
+                break
+            else:
+                cursor = next_cursor
 
         return result
 
