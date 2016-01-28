@@ -1614,10 +1614,10 @@ class Api(object):
         return [Status.NewFromJsonDict(s) for s in data]
 
     def GetBlocksPaged(self,
-                       cursor=None,
+                       cursor=-1,
                        skip_status=False,
                        include_user_entities=False):
-        """ Fetch a page of the users (as twitter.User instances),
+        """ Fetch a page of the users (as twitter.User instances)
         blocked by the currently authenticated user.
 
         Args:
@@ -1631,8 +1631,8 @@ class Api(object):
             When True, the user entities will be included. [Optional]
 
         Returns:
-          next_cursor, previous_cursor, data sequence of twitter.User
-          instances, one for each blocked user.
+          next_cursor, previous_cursor, list of twitter.User instances,
+          one for each blocked user.
         """
         url = '%s/blocks/list.json' % self.base_url
         result = []
@@ -1665,7 +1665,7 @@ class Api(object):
             When True, the user entities will be included. [Optional]
 
         Returns:
-          A sequence of twitter.User instances, one for each blocked user.
+          A list of twitter.User instances, one for each blocked user.
         """
         result = []
         cursor = -1
@@ -1684,11 +1684,11 @@ class Api(object):
         return result
 
     def GetBlocksIDsPaged(self,
-                          cursor=None,
+                          cursor=-1,
                           skip_status=None,
                           include_user_entities=None):
-        """ Fetch a page of the users (as user ids (integers)),
-        blocked by the currently authenticated user.
+        """ Fetch a page of the user IDs (integers) blocked by the currently
+        authenticated user.
 
         Args:
           cursor:
@@ -1701,11 +1701,9 @@ class Api(object):
             When True, the user entities will be included. [Optional]
 
         Returns:
-          next_cursor, previous_cursor, data sequence of twitter.User
-          instances, one for each blocked user.
+          next_cursor, previous_cursor, list of user IDs of blocked users.
         """
         url = '%s/blocks/ids.json' % self.base_url
-        result = []
         parameters = {}
         if skip_status:
             parameters['skip_status'] = True
@@ -1715,11 +1713,11 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        result += [user for user in data.get('users', [])]
+        user_ids = data.get('ids', [])
         next_cursor = data.get('next_cursor', 0)
         previous_cursor = data.get('previous_cursor', 0)
 
-        return next_cursor, previous_cursor, result
+        return next_cursor, previous_cursor, user_ids
 
     def GetBlocksIDs(self,
                      skip_status=None,
@@ -1735,7 +1733,7 @@ class Api(object):
             When True, the user entities will be included. [Optional]
 
         Returns:
-          A sequence of twitter.User instances, one for each blocked user.
+          A list of user IDs for all blocked users.
         """
         result = []
         cursor = -1
