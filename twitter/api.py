@@ -55,7 +55,8 @@ from twitter.category import Category
 from twitter.twitter_utils import (
     calc_expected_status_length,
     is_url,
-    parse_media_file)
+    parse_media_file,
+    enf_type)
 
 warnings.simplefilter('always', DeprecationWarning)
 
@@ -3301,25 +3302,27 @@ class Api(object):
                        count=20,
                        cursor=-1,
                        filter_to_owned_lists=False):
-        """Obtain the lists the specified user is a member of.
+        """Obtain the lists the specified user is a member of. If no user_id or
+        screen_name is specified, the data returned will be for the
+        authenticated user.
 
         Returns a maximum of 20 lists per page by default.
-
-        Twitter endpoint: /lists/memberships
 
         Args:
           user_id:
             The ID of the user for whom to return results for. [Optional]
           screen_name:
-            The screen name of the user for whom to return results for. [Optional]
+            The screen name of the user for whom to return
+            results for. [Optional]
           count:
            The amount of results to return per page.
            No more than 1000 results will ever be returned in a single page.
            Defaults to 20. [Optional]
           cursor:
-            The "page" value that Twitter will use to start building the list sequence from.
-            Use the value of -1 to start at the beginning.
-            Twitter will return in the result the values for next_cursor and previous_cursor. [Optional]
+            The "page" value that Twitter will use to start building the list
+            sequence from. Use the value of -1 to start at the beginning.
+            Twitter will return in the result the values for next_cursor and
+            previous_cursor. [Optional]
           filter_to_owned_lists:
             Set to True to return only the lists the authenticating user
             owns, and the user specified by user_id or screen_name is a
@@ -3332,36 +3335,26 @@ class Api(object):
         """
         url = '%s/lists/memberships.json' % (self.base_url)
         parameters = {}
-        try:
-            parameters['cursor'] = int(cursor)
-        except ValueError:
-            raise TwitterError({'message': "cursor must be an integer"})
-        try:
-            parameters['count'] = int(count)
-        except ValueError:
-            raise TwitterError({'message': "count must be an integer"})
-        try:
-            parameters['filter_to_owned_lists'] = bool(filter_to_owned_lists)
-        except ValueError:
-            raise TwitterError({'message': "filter_to_owned_lists \
-                                must be a boolean value"})
+        if cursor is not None:
+            parameters['cursor'] = enf_type('cursor', int, cursor)
+        if count is not None:
+            parameters['count'] = enf_type('count', int, count)
+        if filter_to_owned_lists:
+            parameters['filter_to_owned_lists'] = enf_type(
+                'filter_to_owned_lists', bool, filter_to_owned_lists)
+
         if user_id is not None:
-            try:
-                parameters['user_id'] = long(user_id)
-            except ValueError:
-                raise TwitterError({'message': "user_id must be an integer"})
+            parameters['user_id'] = enf_type('user_id', int, user_id)
         elif screen_name is not None:
             parameters['screen_name'] = screen_name
-        else:
-            raise TwitterError({'message': "Specify user_id or screen_name"})
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(resp.content)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [List.NewFromJsonDict(x) for x in data['lists']]
 
     def GetListsList(self,
-                     screen_name,
+                     screen_name=None,
                      user_id=None,
                      reverse=False):
         """Returns all lists the user subscribes to, including their own.
@@ -3378,9 +3371,9 @@ class Api(object):
             user_timeline. Helpful for disambiguating when a valid user ID
             is also a valid screen name. [Optional]
           reverse:
-            If False, the owned lists will be returned first, othewise subscribed
-            lists will be at the top. Returns a maximum of 100 entries regardless.
-            Defaults to False. [Optional]
+            If False, the owned lists will be returned first, othewise
+            subscribed lists will be at the top. Returns a maximum of 100
+            entries regardless. Defaults to False. [Optional]
 
         Returns:
           A list of twitter List items.
@@ -3388,11 +3381,11 @@ class Api(object):
         url = '%s/lists/list.json' % (self.base_url)
         parameters = {}
         if user_id:
-            parameters['user_id'] = user_id
+            parameters['user_id'] = enf_type('user_id', int, user_id)
         elif screen_name:
             parameters['screen_name'] = screen_name
         if reverse:
-            parameters['reverse'] = 'true'
+            parameters['reverse'] = enf_type('reverse', bool, reverse)
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -3400,8 +3393,8 @@ class Api(object):
         return [List.NewFromJsonDict(x) for x in data]
 
     def GetListTimeline(self,
-                        list_id,
-                        slug,
+                        list_id=None,
+                        slug=None,
                         owner_id=None,
                         owner_screen_name=None,
                         since_id=None,
@@ -3420,7 +3413,8 @@ class Api(object):
             Specifies the ID of the list to retrieve.
           slug:
             The slug name for the list to retrieve. If you specify None for the
-            list_id, then you have to provide either a owner_screen_name or owner_id.
+            list_id, then you have to provide either a owner_screen_name or
+            owner_id.
           owner_id:
             Specifies the ID of the user for whom to return the
             list timeline. Helpful for disambiguating when a valid user ID
@@ -3433,8 +3427,8 @@ class Api(object):
             Returns results with an ID greater than (that is, more recent than)
             the specified ID. There are limits to the number of Tweets which
             can be accessed through the API.
-            If the limit of Tweets has occurred since the since_id, the since_id
-            will be forced to the oldest ID available. [Optional]
+            If the limit of Tweets has occurred since the since_id, the
+            since_id will be forced to the oldest ID available. [Optional]
           max_id:
             Returns only statuses with an ID less than (that is, older than) or
             equal to the specified ID. [Optional]
@@ -3442,8 +3436,8 @@ class Api(object):
             Specifies the number of statuses to retrieve.
             May not be greater than 200. [Optional]
           include_rts:
-            If True, the timeline will contain native retweets (if they exist) in
-            addition to the standard stream of tweets. [Optional]
+            If True, the timeline will contain native retweets (if they exist)
+            in addition to the standard stream of tweets. [Optional]
           include_entities:
             If False, the timeline will not contain additional metadata.
             Defaults to True. [Optional]
@@ -3452,38 +3446,37 @@ class Api(object):
           A sequence of Status instances, one for each message up to count
         """
         parameters = {}
-        url = '%s/lists/statuses.json' % (self.base_url)
-        parameters['slug'] = slug
-        parameters['list_id'] = list_id
-        if list_id is None:
-            if slug is None:
-                raise TwitterError({'message': "list_id or slug required"})
-            if owner_id is None and not owner_screen_name:
-                raise TwitterError({
-                    'message': "if list_id is not given you have to include an owner to help identify the proper list"})
-        if owner_id:
-            parameters['owner_id'] = owner_id
-        if owner_screen_name:
-            parameters['owner_screen_name'] = owner_screen_name
+        url = '%s/lists/statuses.json' % self.base_url
+
+        if list_id is not None:
+            parameters['list_id'] = enf_type('list_id', int, list_id)
+        elif slug is not None:
+            parameters['slug'] = slug
+            if owner_id is not None:
+                parameters['owner_id'] = enf_type('owner_id', int, owner_id)
+            elif owner_screen_name is not None:
+                parameters['owner_screen_name'] = owner_screen_name
+            else:
+                raise TwitterError({'message': (
+                    'If specifying a list by slug, an owner_id or '
+                    'owner_screen_name must also be given.')
+                })
+        else:
+            raise TwitterError({'message': (
+                'Either list_id or slug and one of owner_id and '
+                'owner_screen_name must be passed.')
+            })
+
         if since_id:
-            try:
-                parameters['since_id'] = int(since_id)
-            except ValueError:
-                raise TwitterError({'message': "since_id must be an integer"})
+            parameters['since_id'] = enf_type('since_id', int, since_id)
         if max_id:
-            try:
-                parameters['max_id'] = int(max_id)
-            except ValueError:
-                raise TwitterError({'message': "max_id must be an integer"})
+            parameters['max_id'] = enf_type('max_id', int, max_id)
         if count:
-            try:
-                parameters['count'] = int(count)
-            except ValueError:
-                raise TwitterError({'message': "count must be an integer"})
+            parameters['count'] = enf_type('count', int, count)
         if not include_rts:
-            parameters['include_rts'] = 'false'
+            parameters['include_rts'] = enf_type('include_rts', bool, include_rts)
         if not include_entities:
-            parameters['include_entities'] = 'false'
+            parameters['include_entities'] = enf_type('include_entities', bool, include_entities)
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -3491,8 +3484,8 @@ class Api(object):
         return [Status.NewFromJsonDict(x) for x in data]
 
     def GetListMembers(self,
-                       list_id,
-                       slug,
+                       list_id=None,
+                       slug=None,
                        owner_id=None,
                        owner_screen_name=None,
                        cursor=-1,
@@ -3508,7 +3501,8 @@ class Api(object):
             Specifies the ID of the list to retrieve.
           slug:
             The slug name for the list to retrieve. If you specify None for the
-            list_id, then you have to provide either a owner_screen_name or owner_id.
+            list_id, then you have to provide either a owner_screen_name or
+            owner_id.
           owner_id:
             Specifies the ID of the user for whom to return the
             list timeline. Helpful for disambiguating when a valid user ID
@@ -3531,28 +3525,33 @@ class Api(object):
           A sequence of twitter.User instances, one for each follower
         """
         parameters = {}
-        url = '%s/lists/members.json' % (self.base_url)
-        parameters['slug'] = slug
-        parameters['list_id'] = list_id
-        if list_id is None:
-            if slug is None:
-                raise TwitterError({'message': "list_id or slug required"})
-            if owner_id is None and not owner_screen_name:
-                raise TwitterError({
-                    'message': "if list_id is not given you have to include an owner to help identify the proper list"})
-        if owner_id:
-            parameters['owner_id'] = owner_id
-        if owner_screen_name:
-            parameters['owner_screen_name'] = owner_screen_name
+        url = '%s/lists/members.json' % self.base_url
+
+        if list_id is not None:
+            parameters['list_id'] = enf_type('list_id', int, list_id)
+        elif slug is not None:
+            parameters['slug'] = slug
+            if owner_id is not None:
+                parameters['owner_id'] = enf_type('owner_id', int, owner_id)
+            elif owner_screen_name is not None:
+                parameters['owner_screen_name'] = owner_screen_name
+            else:
+                raise TwitterError({'message': (
+                    'If specifying a list by slug, an owner_id or '
+                    'owner_screen_name must also be given.')
+                })
+        else:
+            raise TwitterError({'message': (
+                'Either list_id or slug and one of owner_id and '
+                'owner_screen_name must be passed.')
+            })
+
         if cursor:
-            try:
-                parameters['cursor'] = int(cursor)
-            except ValueError:
-                raise TwitterError({'message': "cursor must be an integer"})
+            parameters['cursor'] = enf_type('cursor', int, cursor)
         if skip_status:
-            parameters['skip_status'] = True
+            parameters['skip_status'] = enf_type('skip_status', bool, skip_status)
         if include_entities:
-            parameters['include_user_entities'] = True
+            parameters['include_user_entities'] = enf_type('include_user_entities', bool, include_user_entities)
         result = []
 
         while True:
@@ -3585,17 +3584,17 @@ class Api(object):
 
         Args:
           list_id:
-            The numerical id of the list.
+            The numerical id of the list. [Optional]
           slug:
             You can identify a list by its slug instead of its numerical id. If you
             decide to do so, note that you'll also have to specify the list owner
-            using the owner_id or owner_screen_name parameters.
+            using the owner_id or owner_screen_name parameters. [Optional]
           user_id:
             The user_id or a list of user_id's to add to the list.
-            If not given, then screen_name is required.
+            If not given, then screen_name is required. [Optional]
           screen_name:
             The screen_name or a list of screen_name's to add to the list.
-            If not given, then user_id is required.
+            If not given, then user_id is required. [Optional]
           owner_screen_name:
             The screen_name of the user who owns the list being requested by a slug.
           owner_id:
@@ -3604,42 +3603,41 @@ class Api(object):
         Returns:
           A twitter.List instance representing the list subscribed to
         """
-        isList = False
+        is_list = False
         data = {}
         if list_id:
-            try:
-                data['list_id'] = int(list_id)
-            except ValueError:
-                raise TwitterError({'message': "list_id must be an integer"})
+            data['list_id'] = enf_type('list_id', int, list_id)
         elif slug:
             data['slug'] = slug
             if owner_id:
-                try:
-                    data['owner_id'] = int(owner_id)
-                except ValueError:
-                    raise TwitterError({'message': "owner_id must be an integer"})
+                data['owner_id'] = enf_type('owner_id', int, owner_id)
             elif owner_screen_name:
                 data['owner_screen_name'] = owner_screen_name
             else:
-                raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+                raise TwitterError({'message': (
+                    'If specifying a list by slug, an owner_id or '
+                    'owner_screen_name must also be given.')
+                })
         else:
-            raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+            raise TwitterError({'message': (
+                'Either list_id or slug and one of owner_id and '
+                'owner_screen_name must be passed.')
+            })
+
         if user_id:
-            try:
-                if isinstance(user_id, types.ListType) or isinstance(user_id, types.TupleType):
-                    isList = True
-                    data['user_id'] = '%s' % ','.join(user_id)
-                else:
-                    data['user_id'] = int(user_id)
-            except ValueError:
-                raise TwitterError({'message': "user_id must be an integer"})
+            if isinstance(user_id, list) or isinstance(user_id, tuple):
+                is_list = True
+                data['user_id'] = ','.join([enf_type('user_id', int, uid) for uid in user_id])
+            else:
+                data['user_id'] = enf_type('user_id', int, user_id)
+
         elif screen_name:
-            if isinstance(screen_name, types.ListType) or isinstance(screen_name, types.TupleType):
-                isList = True
-                data['screen_name'] = '%s' % ','.join(screen_name)
+            if isinstance(screen_name, list) or isinstance(screen_name, tuple):
+                is_list = True
+                data['screen_name'] = ','.join(screen_name)
             else:
                 data['screen_name'] = screen_name
-        if isList:
+        if is_list:
             url = '%s/lists/members/create_all.json' % self.base_url
         else:
             url = '%s/lists/members/create.json' % self.base_url
@@ -3681,104 +3679,137 @@ class Api(object):
         Returns:
           A twitter.List instance representing the removed list.
         """
-        isList = False
+        is_list = False
         data = {}
+
         if list_id:
-            try:
-                data['list_id'] = int(list_id)
-            except ValueError:
-                raise TwitterError({'message': "list_id must be an integer"})
+            data['list_id'] = enf_type('list_id', list, list_id)
         elif slug:
             data['slug'] = slug
             if owner_id:
-                try:
-                    data['owner_id'] = int(owner_id)
-                except ValueError:
-                    raise TwitterError({'message': "owner_id must be an integer"})
+                data['owner_id'] = enf_type('owner_id', int, owner_id)
             elif owner_screen_name:
                 data['owner_screen_name'] = owner_screen_name
             else:
-                raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+                raise TwitterError({'message': (
+                    'If specifying a list by slug, an owner_id or '
+                    'owner_screen_name must also be given.')
+                })
         else:
-            raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+            raise TwitterError({'message': (
+                'Either list_id or slug and one of owner_id and '
+                'owner_screen_name must be passed.')
+            })
+
         if user_id:
-            try:
-                if isinstance(user_id, types.ListType) or isinstance(user_id, types.TupleType):
-                    isList = True
-                    data['user_id'] = '%s' % ','.join(user_id)
-                else:
-                    data['user_id'] = int(user_id)
-            except ValueError:
-                raise TwitterError({'message': "user_id must be an integer"})
+            if isinstance(user_id, list) or isinstance(user_id, tuple):
+                is_list = True
+                data['user_id'] = ','.join([enf_type('user_id', int, uid) for uid in user_id])
+            else:
+                data['user_id'] = int(user_id)
         elif screen_name:
-            if isinstance(screen_name, types.ListType) or isinstance(screen_name, types.TupleType):
-                isList = True
-                data['screen_name'] = '%s' % ','.join(screen_name)
+            if isinstance(screen_name, list) or isinstance(screen_name, tuple):
+                is_list = True
+                data['screen_name'] = ','.join(screen_name)
             else:
                 data['screen_name'] = screen_name
-        if isList:
+
+        if is_list:
             url = '%s/lists/members/destroy_all.json' % self.base_url
         else:
-            url = '%s/lists/members/destroy.json' % (self.base_url)
+            url = '%s/lists/members/destroy.json' % self.base_url
 
         resp = self._RequestUrl(url, 'POST', data=data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
 
-    def GetLists(self,
-                 user_id=None,
-                 screen_name=None,
-                 count=None,
-                 cursor=-1):
-        """Fetch the sequence of lists for a user.
-
-        Twitter endpoint: /lists/ownerships
+    def GetListsPaged(self,
+                      user_id=None,
+                      screen_name=None,
+                      cursor=-1,
+                      count=20):
+        """ Fetch the sequence of lists for a user. If no user_id or
+        screen_name is passed, the data returned will be for the
+        authenticated user.
 
         Args:
           user_id:
             The ID of the user for whom to return results for. [Optional]
           screen_name:
-            The screen name of the user for whom to return results for. [Optional]
+            The screen name of the user for whom to return results
+            for. [Optional]
           count:
-            The amount of results to return per page.
-            No more than 1000 results will ever be returned in a single page.
-            Defaults to 20. [Optional]
+            The amount of results to return per page. No more than 1000 results
+            will ever be returned in a single page. Defaults to 20. [Optional]
           cursor:
-            The "page" value that Twitter will use to start building the list sequence from.
-            Use the value of -1 to start at the beginning.
-            Twitter will return in the result the values for next_cursor and previous_cursor. [Optional]
+            The "page" value that Twitter will use to start building the list
+            sequence from. Use the value of -1 to start at the beginning.
+            Twitter will return in the result the values for next_cursor and
+            previous_cursor. [Optional]
 
         Returns:
           A sequence of twitter.List instances, one for each list
         """
         url = '%s/lists/ownerships.json' % self.base_url
-        result = []
         parameters = {}
         if user_id is not None:
-            try:
-                parameters['user_id'] = int(user_id)
-            except ValueError:
-                raise TwitterError({'message': "user_id must be an integer"})
+            parameters['user_id'] = enf_type('user_id', int, user_id)
         elif screen_name is not None:
             parameters['screen_name'] = screen_name
-        else:
-            raise TwitterError({'message': "Specify user_id or screen_name"})
+
         if count is not None:
-            parameters['count'] = count
+            parameters['count'] = enf_type('count', int, count)
+
+        parameters['cursor'] = enf_type('cursor', int, cursor)
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        next_cursor = data.get('next_cursor', 0)
+        previous_cursor = data.get('previous_cursor', 0)
+        lists = [List.NewFromJsonDict(x) for x in data.get('lists', [])]
+
+        return next_cursor, previous_cursor, lists
+
+    def GetLists(self,
+                 user_id=None,
+                 screen_name=None):
+        """Fetch the sequence of lists for a user. If no user_id or screen_name
+        is passed, the data returned will be for the authenticated user.
+
+        Args:
+          user_id:
+            The ID of the user for whom to return results for. [Optional]
+          screen_name:
+            The screen name of the user for whom to return results
+            for. [Optional]
+          count:
+            The amount of results to return per page.
+            No more than 1000 results will ever be returned in a single page.
+            Defaults to 20. [Optional]
+          cursor:
+            The "page" value that Twitter will use to start building the list
+            sequence from. Use the value of -1 to start at the beginning.
+            Twitter will return in the result the values for next_cursor and
+            previous_cursor. [Optional]
+
+        Returns:
+          A sequence of twitter.List instances, one for each list
+        """
+        result = []
+        cursor = -1
 
         while True:
-            parameters['cursor'] = cursor
-            resp = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-            result += [List.NewFromJsonDict(x) for x in data['lists']]
-            if 'next_cursor' in data:
-                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
-                    break
-                else:
-                    cursor = data['next_cursor']
-            else:
+            next_cursor, prev_cursor, lists = self.GetListsPaged(
+                user_id=user_id,
+                screen_name=screen_name,
+                cursor=cursor)
+            result += lists
+            if next_cursor == 0 or next_cursor == prev_cursor:
                 break
+            else:
+                cursor = next_cursor
 
         return result
 

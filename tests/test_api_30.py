@@ -906,7 +906,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/memberships.json?filter_to_owned_lists=False&cursor=-1&count=20',
+            'https://api.twitter.com/1.1/lists/memberships.json?cursor=-1&count=20',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -962,7 +962,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/ownerships.json?cursor=-1',
+            'https://api.twitter.com/1.1/lists/ownerships.json?cursor=-1&count=20',
             body=resp_data,
             match_querystring=True,
             status=200)
