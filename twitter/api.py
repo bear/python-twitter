@@ -2964,43 +2964,19 @@ class Api(object):
 
         return [Status.NewFromJsonDict(x) for x in data]
 
-    # List endpoint status
-    # done GET lists/list
-    # done GET lists/statuses
-    # done POST lists/subscribers/create
-    # done GET lists/subscribers/show
-    # done POST lists/subscribers/destroy
-    # done GET lists/members
-    # done POST lists/members/create
-    # done POST lists/members/create_all
-    # done POST lists/members/destroy
-    # done POST lists/members/destroy_all
-    #      GET lists/members/show
-    # done POST lists/create
-    # done POST lists/destroy
-    #      POST lists/update
-    #      GET lists/show
-    # done GET lists/subscriptions
-    # done GET lists/memberships
-    #      GET lists/subscribers
-    # done GET lists/ownerships
-
     def CreateList(self, name, mode=None, description=None):
         """Creates a new list with the give name for the authenticated user.
 
-        Twitter endpoint: /lists/create
-
         Args:
-          name:
+          name (str):
             New name for the list
-          mode:
-            'public' or 'private'.
-            Defaults to 'public'. [Optional]
-          description:
-            Description of the list. [Optional]
+          mode (str, optional):
+            'public' or 'private'. Defaults to 'public'.
+          description (str, optional):
+            Description of the list.
 
         Returns:
-          A twitter.List instance representing the new list
+          twitter.list.List: A twitter.List instance representing the new list
         """
         url = '%s/lists/create.json' % self.base_url
         parameters = {'name': name}
@@ -3019,24 +2995,26 @@ class Api(object):
                     owner_id=False,
                     list_id=None,
                     slug=None):
-        """Destroys the list identified by list_id or owner_screen_name/owner_id and slug.
-
-        Twitter endpoint: /lists/destroy
+        """Destroys the list identified by list_id or slug and one of
+        owner_screen_name or owner_id.
 
         Args:
-          owner_screen_name:
-            The screen_name of the user who owns the list being requested by a slug.
-          owner_id:
-            The user ID of the user who owns the list being requested by a slug.
-          list_id:
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested
+            by a slug.
+          owner_id (int, optional):
+            The user ID of the user who owns the list being requested
+            by a slug.
+          list_id (int, optional):
             The numerical id of the list.
-          slug:
-            You can identify a list by its slug instead of its numerical id. If you
-            decide to do so, note that you'll also have to specify the list owner
-            using the owner_id or owner_screen_name parameters.
+          slug (str, optional):
+            You can identify a list by its slug instead of its numerical id.
+            If you decide to do so, note that you'll also have to specify
+            the list owner using the owner_id or owner_screen_name parameters.
 
         Returns:
-          A twitter.List instance representing the removed list.
+          twitter.list.List: A twitter.List instance representing the
+          removed list.
         """
         url = '%s/lists/destroy.json' % self.base_url
         data = {}
@@ -3071,22 +3049,22 @@ class Api(object):
                            slug=None):
         """Creates a subscription to a list by the authenticated user.
 
-        Twitter endpoint: /lists/subscribers/create
-
         Args:
-          owner_screen_name:
-            The screen_name of the user who owns the list being requested by a slug.
-          owner_id:
-            The user ID of the user who owns the list being requested by a slug.
-          list_id:
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested
+            by a slug.
+          owner_id (int, optional):
+            The user ID of the user who owns the list being requested
+            by a slug.
+          list_id (int, optional):
             The numerical id of the list.
-          slug:
-            You can identify a list by its slug instead of its numerical id. If you
-            decide to do so, note that you'll also have to specify the list owner
-            using the owner_id or owner_screen_name parameters.
+          slug (str, optional):
+            You can identify a list by its slug instead of its numerical id.
+            If you decide to do so, note that you'll also have to specify
+            the list owner using the owner_id or owner_screen_name parameters.
 
         Returns:
-          A twitter.User instance representing the user subscribed
+          twitter.user.User: A twitter.User instance representing the user subscribed
         """
         url = '%s/lists/subscribers/create.json' % (self.base_url)
         data = {}
@@ -3121,22 +3099,23 @@ class Api(object):
                             slug=None):
         """Destroys the subscription to a list for the authenticated user.
 
-        Twitter endpoint: /lists/subscribers/destroy
-
         Args:
-          owner_screen_name:
-            The screen_name of the user who owns the list being requested by a slug.
-          owner_id:
-            The user ID of the user who owns the list being requested by a slug.
-          list_id:
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested
+            by a slug.
+          owner_id (int, optional):
+            The user ID of the user who owns the list being requested
+            by a slug.
+          list_id (int, optional):
             The numerical id of the list.
-          slug:
-            You can identify a list by its slug instead of its numerical id. If you
-            decide to do so, note that you'll also have to specify the list owner
-            using the owner_id or owner_screen_name parameters.
+          slug (str, optional):
+            You can identify a list by its slug instead of its numerical id.
+            If you decide to do so, note that you'll also have to specify the
+            list owner using the owner_id or owner_screen_name parameters.
 
         Returns:
-          A twitter.List instance representing the removed list.
+          twitter.list.List: A twitter.List instance representing
+          the removed list.
         """
         url = '%s/lists/subscribers/destroy.json' % (self.base_url)
         data = {}
@@ -3177,32 +3156,34 @@ class Api(object):
 
         Returns the user if they are subscriber.
 
-        Twitter endpoint: /lists/subscribers/show
-
         Args:
-          owner_screen_name:
-            The screen_name of the user who owns the list being requested by a slug.
-          owner_id:
-            The user ID of the user who owns the list being requested by a slug.
-          list_id:
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested
+            by a slug.
+          owner_id (int, optional):
+            The user ID of the user who owns the list being requested
+            by a slug.
+          list_id (int, optional):
             The numerical ID of the list.
-          slug:
+          slug (str, optional):
             You can identify a list by its slug instead of its numerical ID.
             If you decide to do so, note that you'll also have to specify
             the list owner using the owner_id or owner_screen_name parameters.
-          user_id:
+          user_id (int, optional):
             The user_id or a list of user_id's to add to the list.
             If not given, then screen_name is required.
-          screen_name:
+          screen_name (str, optional):
             The screen_name or a list of screen_name's to add to the list.
             If not given, then user_id is required.
-          include_entities:
+          include_entities (bool, optional):
             If False, the timeline will not contain additional metadata.
-            Defaults to True. [Optional]
-          skip_status:
-            If True the statuses will not be returned in the user items. [Optional]
+            Defaults to True.
+          skip_status (bool, optional):
+            If True the statuses will not be returned in the user items.
+
         Returns:
-          A twitter.User instance representing the user requested
+          twitter.user.User: A twitter.User instance representing the user
+          requested.
         """
         url = '%s/lists/subscribers/show.json' % (self.base_url)
         data = {}
@@ -3246,30 +3227,30 @@ class Api(object):
                          screen_name=None,
                          count=20,
                          cursor=-1):
-        """Obtain a collection of the lists the specified user is subscribed to.
+        """Obtain a collection of the lists the specified user is
+        subscribed to.
 
         The list will contain a maximum of 20 lists per page by default.
 
         Does not include the user's own lists.
 
-        Twitter endpoint: /lists/subscriptions
-
         Args:
-          user_id:
-            The ID of the user for whom to return results for. [Optional]
-          screen_name:
-            The screen name of the user for whom to return results for. [Optional]
-          count:
+          user_id (int, optional):
+            The ID of the user for whom to return results for.
+          screen_name (str, optional):
+            The screen name of the user for whom to return results for.
+          count (int, optional):
            The amount of results to return per page.
            No more than 1000 results will ever be returned in a single page.
            Defaults to 20. [Optional]
-          cursor:
-            The "page" value that Twitter will use to start building the list sequence from.
-            Use the value of -1 to start at the beginning.
-            Twitter will return in the result the values for next_cursor and previous_cursor. [Optional]
+          cursor (int, optional):
+            The "page" value that Twitter will use to start building the
+            list sequence from. Use the value of -1 to start at the beginning.
+            Twitter will return in the result the values for next_cursor
+            and previous_cursor.
 
         Returns:
-          A sequence of twitter.List instances, one for each list
+          twitter.list.List: A sequence of twitter.List instances, one for each list
         """
         url = '%s/lists/subscriptions.json' % (self.base_url)
         parameters = {}
@@ -3309,29 +3290,28 @@ class Api(object):
         Returns a maximum of 20 lists per page by default.
 
         Args:
-          user_id:
-            The ID of the user for whom to return results for. [Optional]
-          screen_name:
+          user_id (int, optional):
+            The ID of the user for whom to return results for.
+          screen_name (str, optional):
             The screen name of the user for whom to return
-            results for. [Optional]
-          count:
+            results for.
+          count (int, optional):
            The amount of results to return per page.
            No more than 1000 results will ever be returned in a single page.
-           Defaults to 20. [Optional]
-          cursor:
+           Defaults to 20.
+          cursor (int, optional):
             The "page" value that Twitter will use to start building the list
             sequence from. Use the value of -1 to start at the beginning.
             Twitter will return in the result the values for next_cursor and
-            previous_cursor. [Optional]
-          filter_to_owned_lists:
+            previous_cursor.
+          filter_to_owned_lists (bool, optional):
             Set to True to return only the lists the authenticating user
             owns, and the user specified by user_id or screen_name is a
-            member of.
-            Default value is False. [Optional]
+            member of. Default value is False.
 
         Returns:
-          A sequence of twitter.List instances, one for each list in which
-            the user specified by user_id or screen_name is a member
+          list: A list of twitter.List instances, one for each list in which
+          the user specified by user_id or screen_name is a member
         """
         url = '%s/lists/memberships.json' % (self.base_url)
         parameters = {}
@@ -3358,25 +3338,25 @@ class Api(object):
                      user_id=None,
                      reverse=False):
         """Returns all lists the user subscribes to, including their own.
-
-        Twitter endpoint: /lists/list
+        If no user_id or screen_name is specified, the data returned will be
+        for the authenticated user.
 
         Args:
-          screen_name:
+          screen_name (str, optional):
             Specifies the screen name of the user for whom to return the
             user_timeline. Helpful for disambiguating when a valid screen
             name is also a user ID.
-          user_id:
+          user_id (int, optional):
             Specifies the ID of the user for whom to return the
             user_timeline. Helpful for disambiguating when a valid user ID
-            is also a valid screen name. [Optional]
-          reverse:
+            is also a valid screen name.
+          reverse (bool, optional):
             If False, the owned lists will be returned first, othewise
             subscribed lists will be at the top. Returns a maximum of 100
-            entries regardless. Defaults to False. [Optional]
+            entries regardless. Defaults to False.
 
         Returns:
-          A list of twitter List items.
+          list: A sequence of twitter.List instances.
         """
         url = '%s/lists/list.json' % (self.base_url)
         parameters = {}
@@ -3404,46 +3384,43 @@ class Api(object):
                         include_entities=True):
         """Fetch the sequence of Status messages for a given List ID.
 
-        The twitter.Api instance must be authenticated if the user is private.
-
-        Twitter endpoint: /lists/statuses
-
         Args:
-          list_id:
+          list_id (int, optional):
             Specifies the ID of the list to retrieve.
-          slug:
+          slug (str, optional):
             The slug name for the list to retrieve. If you specify None for the
             list_id, then you have to provide either a owner_screen_name or
             owner_id.
-          owner_id:
+          owner_id (int, optional):
             Specifies the ID of the user for whom to return the
             list timeline. Helpful for disambiguating when a valid user ID
-            is also a valid screen name. [Optional]
-          owner_screen_name:
+            is also a valid screen name.
+          owner_screen_name (str, optional):
             Specifies the screen name of the user for whom to return the
             user_timeline. Helpful for disambiguating when a valid screen
-            name is also a user ID. [Optional]
-          since_id:
+            name is also a user ID.
+          since_id (int, optional):
             Returns results with an ID greater than (that is, more recent than)
             the specified ID. There are limits to the number of Tweets which
             can be accessed through the API.
             If the limit of Tweets has occurred since the since_id, the
-            since_id will be forced to the oldest ID available. [Optional]
-          max_id:
+            since_id will be forced to the oldest ID available.
+          max_id (int, optional):
             Returns only statuses with an ID less than (that is, older than) or
-            equal to the specified ID. [Optional]
-          count:
+            equal to the specified ID.
+          count (int, optional):
             Specifies the number of statuses to retrieve.
-            May not be greater than 200. [Optional]
-          include_rts:
+            May not be greater than 200.
+          include_rts (bool, optional):
             If True, the timeline will contain native retweets (if they exist)
-            in addition to the standard stream of tweets. [Optional]
-          include_entities:
+            in addition to the standard stream of tweets.
+          include_entities (bool, optional):
             If False, the timeline will not contain additional metadata.
-            Defaults to True. [Optional]
+            Defaults to True.
 
         Returns:
-          A sequence of Status instances, one for each message up to count
+          list: A list of twitter.status.Status instances, one for each
+          message up to count.
         """
         parameters = {}
         url = '%s/lists/statuses.json' % self.base_url
@@ -3483,6 +3460,7 @@ class Api(object):
 
         return [Status.NewFromJsonDict(x) for x in data]
 
+    # TODO: Paging?
     def GetListMembers(self,
                        list_id=None,
                        slug=None,
@@ -3494,35 +3472,33 @@ class Api(object):
         """Fetch the sequence of twitter.User instances, one for each member
         of the given list_id or slug.
 
-        Twitter endpoint: /lists/members
-
         Args:
-          list_id:
+          list_id (int, optional):
             Specifies the ID of the list to retrieve.
-          slug:
+          slug (str, optional):
             The slug name for the list to retrieve. If you specify None for the
             list_id, then you have to provide either a owner_screen_name or
             owner_id.
-          owner_id:
+          owner_id (int, optional):
             Specifies the ID of the user for whom to return the
             list timeline. Helpful for disambiguating when a valid user ID
-            is also a valid screen name. [Optional]
-          owner_screen_name:
+            is also a valid screen name.
+          owner_screen_name (str, optional):
             Specifies the screen name of the user for whom to return the
             user_timeline. Helpful for disambiguating when a valid screen
-            name is also a user ID. [Optional]
-          cursor:
+            name is also a user ID.
+          cursor (int, optional):
             Should be set to -1 for the initial call and then is used to
             control what result page Twitter returns.
-          skip_status:
+          skip_status (bool, optional):
             If True the statuses will not be returned in the user items.
-            [Optional]
-          include_entities:
+          include_entities (bool, optional):
             If False, the timeline will not contain additional metadata.
-            Defaults to True. [Optional]
+            Defaults to True.
 
         Returns:
-          A sequence of twitter.User instances, one for each follower
+          list: A sequence of twitter.user.User instances, one for each
+          member of the twitter.list.List.
         """
         parameters = {}
         url = '%s/lists/members.json' % self.base_url
@@ -3551,7 +3527,8 @@ class Api(object):
         if skip_status:
             parameters['skip_status'] = enf_type('skip_status', bool, skip_status)
         if include_entities:
-            parameters['include_user_entities'] = enf_type('include_user_entities', bool, include_user_entities)
+            parameters['include_entities'] = \
+                enf_type('include_entities', bool, include_entities)
         result = []
 
         while True:
@@ -3578,30 +3555,31 @@ class Api(object):
                           screen_name=None,
                           owner_screen_name=None,
                           owner_id=None):
-        """Add a new member (or list of members) to a user's list.
-
-        Twitter endpoint: /lists/members/create or /lists/members/create_all
+        """Add a new member (or list of members) to the specified list.
 
         Args:
-          list_id:
-            The numerical id of the list. [Optional]
-          slug:
-            You can identify a list by its slug instead of its numerical id. If you
-            decide to do so, note that you'll also have to specify the list owner
-            using the owner_id or owner_screen_name parameters. [Optional]
-          user_id:
+          list_id (int, optional):
+            The numerical id of the list.
+          slug (str, optional):
+            You can identify a list by its slug instead of its numerical id.
+            If you decide to do so, note that you'll also have to specify the
+            list owner using the owner_id or owner_screen_name parameters.
+          user_id (int, optional):
             The user_id or a list of user_id's to add to the list.
-            If not given, then screen_name is required. [Optional]
-          screen_name:
+            If not given, then screen_name is required.
+          screen_name (str, optional):
             The screen_name or a list of screen_name's to add to the list.
-            If not given, then user_id is required. [Optional]
-          owner_screen_name:
-            The screen_name of the user who owns the list being requested by a slug.
-          owner_id:
-            The user ID of the user who owns the list being requested by a slug.
+            If not given, then user_id is required.
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested by
+            a slug.
+          owner_id (int, optional):
+            The user ID of the user who owns the list being requested by
+            a slug.
 
         Returns:
-          A twitter.List instance representing the list subscribed to
+          twitter.list.List: A twitter.List instance representing the list
+          subscribed to.
         """
         is_list = False
         data = {}
@@ -3656,28 +3634,28 @@ class Api(object):
                            screen_name=None):
         """Destroys the subscription to a list for the authenticated user.
 
-        Twitter endpoint: /lists/subscribers/destroy
-
         Args:
-          list_id:
+          list_id (int, optional):
             The numerical id of the list.
-          slug:
+          slug (str, optional):
             You can identify a list by its slug instead of its numerical id.
             If you decide to do so, note that you'll also have to specify
             the list owner using the owner_id or owner_screen_name parameters.
-          owner_screen_name:
-            The screen_name of the user who owns the list being requested by a slug.
-          owner_id:
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested by a
+            slug.
+          owner_id (int, optional):
             The user ID of the user who owns the list being requested by a slug.
-          user_id:
+          user_id (int, optional):
             The user_id or a list of user_id's to add to the list.
             If not given, then screen_name is required.
-          screen_name:
+          screen_name (str, optional):
             The screen_name or a list of Screen_name's to add to the list.
             If not given, then user_id is required.
 
         Returns:
-          A twitter.List instance representing the removed list.
+          twitter.list.List: A twitter.List instance representing the
+          removed list.
         """
         is_list = False
         data = {}
@@ -3704,7 +3682,8 @@ class Api(object):
         if user_id:
             if isinstance(user_id, list) or isinstance(user_id, tuple):
                 is_list = True
-                data['user_id'] = ','.join([enf_type('user_id', int, uid) for uid in user_id])
+                uids = [str(enf_type('user_id', int, uid)) for uid in user_id]
+                data['user_id'] = ','.join(uids)
             else:
                 data['user_id'] = int(user_id)
         elif screen_name:
@@ -3734,22 +3713,23 @@ class Api(object):
         authenticated user.
 
         Args:
-          user_id:
-            The ID of the user for whom to return results for. [Optional]
-          screen_name:
+          user_id (int, optional):
+            The ID of the user for whom to return results for.
+          screen_name (str, optional):
             The screen name of the user for whom to return results
-            for. [Optional]
-          count:
+            for.
+          count (int, optional):
             The amount of results to return per page. No more than 1000 results
-            will ever be returned in a single page. Defaults to 20. [Optional]
-          cursor:
+            will ever be returned in a single page. Defaults to 20.
+          cursor (int, optional):
             The "page" value that Twitter will use to start building the list
             sequence from. Use the value of -1 to start at the beginning.
             Twitter will return in the result the values for next_cursor and
-            previous_cursor. [Optional]
+            previous_cursor.
 
         Returns:
-          A sequence of twitter.List instances, one for each list
+          next_cursor (int), previous_cursor (int), list of twitter.List
+          instances, one for each list
         """
         url = '%s/lists/ownerships.json' % self.base_url
         parameters = {}
