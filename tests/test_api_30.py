@@ -899,3 +899,91 @@ class ApiTest(unittest.TestCase):
             self.api.UpdateBanner(image='testdata/168NQ.jpg')
         except twitter.TwitterError as e:
             self.assertTrue("Image data could not be processed" in str(e))
+
+    @responses.activate
+    def testGetMemberships(self):
+        with open('testdata/get_memberships.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/memberships.json?filter_to_owned_lists=False&cursor=-1&count=20',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetMemberships()
+        self.assertTrue(type(resp) is list)
+        self.assertTrue([type(lst) is twitter.List for lst in resp])
+        self.assertEqual(resp[0].id, 210635540)
+
+    @responses.activate
+    def testGetListsList(self):
+        with open('testdata/get_lists_list.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/list.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetListsList()
+        self.assertTrue(type(resp) is list)
+        self.assertTrue([type(lst) is twitter.List for lst in resp])
+        self.assertEqual(resp[0].id, 189643778)
+
+        with open('testdata/get_lists_list_screen_name.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/list.json?screen_name=inky',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetListsList(screen_name='inky')
+        self.assertTrue(type(resp) is list)
+        self.assertTrue([type(lst) is twitter.List for lst in resp])
+        self.assertEqual(resp[0].id, 224581495)
+
+        with open('testdata/get_lists_list_user_id.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/list.json?user_id=13148',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetListsList(user_id=13148)
+        self.assertTrue(type(resp) is list)
+        self.assertTrue([type(lst) is twitter.List for lst in resp])
+        self.assertEqual(resp[0].id, 224581495)
+
+    @responses.activate
+    def testGetLists(self):
+        with open('testdata/get_lists.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/ownerships.json?cursor=-1',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetLists()
+        self.assertTrue(resp)
+        lst = resp[0]
+        self.assertEqual(lst.id, 229581524)
+        self.assertTrue(type(lst), twitter.List)
+        self.assertEqual(lst.full_name, "@notinourselves/test")
+        self.assertEqual(lst.slug, "test")
+
+    @responses.activate
+    def testGetListMembers(self):
+        with open('testdata/get_list_members.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/members.json?cursor=-1&list_id=189643778',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetListMembers(list_id=189643778)
+        self.assertTrue(type(resp[0]) is twitter.User)
+        self.assertEqual(resp[0].id, 4040207472)
