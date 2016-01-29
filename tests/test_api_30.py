@@ -987,3 +987,58 @@ class ApiTest(unittest.TestCase):
         resp = self.api.GetListMembers(list_id=189643778)
         self.assertTrue(type(resp[0]) is twitter.User)
         self.assertEqual(resp[0].id, 4040207472)
+
+    @responses.activate
+    def testGetListTimeline(self):
+        with open('testdata/get_list_timeline.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/statuses.json?&list_id=229581524',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetListTimeline(list_id=229581524)
+        self.assertTrue(type(resp[0]) is twitter.Status)
+
+        with open('testdata/get_list_timeline_max_since.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/statuses.json?since_id=692829211019575296&owner_screen_name=notinourselves&slug=test&max_id=692980243339071488',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetListTimeline(slug='test',
+                                        owner_screen_name='notinourselves',
+                                        max_id=692980243339071488,
+                                        since_id=692829211019575296)
+        self.assertTrue([isinstance(s, twitter.Status) for s in resp])
+        self.assertEqual(len(resp), 7)
+        self.assertTrue([s.id >= 692829211019575296 for s in resp])
+        self.assertTrue([s.id <= 692980243339071488 for s in resp])
+
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.GetListTimeline(slug='test'))
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.GetListTimeline())
+
+        # 4012966701
+        with open('testdata/get_list_timeline_count_rts_ent.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/statuses.json?count=13&slug=test&owner_id=4012966701&include_rts=False&include_entities=False',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetListTimeline(slug='test',
+                                        owner_id=4012966701,
+                                        count=13,
+                                        include_entities=False,
+                                        include_rts=False)
+        self.assertEqual(len(resp), 13)
+        # TODO: test the other exclusions, but my bots don't retweet and
+        # twitter.status.Status doesn't include entities node?
