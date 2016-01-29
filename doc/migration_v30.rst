@@ -1,7 +1,6 @@
 Migration from v2 to v3
 -----------------------
 
-
 Changes to Existing Methods
 ===========================
 
@@ -16,6 +15,11 @@ Changes to Existing Methods
 * Method now takes an optional parameter of ``total_count``, which limits the number of users to return. If this is not set, the data returned will be all users following the specified user.
 * The kwarg ``include_user_entities`` now defaults to ``True``. This was set to ``False`` previously, but would not be included in query parameters sent to Twitter. Without the query parameter in the URL, Twitter would default to returning user_entities, so this change makes this behavior explicit.
 
+:py:func:`twitter.api.Api.GetFollowersPaged`
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* The third value of the tuple returned by this method is now a list of twitter.User objects in accordance with its doc string rather than the raw data from API.
+* The kwarg ``include_user_entities`` now defaults to ``True``. This was set to ``False`` previously, but would not be included in query parameters sent to Twitter. Without the query parameter in the URL, Twitter would default to returning user_entities, so this change makes this behavior explicit and consistent with the previously ambiguous behavior.
+
 :py:func:`twitter.api.Api.GetFriends`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * Method no longer honors a ``count`` or ``cursor`` parameter. These have been deprecated in favor of making this method explicitly a convenience function to return a list of every ``twitter.User`` who is followed by the specified or authenticated user. A warning will be raised if ``count`` or ``cursor`` is passed with the expectation that breaking behavior will be introduced in a later version.
@@ -26,11 +30,6 @@ Changes to Existing Methods
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * The third value of the tuple returned by this method is now a list of twitter.User objects in accordance with its doc string rather than the raw data from API.
 * The kwarg ``include_user_entities`` now defaults to ``True``. This was set to ``False`` previously, but would not be included in query parameters sent to Twitter. Without the query parameter in the URL, Twitter would default to returning user_entities, so this change makes this behavior explicit.
-
-:py:func:`twitter.api.Api.GetFollowersPaged`
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-* The third value of the tuple returned by this method is now a list of twitter.User objects in accordance with its doc string rather than the raw data from API.
-* The kwarg ``include_user_entities`` now defaults to ``True``. This was set to ``False`` previously, but would not be included in query parameters sent to Twitter. Without the query parameter in the URL, Twitter would default to returning user_entities, so this change makes this behavior explicit and consistent with the previously ambiguous behavior.
 
 :py:func:`twitter.api.Api.GetSearch`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -61,7 +60,6 @@ Deprecation
 
 New Methods
 ===========
-
 
 :py:func:`twitter.api.Api.GetBlocksIDs`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
