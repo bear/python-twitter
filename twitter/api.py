@@ -2964,6 +2964,28 @@ class Api(object):
 
         return [Status.NewFromJsonDict(x) for x in data]
 
+    @staticmethod
+    def _IDList(list_id, slug, owner_id, owner_screen_name):
+        parameters = {}
+        if list_id is not None:
+            parameters['list_id'] = enf_type('list_id', int, list_id)
+        elif slug is not None:
+            parameters['slug'] = slug
+            if owner_id is not None:
+                parameters['owner_id'] = enf_type('owner_id', int, owner_id)
+            elif owner_screen_name is not None:
+                parameters['owner_screen_name'] = owner_screen_name
+            else:
+                raise TwitterError({'message': (
+                    'If specifying a list by slug, an owner_id or '
+                    'owner_screen_name must also be given.')})
+        else:
+            raise TwitterError({'message': (
+                'Either list_id or slug and one of owner_id and '
+                'owner_screen_name must be passed.')})
+
+        return parameters
+
     def CreateList(self, name, mode=None, description=None):
         """Creates a new list with the give name for the authenticated user.
 
@@ -3018,24 +3040,11 @@ class Api(object):
         """
         url = '%s/lists/destroy.json' % self.base_url
         parameters = {}
-        if list_id is not None:
-            parameters['list_id'] = enf_type('list_id', int, list_id)
-        elif slug is not None:
-            parameters['slug'] = slug
-            if owner_id is not None:
-                parameters['owner_id'] = enf_type('owner_id', int, owner_id)
-            elif owner_screen_name is not None:
-                parameters['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': (
-                    'If specifying a list by slug, an owner_id or '
-                    'owner_screen_name must also be given.')
-                })
-        else:
-            raise TwitterError({'message': (
-                'Either list_id or slug and one of owner_id and '
-                'owner_screen_name must be passed.')
-            })
+
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
 
         resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -3067,28 +3076,15 @@ class Api(object):
         Returns:
           twitter.user.User: A twitter.User instance representing the user subscribed
         """
-        url = '%s/lists/subscribers/create.json' % (self.base_url)
-        data = {}
-        if list_id:
-            try:
-                data['list_id'] = int(list_id)
-            except ValueError:
-                raise TwitterError({'message': "list_id must be an integer"})
-        elif slug:
-            data['slug'] = slug
-            if owner_id:
-                try:
-                    data['owner_id'] = int(owner_id)
-                except ValueError:
-                    raise TwitterError({'message': "owner_id must be an integer"})
-            elif owner_screen_name:
-                data['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
-        else:
-            raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+        url = '%s/lists/subscribers/create.json' % self.base_url
+        parameters = {}
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
+
+        resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
@@ -3120,27 +3116,14 @@ class Api(object):
           the removed list.
         """
         url = '%s/lists/subscribers/destroy.json' % (self.base_url)
-        data = {}
-        if list_id:
-            try:
-                data['list_id'] = int(list_id)
-            except ValueError:
-                raise TwitterError({'message': "list_id must be an integer"})
-        elif slug:
-            data['slug'] = slug
-            if owner_id:
-                try:
-                    data['owner_id'] = int(owner_id)
-                except ValueError:
-                    raise TwitterError({'message': "owner_id must be an integer"})
-            elif owner_screen_name:
-                data['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
-        else:
-            raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+        parameters = {}
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
+
+        resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
@@ -3189,38 +3172,26 @@ class Api(object):
           requested.
         """
         url = '%s/lists/subscribers/show.json' % (self.base_url)
-        data = {}
-        if list_id:
-            try:
-                data['list_id'] = int(list_id)
-            except ValueError:
-                raise TwitterError({'message': "list_id must be an integer"})
-        elif slug:
-            data['slug'] = slug
-            if owner_id:
-                try:
-                    data['owner_id'] = int(owner_id)
-                except ValueError:
-                    raise TwitterError({'message': "owner_id must be an integer"})
-            elif owner_screen_name:
-                data['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
-        else:
-            raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+        parameters = {}
+
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
+
         if user_id:
             try:
-                data['user_id'] = int(user_id)
+                parameters['user_id'] = int(user_id)
             except ValueError:
                 raise TwitterError({'message': "user_id must be an integer"})
         elif screen_name:
-            data['screen_name'] = screen_name
+            parameters['screen_name'] = screen_name
         if skip_status:
-            data['skip_status'] = True
+            parameters['skip_status'] = True
         if include_entities:
-            data['include_entities'] = True
+            parameters['include_entities'] = True
 
-        resp = self._RequestUrl(url, 'GET', data=data)
+        resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
@@ -3428,27 +3399,13 @@ class Api(object):
           list: A list of twitter.status.Status instances, one for each
           message up to count.
         """
-        parameters = {}
         url = '%s/lists/statuses.json' % self.base_url
+        parameters = {}
 
-        if list_id is not None:
-            parameters['list_id'] = enf_type('list_id', int, list_id)
-        elif slug is not None:
-            parameters['slug'] = slug
-            if owner_id is not None:
-                parameters['owner_id'] = enf_type('owner_id', int, owner_id)
-            elif owner_screen_name is not None:
-                parameters['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': (
-                    'If specifying a list by slug, an owner_id or '
-                    'owner_screen_name must also be given.')
-                })
-        else:
-            raise TwitterError({'message': (
-                'Either list_id or slug and one of owner_id and '
-                'owner_screen_name must be passed.')
-            })
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
 
         if since_id:
             parameters['since_id'] = enf_type('since_id', int, since_id)
@@ -3506,27 +3463,13 @@ class Api(object):
           list: A sequence of twitter.user.User instances, one for each
           member of the twitter.list.List.
         """
-        parameters = {}
         url = '%s/lists/members.json' % self.base_url
+        parameters = {}
 
-        if list_id is not None:
-            parameters['list_id'] = enf_type('list_id', int, list_id)
-        elif slug is not None:
-            parameters['slug'] = slug
-            if owner_id is not None:
-                parameters['owner_id'] = enf_type('owner_id', int, owner_id)
-            elif owner_screen_name is not None:
-                parameters['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': (
-                    'If specifying a list by slug, an owner_id or '
-                    'owner_screen_name must also be given.')
-                })
-        else:
-            raise TwitterError({'message': (
-                'Either list_id or slug and one of owner_id and '
-                'owner_screen_name must be passed.')
-            })
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
 
         if cursor:
             parameters['cursor'] = enf_type('cursor', int, cursor)
@@ -3634,46 +3577,33 @@ class Api(object):
           subscribed to.
         """
         is_list = False
-        data = {}
-        if list_id:
-            data['list_id'] = enf_type('list_id', int, list_id)
-        elif slug:
-            data['slug'] = slug
-            if owner_id:
-                data['owner_id'] = enf_type('owner_id', int, owner_id)
-            elif owner_screen_name:
-                data['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': (
-                    'If specifying a list by slug, an owner_id or '
-                    'owner_screen_name must also be given.')
-                })
-        else:
-            raise TwitterError({'message': (
-                'Either list_id or slug and one of owner_id and '
-                'owner_screen_name must be passed.')
-            })
+        parameters = {}
+
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
 
         if user_id:
             if isinstance(user_id, list) or isinstance(user_id, tuple):
                 is_list = True
                 uids = [str(enf_type('user_id', int, uid)) for uid in user_id]
-                data['user_id'] = ','.join(uids)
+                parameters['user_id'] = ','.join(uids)
             else:
-                data['user_id'] = enf_type('user_id', int, user_id)
+                parameters['user_id'] = enf_type('user_id', int, user_id)
 
         elif screen_name:
             if isinstance(screen_name, list) or isinstance(screen_name, tuple):
                 is_list = True
-                data['screen_name'] = ','.join(screen_name)
+                parameters['screen_name'] = ','.join(screen_name)
             else:
-                data['screen_name'] = screen_name
+                parameters['screen_name'] = screen_name
         if is_list:
             url = '%s/lists/members/create_all.json' % self.base_url
         else:
             url = '%s/lists/members/create.json' % self.base_url
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
@@ -3712,47 +3642,33 @@ class Api(object):
           removed list.
         """
         is_list = False
-        data = {}
+        parameters = {}
 
-        if list_id:
-            data['list_id'] = enf_type('list_id', list, list_id)
-        elif slug:
-            data['slug'] = slug
-            if owner_id:
-                data['owner_id'] = enf_type('owner_id', int, owner_id)
-            elif owner_screen_name:
-                data['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': (
-                    'If specifying a list by slug, an owner_id or '
-                    'owner_screen_name must also be given.')
-                })
-        else:
-            raise TwitterError({'message': (
-                'Either list_id or slug and one of owner_id and '
-                'owner_screen_name must be passed.')
-            })
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
 
         if user_id:
             if isinstance(user_id, list) or isinstance(user_id, tuple):
                 is_list = True
                 uids = [str(enf_type('user_id', int, uid)) for uid in user_id]
-                data['user_id'] = ','.join(uids)
+                parameters['user_id'] = ','.join(uids)
             else:
-                data['user_id'] = int(user_id)
+                parameters['user_id'] = int(user_id)
         elif screen_name:
             if isinstance(screen_name, list) or isinstance(screen_name, tuple):
                 is_list = True
-                data['screen_name'] = ','.join(screen_name)
+                parameters['screen_name'] = ','.join(screen_name)
             else:
-                data['screen_name'] = screen_name
+                parameters['screen_name'] = screen_name
 
         if is_list:
             url = '%s/lists/members/destroy_all.json' % self.base_url
         else:
             url = '%s/lists/members/destroy.json' % self.base_url
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
