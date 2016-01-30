@@ -2990,7 +2990,6 @@ class Api(object):
 
         return List.NewFromJsonDict(data)
 
-    # TODO: test.
     def DestroyList(self,
                     owner_screen_name=False,
                     owner_id=False,
@@ -3018,27 +3017,27 @@ class Api(object):
           removed list.
         """
         url = '%s/lists/destroy.json' % self.base_url
-        data = {}
-        if list_id:
-            try:
-                data['list_id'] = int(list_id)
-            except ValueError:
-                raise TwitterError({'message': "list_id must be an integer"})
-        elif slug:
-            data['slug'] = slug
-            if owner_id:
-                try:
-                    data['owner_id'] = int(owner_id)
-                except ValueError:
-                    raise TwitterError({'message': "owner_id must be an integer"})
-            elif owner_screen_name:
-                data['owner_screen_name'] = owner_screen_name
+        parameters = {}
+        if list_id is not None:
+            parameters['list_id'] = enf_type('list_id', int, list_id)
+        elif slug is not None:
+            parameters['slug'] = slug
+            if owner_id is not None:
+                parameters['owner_id'] = enf_type('owner_id', int, owner_id)
+            elif owner_screen_name is not None:
+                parameters['owner_screen_name'] = owner_screen_name
             else:
-                raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+                raise TwitterError({'message': (
+                    'If specifying a list by slug, an owner_id or '
+                    'owner_screen_name must also be given.')
+                })
         else:
-            raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+            raise TwitterError({'message': (
+                'Either list_id or slug and one of owner_id and '
+                'owner_screen_name must be passed.')
+            })
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)

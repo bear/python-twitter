@@ -1045,7 +1045,7 @@ class ApiTest(unittest.TestCase):
 
     @responses.activate
     def testCreateList(self):
-        with open('testdata/create_list.json') as f:
+        with open('testdata/post_create_list.json') as f:
             resp_data = f.read()
         responses.add(
             responses.POST,
@@ -1060,3 +1060,17 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(resp.id, 233452137)
         self.assertEqual(resp.description, 'test for python-twitter')
         self.assertEqual(resp.mode, 'private')
+
+    @responses.activate
+    def testDestroyList(self):
+        with open('testdata/post_destroy_list.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/lists/destroy.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.DestroyList(list_id=233452137)
+        self.assertEqual(resp.id, 233452137)
+        self.assertEqual(resp.member_count, 0)
