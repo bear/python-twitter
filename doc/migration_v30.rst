@@ -31,6 +31,11 @@ Changes to Existing Methods
 * The third value of the tuple returned by this method is now a list of twitter.User objects in accordance with its doc string rather than the raw data from API.
 * The kwarg ``include_user_entities`` now defaults to ``True``. This was set to ``False`` previously, but would not be included in query parameters sent to Twitter. Without the query parameter in the URL, Twitter would default to returning user_entities, so this change makes this behavior explicit.
 
+:py:func:`twitter.api.Api.GetListMembers`
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* No longer accepts ``cursor`` parameter. If you require granular control over the paging of the twitter.list.List members, please user twitter.api.Api.GetListMembersPaged instead.
+
+
 :py:func:`twitter.api.Api.GetSearch`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * Adds ``raw_query`` method. See :ref:`raw_queries` for more information.
@@ -72,6 +77,13 @@ New Methods
 :py:func:`twitter.api.Api.GetBlocksPaged`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * Allows you to page through the currently authenticated user's blocked users. Method returns three values: the next cursor, the previous cursor, and a list of ``twitter.User`` instances representing the blocked users.
+
+:py:func:`twitter.api.Api.GetListMembersPaged`
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* Allows you to page through a the members of a given twitter.list.List.
+* ``cursor`` parameter operates as with other methods, denoting the page of members that you wish to retrieve.
+* Returns ``next_cursor``, ``previous_cursor``, and a list containing the users that are members of the given twitter.list.List.
+
 
 :py:func:`twitter.api.Api.GetListsPaged`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
