@@ -1150,3 +1150,58 @@ class ApiTest(unittest.TestCase):
                                          include_entities=True,
                                          skip_status=True)
         self.assertFalse(resp.status)
+
+    @responses.activate
+    def testGetSubscriptions(self):
+        with open('testdata/get_get_subscriptions.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/subscriptions.json?count=20&cursor=-1',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetSubscriptions()
+        self.assertEqual(len(resp), 1)
+        self.assertEqual(resp[0].name, 'space bots')
+
+    @responses.activate
+    def testGetSubscriptionsSN(self):
+        with open('testdata/get_get_subscriptions_uid.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/subscriptions.json?count=20&cursor=-1&screen_name=inky',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetSubscriptions(screen_name='inky')
+        self.assertEqual(len(resp), 20)
+        self.assertTrue([isinstance(l, twitter.List) for l in resp])
+
+    @responses.activate
+    def testGetMemberships(self):
+        with open('testdata/get_get_memberships.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/memberships.json?count=20&cursor=-1',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetMemberships()
+        self.assertEqual(len(resp), 1)
+        self.assertEqual(resp[0].name, 'my-bots')
+
+        with open('testdata/get_get_memberships_himawari8bot.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/memberships.json?count=20&cursor=-1&screen_name=himawari8bot',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetMemberships(screen_name='himawari8bot')
+        self.assertEqual(len(resp), 20)
+        self.assertTrue([isinstance(lst, twitter.List) for lst in resp])
+

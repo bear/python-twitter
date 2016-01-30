@@ -3189,14 +3189,14 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
-    # TODO: test.
     def GetSubscriptions(self,
                          user_id=None,
                          screen_name=None,
                          count=20,
                          cursor=-1):
         """Obtain a collection of the lists the specified user is
-        subscribed to.
+        subscribed to. If neither user_id or screen_name is specified, the
+        data returned will be for the authenticated user.
 
         The list will contain a maximum of 20 lists per page by default.
 
@@ -3209,43 +3209,32 @@ class Api(object):
             The screen name of the user for whom to return results for.
           count (int, optional):
            The amount of results to return per page.
-           No more than 1000 results will ever be returned in a single page.
-           Defaults to 20. [Optional]
+           No more than 1000 results will ever be returned in a single
+           page. Defaults to 20.
           cursor (int, optional):
             The "page" value that Twitter will use to start building the
-            list sequence from. Use the value of -1 to start at the beginning.
-            Twitter will return in the result the values for next_cursor
-            and previous_cursor.
+            list sequence from. Use the value of -1 to start at the
+            beginning. Twitter will return in the result the values for
+            next_cursor and previous_cursor.
 
         Returns:
-          twitter.list.List: A sequence of twitter.List instances, one for each list
+          twitter.list.List: A sequence of twitter.List instances,
+          one for each list
         """
         url = '%s/lists/subscriptions.json' % (self.base_url)
         parameters = {}
-        try:
-            parameters['cursor'] = int(cursor)
-        except ValueError:
-            raise TwitterError({'message': "cursor must be an integer"})
-        try:
-            parameters['count'] = int(count)
-        except ValueError:
-            raise TwitterError({'message': "count must be an integer"})
+        parameters['cursor'] = enf_type('cursor', int, cursor)
+        parameters['count'] = enf_type('count', int, count)
         if user_id is not None:
-            try:
-                parameters['user_id'] = int(user_id)
-            except ValueError:
-                raise TwitterError({'message': "user_id must be an integer"})
+            parameters['user_id'] = enf_type('user_id', int, user_id)
         elif screen_name is not None:
             parameters['screen_name'] = screen_name
-        else:
-            raise TwitterError({'message': "Specify user_id or screen_name"})
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [List.NewFromJsonDict(x) for x in data['lists']]
 
-    # TODO: test.
     def GetMemberships(self,
                        user_id=None,
                        screen_name=None,
