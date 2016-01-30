@@ -2751,9 +2751,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if len(data) > 1:
-          return map(lambda datum: UserStatus.NewFromJsonDict(datum), data)
+          return [UserStatus.NewFromJsonDict(x) for x in data]
         elif len(data) == 1:
-            return UserStatus.NewFromJsonDict(data[0])
+          return UserStatus.NewFromJsonDict(data[0])
         else:
             return None
 
