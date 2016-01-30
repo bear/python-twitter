@@ -3291,7 +3291,6 @@ class Api(object):
 
         return [List.NewFromJsonDict(x) for x in data['lists']]
 
-    # TODO: test.
     def GetListsList(self,
                      screen_name=None,
                      user_id=None,
@@ -3405,15 +3404,15 @@ class Api(object):
 
         return [Status.NewFromJsonDict(x) for x in data]
 
-    # TODO: test.
     def GetListMembersPaged(self,
                             list_id=None,
                             slug=None,
                             owner_id=None,
                             owner_screen_name=None,
                             cursor=-1,
+                            count=100,
                             skip_status=False,
-                            include_entities=False):
+                            include_entities=True):
         """Fetch the sequence of twitter.User instances, one for each member
         of the given list_id or slug.
 
@@ -3453,12 +3452,13 @@ class Api(object):
                                        owner_id=owner_id,
                                        owner_screen_name=owner_screen_name))
 
+        if count:
+            parameters['count'] = enf_type('count', int, count)
         if cursor:
             parameters['cursor'] = enf_type('cursor', int, cursor)
-        if skip_status:
-            parameters['skip_status'] = enf_type('skip_status', bool, skip_status)
-        if include_entities:
-            parameters['include_entities'] = enf_type('include_entities', bool, include_entities)
+
+        parameters['skip_status'] = enf_type('skip_status', bool, skip_status)
+        parameters['include_entities'] = enf_type('include_entities', bool, include_entities)
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -3468,7 +3468,6 @@ class Api(object):
 
         return next_cursor, previous_cursor, users
 
-    # TODO: test.
     def GetListMembers(self,
                        list_id=None,
                        slug=None,

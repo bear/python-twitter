@@ -976,17 +976,54 @@ class ApiTest(unittest.TestCase):
 
     @responses.activate
     def testGetListMembers(self):
-        with open('testdata/get_list_members.json') as f:
+        with open('testdata/get_list_members_0.json') as f:
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/members.json?cursor=-1&list_id=189643778',
+            'https://api.twitter.com/1.1/lists/members.json?count=100&include_entities=False&skip_status=False&list_id=93527328&cursor=-1',
             body=resp_data,
             match_querystring=True,
             status=200)
-        resp = self.api.GetListMembers(list_id=189643778)
+
+        with open('testdata/get_list_members_1.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/members.json?count=100&include_entities=False&skip_status=False&cursor=4611686020936348428&list_id=93527328',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetListMembers(list_id=93527328)
         self.assertTrue(type(resp[0]) is twitter.User)
-        self.assertEqual(resp[0].id, 4040207472)
+        self.assertEqual(resp[0].id, 4048395140)
+
+    @responses.activate
+    def testGetListMembersPaged(self):
+        with open('testdata/get_list_members_0.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/members.json?count=100&include_entities=True&skip_status=False&cursor=4611686020936348428&list_id=93527328',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetListMembersPaged(list_id=93527328, cursor=4611686020936348428)
+        self.assertTrue([isinstance(u, twitter.User) for u in resp])
+
+        with open('testdata/get_list_members_extra_params.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/members.json?count=100&skip_status=True&include_entities=False&cursor=4611686020936348428&list_id=93527328',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        _, _, resp = self.api.GetListMembersPaged(list_id=93527328,
+                                            cursor=4611686020936348428,
+                                            skip_status=True,
+                                            include_entities=False,
+                                            count=100)
+        self.assertFalse(resp[0].status) 
 
     @responses.activate
     def testGetListTimeline(self):
@@ -1204,4 +1241,3 @@ class ApiTest(unittest.TestCase):
         resp = self.api.GetMemberships(screen_name='himawari8bot')
         self.assertEqual(len(resp), 20)
         self.assertTrue([isinstance(lst, twitter.List) for lst in resp])
-
