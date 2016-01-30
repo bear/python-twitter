@@ -1023,7 +1023,7 @@ class ApiTest(unittest.TestCase):
                                             skip_status=True,
                                             include_entities=False,
                                             count=100)
-        self.assertFalse(resp[0].status) 
+        self.assertFalse(resp[0].status)
 
     @responses.activate
     def testGetListTimeline(self):
@@ -1241,3 +1241,65 @@ class ApiTest(unittest.TestCase):
         resp = self.api.GetMemberships(screen_name='himawari8bot')
         self.assertEqual(len(resp), 20)
         self.assertTrue([isinstance(lst, twitter.List) for lst in resp])
+
+    @responses.activate
+    def testCreateListsMember(self):
+        with open('testdata/post_create_lists_member.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/lists/members/create.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.CreateListsMember(list_id=229581524, user_id=372018022)
+        self.assertTrue(isinstance(resp, twitter.List))
+        self.assertEqual(resp.name, 'test')
+        self.assertEqual(resp.member_count, 2)
+
+    @responses.activate
+    def testCreateListsMemberMultiple(self):
+        with open('testdata/post_create_lists_member_multiple.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/lists/members/create_all.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.CreateListsMember(list_id=229581524,
+                                          user_id=[372018022, 4040207472])
+        self.assertTrue(isinstance(resp, twitter.List))
+        self.assertEqual(resp.name, 'test')
+        self.assertEqual(resp.member_count, 3)
+
+    @responses.activate
+    def testDestroyListsMember(self):
+        with open('testdata/post_destroy_lists_member.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/lists/members/destroy.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.DestroyListsMember(list_id=229581524, user_id=372018022)
+        self.assertTrue(isinstance(resp, twitter.List))
+        self.assertEqual(resp.name, 'test')
+        self.assertEqual(resp.member_count, 1)
+
+    @responses.activate
+    def testDestroyListsMemberMultiple(self):
+        with open('testdata/post_destroy_lists_member_multiple.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/lists/members/destroy_all.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.DestroyListsMember(list_id=229581524,
+                                           user_id=[372018022, 4040207472])
+        self.assertEqual(resp.member_count, 0)
+        self.assertEqual(resp.name, 'test')
+        self.assertTrue(isinstance(resp, twitter.List))

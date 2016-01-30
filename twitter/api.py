@@ -3523,7 +3523,6 @@ class Api(object):
 
         return result
 
-    # TODO: test.
     def CreateListsMember(self,
                           list_id=None,
                           slug=None,
@@ -3589,7 +3588,6 @@ class Api(object):
 
         return List.NewFromJsonDict(data)
 
-    # TODO: test.
     def DestroyListsMember(self,
                            list_id=None,
                            slug=None,
@@ -3654,7 +3652,6 @@ class Api(object):
 
         return List.NewFromJsonDict(data)
 
-    # TODO: test.
     def GetListsPaged(self,
                       user_id=None,
                       screen_name=None,
@@ -3704,7 +3701,6 @@ class Api(object):
 
         return next_cursor, previous_cursor, lists
 
-    # TODO: test.
     def GetLists(self,
                  user_id=None,
                  screen_name=None):
