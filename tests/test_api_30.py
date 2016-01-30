@@ -1088,3 +1088,17 @@ class ApiTest(unittest.TestCase):
         resp = self.api.CreateSubscription(list_id=225486809)
         self.assertEqual(resp.id, 225486809)
         self.assertEqual(resp.name, 'my-bots')
+
+    @responses.activate
+    def testDestroySubscription(self):
+        with open('testdata/post_destroy_subscription.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/lists/subscribers/destroy.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.DestroySubscription(list_id=225486809)
+        self.assertEqual(resp.id, 225486809)
+        self.assertEqual(resp.name, 'my-bots')
