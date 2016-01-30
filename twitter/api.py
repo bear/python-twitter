@@ -2990,6 +2990,7 @@ class Api(object):
 
         return List.NewFromJsonDict(data)
 
+    # TODO: test.
     def DestroyList(self,
                     owner_screen_name=False,
                     owner_id=False,
@@ -3042,6 +3043,7 @@ class Api(object):
 
         return List.NewFromJsonDict(data)
 
+    # TODO: test.
     def CreateSubscription(self,
                            owner_screen_name=False,
                            owner_id=False,
@@ -3092,6 +3094,7 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
+    # TODO: test.
     def DestroySubscription(self,
                             owner_screen_name=False,
                             owner_id=False,
@@ -3143,6 +3146,7 @@ class Api(object):
 
         return List.NewFromJsonDict(data)
 
+    # TODO: test.
     def ShowSubscription(self,
                          owner_screen_name=False,
                          owner_id=False,
@@ -3222,6 +3226,7 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
+    # TODO: test.
     def GetSubscriptions(self,
                          user_id=None,
                          screen_name=None,
@@ -3277,6 +3282,7 @@ class Api(object):
 
         return [List.NewFromJsonDict(x) for x in data['lists']]
 
+    # TODO: test.
     def GetMemberships(self,
                        user_id=None,
                        screen_name=None,
@@ -3333,6 +3339,7 @@ class Api(object):
 
         return [List.NewFromJsonDict(x) for x in data['lists']]
 
+    # TODO: test.
     def GetListsList(self,
                      screen_name=None,
                      user_id=None,
@@ -3460,15 +3467,15 @@ class Api(object):
 
         return [Status.NewFromJsonDict(x) for x in data]
 
-    # TODO: Paging?
-    def GetListMembers(self,
-                       list_id=None,
-                       slug=None,
-                       owner_id=None,
-                       owner_screen_name=None,
-                       cursor=-1,
-                       skip_status=False,
-                       include_entities=False):
+    # TODO: test.
+    def GetListMembersPaged(self,
+                            list_id=None,
+                            slug=None,
+                            owner_id=None,
+                            owner_screen_name=None,
+                            cursor=-1,
+                            skip_status=False,
+                            include_entities=False):
         """Fetch the sequence of twitter.User instances, one for each member
         of the given list_id or slug.
 
@@ -3527,27 +3534,73 @@ class Api(object):
         if skip_status:
             parameters['skip_status'] = enf_type('skip_status', bool, skip_status)
         if include_entities:
-            parameters['include_entities'] = \
-                enf_type('include_entities', bool, include_entities)
-        result = []
+            parameters['include_entities'] = enf_type('include_entities', bool, include_entities)
 
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        next_cursor = data.get('next_cursor', 0)
+        previous_cursor = data.get('previous_cursor', 0)
+        users = [User.NewFromJsonDict(user) for user in data.get('users', [])]
+
+        return next_cursor, previous_cursor, users
+
+    # TODO: test.
+    def GetListMembers(self,
+                       list_id=None,
+                       slug=None,
+                       owner_id=None,
+                       owner_screen_name=None,
+                       skip_status=False,
+                       include_entities=False):
+        """Fetch the sequence of twitter.User instances, one for each member
+        of the given list_id or slug.
+
+        Args:
+          list_id (int, optional):
+            Specifies the ID of the list to retrieve.
+          slug (str, optional):
+            The slug name for the list to retrieve. If you specify None for the
+            list_id, then you have to provide either a owner_screen_name or
+            owner_id.
+          owner_id (int, optional):
+            Specifies the ID of the user for whom to return the
+            list timeline. Helpful for disambiguating when a valid user ID
+            is also a valid screen name.
+          owner_screen_name (str, optional):
+            Specifies the screen name of the user for whom to return the
+            user_timeline. Helpful for disambiguating when a valid screen
+            name is also a user ID.
+          skip_status (bool, optional):
+            If True the statuses will not be returned in the user items.
+          include_entities (bool, optional):
+            If False, the timeline will not contain additional metadata.
+            Defaults to True.
+
+        Returns:
+          list: A sequence of twitter.user.User instances, one for each
+          member of the twitter.list.List.
+        """
+        cursor = -1
+        result = []
         while True:
-            parameters['cursor'] = cursor
-            resp = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-            result += [User.NewFromJsonDict(x) for x in data['users']]
-            if 'next_cursor' in data:
-                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
-                    break
-                else:
-                    cursor = data['next_cursor']
-            else:
+            next_cursor, previous_cursor, users = self.GetListMembersPaged(
+                list_id=list_id,
+                slug=slug,
+                owner_id=owner_id,
+                owner_screen_name=owner_screen_name,
+                cursor=cursor,
+                skip_status=skip_status,
+                include_entities=include_entities)
+            result += users
+
+            if next_cursor == 0 or next_cursor == previous_cursor:
                 break
-            sec = self.GetSleepTime('/followers/list')
-            time.sleep(sec)
+            else:
+                cursor = next_cursor
 
         return result
 
+    # TODO: test.
     def CreateListsMember(self,
                           list_id=None,
                           slug=None,
@@ -3605,7 +3658,8 @@ class Api(object):
         if user_id:
             if isinstance(user_id, list) or isinstance(user_id, tuple):
                 is_list = True
-                data['user_id'] = ','.join([enf_type('user_id', int, uid) for uid in user_id])
+                uids = [str(enf_type('user_id', int, uid)) for uid in user_id]
+                data['user_id'] = ','.join(uids)
             else:
                 data['user_id'] = enf_type('user_id', int, user_id)
 
@@ -3625,6 +3679,7 @@ class Api(object):
 
         return List.NewFromJsonDict(data)
 
+    # TODO: test.
     def DestroyListsMember(self,
                            list_id=None,
                            slug=None,
@@ -3703,6 +3758,7 @@ class Api(object):
 
         return List.NewFromJsonDict(data)
 
+    # TODO: test.
     def GetListsPaged(self,
                       user_id=None,
                       screen_name=None,
@@ -3752,6 +3808,7 @@ class Api(object):
 
         return next_cursor, previous_cursor, lists
 
+    # TODO: test.
     def GetLists(self,
                  user_id=None,
                  screen_name=None):
