@@ -1042,3 +1042,21 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(len(resp), 13)
         # TODO: test the other exclusions, but my bots don't retweet and
         # twitter.status.Status doesn't include entities node?
+
+    @responses.activate
+    def testCreateList(self):
+        with open('testdata/create_list.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/lists/create.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.CreateList(
+            name='test2',
+            mode='private',
+            description='test for python-twitter')
+        self.assertEqual(resp.id, 233452137)
+        self.assertEqual(resp.description, 'test for python-twitter')
+        self.assertEqual(resp.mode, 'private')
