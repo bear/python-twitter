@@ -1194,8 +1194,7 @@ class Api(object):
             "PostUpdate() instead. Details of Twitter's deprecation can be "
             "found at: "
             "dev.twitter.com/rest/reference/post/statuses/update_with_media"),
-            DeprecationWarning
-        )
+            DeprecationWarning)
 
         url = '%s/statuses/update_with_media.json' % self.base_url
 
@@ -3051,7 +3050,6 @@ class Api(object):
 
         return List.NewFromJsonDict(data)
 
-    # TODO: test.
     def CreateSubscription(self,
                            owner_screen_name=False,
                            owner_id=False,
@@ -3089,7 +3087,6 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
-    # TODO: test.
     def DestroySubscription(self,
                             owner_screen_name=False,
                             owner_id=False,
@@ -3128,7 +3125,6 @@ class Api(object):
 
         return List.NewFromJsonDict(data)
 
-    # TODO: test.
     def ShowSubscription(self,
                          owner_screen_name=False,
                          owner_id=False,
@@ -3180,10 +3176,7 @@ class Api(object):
                                        owner_screen_name=owner_screen_name))
 
         if user_id:
-            try:
-                parameters['user_id'] = int(user_id)
-            except ValueError:
-                raise TwitterError({'message': "user_id must be an integer"})
+            parameters['user_id'] = enf_type('user_id', int, user_id)
         elif screen_name:
             parameters['screen_name'] = screen_name
         if skip_status:

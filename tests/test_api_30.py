@@ -1102,3 +1102,51 @@ class ApiTest(unittest.TestCase):
         resp = self.api.DestroySubscription(list_id=225486809)
         self.assertEqual(resp.id, 225486809)
         self.assertEqual(resp.name, 'my-bots')
+
+    @responses.activate
+    def testShowSubscription(self):
+        # User not a subscriber to the list.
+        with open('testdata/get_show_subscription_not_subscriber.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/subscribers/show.json?user_id=4040207472&list_id=189643778',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        try:
+            self.api.ShowSubscription(list_id=189643778, user_id=4040207472)
+        except twitter.TwitterError as e:
+            self.assertIn(
+                "The specified user is not a subscriber of this list.",
+                str(e.message))
+
+        # User is a subscriber to list
+        with open('testdata/get_show_subscription.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/subscribers/show.json?list_id=189643778&screen_name=__jcbl__',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.ShowSubscription(list_id=189643778,
+                                         screen_name='__jcbl__')
+        self.assertEqual(resp.id, 372018022)
+        self.assertEqual(resp.screen_name, '__jcbl__')
+        self.assertTrue(resp.status)
+
+        # User is subscriber, using extra params
+        with open('testdata/get_show_subscription_extra_params.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/lists/subscribers/show.json?include_entities=True&list_id=18964377&skip_status=True&screen_name=__jcbl__',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.ShowSubscription(list_id=18964377,
+                                         screen_name='__jcbl__',
+                                         include_entities=True,
+                                         skip_status=True)
+        self.assertFalse(resp.status)
