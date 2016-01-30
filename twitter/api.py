@@ -2726,15 +2726,27 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
-    def LookupFriendship(self, user_id=None, screen_name=None):
-        """Lookup friendship status for user specified by user_id or screen_name.
+    def LookupFriendship(self, 
+            user_id=None, 
+            screen_name=None,
+            users=None):
+        """Lookup friendship status for user to authed user.
+        
+        Users may be specified either as lists of either user_ids,
+        screen_names, or twitter.User objects. The list of users that
+        are queried is the union of all specified parameters.
+        
+        Up to 100 users may be specified.
         
         Args:
           user_id:
             A list of user_ids to retrieve extended information. [Optional]
           screen_name:
             A list of screen_names to retrieve extended information. [Optional]
-
+          users:
+            A list of twitter.User objects to retrieve extended information.
+            [Optional]
+            
         Returns:
           A twitter.UserStatus instance representing the friendship status
         """
@@ -2745,6 +2757,8 @@ class Api(object):
         uids = list()
         if user_id:
             uids.extend(user_id)
+        if users:
+            uids.extend([u.id for u in users])
         if len(uids):
             data['user_id'] = ','.join(["%s" % u for u in uids])
         if screen_name:
