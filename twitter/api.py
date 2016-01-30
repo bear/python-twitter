@@ -2750,8 +2750,9 @@ class Api(object):
         Returns:
           A twitter.UserStatus instance representing the friendship status
         """
-        if not user_id and not screen_name:
-            raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
+        if not user_id and not screen_name and not users:
+            raise TwitterError({'message': "Specify at least one of user_id, screen_name, users."})
+            
         url = '%s/friendships/lookup.json' % (self.base_url)
         data = {}
         uids = list()
