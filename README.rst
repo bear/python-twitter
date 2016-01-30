@@ -124,7 +124,7 @@ To create an instance of the ``twitter.Api`` with login credentials (Twitter now
 
 To see if your credentials are successful::
 
-    >>> print api.VerifyCredentials()
+    >>> print(api.VerifyCredentials())
     {"id": 16133, "location": "Philadelphia", "name": "bear"}
 
 **NOTE**: much more than the small sample given here will print
@@ -132,17 +132,17 @@ To see if your credentials are successful::
 To fetch a single user's public status messages, where ``user`` is a Twitter *short name*::
 
     >>> statuses = api.GetUserTimeline(screen_name=user)
-    >>> print [s.text for s in statuses]
+    >>> print([s.text for s in statuses])
 
 To fetch a list a user's friends (requires authentication)::
 
     >>> users = api.GetFriends()
-    >>> print [u.name for u in users]
+    >>> print([u.name for u in users])
 
 To post a Twitter status message (requires authentication)::
 
     >>> status = api.PostUpdate('I love python-twitter!')
-    >>> print status.text
+    >>> print(status.text)
     I love python-twitter!
 
 There are many more API methods, to read the full API documentation::
