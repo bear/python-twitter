@@ -2728,14 +2728,12 @@ class Api(object):
 
     def LookupFriendship(self, user_id=None, screen_name=None):
         """Lookup friendship status for user specified by user_id or screen_name.
-
-        Currently only supports one user at a time.
-
+        
         Args:
           user_id:
-            A user_id to lookup [Optional]
+            A user_id to lookup, or a comma-separated string of many user_ids [Optional]
           screen_name:
-            A screen_name to lookup [Optional]
+            A screen_name to lookup, or a comma-separated string of many screen_names [Optional]
 
         Returns:
           A twitter.UserStatus instance representing the friendship status
@@ -2752,7 +2750,9 @@ class Api(object):
         resp = self._RequestUrl(url, 'GET', data=data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        if len(data) >= 1:
+        if len(data) > 1:
+          return map(lambda datum: UserStatus.NewFromJsonDict(datum), data)
+        elif len(data) == 1:
             return UserStatus.NewFromJsonDict(data[0])
         else:
             return None
