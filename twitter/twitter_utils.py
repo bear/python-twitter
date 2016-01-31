@@ -234,3 +234,28 @@ def parse_media_file(passed_media):
         raise TwitterError({'message': 'Media type could not be determined.'})
 
     return data_file, filename, file_size, media_type
+
+
+def enf_type(field, _type, val):
+    """ Checks to see if a given val for a field (i.e., the name of the field)
+    is of the proper _type. If it is not, raises a TwitterError with a brief
+    explanation.
+
+    Args:
+        field:
+            Name of the field you are checking.
+        _type:
+            Type that the value should be returned as.
+        val:
+            Value to convert to _type.
+
+    Returns:
+        val converted to type _type.
+
+    """
+    try:
+        return _type(val)
+    except ValueError:
+        raise TwitterError({
+            'message': '"{0}" must be type {1}'.format(field, _type.__name__)
+        })
