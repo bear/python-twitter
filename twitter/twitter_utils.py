@@ -3,12 +3,11 @@ import mimetypes
 import os
 import re
 
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib import urlopen
+import requests
+from tempfile import NamedTemporaryFile
 
 from twitter import TwitterError
+
 
 TLDS = [
     "ac", "ad", "ae", "af", "ag", "ai", "al", "am", "an", "ao", "aq", "ar",
@@ -178,6 +177,13 @@ def is_url(text):
         return False
 
 
+def http_to_file(http):
+    data_file = NamedTemporaryFile()
+    req = requests.get(http, stream=True)
+    data_file.write(req.raw.data)
+    return data_file
+
+
 def parse_media_file(passed_media):
     """ Parses a media file and attempts to return a file-like object and
     information about the media file.
@@ -201,14 +207,11 @@ def parse_media_file(passed_media):
     #  each case such that data_file ends up with a read() method.
     if not hasattr(passed_media, 'read'):
         if passed_media.startswith('http'):
+            data_file = http_to_file(passed_media)
             filename = os.path.basename(passed_media)
-            data_file = urlopen(passed_media)
-            file_size = data_file.length
         else:
             data_file = open(os.path.realpath(passed_media), 'rb')
             filename = os.path.basename(passed_media)
-            data_file.seek(0, 2)
-            file_size = data_file.tell()
 
     # Otherwise, if a file object was passed in the first place,
     # create the standard reference to media_file (i.e., rename it to fp).
@@ -217,8 +220,9 @@ def parse_media_file(passed_media):
             raise TwitterError({'message': 'File mode must be "rb".'})
         filename = os.path.basename(passed_media.name)
         data_file = passed_media
-        data_file.seek(0, 2)
-        file_size = data_file.tell()
+
+    data_file.seek(0, 2)
+    file_size = data_file.tell()
 
     try:
         data_file.seek(0)
