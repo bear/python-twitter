@@ -1303,3 +1303,50 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(resp.member_count, 0)
         self.assertEqual(resp.name, 'test')
         self.assertTrue(isinstance(resp, twitter.List))
+
+    @responses.activate
+    def testPostUpdateWithMedia(self):
+        # API will first make a POST request to upload the file.
+        with open('testdata/post_upload_media_simple.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://upload.twitter.com/1.1/media/upload.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+
+        # Then the POST request to post a status with the media id attached.
+        with open('testdata/post_update_media_id.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/statuses/update.json?media_ids=697007311538229248',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+
+        # Local file
+        resp = self.api.PostUpdate(media='testdata/168NQ.jpg', status='test')
+        self.assertEqual(697007311538229248, resp.AsDict()['media'][0].id)
+        self.assertEqual(resp.text, "hi this is a test for media uploads with statuses https://t.co/FHgqb6iLOX")
+
+        # File object
+        with open('testdata/168NQ.jpg', 'rb') as f:
+            resp = self.api.PostUpdate(media=[f], status='test')
+        self.assertEqual(697007311538229248, resp.AsDict()['media'][0].id)
+        self.assertEqual(resp.text, "hi this is a test for media uploads with statuses https://t.co/FHgqb6iLOX")
+
+        # Media ID as int
+        resp = self.api.PostUpdate(media=697007311538229248, status='test')
+
+        # Media ID as list of ints
+        resp = self.api.PostUpdate(media=[697007311538229248], status='test')
+        responses.add(
+            responses.POST,
+            "https://api.twitter.com/1.1/statuses/update.json?media_ids=697007311538229248,697007311538229249",
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.PostUpdate(
+            media=[697007311538229248, 697007311538229249], status='test')

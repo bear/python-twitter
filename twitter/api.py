@@ -947,12 +947,23 @@ class Api(object):
         parameters = {'status': u_status}
 
         if media:
-            if type(media) is list and len(media) > 1:
-                media_ids = []
+            media_ids = []
+            if isinstance(media, int):
+                media_ids.append(media)
+
+            elif isinstance(media, list):
                 for media_file in media:
+
+                    # If you want to pass just a media ID, it should be an int
+                    if isinstance(media_file, int):
+                        media_ids.append(media_file)
+                        continue
+
                     _, _, file_size, media_type = parse_media_file(media_file)
                     if media_type == 'image/gif' or media_type == 'video/mp4':
-                        raise TwitterError({'message': 'You cannot post more than 1 GIF or 1 video in a single status.'})
+                        raise TwitterError(
+                            'You cannot post more than 1 GIF or 1 video in a '
+                            'single status.')
                     if file_size > self.chunk_size:
                         media_id = self.UploadMediaChunked(
                             media=media_file,
@@ -971,9 +982,9 @@ class Api(object):
                         media,
                         media_additional_owners)
                 else:
-                    media_ids = self.UploadMediaSimple(
-                        media,
-                        media_additional_owners)
+                    media_ids.append(
+                        self.UploadMediaSimple(media,
+                                               media_additional_owners))
             parameters['media_ids'] = ','.join([str(mid) for mid in media_ids])
 
         if in_reply_to_status_id:
