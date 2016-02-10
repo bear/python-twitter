@@ -2737,33 +2737,51 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
-    def LookupFriendship(self, user_id=None, screen_name=None):
-        """Lookup friendship status for user specified by user_id or screen_name.
-
-        Currently only supports one user at a time.
-
+    def LookupFriendship(self, 
+            user_id=None, 
+            screen_name=None,
+            users=None):
+        """Lookup friendship status for user to authed user.
+        
+        Users may be specified either as lists of either user_ids,
+        screen_names, or twitter.User objects. The list of users that
+        are queried is the union of all specified parameters.
+        
+        Up to 100 users may be specified.
+        
         Args:
           user_id:
-            A user_id to lookup [Optional]
+            A list of user_ids to retrieve extended information. [Optional]
           screen_name:
-            A screen_name to lookup [Optional]
-
+            A list of screen_names to retrieve extended information. [Optional]
+          users:
+            A list of twitter.User objects to retrieve extended information.
+            [Optional]
+            
         Returns:
           A twitter.UserStatus instance representing the friendship status
         """
+        if not user_id and not screen_name and not users:
+            raise TwitterError({'message': "Specify at least one of user_id, screen_name, users."})
+            
         url = '%s/friendships/lookup.json' % (self.base_url)
         data = {}
+        uids = list()
         if user_id:
-            data['user_id'] = user_id
-        elif screen_name:
-            data['screen_name'] = screen_name
-        else:
-            raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
+            uids.extend(user_id)
+        if users:
+            uids.extend([u.id for u in users])
+        if len(uids):
+            data['user_id'] = ','.join(["%s" % u for u in uids])
+        if screen_name:
+            data['screen_name'] = ','.join(screen_name)
 
         resp = self._RequestUrl(url, 'GET', data=data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        if len(data) >= 1:
+        if len(data) > 1:
+            return [UserStatus.NewFromJsonDict(x) for x in data]
+        elif len(data) == 1:
             return UserStatus.NewFromJsonDict(data[0])
         else:
             return None
