@@ -163,6 +163,12 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(status, twitter.Status)
         self.assertTrue(status.geo)
         self.assertEqual(status.geo['type'], 'Point')
+        resp = self.api.GetSearch(
+            term="python",
+            geocode=('37.781157,-122.398720,100mi'))
+        status = resp[0]
+        self.assertTrue(status, twitter.Status)
+        self.assertTrue(status.geo)
 
     @responses.activate
     def testGetUsersSearch(self):
