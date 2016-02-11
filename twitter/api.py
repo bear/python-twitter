@@ -2749,54 +2749,67 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
-    def LookupFriendship(self, 
-            user_id=None, 
-            screen_name=None,
-            users=None):
+    def LookupFriendship(self,
+                         user_id=None,
+                         screen_name=None):
         """Lookup friendship status for user to authed user.
-        
+
         Users may be specified either as lists of either user_ids,
         screen_names, or twitter.User objects. The list of users that
         are queried is the union of all specified parameters.
-        
-        Up to 100 users may be specified.
-        
-        Args:
-          user_id:
-            A list of user_ids to retrieve extended information. [Optional]
-          screen_name:
-            A list of screen_names to retrieve extended information. [Optional]
-          users:
-            A list of twitter.User objects to retrieve extended information.
-            [Optional]
-            
-        Returns:
-          A twitter.UserStatus instance representing the friendship status
-        """
-        if not user_id and not screen_name and not users:
-            raise TwitterError({'message': "Specify at least one of user_id, screen_name, users."})
-            
-        url = '%s/friendships/lookup.json' % (self.base_url)
-        data = {}
-        uids = list()
-        if user_id:
-            uids.extend(user_id)
-        if users:
-            uids.extend([u.id for u in users])
-        if len(uids):
-            data['user_id'] = ','.join(["%s" % u for u in uids])
-        if screen_name:
-            data['screen_name'] = ','.join(screen_name)
 
-        resp = self._RequestUrl(url, 'GET', data=data)
+        Up to 100 users may be specified.
+
+        Args:
+          user_id (int, User, or list of ints or Users, optional):
+            A list of user_ids to retrieve extended information.
+          screen_name (string, User, or list of strings or Users, optional):
+            A list of screen_names to retrieve extended information.
+
+        Returns:
+          list: A list of twitter.UserStatus instance representing the
+          friendship status between the specified users and the authenticated
+          user.
+        """
+        url = '%s/friendships/lookup.json' % (self.base_url)
+        parameters = {}
+
+        if user_id:
+            if isinstance(user_id, list) or isinstance(user_id, tuple):
+                uids = list()
+                for user in user_id:
+                    if isinstance(user, User):
+                        uids.append(user.id)
+                    else:
+                        uids.append(enf_type('user_id', int, user))
+                parameters['user_id'] = ",".join([str(uid) for uid in uids])
+            else:
+                if isinstance(user_id, User):
+                    parameters['user_id'] = user_id.id
+                else:
+                    parameters['user_id'] = enf_type('user_id', int, user_id)
+        if screen_name:
+            if isinstance(screen_name, list) or isinstance(screen_name, tuple):
+                sn_list = list()
+                for user in screen_name:
+                    if isinstance(user, User):
+                        sn_list.append(user.screen_name)
+                    else:
+                        sn_list.append(enf_type('screen_name', str, user))
+                parameters['screen_name'] = ','.join(sn_list)
+            else:
+                if isinstance(screen_name, User):
+                    parameters['screen_name'] = screen_name.screen_name
+                else:
+                    parameters['screen_name'] = enf_type('screen_name', str, screen_name)
+        if not user_id and not screen_name:
+            raise TwitterError(
+                "Specify at least one of user_id or screen_name.")
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        if len(data) > 1:
-            return [UserStatus.NewFromJsonDict(x) for x in data]
-        elif len(data) == 1:
-            return UserStatus.NewFromJsonDict(data[0])
-        else:
-            return None
+        return [UserStatus.NewFromJsonDict(x) for x in data]
 
     def CreateFavorite(self,
                        status=None,

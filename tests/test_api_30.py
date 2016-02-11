@@ -1356,3 +1356,59 @@ class ApiTest(unittest.TestCase):
             status=200)
         resp = self.api.PostUpdate(
             media=[697007311538229248, 697007311538229249], status='test')
+
+    @responses.activate
+    def testLookupFriendship(self):
+        with open('testdata/get_friendships_lookup_none.json') as f:
+            resp_data = f.read()
+
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/friendships/lookup.json?user_id=12',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/friendships/lookup.json?user_id=12,13',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/friendships/lookup.json?screen_name=jack',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/friendships/lookup.json?screen_name=jack,test',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+
+        resp = self.api.LookupFriendship(user_id=12)
+        self.assertTrue(isinstance(resp, list))
+        self.assertTrue(isinstance(resp[0], twitter.UserStatus))
+        self.assertEqual(resp[0].following, False)
+        self.assertEqual(resp[0].followed_by, False)
+
+        # If any of the following produce an unexpect result, the test will
+        # fail on a request to a URL that hasn't been set by responses:
+        test_user = twitter.User(id=12, screen_name='jack')
+        test_user2 = twitter.User(id=13, screen_name='test')
+
+        resp = self.api.LookupFriendship(screen_name='jack')
+        resp = self.api.LookupFriendship(screen_name=['jack'])
+        resp = self.api.LookupFriendship(screen_name=test_user)
+        resp = self.api.LookupFriendship(screen_name=[test_user, test_user2])
+
+        resp = self.api.LookupFriendship(user_id=12)
+        resp = self.api.LookupFriendship(user_id=[12])
+        resp = self.api.LookupFriendship(user_id=test_user)
+        resp = self.api.LookupFriendship(user_id=[test_user, test_user2])
+
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.LookupFriendship())
