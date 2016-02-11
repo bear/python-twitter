@@ -14,6 +14,10 @@ class UserStatus(object):
       userstatus.screen_name
       userstatus.following
       userstatus.followed_by
+      userstatus.following_received
+      userstatus.following_requested
+      userstatus.blocking
+      userstatus.muting
     """
 
     def __init__(self, **kwargs):
@@ -34,7 +38,11 @@ class UserStatus(object):
             'id_str': None,
             'screen_name': None,
             'following': None,
-            'followed_by': None}
+            'followed_by': None,
+            'following_received': None,
+            'following_requested': None,
+            'blocking': None,
+            'muting': None}
 
         for (param, default) in param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
@@ -105,6 +113,14 @@ class UserStatus(object):
             data['following'] = self.following
         if self.followed_by:
             data['followed_by'] = self.followed_by
+        if self.following_received:
+            data['following_received'] = self.following_received
+        if self.following_requested:
+            data['following_requested'] = self.following_requested
+        if self.blocking:
+            data['blocking'] = self.blocking
+        if self.muting:
+            data['muting'] = self.muting
         return data
 
     @staticmethod
@@ -116,20 +132,37 @@ class UserStatus(object):
         Returns:
           A twitter.UserStatus instance
         """
-        following = None
-        followed_by = None
+        following = False
+        followed_by = False
+        following_received = False
+        following_requested = False
+        blocking = False
+        muting = False
+
         if 'connections' in data:
             if 'following' in data['connections']:
                 following = True
             if 'followed_by' in data['connections']:
                 followed_by = True
+            if 'following_received' in data['connections']:
+                following_received = True
+            if 'following_requested' in data['connections']:
+                following_requested = True
+            if 'blocking' in data['connections']:
+                blocking = True
+            if 'muting' in data['connections']:
+                muting = True
 
         return UserStatus(name=data.get('name', None),
                           id=data.get('id', None),
                           id_str=data.get('id_str', None),
                           screen_name=data.get('screen_name', None),
                           following=following,
-                          followed_by=followed_by)
+                          followed_by=followed_by,
+                          following_received=following_received,
+                          following_requested=following_requested,
+                          blocking=blocking,
+                          muting=muting)
 
 
 class User(object):
