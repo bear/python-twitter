@@ -70,7 +70,11 @@ class UserStatus(object):
                    self.id_str == other.id_str and \
                    self.screen_name == other.screen_name and \
                    self.following == other.following and \
-                   self.followed_by == other.followed_by
+                   self.followed_by == other.followed_by and \
+                   self.following_received == other.following_received and \
+                   self.following_requested == other.following_requested and\
+                   self.muting == other.muting and \
+                   self.blocking == other.blocking
         except AttributeError:
             return False
 
