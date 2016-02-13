@@ -35,7 +35,6 @@ Changes to Existing Methods
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * No longer accepts ``cursor`` parameter. If you require granular control over the paging of the twitter.list.List members, please user twitter.api.Api.GetListMembersPaged instead.
 
-
 :py:func:`twitter.api.Api.GetSearch`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * Adds ``raw_query`` method. See :ref:`raw_queries` for more information.
@@ -43,6 +42,13 @@ Changes to Existing Methods
 :py:func:`twitter.api.Api.GetUserStream`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * Parameter 'stall_warning' is now 'stall_warnings' in line with GetStreamFilter and Twitter's naming convention. This should now actually return stall warnings, whereas it did not have any effect previously.
+
+
+:py:func:`twitter.api.Api.LookupFriendship`
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+* Method will now accept a list for either ``user_id`` or ``screen_name``. The list can contain either ints, strings, or :py:mod:`twitter.user.User` objects for either ``user_id`` or ``screen_name``.
+* Return value is a list of :py:mod:`twitter.user.UserStatus` objects.
 
 :py:func:`twitter.api.Api.PostUpdate`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
