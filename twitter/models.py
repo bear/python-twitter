@@ -12,8 +12,7 @@ class TwitterModel(object):
         return self.AsJsonString()
 
     def __eq__(self, other):
-        return other and \
-            self.AsDict() == other.AsDict()
+        return other and self.AsDict() == other.AsDict()
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -220,24 +219,40 @@ class UserStatus(TwitterModel):
     """ A class representing the UserStatus structure. This is an abbreviated
     form of the twitter.User object. """
 
+    connections = {'following': False,
+                   'followed_by': False,
+                   'following_received': False,
+                   'following_requested': False,
+                   'blocking': False,
+                   'muting': False}
+
     def __init__(self, **kwargs):
         self.param_defaults = {
             'name': None,
             'id': None,
             'id_str': None,
             'screen_name': None,
-            'following': None,
-            'followed_by': None}
+            'following': False,
+            'followed_by': False,
+            'following_received': False,
+            'following_requested': False,
+            'blocking': False,
+            'muting': False}
 
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
+        if 'connections' in kwargs:
+            for param in self.connections:
+                if param in kwargs['connections']:
+                    setattr(self, param, True)
+
     def __repr__(self):
-        return "UserStatus(ID={uid}, Name={sn}, Following={fng}, Followed={fed})".format(
+        conns = [param for param in self.connections if getattr(self, param)]
+        return "UserStatus(ID={uid}, Name={sn}, Connections=[{conn}])".format(
             uid=self.id,
             sn=self.screen_name,
-            fng=self.following,
-            fed=self.followed_by)
+            conn=", ".join(conns))
 
 
 class User(TwitterModel):

@@ -1424,6 +1424,7 @@ class ApiTest(unittest.TestCase):
             match_querystring=True,
             status=200)
         resp = self.api.LookupFriendship(screen_name='dickc')
+        self.assertEqual(resp[0].blocking, False)
         self.assertEqual(resp[0].muting, True)
 
     @responses.activate
