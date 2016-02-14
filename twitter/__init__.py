@@ -52,5 +52,5 @@ from .models import (
     UserStatus,
 )
 
-from .status import Status                  # noqa
+from .models import Status                  # noqa
 from .api import Api                        # noqa
