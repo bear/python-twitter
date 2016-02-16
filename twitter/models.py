@@ -29,10 +29,34 @@ class TwitterModel(object):
         return json.dumps(self.AsDict(), sort_keys=True)
 
     def AsDict(self):
+        """ Create a dictionary representation of the object. Please see inline
+        comments on construction when dictionaries contain TwitterModels. """
         data = {}
+
         for (key, value) in self.param_defaults.items():
-            if getattr(getattr(self, key, None), 'AsDict', None):
+
+            # If the value is a list, we need to create a list to hold the
+            # dicts created by the object supporting the AsDict() method,
+            # i.e., if it inherits from TwitterModel. If the item in the list
+            # doesn't support the AsDict() method, then we assign the value
+            # directly.
+            if isinstance(value, list):
+                data[key] = list()
+                for subobj in value:
+                    if getattr(subobj, 'AsDict', None):
+                        data[key].append(subobj.AsDict())
+                    else:
+                        data[key].append(subobj)
+
+            # Not a list, *but still a subclass of TwitterModel* and
+            # and we can assign the data[key] directly with the AsDict()
+            # method of the object.
+            elif getattr(getattr(self, key, None), 'AsDict', None):
                 data[key] = getattr(self, key).AsDict()
+
+            # If the value doesn't have an AsDict() method, i.e., it's not
+            # something that subclasses TwitterModel, then we can use direct
+            # assigment.
             elif getattr(self, key, None):
                 data[key] = getattr(self, key, None)
         return data
@@ -61,13 +85,13 @@ class Media(TwitterModel):
 
     def __init__(self, **kwargs):
         self.param_defaults = {
-            'id': None,
-            'expanded_url': None,
             'display_url': None,
-            'url': None,
-            'media_url_https': None,
+            'expanded_url': None,
+            'id': None,
             'media_url': None,
+            'media_url_https': None,
             'type': None,
+            'url': None,
         }
 
         for (param, default) in self.param_defaults.items():
@@ -86,17 +110,18 @@ class List(TwitterModel):
 
     def __init__(self, **kwargs):
         self.param_defaults = {
+            'description': None,
+            'following': None,
+            'full_name': None,
             'id': None,
+            'member_count': None,
+            'mode': None,
             'name': None,
             'slug': None,
-            'description': None,
-            'full_name': None,
-            'mode': None,
-            'uri': None,
-            'member_count': None,
             'subscriber_count': None,
-            'following': None,
-            'user': None}
+            'uri': None,
+            'user': None,
+        }
 
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
@@ -119,8 +144,8 @@ class Category(TwitterModel):
     def __init__(self, **kwargs):
         self.param_defaults = {
             'name': None,
-            'slug': None,
             'size': None,
+            'slug': None,
         }
 
         for (param, default) in self.param_defaults.items():
@@ -139,13 +164,14 @@ class DirectMessage(TwitterModel):
 
     def __init__(self, **kwargs):
         self.param_defaults = {
-            'id': None,
             'created_at': None,
-            'sender_id': None,
-            'sender_screen_name': None,
+            'id': None,
             'recipient_id': None,
             'recipient_screen_name': None,
-            'text': None}
+            'sender_id': None,
+            'sender_screen_name': None,
+            'text': None,
+        }
 
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
@@ -155,7 +181,7 @@ class DirectMessage(TwitterModel):
             text = self.text[:140] + "[...]"
         else:
             text = self.text
-        return "DirectMessage(ID={dm_id}, Sender={sender}, Time={time}, Text={text})".format(
+        return "DirectMessage(ID={dm_id}, Sender={sender}, Time={time}, Text='{text}')".format(
             dm_id=self.id,
             sender=self.sender_screen_name,
             time=self.created_at,
@@ -358,10 +384,12 @@ class Status(TwitterModel):
 
     @property
     def created_at_in_seconds(self):
-        """Get the time this status message was posted, in seconds since the epoch.
+        """ Get the time this status message was posted, in seconds since
+        the epoch (1 Jan 1970).
 
         Returns:
-          The time this status message was posted, in seconds since the epoch.
+            string: The time this status message was posted, in seconds since
+            the epoch.
         """
         return timegm(parsedate(self.created_at))
 
@@ -400,8 +428,8 @@ class Status(TwitterModel):
         the object was instantiated.
 
         Returns:
-          Whatever the status instance believes the current time to be,
-          in seconds since the epoch.
+            int: Whatever the status instance believes the current time to be,
+            in seconds since the epoch.
         """
         if self._now is None:
             self._now = time.time()
@@ -412,27 +440,32 @@ class Status(TwitterModel):
         self._now = now
 
     def __repr__(self):
-        """A string representation of this twitter.Status instance.
-      The return value is the ID of status, username and datetime.
-      Returns:
-        A string representation of this twitter.Status instance with
-        the ID of status, username and datetime.
-      """
+        """ A string representation of this twitter.Status instance.
+        The return value is the ID of status, username and datetime.
+
+        Returns:
+            string: A string representation of this twitter.Status instance with
+            the ID of status, username and datetime.
+        """
         if self.user:
-            representation = "Status(ID=%s, screen_name='%s', created_at='%s')" % \
-                             (self.id, self.user.screen_name, self.created_at)
+            return "Status(ID={0}, screen_name='{1}', created_at='{2}')".format(
+                self.id,
+                self.user.screen_name,
+                self.created_at)
         else:
-            representation = "Status(ID=%s,  created_at='%s')" % (self.id, self.created_at)
-        return representation
+            return "Status(ID={0}, created_at='{1}')".format(
+                self.id,
+                self.created_at)
 
     @staticmethod
     def NewFromJsonDict(data):
         """Create a new instance based on a JSON dict.
 
         Args:
-          data: A JSON dict, as converted from the JSON in the twitter API
+            data: A JSON dict, as converted from the JSON in the twitter API
+
         Returns:
-          A twitter.Status instance
+            A twitter.Status instance
         """
         if 'user' in data:
             from twitter import User
@@ -440,31 +473,32 @@ class Status(TwitterModel):
         else:
             user = None
 
-        if 'retweeted_status' in data:
-            retweeted_status = Status.NewFromJsonDict(data['retweeted_status'])
-        else:
-            retweeted_status = None
+        # if 'retweeted_status' in data:
+        #     retweeted_status = Status.NewFromJsonDict(data['retweeted_status'])
+        # else:
+        #     retweeted_status = None
 
-        if 'current_user_retweet' in data:
-            current_user_retweet = data['current_user_retweet']['id']
-        else:
-            current_user_retweet = None
+        # if 'current_user_retweet' in data:
+        #     current_user_retweet = data['current_user_retweet']['id']
+        # else:
+        #     current_user_retweet = None
 
         urls = None
         user_mentions = None
         hashtags = None
-        media = list()
+        media = None
 
         if 'entities' in data:
             if 'urls' in data['entities']:
-                print(data['entities']['urls'])
                 urls = [Url.NewFromJsonDict(u) for u in data['entities']['urls']]
+
             if 'user_mentions' in data['entities']:
                 from twitter import User
-
                 user_mentions = [User.NewFromJsonDict(u) for u in data['entities']['user_mentions']]
+
             if 'hashtags' in data['entities']:
                 hashtags = [Hashtag.NewFromJsonDict(h) for h in data['entities']['hashtags']]
+
             if 'media' in data['entities']:
                 media = [Media.NewFromJsonDict(m) for m in data['entities']['media']]
 
