@@ -1334,13 +1334,13 @@ class ApiTest(unittest.TestCase):
 
         # Local file
         resp = self.api.PostUpdate(media='testdata/168NQ.jpg', status='test')
-        self.assertEqual(697007311538229248, resp.AsDict()['media'][0].id)
+        self.assertEqual(697007311538229248, resp.AsDict()['media'][0]['id'])
         self.assertEqual(resp.text, "hi this is a test for media uploads with statuses https://t.co/FHgqb6iLOX")
 
         # File object
         with open('testdata/168NQ.jpg', 'rb') as f:
             resp = self.api.PostUpdate(media=[f], status='test')
-        self.assertEqual(697007311538229248, resp.AsDict()['media'][0].id)
+        self.assertEqual(697007311538229248, resp.AsDict()['media'][0]['id'])
         self.assertEqual(resp.text, "hi this is a test for media uploads with statuses https://t.co/FHgqb6iLOX")
 
         # Media ID as int
