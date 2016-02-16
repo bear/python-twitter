@@ -146,7 +146,7 @@ class Api(object):
                  use_gzip_compression=False,
                  debugHTTP=False,
                  timeout=None,
-                 sleep_on_rate_limit=True):
+                 sleep_on_rate_limit=False):
         """Instantiate a new twitter.Api object.
 
         Args:
@@ -4229,67 +4229,6 @@ class Api(object):
                 self.InitRateLimit()
 
             return self.rate_limit.get_limit(url)
-
-    def GetAverageSleepTime(self, resources):
-        """Determines the minimum number of seconds that a program must wait
-        before hitting the server again without exceeding the rate_limit
-        imposed for the currently authenticated user.
-
-        Returns:
-          The average seconds that the api must have to sleep
-        """
-        if resources[0] == '/':
-            resources = resources[1:]
-        resource_families = resources[:resources.find('/')] if '/' in resources else resources
-        rate_status = self.GetRateLimitStatus(resource_families)
-        try:
-            reset_time = rate_status['resources'][resource_families]['/' + resources]['reset']
-            remaining = rate_status['resources'][resource_families]['/' + resources]['remaining']
-        except:
-            raise TwitterError({'message': 'Wrong resources'})
-        utc_now = datetime.datetime.utcnow()
-        utc_stuct = utc_now.timetuple()
-        current_time = timegm(utc_stuct)
-        delta = reset_time - current_time
-
-        if remaining == 0:
-            return remaining
-        else:
-            return old_div(delta, remaining)
-
-    def GetSleepTime(self, resources):
-        """Determines the minimum number of seconds that a program must wait
-        before hitting the server again without exceeding the rate_limit
-        imposed for the currently authenticated user.
-
-        Returns:
-          The minimum seconds that the api must have to sleep before query again
-        """
-
-        if self.sleep_on_rate_limit is False:
-            return 0
-
-        if resources[0] == '/':
-            resources = resources[1:]
-        resource_families = resources[:resources.find('/')] if '/' in resources else resources
-        rate_status = self.GetRateLimitStatus(resource_families)
-        try:
-            reset_time = rate_status['resources'][resource_families]['/' + resources]['reset']
-            remaining = rate_status['resources'][resource_families]['/' + resources]['remaining']
-        except:
-            raise TwitterError({'message': 'Wrong resources'})
-
-        if remaining == 0:
-            utc_now = datetime.datetime.utcnow()
-            utc_stuct = utc_now.timetuple()
-            current_time = timegm(utc_stuct)
-            delta = reset_time - current_time
-            if delta < 0:
-                return 0
-            else:
-                return delta
-        else:
-            return 0
 
     def _BuildUrl(self, url, path_elements=None, extra_params=None):
         # Break url into constituent parts
