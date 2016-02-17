@@ -4196,10 +4196,7 @@ class Api(object):
         if url:
             limit = self.rate_limit.get_limit(url)
 
-            if time.time() > limit.reset:
-                self.InitializeRateLimit()
-
-            return self.rate_limit.get_limit(url)
+        return limit
 
     def _BuildUrl(self, url, path_elements=None, extra_params=None):
         # Break url into constituent parts
