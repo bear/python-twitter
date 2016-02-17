@@ -54,6 +54,28 @@ class RateLimitTests(unittest.TestCase):
         self.api.InitializeRateLimit()
         self.assertTrue(self.api.rate_limit)
 
+        self.rate_limit = None
+        self.api.sleep_on_rate_limit = True
+        self.api.InitializeRateLimit()
+        self.assertTrue(self.api.rate_limit)
+        self.assertTrue(self.api.sleep_on_rate_limit)
+
+    @responses.activate
+    def testCheckRateLimit(self):
+        with open('testdata/ratelimit.json') as f:
+            resp_data = f.read()
+        url = '%s/application/rate_limit_status.json' % self.api.base_url
+        responses.add(
+            responses.GET,
+            url,
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        rt = self.api.CheckRateLimit('https://api.twitter.com/1.1/help/privacy.json')
+        self.assertEqual(rt.limit, 15)
+        self.assertEqual(rt.remaining, 15)
+        self.assertEqual(rt.reset, 1452254278)
+
 
 class RateLimitMethodsTests(unittest.TestCase):
     """ Tests for RateLimit object """

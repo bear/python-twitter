@@ -3901,10 +3901,7 @@ class Api(object):
         if skip_status:
             data['skip_status'] = 1
 
-        resp = self._RequestUrl(url,
-                                'POST',
-                                data=data,
-                                rate_context='/account/update_profile_image')
+        resp = self._RequestUrl(url, 'POST', data=data)
 
         if resp.status_code in [200, 201, 202]:
             return True
@@ -4162,32 +4159,8 @@ class Api(object):
         """
         self._default_params['source'] = source
 
-    def GetRateLimitStatus(self, resource_families=None):
-        """Fetch the rate limit status for the currently authorized user.
-
-        Args:
-          resources:
-            A comma seperated list of resource families you want to know the current
-            rate limit disposition of. [Optional]
-
-        Returns:
-          A dictionary containing the time the limit will reset (reset_time),
-          the number of remaining hits allowed before the reset (remaining_hits),
-          the number of hits allowed in a 60-minute period (hourly_limit), and
-          the time of the reset in seconds since The Epoch (reset_time_in_seconds).
-        """
-        url = '%s/application/rate_limit_status.json' % self.base_url
-        parameters = {}
-        if resource_families is not None:
-            parameters['resources'] = resource_families
-
-        resp = self._RequestUrl(url, 'GET', data=parameters)  # No-Cache
-        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-
-        return data
-
     def InitializeRateLimit(self):
-        """ Make the initial call to the Twitter API to get the rate limit
+        """ Make a call to the Twitter API to get the rate limit
         status for the currently authenticated user or application.
 
         Returns:
@@ -4216,17 +4189,15 @@ class Api(object):
         Returns:
             namedtuple: EndpointRateLimit namedtuple.
 
-        Raises:
-            twitter.TwitterError: If a match to an endpoint is not found.
         """
         if not self.rate_limit:
-            self.InitRateLimit()
+            self.InitializeRateLimit()
 
         if url:
             limit = self.rate_limit.get_limit(url)
 
             if time.time() > limit.reset:
-                self.InitRateLimit()
+                self.InitializeRateLimit()
 
             return self.rate_limit.get_limit(url)
 
