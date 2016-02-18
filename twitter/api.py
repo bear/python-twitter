@@ -24,7 +24,6 @@ from __future__ import print_function
 import sys
 import gzip
 import time
-import types
 import base64
 import re
 import datetime
@@ -51,6 +50,8 @@ except ImportError:
 from twitter import (__version__, _FileCache, json, DirectMessage, List,
                      Status, Trend, TwitterError, User, UserStatus)
 from twitter.category import Category
+
+from twitter.ratelimit import RateLimit
 
 from twitter.twitter_utils import (
     calc_expected_status_length,
@@ -145,7 +146,7 @@ class Api(object):
                  use_gzip_compression=False,
                  debugHTTP=False,
                  timeout=None,
-                 sleep_on_rate_limit=True):
+                 sleep_on_rate_limit=False):
         """Instantiate a new twitter.Api object.
 
         Args:
@@ -195,6 +196,7 @@ class Api(object):
         self._InitializeUserAgent()
         self._InitializeDefaultParameters()
 
+        self.rate_limit = None
         self.sleep_on_rate_limit = sleep_on_rate_limit
 
         if base_url is None:
@@ -3900,6 +3902,7 @@ class Api(object):
             data['skip_status'] = 1
 
         resp = self._RequestUrl(url, 'POST', data=data)
+
         if resp.status_code in [200, 201, 202]:
             return True
         if resp.status_code == 400:
@@ -3940,6 +3943,7 @@ class Api(object):
             data['skip_status'] = 1
 
         resp = self._RequestUrl(url, 'POST', data=data)
+
         if resp.status_code in [200, 201, 202]:
             return True
         if resp.status_code == 400:
@@ -4155,90 +4159,44 @@ class Api(object):
         """
         self._default_params['source'] = source
 
-    def GetRateLimitStatus(self, resource_families=None):
-        """Fetch the rate limit status for the currently authorized user.
-
-        Args:
-          resources:
-            A comma seperated list of resource families you want to know the current
-            rate limit disposition of. [Optional]
+    def InitializeRateLimit(self):
+        """ Make a call to the Twitter API to get the rate limit
+        status for the currently authenticated user or application.
 
         Returns:
-          A dictionary containing the time the limit will reset (reset_time),
-          the number of remaining hits allowed before the reset (remaining_hits),
-          the number of hits allowed in a 60-minute period (hourly_limit), and
-          the time of the reset in seconds since The Epoch (reset_time_in_seconds).
-        """
-        url = '%s/application/rate_limit_status.json' % self.base_url
-        parameters = {}
-        if resource_families is not None:
-            parameters['resources'] = resource_families
+            None.
 
-        resp = self._RequestUrl(url, 'GET', data=parameters)  # No-Cache
+        """
+        _sleep = self.sleep_on_rate_limit
+        if self.sleep_on_rate_limit:
+            self.sleep_on_rate_limit = False
+
+        url = '%s/application/rate_limit_status.json' % self.base_url
+
+        resp = self._RequestUrl(url, 'GET')  # No-Cache
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        return data
+        self.sleep_on_rate_limit = _sleep
+        self.rate_limit = RateLimit(**data)
 
-    def GetAverageSleepTime(self, resources):
-        """Determines the minimum number of seconds that a program must wait
-        before hitting the server again without exceeding the rate_limit
-        imposed for the currently authenticated user.
+    def CheckRateLimit(self, url):
+        """ Checks a URL to see the rate limit status for that endpoint.
 
-        Returns:
-          The average seconds that the api must have to sleep
-        """
-        if resources[0] == '/':
-            resources = resources[1:]
-        resource_families = resources[:resources.find('/')] if '/' in resources else resources
-        rate_status = self.GetRateLimitStatus(resource_families)
-        try:
-            reset_time = rate_status['resources'][resource_families]['/' + resources]['reset']
-            remaining = rate_status['resources'][resource_families]['/' + resources]['remaining']
-        except:
-            raise TwitterError({'message': 'Wrong resources'})
-        utc_now = datetime.datetime.utcnow()
-        utc_stuct = utc_now.timetuple()
-        current_time = timegm(utc_stuct)
-        delta = reset_time - current_time
-
-        if remaining == 0:
-            return remaining
-        else:
-            return old_div(delta, remaining)
-
-    def GetSleepTime(self, resources):
-        """Determines the minimum number of seconds that a program must wait
-        before hitting the server again without exceeding the rate_limit
-        imposed for the currently authenticated user.
+        Args:
+            url (str):
+                URL to check against the current rate limits.
 
         Returns:
-          The minimum seconds that the api must have to sleep before query again
+            namedtuple: EndpointRateLimit namedtuple.
+
         """
+        if not self.rate_limit:
+            self.InitializeRateLimit()
 
-        if self.sleep_on_rate_limit is False:
-            return 0
+        if url:
+            limit = self.rate_limit.get_limit(url)
 
-        if resources[0] == '/':
-            resources = resources[1:]
-        resource_families = resources[:resources.find('/')] if '/' in resources else resources
-        rate_status = self.GetRateLimitStatus(resource_families)
-        try:
-            reset_time = rate_status['resources'][resource_families]['/' + resources]['reset']
-            remaining = rate_status['resources'][resource_families]['/' + resources]['remaining']
-        except:
-            raise TwitterError({'message': 'Wrong resources'})
-
-        if remaining == 0:
-            utc_now = datetime.datetime.utcnow()
-            utc_stuct = utc_now.timetuple()
-            current_time = timegm(utc_stuct)
-            delta = reset_time - current_time
-            if delta < 0:
-                return 0
-            else:
-                return delta
-        else:
-            return 0
+        return limit
 
     def _BuildUrl(self, url, path_elements=None, extra_params=None):
         # Break url into constituent parts
@@ -4394,42 +4352,61 @@ class Api(object):
             A JSON object.
         """
         if not self.__auth:
-            raise TwitterError({'error': "The twitter.Api instance must be authenticated."})
+            raise TwitterError(
+                "The twitter.Api instance must be authenticated.")
+
+        if url and self.sleep_on_rate_limit:
+            limit = self.CheckRateLimit(url)
+
+            if limit.remaining == 0:
+                try:
+                    time.sleep(int(limit.reset - time.time()))
+                except ValueError:
+                    pass
 
         if verb == 'POST':
             if 'media_ids' in data:
                 url = self._BuildUrl(url, extra_params={'media_ids': data['media_ids']})
+
             if 'media' in data:
                 try:
-                    return requests.post(
-                        url,
-                        files=data,
-                        auth=self.__auth,
-                        timeout=self._timeout
-                    )
+                    resp = requests.post(url,
+                                         files=data,
+                                         auth=self.__auth,
+                                         timeout=self._timeout)
                 except requests.RequestException as e:
                     raise TwitterError(str(e))
             else:
                 try:
-                    return requests.post(
-                        url,
-                        data=data,
-                        auth=self.__auth,
-                        timeout=self._timeout
-                    )
+                    resp = requests.post(url,
+                                         data=data,
+                                         auth=self.__auth,
+                                         timeout=self._timeout)
+
                 except requests.RequestException as e:
                     raise TwitterError(str(e))
-        if verb == 'GET':
+
+        elif verb == 'GET':
             url = self._BuildUrl(url, extra_params=data)
             try:
-                return requests.get(
-                    url,
-                    auth=self.__auth,
-                    timeout=self._timeout
-                )
+                resp = requests.get(url,
+                                    auth=self.__auth,
+                                    timeout=self._timeout)
+
             except requests.RequestException as e:
                 raise TwitterError(str(e))
-        return 0  # if not a POST or GET request
+
+        else:
+            resp = 0  # if not a POST or GET request
+
+        if url and self.sleep_on_rate_limit and self.rate_limit:
+            limit = resp.headers.get('x-rate-limit-limit', 0)
+            remaining = resp.headers.get('x-rate-limit-remaining', 0)
+            reset = resp.headers.get('x-rate-limit-reset', 0)
+
+            self.rate_limit.set_limit(url, limit, remaining, reset)
+
+        return resp
 
     def _RequestStream(self, url, verb, data=None):
         """Request a stream of data.

@@ -35,6 +35,11 @@ twitter.api
     :undoc-members:
     :show-inheritance:
 
+.. automodule:: twitter.ratelimit
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 .. automodule:: twitter.status
     :members:
     :undoc-members:
