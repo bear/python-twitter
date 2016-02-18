@@ -3969,7 +3969,7 @@ class Api(object):
         resp = self._RequestStream(url, 'GET')
         for line in resp.iter_lines():
             if line:
-                data = self._ParseAndCheckTwitter(line)
+                data = self._ParseAndCheckTwitter(line.decode('utf-8'))
                 yield data
 
     def GetStreamFilter(self,
@@ -4014,7 +4014,7 @@ class Api(object):
         resp = self._RequestStream(url, 'POST', data=data)
         for line in resp.iter_lines():
             if line:
-                data = self._ParseAndCheckTwitter(line)
+                data = self._ParseAndCheckTwitter(line.decode('utf-8'))
                 yield data
 
     def GetUserStream(self,
@@ -4070,7 +4070,7 @@ class Api(object):
         resp = self._RequestStream(url, 'POST', data=data)
         for line in resp.iter_lines():
             if line:
-                data = self._ParseAndCheckTwitter(line)
+                data = self._ParseAndCheckTwitter(line.decode('utf-8'))
                 yield data
 
     def VerifyCredentials(self):
