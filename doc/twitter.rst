@@ -1,14 +1,17 @@
-python-twitter package
-=============
+Modules Documentation
+=====================
 
 
-twitter.api
+API
 ----------------
 
 .. automodule:: twitter.api
     :members:
     :undoc-members:
     :show-inheritance:
+
+Models
+---------------------
 
 .. automodule:: twitter.category
     :members:
@@ -59,6 +62,10 @@ twitter.api
     :members:
     :undoc-members:
     :show-inheritance:
+
+
+Utilities
+---------------------
 
 .. automodule:: twitter.twitter_utils
     :members:
