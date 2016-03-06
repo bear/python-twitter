@@ -76,6 +76,7 @@ class ModelsTest(unittest.TestCase):
         self.assertTrue(status.media[0].AsJsonString())
         self.assertTrue(status.media[0].AsDict())
         self.assertTrue(isinstance(status.AsDict()['media'][0], dict))
+        self.assertEqual(status.id_str, "698657677329752065")
 
     def test_status_no_user(self):
         """ Test twitter.Status object which does not contain a 'user' entity. """
