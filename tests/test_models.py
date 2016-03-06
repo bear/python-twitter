@@ -40,9 +40,9 @@ class ModelsTest(unittest.TestCase):
     def test_direct_message(self):
         """ Test twitter.DirectMessage object """
         dm = twitter.DirectMessage.NewFromJsonDict(self.DIRECT_MESSAGE_SAMPLE_JSON)
-        self.assertEqual(dm.__repr__(), "DirectMessage(ID=678629245946433539, Sender=__jcbl__, Time=Sun Dec 20 17:33:15 +0000 2015, Text='The Communists are distinguished from the other working-class parties by this only: 1. In the national struggles of the proletarians of the [...]')")
+        self.assertEqual(dm.__repr__(), "DirectMessage(ID=678629245946433539, Sender=__jcbl__, Created=Sun Dec 20 17:33:15 +0000 2015, Text='The Communists are distinguished from the other working-class parties by this only: 1. In the national struggles of the proletarians of the [...]')")
         dm_short = twitter.DirectMessage.NewFromJsonDict(self.DIRECT_MESSAGE_SHORT_SAMPLE_JSON)
-        self.assertEqual(dm_short.__repr__(), "DirectMessage(ID=678629245946433539, Sender=__jcbl__, Time=Sun Dec 20 17:33:15 +0000 2015, Text='The Communists are distinguished from the other working-class parties by this only')")
+        self.assertEqual(dm_short.__repr__(), "DirectMessage(ID=678629245946433539, Sender=__jcbl__, Created=Sun Dec 20 17:33:15 +0000 2015, Text='The Communists are distinguished from the other working-class parties by this only')")
         self.assertTrue(dm.AsJsonString())
         self.assertTrue(dm.AsDict())
 
@@ -70,7 +70,7 @@ class ModelsTest(unittest.TestCase):
     def test_status(self):
         """ Test twitter.Status object """
         status = twitter.Status.NewFromJsonDict(self.STATUS_SAMPLE_JSON)
-        self.assertEqual(status.__repr__(), "Status(ID=698657677329752065, screen_name='himawari8bot', created_at='Sat Feb 13 23:59:05 +0000 2016')")
+        self.assertEqual(status.__repr__(), "Status(ID=698657677329752065, ScreenName='himawari8bot', Created='Sat Feb 13 23:59:05 +0000 2016')")
         self.assertTrue(status.AsJsonString())
         self.assertTrue(status.AsDict())
         self.assertTrue(status.media[0].AsJsonString())
@@ -80,7 +80,7 @@ class ModelsTest(unittest.TestCase):
     def test_status_no_user(self):
         """ Test twitter.Status object which does not contain a 'user' entity. """
         status = twitter.Status.NewFromJsonDict(self.STATUS_NO_USER_SAMPLE_JSON)
-        self.assertEqual(status.__repr__(), "Status(ID=698657677329752065, created_at='Sat Feb 13 23:59:05 +0000 2016')")
+        self.assertEqual(status.__repr__(), "Status(ID=698657677329752065, Created='Sat Feb 13 23:59:05 +0000 2016')")
         self.assertTrue(status.AsJsonString())
         self.assertTrue(status.AsDict())
 
@@ -101,7 +101,7 @@ class ModelsTest(unittest.TestCase):
         '''Test the twitter.User NewFromJsonDict method'''
         user = twitter.User.NewFromJsonDict(self.USER_SAMPLE_JSON)
         self.assertEqual(user.id, 718443)
-        self.assertEqual(user.__repr__(), "User(ID=718443, Screenname=kesuke)")
+        self.assertEqual(user.__repr__(), "User(ID=718443, ScreenName=kesuke)")
         self.assertTrue(user.AsJsonString())
         self.assertTrue(user.AsDict())
 
@@ -110,7 +110,7 @@ class ModelsTest(unittest.TestCase):
         user_status = twitter.UserStatus.NewFromJsonDict(self.USER_STATUS_SAMPLE_JSON)
         # __repr__ doesn't always order 'connections' in the same manner when
         # call, hence the regex.
-        mtch = re.compile(r'UserStatus\(ID=6385432, Name=dickc, Connections=\[[blocking|muting]+, [blocking|muting]+\]\)')
+        mtch = re.compile(r'UserStatus\(ID=6385432, ScreenName=dickc, Connections=\[[blocking|muting]+, [blocking|muting]+\]\)')
         self.assertTrue(re.findall(mtch, user_status.__repr__()))
         self.assertTrue(user_status.AsJsonString())
         self.assertTrue(user_status.AsDict())
