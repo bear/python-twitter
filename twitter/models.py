@@ -40,9 +40,11 @@ class TwitterModel(object):
             # i.e., if it inherits from TwitterModel. If the item in the list
             # doesn't support the AsDict() method, then we assign the value
             # directly.
-            if isinstance(value, list):
+            if isinstance(getattr(self, key, None), list) or \
+               isinstance(getattr(self, key, None), tuple) or \
+               isinstance(getattr(self, key, None), set):
                 data[key] = list()
-                for subobj in value:
+                for subobj in getattr(self, key, None):
                     if getattr(subobj, 'AsDict', None):
                         data[key].append(subobj.AsDict())
                     else:
@@ -178,10 +180,10 @@ class DirectMessage(TwitterModel):
 
     def __repr__(self):
         if self.text and len(self.text) > 140:
-            text = self.text[:140] + "[...]"
+            text = "{text}[...]".format(text=self.text[:140])
         else:
             text = self.text
-        return "DirectMessage(ID={dm_id}, Sender={sender}, Time={time}, Text='{text}')".format(
+        return "DirectMessage(ID={dm_id}, Sender={sender}, Created={time}, Text='{text}')".format(
             dm_id=self.id,
             sender=self.sender_screen_name,
             time=self.created_at,
@@ -258,8 +260,7 @@ class UserStatus(TwitterModel):
                    'following_received': False,
                    'following_requested': False,
                    'blocking': False,
-                   'muting': False,
-                   }
+                   'muting': False}
 
     def __init__(self, **kwargs):
         self.param_defaults = {
@@ -285,7 +286,7 @@ class UserStatus(TwitterModel):
 
     def __repr__(self):
         conns = [param for param in self.connections if getattr(self, param)]
-        return "UserStatus(ID={uid}, Name={sn}, Connections=[{conn}])".format(
+        return "UserStatus(ID={uid}, ScreenName={sn}, Connections=[{conn}])".format(
             uid=self.id,
             sn=self.screen_name,
             conn=", ".join(conns))
@@ -334,7 +335,7 @@ class User(TwitterModel):
             setattr(self, param, kwargs.get(param, default))
 
     def __repr__(self):
-        return "User(ID={uid}, Screenname={sn})".format(
+        return "User(ID={uid}, ScreenName={sn})".format(
             uid=self.id,
             sn=self.screen_name)
 
@@ -448,18 +449,18 @@ class Status(TwitterModel):
             the ID of status, username and datetime.
         """
         if self.user:
-            return "Status(ID={0}, screen_name='{1}', created_at='{2}')".format(
+            return "Status(ID={0}, ScreenName='{1}', Created='{2}')".format(
                 self.id,
                 self.user.screen_name,
                 self.created_at)
         else:
-            return "Status(ID={0}, created_at='{1}')".format(
+            return "Status(ID={0}, Created='{1}')".format(
                 self.id,
                 self.created_at)
 
     @staticmethod
     def NewFromJsonDict(data):
-        """Create a new instance based on a JSON dict.
+        """ Create a new instance based on a JSON dict.
 
         Args:
             data: A JSON dict, as converted from the JSON in the twitter API
@@ -473,15 +474,15 @@ class Status(TwitterModel):
         else:
             user = None
 
-        # if 'retweeted_status' in data:
-        #     retweeted_status = Status.NewFromJsonDict(data['retweeted_status'])
-        # else:
-        #     retweeted_status = None
+        if 'retweeted_status' in data:
+            retweeted_status = Status.NewFromJsonDict(data['retweeted_status'])
+        else:
+            retweeted_status = None
 
-        # if 'current_user_retweet' in data:
-        #     current_user_retweet = data['current_user_retweet']['id']
-        # else:
-        #     current_user_retweet = None
+        if 'current_user_retweet' in data:
+            current_user_retweet = data['current_user_retweet']['id']
+        else:
+            current_user_retweet = None
 
         urls = None
         user_mentions = None
@@ -508,6 +509,8 @@ class Status(TwitterModel):
                 media = [Media.NewFromJsonDict(m) for m in data['extended_entities']['media']]
 
         return super(Status, Status).NewFromJsonDict(data,
+                                                     retweeted_status=retweeted_status,
+                                                     current_user_retweet=current_user_retweet,
                                                      user=user,
                                                      urls=urls,
                                                      user_mentions=user_mentions,
