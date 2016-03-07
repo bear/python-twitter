@@ -36,13 +36,11 @@ class TwitterModel(object):
         for (key, value) in self.param_defaults.items():
 
             # If the value is a list, we need to create a list to hold the
-            # dicts created by the object supporting the AsDict() method,
+            # dicts created by an object supporting the AsDict() method,
             # i.e., if it inherits from TwitterModel. If the item in the list
             # doesn't support the AsDict() method, then we assign the value
             # directly.
-            if isinstance(getattr(self, key, None), list) or \
-               isinstance(getattr(self, key, None), tuple) or \
-               isinstance(getattr(self, key, None), set):
+            if isinstance(getattr(self, key, None), (list, tuple, set)):
                 data[key] = list()
                 for subobj in getattr(self, key, None):
                     if getattr(subobj, 'AsDict', None):
@@ -65,13 +63,12 @@ class TwitterModel(object):
 
     @classmethod
     def NewFromJsonDict(cls, data, **kwargs):
-        """ Create a new instance based on a JSON dict.
+        """ Create a new instance based on a JSON dict. Any kwargs should be
+        supplied by the inherited, calling class.
 
         Args:
-            data: A JSON dict, as converted from the JSON in the twitter API
+            data: A JSON dict, as converted from the JSON in the twitter API.
 
-        Returns:
-            A twitter.Media instance
         """
 
         if kwargs:
@@ -100,9 +97,9 @@ class Media(TwitterModel):
             setattr(self, param, kwargs.get(param, default))
 
     def __repr__(self):
-        return "Media(ID={media_id}, Type={type}, DisplayURL='{url}')".format(
+        return "Media(ID={media_id}, Type={media_type}, DisplayURL='{url}')".format(
             media_id=self.id,
-            type=self.type,
+            media_type=self.type,
             url=self.display_url)
 
 
@@ -285,11 +282,11 @@ class UserStatus(TwitterModel):
                     setattr(self, param, True)
 
     def __repr__(self):
-        conns = [param for param in self.connections if getattr(self, param)]
+        connections = [param for param in self.connections if getattr(self, param)]
         return "UserStatus(ID={uid}, ScreenName={sn}, Connections=[{conn}])".format(
             uid=self.id,
             sn=self.screen_name,
-            conn=", ".join(conns))
+            conn=", ".join(connections))
 
 
 class User(TwitterModel):
@@ -469,7 +466,6 @@ class Status(TwitterModel):
             A twitter.Status instance
         """
         if 'user' in data:
-            from twitter import User
             user = User.NewFromJsonDict(data['user'])
         else:
             user = None
@@ -494,7 +490,6 @@ class Status(TwitterModel):
                 urls = [Url.NewFromJsonDict(u) for u in data['entities']['urls']]
 
             if 'user_mentions' in data['entities']:
-                from twitter import User
                 user_mentions = [User.NewFromJsonDict(u) for u in data['entities']['user_mentions']]
 
             if 'hashtags' in data['entities']:
