@@ -336,6 +336,15 @@ class User(TwitterModel):
             uid=self.id,
             sn=self.screen_name)
 
+    @classmethod
+    def NewFromJsonDict(cls, data, **kwargs):
+        from twitter import Status
+        if data.get('status'):
+            status = Status.NewFromJsonDict(data.get('status'))
+            return super(cls, cls).NewFromJsonDict(data=data, status=status)
+        else:
+            return super(cls, cls).NewFromJsonDict(data=data)
+
 
 class Status(TwitterModel):
     """A class representing the Status structure used by the twitter API.
@@ -446,17 +455,19 @@ class Status(TwitterModel):
             the ID of status, username and datetime.
         """
         if self.user:
-            return "Status(ID={0}, ScreenName='{1}', Created='{2}')".format(
+            return "Status(ID={0}, ScreenName='{1}', Created='{2}', Text={3})".format(
                 self.id,
                 self.user.screen_name,
-                self.created_at)
+                self.created_at,
+                self.text)
         else:
-            return "Status(ID={0}, Created='{1}')".format(
+            return "Status(ID={0}, Created='{1}', Text={2})".format(
                 self.id,
-                self.created_at)
+                self.created_at,
+                self.text)
 
-    @staticmethod
-    def NewFromJsonDict(data):
+    @classmethod
+    def NewFromJsonDict(cls, data, **kwargs):
         """ Create a new instance based on a JSON dict.
 
         Args:
@@ -465,36 +476,28 @@ class Status(TwitterModel):
         Returns:
             A twitter.Status instance
         """
-        if 'user' in data:
-            user = User.NewFromJsonDict(data['user'])
-        else:
-            user = None
-
-        if 'retweeted_status' in data:
-            retweeted_status = Status.NewFromJsonDict(data['retweeted_status'])
-        else:
-            retweeted_status = None
-
-        if 'current_user_retweet' in data:
-            current_user_retweet = data['current_user_retweet']['id']
-        else:
-            current_user_retweet = None
-
-        urls = None
-        user_mentions = None
+        current_user_retweet = None
         hashtags = None
         media = None
+        retweeted_status = None
+        urls = None
+        user = None
+        user_mentions = None
+
+        if 'user' in data:
+            user = User.NewFromJsonDict(data['user'])
+        if 'retweeted_status' in data:
+            retweeted_status = Status.NewFromJsonDict(data['retweeted_status'])
+        if 'current_user_retweet' in data:
+            current_user_retweet = data['current_user_retweet']['id']
 
         if 'entities' in data:
             if 'urls' in data['entities']:
                 urls = [Url.NewFromJsonDict(u) for u in data['entities']['urls']]
-
             if 'user_mentions' in data['entities']:
                 user_mentions = [User.NewFromJsonDict(u) for u in data['entities']['user_mentions']]
-
             if 'hashtags' in data['entities']:
                 hashtags = [Hashtag.NewFromJsonDict(h) for h in data['entities']['hashtags']]
-
             if 'media' in data['entities']:
                 media = [Media.NewFromJsonDict(m) for m in data['entities']['media']]
 
@@ -503,11 +506,11 @@ class Status(TwitterModel):
             if 'media' in data['extended_entities']:
                 media = [Media.NewFromJsonDict(m) for m in data['extended_entities']['media']]
 
-        return super(Status, Status).NewFromJsonDict(data,
-                                                     retweeted_status=retweeted_status,
-                                                     current_user_retweet=current_user_retweet,
-                                                     user=user,
-                                                     urls=urls,
-                                                     user_mentions=user_mentions,
-                                                     hashtags=hashtags,
-                                                     media=media)
+        return super(cls, cls).NewFromJsonDict(data=data,
+                                               current_user_retweet=current_user_retweet,
+                                               hashtags=hashtags,
+                                               media=media,
+                                               retweeted_status=retweeted_status,
+                                               urls=urls,
+                                               user=user,
+                                               user_mentions=user_mentions)
