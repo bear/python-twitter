@@ -40,3 +40,6 @@ env
 
 # Built docs
 doc/_build/**
+
+# Generated html coverage reports
+htmlcov/
