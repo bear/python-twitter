@@ -24,7 +24,7 @@ By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
 Introduction
 ============
 
-This library provides a pure Python interface for the `Twitter API <https://dev.twitter.com/>`_. It works with Python versions from 2.6+. Python 3 support is under development.
+This library provides a pure Python interface for the `Twitter API <https://dev.twitter.com/>`_. It works with Python versions from 2.7+ and python 3.
 
 `Twitter <http://twitter.com>`_ provides a service that allows people to connect via the web, IM, and SMS. Twitter exposes a `web services API <https://dev.twitter.com/overview/documentation>`_ and this library is intended to make it even easier for Python programmers to use.
 
@@ -47,24 +47,24 @@ Check out the latest development version anonymously with::
     $ git clone git://github.com/bear/python-twitter.git
     $ cd python-twitter
 
-Setup a virtual environment and install dependencies:
+Setup a virtual environment and install dependencies::
 
-	$ make env
+	$ make env-devel
 
-Activate the virtual environment created:
+Activate the virtual environment created::
 
 	$ source env/bin/activate
 
 =============
 Running Tests
 =============
-Note that tests require ```pip install nose``` and optionally ```pip install coverage```:
+Note that tests require ```pip install pytest``` and optionally ```pip install pytest-cov```:
 
-To run the unit tests:
+To run the unit tests::
 
 	$ make test
 
-to also run code coverage:
+to also run code coverage::
 
     $ make coverage
 
@@ -72,13 +72,14 @@ to also run code coverage:
 Documentation
 =============
 
-View the last release API documentation at: https://dev.twitter.com/overview/documentation
+View the latest python-twitter documentation at
+https://python-twitter.readthedocs.org. You can view Twitter's API documentation at: https://dev.twitter.com/overview/documentation 
 
 =====
 Using
 =====
 
-The library provides a Python wrapper around the Twitter API and the Twitter data model.
+The library provides a Python wrapper around the Twitter API and the Twitter data model. To get started, check out the examples in the examples/ folder or read the documentation at https://python-twitter.readthedocs.org which contains information about getting your authentication keys from Twitter and using the library.
 
 ----
 Using with Django
@@ -86,17 +87,25 @@ Using with Django
 
 Additional template tags that expand tweet urls and urlize tweet text. See the django template tags available for use with python-twitter: https://github.com/radzhome/python-twitter-django-tags
 
------
-Model
------
+------
+Models
+------
 
-The three model classes are ``twitter.Status``, ``twitter.User``, and ``twitter.DirectMessage``. The API methods return instances of these classes.
+The library utilizes models to represent various data structures returned by Twitter. Those models are:
+    * twitter.Category
+    * twitter.DirectMessage
+    * twitter.Hashtag
+    * twitter.List
+    * twitter.Media
+    * twitter.Status
+    * twitter.Trend
+    * twitter.Url
+    * twitter.User
+    * twitter.UserStatus
 
-To read the full API for ``twitter.Status``, ``twitter.User``, or ``twitter.DirectMessage``, run::
+To read the documentation for any of these models, run:: 
 
-    $ pydoc twitter.Status
-    $ pydoc twitter.User
-    $ pydoc twitter.DirectMessage
+    $ pydoc twitter.[model]
 
 ---
 API
@@ -149,8 +158,6 @@ There are many more API methods, to read the full API documentation::
 
     $ pydoc twitter.Api
 
-
-
 ----
 Todo
 ----
@@ -160,8 +167,6 @@ Patches and bug reports are `welcome <https://github.com/bear/python-twitter/iss
 Add more example scripts.
 
 The twitter.Status and ``twitter.User`` classes are going to be hard to keep in sync with the API if the API changes. More of the code could probably be written with introspection.
-
-Statement coverage of ``twitter_test`` is only about 80% of twitter.py.
 
 The ``twitter.Status`` and ``twitter.User`` classes could perform more validation on the property setters.
 
@@ -183,7 +188,7 @@ Now it's a full-on open source project with many contributors over time. See AUT
 License
 -------
 
-| Copyright 2007-2014 The Python-Twitter Developers
+| Copyright 2007-2016 The Python-Twitter Developers
 |
 | Licensed under the Apache License, Version 2.0 (the 'License');
 | you may not use this file except in compliance with the License.
