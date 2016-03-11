@@ -14,7 +14,9 @@ Contents:
 
    installation.rst
    getting_started.rst
+   contributing.rst
    migration_v30.rst
+   rate_limits.rst
    models.rst
    searching.rst
    with_django.rst
