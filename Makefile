@@ -52,7 +52,7 @@ coverage:
 	py.test --cov=twitter
 
 test:
-	py.test	
+	py.test
 
 build: clean
 	python setup.py sdist
