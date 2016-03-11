@@ -49,11 +49,11 @@ Check out the latest development version anonymously with::
 
 Setup a virtual environment and install dependencies::
 
-	$ make env-devel
+    $ make env-devel
 
 Activate the virtual environment created::
 
-	$ source env/bin/activate
+    $ source env/bin/activate
 
 =============
 Running Tests
