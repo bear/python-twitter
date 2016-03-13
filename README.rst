@@ -49,16 +49,14 @@ Check out the latest development version anonymously with::
 
 Setup a virtual environment and install dependencies::
 
-    $ make env-devel
+    $ make env development
 
-Activate the virtual environment created::
-
-    $ source env/bin/activate
+For minimal dependencies just to get the library to operate, run ``make env production``. For more information, see the Contributing guide for setting up a working environment.
 
 =============
 Running Tests
 =============
-Note that tests require ```pip install pytest``` and optionally ```pip install pytest-cov``` (these are included if you have installed dependencies from ```requirements.devel.txt``` or run ```make env-devel```)
+Note that tests require ```pip install pytest``` and optionally ```pip install pytest-cov``` (these are included if you have installed dependencies from ```requirements.devel.txt``` or ``make env development``).
 
 To run the unit tests::
 
