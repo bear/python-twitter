@@ -12,28 +12,21 @@ help:
 	@echo "  test        run tests"
 	@echo "  coverage    run tests with code coverage"
 
-env-devel:
-	sudo easy_install pip && \
-	sudo pip install --upgrade pip && \
-	sudo pip install virtualenv && \
-	virtualenv env && \
-	. env/bin/activate && \
-	make deps-devel
+env:
+	@pyenv install -s 3.5.1
+	-@pyenv uninstall pythontwitter
+	@pyenv virtualenv 3.5.1 pythontwitter
+	@echo 'pythontwitter' >> .python-version
+	@pip install pip --upgrade
 
-env-prod:
-	sudo easy_install pip && \
-	pip install virtualenv && \
-	virtualenv env && \
-	. env/bin/activate && \
-	make deps-prod
+production:
+	@pip install -r requirements.txt
 
-deps-devel:
-	pip install -r requirements.devel.txt
-
-deps-prod:
-	pip install -r requirements.txt
+development:
+	@pip install -r requirements.devel.txt
 
 clean:
+	pyenv uninstall pythontwitter
 	rm -fr build
 	rm -fr dist
 	rm -fr env
