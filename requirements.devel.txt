@@ -1,4 +1,6 @@
-future
 requests
 requests_oauthlib
 responses
+pytest
+pytest-cov
+sphinx

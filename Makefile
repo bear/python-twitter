@@ -1,25 +1,35 @@
+DOCOPTIONS = html
+DOCDIR = doc
 
 help:
-	@echo "  env         create a development environment using virtualenv"
-	@echo "  deps        install dependencies"
-	@echo "  clean       remove unwanted stuff"
-	@echo "  lint        check style with flake8"
-	@echo "  coverage    run tests with code coverage"
-	@echo "  test        run tests"
+	@echo "  env             create a development environment using pyenv"
+	@echo "  development     install dependencies for development and testing"
+	@echo "  production      install only production dependencies"
+	@echo "  docs            build documentation"
+	@echo "  clean           remove unwanted stuff"
+	@echo "  lint            check style with flake8"
+	@echo "  test            run tests"
+	@echo "  coverage        run tests with code coverage"
 
 env:
-	sudo easy_install pip && \
-	pip install virtualenv && \
-	virtualenv env && \
-	. env/bin/activate && \
-	make deps
+	@pyenv install -s 3.5.1
+	-@pyenv uninstall pythontwitter
+	@pyenv virtualenv 3.5.1 pythontwitter
+	@echo 'pythontwitter' >> .python-version
+	@pip install pip --upgrade
 
-deps:
-	pip install -r requirements.txt --use-mirrors
+production:
+	@pip install -r requirements.txt
+
+development:
+	@pip install -r requirements.devel.txt
 
 clean:
+	pyenv uninstall pythontwitter
 	rm -fr build
 	rm -fr dist
+	rm -fr env
+	rm -fr doc/_build/*
 	find . -name '*.pyc' -exec rm -f {} \;
 	find . -name '*.pyo' -exec rm -f {} \;
 	find . -name '*~' -exec rm -f {} \;
@@ -27,11 +37,14 @@ clean:
 lint:
 	flake8 twitter > violations.flake8.txt
 
+docs:
+	$(MAKE) -C $(DOCDIR) html
+
 coverage:
-	nosetests --with-coverage --cover-package=twitter
+	py.test --cov=twitter
 
 test:
-	nosetests
+	py.test
 
 build: clean
 	python setup.py sdist

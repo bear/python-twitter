@@ -37,6 +37,10 @@ pip-log.txt
 
 #Environment
 env
+.python-version
 
 # Built docs
 doc/_build/**
+
+# Generated html coverage reports
+htmlcov/

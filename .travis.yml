@@ -9,7 +9,7 @@ before_install:
 
 install:
   - travis_retry pip install .
-  - pip install -r requirements.testing.txt
+  - pip install -r requirements.devel.txt
 
 script:
   - make test
