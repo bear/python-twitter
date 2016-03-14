@@ -2,15 +2,14 @@ DOCOPTIONS = html
 DOCDIR = doc
 
 help:
-	@echo "  env-devel   create a development environment using virtualenv"
-	@echo "  env-prod    create a production environment without development dependencies"
-	@echo "  deps-devel  install dependencies for development and testing"
-	@echo "  deps-prod   install only production dependencies"
-	@echo "  docs        build documentation"
-	@echo "  clean       remove unwanted stuff"
-	@echo "  lint        check style with flake8"
-	@echo "  test        run tests"
-	@echo "  coverage    run tests with code coverage"
+	@echo "  env             create a development environment using pyenv"
+	@echo "  development     install dependencies for development and testing"
+	@echo "  production      install only production dependencies"
+	@echo "  docs            build documentation"
+	@echo "  clean           remove unwanted stuff"
+	@echo "  lint            check style with flake8"
+	@echo "  test            run tests"
+	@echo "  coverage        run tests with code coverage"
 
 env:
 	@pyenv install -s 3.5.1
