@@ -1,5 +1,13 @@
 # encoding: utf-8
+import mimetypes
+import os
 import re
+
+import requests
+from tempfile import NamedTemporaryFile
+
+from twitter import TwitterError
+
 
 TLDS = [
     "ac", "ad", "ae", "af", "ag", "ai", "al", "am", "an", "ao", "aq", "ar",
@@ -134,6 +142,17 @@ URL_REGEXP = re.compile(r'(?i)((?:https?://|www\\.)*(?:[\w+-_]+[.])(?:' + r'\b|'
 
 
 def calc_expected_status_length(status, short_url_length=23):
+    """ Calculates the length of a tweet, taking into account Twitter's
+    replacement of URLs with https://t.co links.
+
+    Args:
+        status: text of the status message to be posted.
+        short_url_length: the current published https://t.co links
+
+    Returns:
+        Expected length of the status message as an integer.
+
+    """
     replaced_chars = 0
     status_length = len(status)
     match = re.findall(URL_REGEXP, status)
@@ -144,7 +163,103 @@ def calc_expected_status_length(status, short_url_length=23):
 
 
 def is_url(text):
+    """ Checks to see if a bit of text is a URL.
+
+    Args:
+        text: text to check.
+
+    Returns:
+        Boolean of whether the text should be treated as a URL or not.
+    """
     if re.findall(URL_REGEXP, text):
         return True
     else:
         return False
+
+
+def http_to_file(http):
+    data_file = NamedTemporaryFile()
+    req = requests.get(http, stream=True)
+    data_file.write(req.raw.data)
+    return data_file
+
+
+def parse_media_file(passed_media):
+    """ Parses a media file and attempts to return a file-like object and
+    information about the media file.
+
+    Args:
+        passed_media: media file which to parse.
+
+    Returns:
+        file-like object, the filename of the media file, the file size, and
+        the type of media.
+    """
+    img_formats = ['image/jpeg',
+                   'image/png',
+                   'image/gif',
+                   'image/bmp',
+                   'image/webp']
+    video_formats = ['video/mp4']
+
+    # If passed_media is a string, check if it points to a URL, otherwise,
+    # it should point to local file. Create a reference to a file obj for
+    #  each case such that data_file ends up with a read() method.
+    if not hasattr(passed_media, 'read'):
+        if passed_media.startswith('http'):
+            data_file = http_to_file(passed_media)
+            filename = os.path.basename(passed_media)
+        else:
+            data_file = open(os.path.realpath(passed_media), 'rb')
+            filename = os.path.basename(passed_media)
+
+    # Otherwise, if a file object was passed in the first place,
+    # create the standard reference to media_file (i.e., rename it to fp).
+    else:
+        if passed_media.mode != 'rb':
+            raise TwitterError({'message': 'File mode must be "rb".'})
+        filename = os.path.basename(passed_media.name)
+        data_file = passed_media
+
+    data_file.seek(0, 2)
+    file_size = data_file.tell()
+
+    try:
+        data_file.seek(0)
+    except:
+        pass
+
+    media_type = mimetypes.guess_type(os.path.basename(filename))[0]
+    if media_type in img_formats and file_size > 5 * 1048576:
+        raise TwitterError({'message': 'Images must be less than 5MB.'})
+    elif media_type in video_formats and file_size > 15 * 1048576:
+        raise TwitterError({'message': 'Videos must be less than 15MB.'})
+    elif media_type not in img_formats and media_type not in video_formats:
+        raise TwitterError({'message': 'Media type could not be determined.'})
+
+    return data_file, filename, file_size, media_type
+
+
+def enf_type(field, _type, val):
+    """ Checks to see if a given val for a field (i.e., the name of the field)
+    is of the proper _type. If it is not, raises a TwitterError with a brief
+    explanation.
+
+    Args:
+        field:
+            Name of the field you are checking.
+        _type:
+            Type that the value should be returned as.
+        val:
+            Value to convert to _type.
+
+    Returns:
+        val converted to type _type.
+
+    """
+    try:
+        return _type(val)
+    except ValueError:
+        raise TwitterError({
+            'message': '"{0}" must be type {1}'.format(field, _type.__name__)
+        })

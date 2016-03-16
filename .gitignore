@@ -42,3 +42,6 @@ htmlcov
 env
 
 violations.flake8.txt
+
+# Built docs
+doc/_build/**

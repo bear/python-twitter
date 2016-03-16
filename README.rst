@@ -5,7 +5,7 @@ A Python wrapper around the Twitter API.
 By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
 
 .. image:: https://img.shields.io/pypi/v/python-twitter.svg
-    :target: https://pypi.python.org/pypi/parsedatetime/
+    :target: https://pypi.python.org/pypi/python-twitter/
     :alt: Downloads
 
 .. image:: https://travis-ci.org/bear/python-twitter.svg?branch=master
@@ -84,7 +84,7 @@ The library provides a Python wrapper around the Twitter API and the Twitter dat
 Using with Django
 ----
 
-Additional template tags that expand tweet urls and urlize tweet text. See the django template tags available for use with python-twitter: https://github.com/radlws/python-twitter-django-tags
+Additional template tags that expand tweet urls and urlize tweet text. See the django template tags available for use with python-twitter: https://github.com/radzhome/python-twitter-django-tags
 
 -----
 Model
@@ -124,7 +124,7 @@ To create an instance of the ``twitter.Api`` with login credentials (Twitter now
 
 To see if your credentials are successful::
 
-    >>> print api.VerifyCredentials()
+    >>> print(api.VerifyCredentials())
     {"id": 16133, "location": "Philadelphia", "name": "bear"}
 
 **NOTE**: much more than the small sample given here will print
@@ -132,17 +132,17 @@ To see if your credentials are successful::
 To fetch a single user's public status messages, where ``user`` is a Twitter *short name*::
 
     >>> statuses = api.GetUserTimeline(screen_name=user)
-    >>> print [s.text for s in statuses]
+    >>> print([s.text for s in statuses])
 
 To fetch a list a user's friends (requires authentication)::
 
     >>> users = api.GetFriends()
-    >>> print [u.name for u in users]
+    >>> print([u.name for u in users])
 
 To post a Twitter status message (requires authentication)::
 
     >>> status = api.PostUpdate('I love python-twitter!')
-    >>> print status.text
+    >>> print(status.text)
     I love python-twitter!
 
 There are many more API methods, to read the full API documentation::

@@ -24,7 +24,6 @@ from __future__ import print_function
 import sys
 import gzip
 import time
-import types
 import base64
 import re
 import datetime
@@ -32,6 +31,8 @@ from calendar import timegm
 import requests
 from requests_oauthlib import OAuth1
 import io
+import warnings
+from uuid import uuid4
 
 from past.utils import old_div
 
@@ -50,7 +51,15 @@ from twitter import (__version__, _FileCache, json, DirectMessage, List,
                      Status, Trend, TwitterError, User, UserStatus)
 from twitter.category import Category
 
-from twitter.twitter_utils import calc_expected_status_length, is_url
+from twitter.ratelimit import RateLimit
+
+from twitter.twitter_utils import (
+    calc_expected_status_length,
+    is_url,
+    parse_media_file,
+    enf_type)
+
+warnings.simplefilter('always', DeprecationWarning)
 
 CHARACTER_LIMIT = 140
 
@@ -74,7 +83,7 @@ class Api(object):
       a Twitter "short name" or their user id.
 
         >>> statuses = api.GetUserTimeline(user)
-        >>> print [s.text for s in statuses]
+        >>> print([s.text for s in statuses])
 
       To use authentication, instantiate the twitter.Api class with a
       consumer key and secret; and the oAuth key and secret:
@@ -87,12 +96,12 @@ class Api(object):
       To fetch your friends (after being authenticated):
 
         >>> users = api.GetFriends()
-        >>> print [u.name for u in users]
+        >>> print([u.name for u in users])
 
       To post a twitter status message (after being authenticated):
 
         >>> status = api.PostUpdate('I love python-twitter!')
-        >>> print status.text
+        >>> print(status.text)
         I love python-twitter!
 
       There are many other methods, including:
@@ -133,9 +142,11 @@ class Api(object):
                  base_url=None,
                  stream_url=None,
                  upload_url=None,
+                 chunk_size=1024*1024,
                  use_gzip_compression=False,
                  debugHTTP=False,
-                 timeout=None):
+                 timeout=None,
+                 sleep_on_rate_limit=False):
         """Instantiate a new twitter.Api object.
 
         Args:
@@ -185,6 +196,9 @@ class Api(object):
         self._InitializeUserAgent()
         self._InitializeDefaultParameters()
 
+        self.rate_limit = None
+        self.sleep_on_rate_limit = sleep_on_rate_limit
+
         if base_url is None:
             self.base_url = 'https://api.twitter.com/1.1'
         else:
@@ -200,11 +214,21 @@ class Api(object):
         else:
             self.upload_url = upload_url
 
+        self.chunk_size = chunk_size
+
+        if self.chunk_size < 1024 * 16:
+            warnings.warn((
+                "A chunk size lower than 16384 may result in too many "
+                "requests to the Twitter API when uploading videos. You are "
+                "strongly advised to increase it above 16384"
+            ))
+
         if consumer_key is not None and (access_token_key is None or
                                          access_token_secret is None):
-            print >> sys.stderr, 'Twitter now requires an oAuth Access Token for API calls.'
-            print >> sys.stderr, 'If you\'re using this library from a command line utility, please'
-            print >> sys.stderr, 'run the included get_access_token.py tool to generate one.'
+            print('Twitter now requires an oAuth Access Token for API calls. '
+                  'If you\'re using this library from a command line utility, '
+                  'please run the included get_access_token.py tool to '
+                  'generate one.', file=sys.stderr)
 
             raise TwitterError({'message': "Twitter requires oAuth Access Token for all API access"})
 
@@ -280,7 +304,7 @@ class Api(object):
 
     def GetSearch(self,
                   term=None,
-                  who=None,
+                  raw_query=None,
                   geocode=None,
                   since_id=None,
                   max_id=None,
@@ -291,111 +315,125 @@ class Api(object):
                   locale=None,
                   result_type="mixed",
                   include_entities=None):
-        """Return twitter search results for a given term.
+        """Return twitter search results for a given term. You must specify one
+        of term, geocode, or raw_query.
 
         Args:
-          term:
+          term (str, optional):
             Term to search by. Optional if you include geocode.
-          who:
-            Handle of user's tweets you want. Optional.
-          since_id:
+          raw_query (str, optional):
+            A raw query as a string. This should be everything after the "?" in
+            the URL (i.e., the query parameters). You are responsible for all
+            type checking and ensuring that the query string is properly
+            formatted, as it will only be URL-encoded before be passed directly
+            to Twitter with no other checks performed. For advanced usage only.
+          since_id (int, optional):
             Returns results with an ID greater than (that is, more recent
             than) the specified ID. There are limits to the number of
             Tweets which can be accessed through the API. If the limit of
             Tweets has occurred since the since_id, the since_id will be
-            forced to the oldest ID available. [Optional]
-          max_id:
+            forced to the oldest ID available.
+          max_id (int, optional):
             Returns only statuses with an ID less than (that is, older
-            than) or equal to the specified ID. [Optional]
-          until:
+            than) or equal to the specified ID.
+          until (str, optional):
             Returns tweets generated before the given date. Date should be
-            formatted as YYYY-MM-DD. [Optional]
-          since:
+            formatted as YYYY-MM-DD.
+          since (str, optional):
             Returns tweets generated since the given date. Date should be
-            formatted as YYYY-MM-DD. [Optional]
-          geocode:
-            Geolocation information in the form (latitude, longitude, radius)
-            [Optional]
-          count:
-            Number of results to return.  Default is 15 and maxmimum that twitter
-            returns is 100 irrespective of what you type in. [Optional]
-          lang:
-            Language for results as ISO 639-1 code.  Default is None (all languages)
-            [Optional]
-          locale:
-            Language of the search query. Currently only 'ja' is effective. This is
-            intended for language-specific consumers and the default should work in
-            the majority of cases.
-          result_type:
-            Type of result which should be returned.  Default is "mixed".  Other
-            valid options are "recent" and "popular". [Optional]
-          include_entities:
-            If True, each tweet will include a node called "entities,".
+            formatted as YYYY-MM-DD.
+          geocode (str or list or tuple, optional):
+            Geolocation within which to search for tweets. Can be either a
+            string in the form of "latitude,longitude,radius" where latitude
+            and longitude are floats and radius is a string such as "1mi" or
+            "1km" ("mi" or "km" are the only units allowed). For example:
+              >>> api.GetSearch(geocode="37.781157,-122.398720,1mi").
+            Otherwise, you can pass a list of either floats or strings for
+            lat/long and a string for radius:
+              >>> api.GetSearch(geocode=[37.781157, -122.398720, "1mi"])
+              >>> # or:
+              >>> api.GetSearch(geocode=(37.781157, -122.398720, "1mi"))
+              >>> # or:
+              >>> api.GetSearch(geocode=("37.781157", "-122.398720", "1mi"))
+          count (int, optional):
+            Number of results to return.  Default is 15 and maxmimum that
+            Twitter returns is 100 irrespective of what you type in.
+          lang (str, optional):
+            Language for results as ISO 639-1 code.  Default is None
+            (all languages).
+          locale (str, optional):
+            Language of the search query. Currently only 'ja' is effective.
+            This is intended for language-specific consumers and the default
+            should work in the majority of cases.
+          result_type (str, optional):
+            Type of result which should be returned. Default is "mixed".
+            Valid options are "mixed, "recent", and "popular".
+          include_entities (bool, optional):
+            If True, each tweet will include a node called "entities".
             This node offers a variety of metadata about the tweet in a
             discrete structure, including: user_mentions, urls, and
-            hashtags. [Optional]
+            hashtags.
 
         Returns:
-          A sequence of twitter.Status instances, one for each message containing
-          the term
+          list: A sequence of twitter.Status instances, one for each message
+          containing the term, within the bounds of the geocoded area, or
+          given by the raw_query.
         """
-        # Build request parameters
+
+        url = '%s/search/tweets.json' % self.base_url
         parameters = {}
 
         if since_id:
-            try:
-                parameters['since_id'] = int(since_id)
-            except ValueError:
-                raise TwitterError({'message': "since_id must be an integer"})
+            parameters['since_id'] = enf_type('since_id', int, since_id)
 
         if max_id:
-            try:
-                parameters['max_id'] = int(max_id)
-            except ValueError:
-                raise TwitterError({'message': "max_id must be an integer"})
+            parameters['max_id'] = enf_type('max_id', int, max_id)
 
         if until:
-            parameters['until'] = until
+            parameters['until'] = enf_type('until', str, until)
 
         if since:
-            parameters['since'] = since
+            parameters['since'] = enf_type('since', str, since)
 
         if lang:
-            parameters['lang'] = lang
+            parameters['lang'] = enf_type('lang', str, lang)
 
         if locale:
-            parameters['locale'] = locale
+            parameters['locale'] = enf_type('locale', str, locale)
 
-        if term is None and geocode is None and who is None:
+        if term is None and geocode is None and raw_query is None:
             return []
 
         if term is not None:
             parameters['q'] = term
 
-        if who is not None:
-            parameters['q'] = "from:%s" % (who)
-
         if geocode is not None:
-            parameters['geocode'] = ','.join(map(str, geocode))
+            if isinstance(geocode, list) or isinstance(geocode, tuple):
+                parameters['geocode'] = ','.join([str(geo) for geo in geocode])
+            else:
+                parameters['geocode'] = enf_type('geocode', str, geocode)
 
         if include_entities:
-            parameters['include_entities'] = 1
+            parameters['include_entities'] = enf_type('include_entities',
+                                                      bool,
+                                                      include_entities)
 
-        try:
-            parameters['count'] = int(count)
-        except ValueError:
-            raise TwitterError({'message': "count must be an integer"})
+        parameters['count'] = enf_type('count', int, count)
 
         if result_type in ["mixed", "popular", "recent"]:
             parameters['result_type'] = result_type
 
-        # Make and send requests
-        url = '%s/search/tweets.json' % self.base_url
-        resp = self._RequestUrl(url, 'GET', data=parameters)
+        if raw_query is not None:
+            url = "{url}?{raw_query}".format(
+                url=url,
+                raw_query=raw_query)
+            resp = self._RequestUrl(url, 'GET')
+        else:
+            resp = self._RequestUrl(url, 'GET', data=parameters)
+
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        # Return built list of statuses
-        return [Status.NewFromJsonDict(x) for x in data['statuses']]
+        return [Status.NewFromJsonDict(x) for x in data.get('statuses', '')]
 
     def GetUsersSearch(self,
                        term=None,
@@ -535,8 +573,6 @@ class Api(object):
 
         The home timeline is central to how most users interact with Twitter.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           count:
             Specifies the number of statuses to retrieve. May not be
@@ -575,8 +611,6 @@ class Api(object):
         """
         url = '%s/statuses/home_timeline.json' % self.base_url
 
-        if not self.__auth:
-            raise TwitterError({'message': "API must be authenticated."})
         parameters = {}
         if count is not None:
             try:
@@ -700,8 +734,6 @@ class Api(object):
                   include_entities=True):
         """Returns a single status message, specified by the id parameter.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           id:
             The numeric ID of the status you are trying to retrieve.
@@ -723,9 +755,6 @@ class Api(object):
           A twitter.Status instance representing that status message
         """
         url = '%s/statuses/show.json' % (self.base_url)
-
-        if not self.__auth:
-            raise TwitterError({'message': "API must be authenticated."})
 
         parameters = {}
 
@@ -761,8 +790,6 @@ class Api(object):
 
         Specify tweet by the id or url parameter.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           id:
             The numeric ID of the status you are trying to embed.
@@ -791,9 +818,6 @@ class Api(object):
           A dictionary with the response.
         """
         request_url = '%s/statuses/oembed.json' % (self.base_url)
-
-        if not self.__auth:
-            raise TwitterError({'message': "API must be authenticated."})
 
         parameters = {}
 
@@ -836,8 +860,8 @@ class Api(object):
     def DestroyStatus(self, id, trim_user=False):
         """Destroys the status specified by the required ID parameter.
 
-        The twitter.Api instance must be authenticated and the
-        authenticating user must be the author of the specified status.
+        The authenticating user must be the author of the specified
+        status.
 
         Args:
           id:
@@ -846,9 +870,6 @@ class Api(object):
         Returns:
           A twitter.Status instance representing the destroyed status message
         """
-        if not self.__auth:
-            raise TwitterError({'message': "API must be authenticated."})
-
         try:
             post_data = {'id': int(id)}
         except ValueError:
@@ -864,6 +885,9 @@ class Api(object):
 
     def PostUpdate(self,
                    status,
+                   media=None,
+                   media_additional_owners=None,
+                   media_category=None,
                    in_reply_to_status_id=None,
                    latitude=None,
                    longitude=None,
@@ -873,14 +897,24 @@ class Api(object):
                    verify_status_length=True):
         """Post a twitter status message from the authenticated user.
 
-        The twitter.Api instance must be authenticated.
-
         https://dev.twitter.com/docs/api/1.1/post/statuses/update
 
         Args:
           status:
-            The message text to be posted.
-            Must be less than or equal to 140 characters.
+            The message text to be posted. Must be less than or equal to 140
+            characters.
+          media:
+            A URL, a local file, or a file-like object (something with a read()
+            method), or a list of any combination of the above.
+          media_additional_owners:
+            A list of user ids representing Twitter users that should be able
+            to use the uploaded media in their tweets. If you pass a list of
+            media, then additional_owners will apply to each object. If you
+            need more granular control, please use the UploadMedia* methods.
+          media_category:
+            Only for use with the AdsAPI. See
+            https://dev.twitter.com/ads/creative/promoted-video-overview if
+            this applies to your application.
           in_reply_to_status_id:
             The ID of an existing status that the status to be posted is
             in reply to.  This implicitly sets the in_reply_to_user_id
@@ -914,9 +948,6 @@ class Api(object):
         Returns:
           A twitter.Status instance representing the message posted.
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         url = '%s/statuses/update.json' % self.base_url
 
         if isinstance(status, str) or self._input_encoding is None:
@@ -927,23 +958,227 @@ class Api(object):
         if verify_status_length and calc_expected_status_length(u_status) > 140:
             raise TwitterError("Text must be less than or equal to 140 characters.")
 
-        data = {'status': u_status}
-        if in_reply_to_status_id:
-            data['in_reply_to_status_id'] = in_reply_to_status_id
-        if latitude is not None and longitude is not None:
-            data['lat'] = str(latitude)
-            data['long'] = str(longitude)
-        if place_id is not None:
-            data['place_id'] = str(place_id)
-        if display_coordinates:
-            data['display_coordinates'] = 'true'
-        if trim_user:
-            data['trim_user'] = 'true'
+        parameters = {'status': u_status}
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        if media:
+            media_ids = []
+            if isinstance(media, int):
+                media_ids.append(media)
+
+            elif isinstance(media, list):
+                for media_file in media:
+
+                    # If you want to pass just a media ID, it should be an int
+                    if isinstance(media_file, int):
+                        media_ids.append(media_file)
+                        continue
+
+                    _, _, file_size, media_type = parse_media_file(media_file)
+                    if media_type == 'image/gif' or media_type == 'video/mp4':
+                        raise TwitterError(
+                            'You cannot post more than 1 GIF or 1 video in a '
+                            'single status.')
+                    if file_size > self.chunk_size:
+                        media_id = self.UploadMediaChunked(
+                            media=media_file,
+                            additional_owners=media_additional_owners,
+                            media_category=media_category)
+                    else:
+                        media_id = self.UploadMediaSimple(
+                            media=media_file,
+                            additional_owners=media_additional_owners,
+                            media_category=media_category)
+                    media_ids.append(media_id)
+            else:
+                _, _, file_size, _ = parse_media_file(media)
+                if file_size > self.chunk_size:
+                    media_ids = self.UploadMediaChunked(
+                        media,
+                        media_additional_owners)
+                else:
+                    media_ids.append(
+                        self.UploadMediaSimple(media,
+                                               media_additional_owners))
+            parameters['media_ids'] = ','.join([str(mid) for mid in media_ids])
+
+        if in_reply_to_status_id:
+            parameters['in_reply_to_status_id'] = in_reply_to_status_id
+        if latitude is not None and longitude is not None:
+            parameters['lat'] = str(latitude)
+            parameters['long'] = str(longitude)
+        if place_id is not None:
+            parameters['place_id'] = str(place_id)
+        if display_coordinates:
+            parameters['display_coordinates'] = 'true'
+        if trim_user:
+            parameters['trim_user'] = 'true'
+
+        resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
+
+    def UploadMediaSimple(self,
+                          media,
+                          additional_owners=None,
+                          media_category=None):
+
+        """ Upload a media file to Twitter in one request. Used for small file
+        uploads that do not require chunked uploads.
+
+        Args:
+            media:
+                File-like object to upload.
+            additional_owners: additional Twitter users that are allowed to use
+                The uploaded media. Should be a list of integers. Maximum
+                number of additional owners is capped at 100 by Twitter.
+            media_category:
+                Category with which to identify media upload. Only use with Ads
+                API & video files.
+
+        Returns:
+            media_id:
+                ID of the uploaded media returned by the Twitter API or 0.
+
+        """
+        url = '%s/media/upload.json' % self.upload_url
+        parameters = {}
+
+        media_fp, filename, file_size, media_type = parse_media_file(media)
+
+        parameters['media'] = media_fp.read()
+
+        if additional_owners and len(additional_owners) > 100:
+            raise TwitterError({'message': 'Maximum of 100 additional owners may be specified for a Media object'})
+        if additional_owners:
+            parameters['additional_owners'] = additional_owners
+        if media_category:
+            parameters['media_category'] = media_category
+
+        resp = self._RequestUrl(url, 'POST', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        try:
+            return data['media_id']
+        except KeyError:
+            raise TwitterError({'message': 'Media could not be uploaded.'})
+
+    def UploadMediaChunked(self,
+                           media,
+                           additional_owners=None,
+                           media_category=None):
+        """ Upload a media file to Twitter in multiple requests.
+
+        Args:
+            media:
+                File-like object to upload.
+            additional_owners: additional Twitter users that are allowed to use
+                The uploaded media. Should be a list of integers. Maximum
+                number of additional owners is capped at 100 by Twitter.
+            media_category:
+                Category with which to identify media upload. Only use with Ads
+                API & video files.
+
+        Returns:
+            media_id:
+                ID of the uploaded media returned by the Twitter API or 0.
+        """
+        url = '%s/media/upload.json' % self.upload_url
+
+        media_fp, filename, file_size, media_type = parse_media_file(media)
+
+        if not all([media_fp, filename, file_size, media_type]):
+            raise TwitterError({'message': 'Could not process media file'})
+
+        parameters = {}
+
+        if additional_owners and len(additional_owners) > 100:
+            raise TwitterError({'message': 'Maximum of 100 additional owners may be specified for a Media object'})
+        if additional_owners:
+            parameters['additional_owners'] = additional_owners
+        if media_category:
+            parameters['media_category'] = media_category
+
+        # INIT doesn't read in any data. It's purpose is to prepare Twitter to
+        # receive the content in APPEND requests.
+        parameters['command'] = 'INIT'
+        parameters['media_type'] = media_type
+        parameters['total_bytes'] = file_size
+
+        resp = self._RequestUrl(url, 'POST', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        try:
+            media_id = data['media_id']
+        except KeyError:
+            raise TwitterError({'message': 'Media could not be uploaded'})
+
+        boundary = bytes("--{0}".format(uuid4()), 'utf-8')
+        media_id_bytes = bytes(str(media_id).encode('utf-8'))
+        headers = {'Content-Type': 'multipart/form-data; boundary={0}'.format(
+            str(boundary[2:], 'utf-8'))}
+
+        segment_id = 0
+        while True:
+            try:
+                data = media_fp.read(self.chunk_size)
+            except ValueError:
+                break
+            if not data:
+                break
+            body = [
+                boundary,
+                b'Content-Disposition: form-data; name="command"',
+                b'',
+                b'APPEND',
+                boundary,
+                b'Content-Disposition: form-data; name="media_id"',
+                b'',
+                media_id_bytes,
+                boundary,
+                b'Content-Disposition: form-data; name="segment_index"',
+                b'',
+                bytes(str(segment_id).encode('utf-8')),
+                boundary,
+                bytes('Content-Disposition: form-data; name="media"; filename="{0}"'.format(filename), 'utf-8'),
+                b'Content-Type: application/octet-stream',
+                b'',
+                data,
+                boundary + b'--'
+            ]
+            body_data = b'\r\n'.join(body)
+            headers['Content-Length'] = str(len(body_data))
+
+            resp = self._RequestChunkedUpload(url=url,
+                                              headers=headers,
+                                              data=body_data)
+
+            # The body of the response should be blank, but the normal decoding
+            # raises a JSONDecodeError, so we should only do error checking
+            # if the response is not blank.
+            if resp.content.decode('utf-8'):
+                return self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+            segment_id += 1
+
+        try:
+            media_fp.close()
+        except:
+            pass
+
+        # Finalizing the upload:
+        parameters = {
+            'command': 'FINALIZE',
+            'media_id': media_id
+        }
+
+        resp = self._RequestUrl(url, 'POST', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        try:
+            return data['media_id']
+        except KeyError:
+            raise TwitterError({'message': 'Media could not be uploaded.'})
 
     def PostMedia(self,
                   status,
@@ -978,8 +1213,13 @@ class Api(object):
           Returns:
               A twitter.Status instance representing the message posted.
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
+
+        warnings.warn((
+            "This endpoint has been deprecated by Twitter. Please use "
+            "PostUpdate() instead. Details of Twitter's deprecation can be "
+            "found at: "
+            "dev.twitter.com/rest/reference/post/statuses/update_with_media"),
+            DeprecationWarning)
 
         url = '%s/statuses/update_with_media.json' % self.base_url
 
@@ -1042,9 +1282,11 @@ class Api(object):
           Returns:
               A twitter.Status instance representing the message posted.
         """
-        if not self.__auth:
-            raise TwitterError("The twitter.Api instance must be authenticated.")
 
+        warnings.warn((
+            "This method is deprecated. Please use PostUpdate instead, "
+            "passing a list of media that you would like to associate "
+            "with the updated."), DeprecationWarning, stacklevel=2)
         if type(media) is not list:
             raise TwitterError("Must by multiple media elements")
 
@@ -1135,8 +1377,6 @@ class Api(object):
         Unlike api.PostUpdate, this method will post multiple status updates
         if the message is longer than 140 characters.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           status:
             The message text to be posted.
@@ -1174,8 +1414,6 @@ class Api(object):
     def PostRetweet(self, original_id, trim_user=False):
         """Retweet a tweet with the Retweet API.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           original_id:
             The numerical id of the tweet that will be retweeted
@@ -1187,9 +1425,6 @@ class Api(object):
         Returns:
           A twitter.Status instance representing the original tweet with retweet details embedded.
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         try:
             if int(original_id) <= 0:
                 raise TwitterError({'message': "'original_id' must be a positive number"})
@@ -1211,8 +1446,6 @@ class Api(object):
                         max_id=None,
                         trim_user=False):
         """Fetch the sequence of retweets made by the authenticated user.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           count:
@@ -1287,9 +1520,6 @@ class Api(object):
         Returns:
           A list of twitter.Status instances, which are retweets of statusid
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instsance must be authenticated."})
-
         url = '%s/statuses/retweets/%s.json' % (self.base_url, statusid)
         parameters = {}
         if trim_user:
@@ -1323,9 +1553,6 @@ class Api(object):
         Returns:
           A list of user IDs
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instsance must be authenticated."})
-
         url = '%s/statuses/retweeters/ids.json' % (self.base_url)
         parameters = {}
         parameters['id'] = status_id
@@ -1385,9 +1612,6 @@ class Api(object):
           include_user_entities:
             When True, the user entities will be included. [Optional]
         """
-        if not self.__auth:
-            raise TwitterError({'error': "The twitter.Api instance must be authenticated."})
-
         url = '%s/statuses/retweets_of_me.json' % self.base_url
         parameters = {}
         if count is not None:
@@ -1414,26 +1638,17 @@ class Api(object):
 
         return [Status.NewFromJsonDict(s) for s in data]
 
-    def GetBlocks(self,
-                  user_id=None,
-                  screen_name=None,
-                  cursor=-1,
-                  skip_status=False,
-                  include_user_entities=False):
-        """Fetch the sequence of twitter.User instances, one for each blocked user.
-
-        The twitter.Api instance must be authenticated.
+    def GetBlocksPaged(self,
+                       cursor=-1,
+                       skip_status=False,
+                       include_user_entities=False):
+        """ Fetch a page of the users (as twitter.User instances)
+        blocked by the currently authenticated user.
 
         Args:
-          user_id:
-            The twitter id of the user whose friends you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
-          screen_name:
-            The twitter name of the user whose friends you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
           cursor:
-            Should be set to -1 for the initial call and then is used to
-            control what result page Twitter returns.
+            Should be set to -1 if you want the first page, thereafter denotes
+            the page of blocked users that you want to return.
           skip_status:
             If True the statuses will not be returned in the user items.
             [Optional]
@@ -1441,35 +1656,123 @@ class Api(object):
             When True, the user entities will be included. [Optional]
 
         Returns:
-          A sequence of twitter.User instances, one for each friend
+          next_cursor, previous_cursor, list of twitter.User instances,
+          one for each blocked user.
         """
-        if not self.__auth:
-            raise TwitterError({'message': "twitter.Api instance must be authenticated"})
-
         url = '%s/blocks/list.json' % self.base_url
         result = []
         parameters = {}
-        if user_id is not None:
-            parameters['user_id'] = user_id
-        if screen_name is not None:
-            parameters['screen_name'] = screen_name
         if skip_status:
             parameters['skip_status'] = True
         if include_user_entities:
             parameters['include_user_entities'] = True
+        parameters['cursor'] = cursor
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        result += [User.NewFromJsonDict(x) for x in data['users']]
+        next_cursor = data.get('next_cursor', 0)
+        previous_cursor = data.get('previous_cursor', 0)
+
+        return next_cursor, previous_cursor, result
+
+    def GetBlocks(self,
+                  skip_status=False,
+                  include_user_entities=False):
+        """ Fetch the sequence of all users (as twitter.User instances),
+        blocked by the currently authenticated user.
+
+        Args:
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          A list of twitter.User instances, one for each blocked user.
+        """
+        result = []
+        cursor = -1
 
         while True:
-            parameters['cursor'] = cursor
-            resp = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-            result += [User.NewFromJsonDict(x) for x in data['users']]
-            if 'next_cursor' in data:
-                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
-                    break
-                else:
-                    cursor = data['next_cursor']
-            else:
+            next_cursor, previous_cursor, users = self.GetBlocksPaged(
+                cursor=cursor,
+                skip_status=skip_status,
+                include_user_entities=include_user_entities)
+            result += users
+            if next_cursor == 0 or next_cursor == previous_cursor:
                 break
+            else:
+                cursor = next_cursor
+
+        return result
+
+    def GetBlocksIDsPaged(self,
+                          cursor=-1,
+                          skip_status=None,
+                          include_user_entities=None):
+        """ Fetch a page of the user IDs (integers) blocked by the currently
+        authenticated user.
+
+        Args:
+          cursor:
+            Should be set to -1 if you want the first page, thereafter denotes
+            the page of blocked users that you want to return.
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          next_cursor, previous_cursor, list of user IDs of blocked users.
+        """
+        url = '%s/blocks/ids.json' % self.base_url
+        parameters = {}
+        if skip_status:
+            parameters['skip_status'] = True
+        if include_user_entities:
+            parameters['include_user_entities'] = True
+        parameters['cursor'] = cursor
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        user_ids = data.get('ids', [])
+        next_cursor = data.get('next_cursor', 0)
+        previous_cursor = data.get('previous_cursor', 0)
+
+        return next_cursor, previous_cursor, user_ids
+
+    def GetBlocksIDs(self,
+                     skip_status=None,
+                     include_user_entities=None):
+        """ Fetch the sequence of all users (as integer user ids),
+        blocked by the currently authenticated user.
+
+        Args:
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          A list of user IDs for all blocked users.
+        """
+        result = []
+        cursor = -1
+
+        while True:
+            next_cursor, previous_cursor, user_ids = self.GetBlocksIDsPaged(
+                cursor=cursor,
+                skip_status=skip_status,
+                include_user_entities=include_user_entities)
+            result += user_ids
+            if next_cursor == 0 or next_cursor == previous_cursor:
+                break
+            else:
+                cursor = next_cursor
 
         return result
 
@@ -1477,8 +1780,7 @@ class Api(object):
         """Destroys the block for the user specified by the required ID
         parameter.
 
-        The twitter.Api instance must be authenticated and the
-        authenticating user must have blocked the user specified by the
+        The authenticating user must have blocked the user specified by the
         required ID parameter.
 
         Args:
@@ -1488,9 +1790,6 @@ class Api(object):
         Returns:
           A twitter.User instance representing the un-blocked user.
         """
-        if not self.__auth:
-            raise TwitterError({'message': "API must be authenticated."})
-
         try:
             post_data = {'user_id': int(id)}
         except ValueError:
@@ -1504,73 +1803,7 @@ class Api(object):
 
         return Status.NewFromJsonDict(data)
 
-    def GetFriends(self, user_id=None, screen_name=None, cursor=-1, count=None, skip_status=False,
-                   include_user_entities=False):
-        """Fetch the sequence of twitter.User instances, one for each friend.
-
-        The twitter.Api instance must be authenticated.
-
-        Args:
-          user_id:
-            The twitter id of the user whose friends you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
-          screen_name:
-            The twitter name of the user whose friends you are fetching.
-            If not specified, defaults to the authenticated user. [Optional]
-          cursor:
-            Should be set to -1 for the initial call and then is used to
-            control what result page Twitter returns.
-          count:
-            The number of users to return per page, up to a maximum of 200.
-            Defaults to 20. [Optional]
-          skip_status:
-            If True the statuses will not be returned in the user items.
-            [Optional]
-          include_user_entities:
-            When True, the user entities will be included. [Optional]
-
-        Returns:
-          A sequence of twitter.User instances, one for each friend
-        """
-        if not self.__auth:
-            raise TwitterError({'message': "twitter.Api instance must be authenticated"})
-
-        url = '%s/friends/list.json' % self.base_url
-        result = []
-        parameters = {}
-        if user_id is not None:
-            parameters['user_id'] = user_id
-        if screen_name is not None:
-            parameters['screen_name'] = screen_name
-        if count:
-            try:
-                parameters['count'] = int(count)
-            except ValueError:
-                raise TwitterError({'message': "count must be an integer"})
-        if skip_status:
-            parameters['skip_status'] = True
-        if include_user_entities:
-            parameters['include_user_entities'] = True
-
-        while True:
-            parameters['cursor'] = cursor
-            resp = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-            result += [User.NewFromJsonDict(x) for x in data['users']]
-            if 'next_cursor' in data:
-                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
-                    break
-                else:
-                    cursor = data['next_cursor']
-            else:
-                break
-            sec = self.GetSleepTime('/friends/list')
-            time.sleep(sec)
-
-        return result
-
     def _GetIDsPaged(self,
-                     # must be the url for followers/ids.json or friends/ids.json
                      url,
                      user_id,
                      screen_name,
@@ -1578,41 +1811,35 @@ class Api(object):
                      stringify_ids,
                      count):
         """
-        This is the lowlest level paging logic for fetching IDs. It is used soley by
-        GetFollowerIDsPaged and GetFriendIDsPaged. It is not intended for other use.
+        This is the lowest level paging logic for fetching IDs. It is used
+        solely by GetFollowerIDsPaged and GetFriendIDsPaged. It is not intended
+        for other use.
 
-        See GetFollowerIDsPaged or GetFriendIDsPaged for an explanation of the input arguments.
+        See GetFollowerIDsPaged or GetFriendIDsPaged for an explanation of the
+        input arguments.
         """
-        # assert(url.endswith('followers/ids.json') or url.endswith('friends/ids.json'))
-        if not self.__auth:
-            raise TwitterError({'message': "twitter.Api instance must be authenticated"})
         result = []
+
         parameters = {}
         if user_id is not None:
             parameters['user_id'] = user_id
         if screen_name is not None:
             parameters['screen_name'] = screen_name
-        if stringify_ids:
-            parameters['stringify_ids'] = True
         if count is not None:
             parameters['count'] = count
+        parameters['stringify_ids'] = stringify_ids
+        parameters['cursor'] = cursor
 
-        while True:
-            parameters['cursor'] = cursor
-            resp = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-            result += [x for x in data['ids']]
-            if 'next_cursor' in data:
-                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
-                    break
-                else:
-                    cursor = data['next_cursor']
-            else:
-                break
-            sec = self.GetSleepTime('/friends/ids')
-            time.sleep(sec)
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        return data['next_cursor'], data['previous_cursor'], result
+        if 'ids' in data:
+            result.extend([x for x in data['ids']])
+
+        next_cursor = data.get('next_cursor', 0)
+        previous_cursor = data.get('previous_cursor', 0)
+
+        return next_cursor, previous_cursor, result
 
     def GetFollowerIDsPaged(self,
                             user_id=None,
@@ -1620,7 +1847,7 @@ class Api(object):
                             cursor=-1,
                             stringify_ids=False,
                             count=5000):
-        """Make a cursor driven call to return the list of all followers
+        """Make a cursor driven call to return a list of one page followers.
 
         The caller is responsible for handling the cursor value and looping
         to gather all of the data
@@ -1635,16 +1862,25 @@ class Api(object):
           cursor:
             Should be set to -1 for the initial call and then is used to
             control what result page Twitter returns.
+          stringify_ids:
+            if True then twitter will return the ids as strings instead of
+            integers. [Optional]
           count:
-            The number of user id's to retrieve per API request. Please be aware that
-            this might get you rate-limited if set to a small number.
+            The number of user id's to retrieve per API request. Please be aware
+            that this might get you rate-limited if set to a small number.
             By default Twitter will retrieve 5000 UIDs per call. [Optional]
 
         Returns:
-          next_cursor, previous_cursor, data sequence of twitter.User instances, one for each follower
+          next_cursor, previous_cursor, data sequence of user ids,
+          one for each follower
         """
         url = '%s/followers/ids.json' % self.base_url
-        return self._GetIDsPaged(url, user_id, screen_name, cursor, stringify_ids, count)
+        return self._GetIDsPaged(url,
+                                 user_id,
+                                 screen_name,
+                                 cursor,
+                                 stringify_ids,
+                                 count)
 
     def GetFriendIDsPaged(self,
                           user_id=None,
@@ -1667,21 +1903,81 @@ class Api(object):
           cursor:
             Should be set to -1 for the initial call and then is used to
             control what result page Twitter returns.
+          stringify_ids:
+            if True then twitter will return the ids as strings instead of
+            integers. [Optional]
           count:
-            The number of user id's to retrieve per API request. Please be aware that
-            this might get you rate-limited if set to a small number.
+            The number of user id's to retrieve per API request. Please be aware
+            that this might get you rate-limited if set to a small number.
             By default Twitter will retrieve 5000 UIDs per call. [Optional]
 
         Returns:
-          next_cursor, previous_cursor, data sequence of twitter.User instances, one for each friend
+          next_cursor, previous_cursor, data sequence of twitter.User instances,
+          one for each friend
         """
         url = '%s/friends/ids.json' % self.base_url
-        return self._GetIDsPaged(url, user_id, screen_name, cursor, stringify_ids, count)
+        return self._GetIDsPaged(url,
+                                 user_id,
+                                 screen_name,
+                                 cursor,
+                                 stringify_ids,
+                                 count)
+
+    def _GetFriendFollowerIDs(self,
+                              url=None,
+                              user_id=None,
+                              screen_name=None,
+                              cursor=None,
+                              count=None,
+                              stringify_ids=False,
+                              total_count=None):
+        """ Common method for GetFriendIDs and GetFollowerIDs """
+
+        if cursor is not None or count is not None:
+            warnings.warn(
+                "Use of 'cursor' and 'count' parameters are deprecated as of "
+                "python-twitter 3.0. Please use GetFriendIDsPaged or "
+                "GetFollowerIDsPaged instead.",
+                DeprecationWarning, stacklevel=2)
+
+        count = 5000
+        cursor = -1
+        result = []
+
+        if total_count:
+            try:
+                total_count = int(total_count)
+            except ValueError:
+                raise TwitterError({'message': "total_count must be an integer"})
+
+        if total_count and total_count < count:
+            count = total_count
+
+        while True:
+            if total_count is not None and len(result) + count > total_count:
+                break
+
+            next_cursor, previous_cursor, data = self._GetIDsPaged(
+                url,
+                user_id,
+                screen_name,
+                cursor,
+                stringify_ids,
+                count)
+
+            result.extend([x for x in data])
+
+            if next_cursor == 0 or next_cursor == previous_cursor:
+                break
+            else:
+                cursor = next_cursor
+
+        return result
 
     def GetFollowerIDs(self,
                        user_id=None,
                        screen_name=None,
-                       cursor=-1,
+                       cursor=None,
                        stringify_ids=False,
                        count=None,
                        total_count=None):
@@ -1697,50 +1993,41 @@ class Api(object):
             Specifies the Twitter API Cursor location to start at.
             Note: there are pagination limits. [Optional]
           stringify_ids:
-            if True then twitter will return the ids as strings instead of integers.
-            [Optional]
+            if True then twitter will return the ids as strings instead of
+            integers. [Optional]
           count:
-            The number of user id's to retrieve per API request. Please be aware that
-            this might get you rate-limited if set to a small number.
+            The number of user id's to retrieve per API request. Please be aware
+            that this might get you rate-limited if set to a small number.
             By default Twitter will retrieve 5000 UIDs per call. [Optional]
           total_count:
-            The total amount of UIDs to retrieve. Good if the account has many followers
-            and you don't want to get rate limited. The data returned might contain more
-            UIDs if total_count is not a multiple of count (5000 by default). [Optional]
+            The total amount of UIDs to retrieve. Good if the account has many
+            followers and you don't want to get rate limited. The data returned
+            might contain more UIDs if total_count is not a multiple of count
+            (5000 by default). [Optional]
 
         Returns:
           A list of integers, one for each user id.
         """
-        result = []
-        if total_count and total_count < count:
-            count = total_count
-
-        while True:
-            next_cursor, previous_cursor, data = self.GetFollowerIDsPaged(user_id, screen_name, cursor, stringify_ids,
-                                                                          count)
-            result += [x for x in data['ids']]
-            if next_cursor == 0 or next_cursor == previous_cursor:
-                break
-            else:
-                cursor = next_cursor
-            if total_count is not None:
-                total_count -= len(data['ids'])
-                if total_count < 1:
-                    break
-            sec = self.GetSleepTime('/followers/ids')
-            time.sleep(sec)
-
-        return result
+        url = '%s/followers/ids.json' % self.base_url
+        return self._GetFriendFollowerIDs(url,
+                                          user_id,
+                                          screen_name,
+                                          cursor,
+                                          stringify_ids,
+                                          count,
+                                          total_count)
 
     def GetFriendIDs(self,
                      user_id=None,
                      screen_name=None,
-                     cursor=-1,
-                     stringify_ids=False,
+                     cursor=None,
                      count=None,
+                     stringify_ids=False,
                      total_count=None):
-        """Returns a list of twitter user id's for every person
-        that is followed by the specified user.
+        """ Fetch a sequence of user ids, one for each friend.
+        Returns a list of all the given user's friends' IDs. If no user_id or
+        screen_name is given, the friends will be those of the authenticated
+        user.
 
         Args:
           user_id:
@@ -1765,26 +2052,95 @@ class Api(object):
         Returns:
           A list of integers, one for each user id.
         """
-        result = []
-        if total_count and total_count < count:
-            count = total_count
+        url = '%s/friends/ids.json' % self.base_url
+        return self._GetFriendFollowerIDs(url,
+                                          user_id,
+                                          screen_name,
+                                          cursor,
+                                          count,
+                                          stringify_ids,
+                                          total_count)
 
-        while True:
-            next_cursor, previous_cursor, data = self.GetFriendIDsPaged(user_id, screen_name,
-                                                                        cursor, stringify_ids, count)
-            result += [x for x in data['ids']]
-            if next_cursor == 0 or next_cursor == previous_cursor:
-                break
-            else:
-                cursor = next_cursor
-            if total_count is not None:
-                total_count -= len(data['ids'])
-                if total_count < 1:
-                    break
-            sec = self.GetSleepTime('/followers/ids')
-            time.sleep(sec)
+    def _GetFriendsFollowersPaged(self,
+                                  url=None,
+                                  user_id=None,
+                                  screen_name=None,
+                                  cursor=-1,
+                                  count=200,
+                                  skip_status=False,
+                                  include_user_entities=True):
 
-        return result
+        """Make a cursor driven call to return the list of 1 page of friends
+        or followers.
+
+        Args:
+          url:
+            Endpoint from which to get data. Either
+            base_url+'/followers/list.json' or base_url+'/friends/list.json'.
+          user_id:
+            The twitter id of the user whose followers you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          screen_name:
+            The twitter name of the user whose followers you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          cursor:
+            Should be set to -1 for the initial call and then is used to
+            control what result page Twitter returns.
+          count:
+            The number of users to return per page, up to a maximum of 200.
+            Defaults to 200. [Optional]
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          next_cursor, previous_cursor, data sequence of twitter.User
+          instances, one for each follower
+        """
+
+        if user_id and screen_name:
+            warnings.warn(
+                "If both user_id and screen_name are specified, Twitter will "
+                "return the followers of the user specified by screen_name, "
+                "however this behavior is undocumented by Twitter and might "
+                "change without warning.", stacklevel=2)
+
+        parameters = {}
+
+        if user_id is not None:
+            parameters['user_id'] = user_id
+        if screen_name is not None:
+            parameters['screen_name'] = screen_name
+
+        try:
+            parameters['count'] = int(count)
+        except ValueError:
+            raise TwitterError({'message': "count must be an integer"})
+
+        parameters['skip_status'] = skip_status
+        parameters['include_user_entities'] = include_user_entities
+        parameters['cursor'] = cursor
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        if 'users' in data:
+            users = [User.NewFromJsonDict(user) for user in data['users']]
+        else:
+            users = []
+
+        if 'next_cursor' in data:
+            next_cursor = data['next_cursor']
+        else:
+            next_cursor = 0
+        if 'previous_cursor' in data:
+            previous_cursor = data['previous_cursor']
+        else:
+            previous_cursor = 0
+
+        return next_cursor, previous_cursor, users
 
     def GetFollowersPaged(self,
                           user_id=None,
@@ -1792,11 +2148,8 @@ class Api(object):
                           cursor=-1,
                           count=200,
                           skip_status=False,
-                          include_user_entities=False):
+                          include_user_entities=True):
         """Make a cursor driven call to return the list of all followers
-
-        The caller is responsible for handling the cursor value and looping
-        to gather all of the data
 
         Args:
           user_id:
@@ -1818,48 +2171,155 @@ class Api(object):
             When True, the user entities will be included. [Optional]
 
         Returns:
-          next_cursor, previous_cursor, data sequence of twitter.User instances, one for each follower
+          next_cursor, previous_cursor, data sequence of twitter.User
+          instances, one for each follower
         """
         url = '%s/followers/list.json' % self.base_url
-        parameters = {}
-        if user_id is not None:
-            parameters['user_id'] = user_id
-        if screen_name is not None:
-            parameters['screen_name'] = screen_name
-        try:
-            parameters['count'] = int(count)
-        except ValueError:
-            raise TwitterError({'message': "count must be an integer"})
-        if skip_status:
-            parameters['skip_status'] = True
-        if include_user_entities:
-            parameters['include_user_entities'] = True
-        parameters['cursor'] = cursor
+        return self._GetFriendsFollowersPaged(url,
+                                              user_id,
+                                              screen_name,
+                                              cursor,
+                                              count,
+                                              skip_status,
+                                              include_user_entities)
 
-        resp = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+    def GetFriendsPaged(self,
+                        user_id=None,
+                        screen_name=None,
+                        cursor=-1,
+                        count=200,
+                        skip_status=False,
+                        include_user_entities=True):
+        """Make a cursor driven call to return the list of all friends.
 
-        if 'next_cursor' in data:
-            next_cursor = data['next_cursor']
-        else:
-            next_cursor = 0
-        if 'previous_cursor' in data:
-            previous_cursor = data['previous_cursor']
-        else:
-            previous_cursor = 0
+        Args:
+          user_id:
+            The twitter id of the user whose friends you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          screen_name:
+            The twitter name of the user whose friends you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          cursor:
+            Should be set to -1 for the initial call and then is used to
+            control what result page Twitter returns.
+          count:
+            The number of users to return per page, up to a current maximum of
+            200. Defaults to 200. [Optional]
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
 
-        return next_cursor, previous_cursor, data
+        Returns:
+          next_cursor, previous_cursor, data sequence of twitter.User
+          instances, one for each follower
+        """
+        url = '%s/friends/list.json' % self.base_url
+        return self._GetFriendsFollowersPaged(url,
+                                              user_id,
+                                              screen_name,
+                                              cursor,
+                                              count,
+                                              skip_status,
+                                              include_user_entities)
+
+    def _GetFriendsFollowers(self,
+                             url=None,
+                             user_id=None,
+                             screen_name=None,
+                             cursor=None,
+                             count=None,
+                             total_count=None,
+                             skip_status=False,
+                             include_user_entities=True):
+
+        """ Fetch the sequence of twitter.User instances, one for each friend
+        or follower.
+
+        Args:
+          url:
+            URL to get. Either base_url + ('/followers/list.json' or
+            '/friends/list.json').
+          user_id:
+            The twitter id of the user whose friends you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          screen_name:
+            The twitter name of the user whose friends you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          cursor:
+            Should be set to -1 for the initial call and then is used to
+            control what result page Twitter returns.
+          count:
+            The number of users to return per page, up to a maximum of 200.
+            Defaults to 200. [Optional]
+          total_count:
+            The upper bound of number of users to return, defaults to None.
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          A sequence of twitter.User instances, one for each friend or follower
+        """
+
+        if cursor is not None or count is not None:
+            warnings.warn(
+                "Use of 'cursor' and 'count' parameters are deprecated as of "
+                "python-twitter 3.0. Please use GetFriendsPaged instead.",
+                DeprecationWarning, stacklevel=2)
+
+        count = 200
+        cursor = -1
+        result = []
+
+        if total_count:
+            try:
+                total_count = int(total_count)
+            except ValueError:
+                raise TwitterError({'message': "total_count must be an integer"})
+
+            if total_count <= 200:
+                count = total_count
+
+        while True:
+            if total_count is not None and len(result) + count > total_count:
+                break
+
+            next_cursor, previous_cursor, data = self._GetFriendsFollowersPaged(
+                url,
+                user_id,
+                screen_name,
+                cursor,
+                count,
+                skip_status,
+                include_user_entities)
+
+            if next_cursor:
+                cursor = next_cursor
+
+            result.extend(data)
+
+            if next_cursor == 0 or next_cursor == previous_cursor:
+                break
+
+        return result
 
     def GetFollowers(self,
                      user_id=None,
                      screen_name=None,
-                     cursor=-1,
-                     count=200,
+                     cursor=None,
+                     count=None,
+                     total_count=None,
                      skip_status=False,
-                     include_user_entities=False):
+                     include_user_entities=True):
         """Fetch the sequence of twitter.User instances, one for each follower.
 
-        The twitter.Api instance must be authenticated.
+        If both user_id and screen_name are specified, this call will return
+        the followers of the user specified by screen_name, however this
+        behavior is undocumented by Twitter and may change without warning.
 
         Args:
           user_id:
@@ -1874,6 +2334,8 @@ class Api(object):
           count:
             The number of users to return per page, up to a maximum of 200.
             Defaults to 200. [Optional]
+          total_count:
+            The upper bound of number of users to return, defaults to None.
           skip_status:
             If True the statuses will not be returned in the user items. [Optional]
           include_user_entities:
@@ -1882,22 +2344,63 @@ class Api(object):
         Returns:
           A sequence of twitter.User instances, one for each follower
         """
-        if not self.__auth:
-            raise TwitterError({'message': "twitter.Api instance must be authenticated"})
+        url = '%s/followers/list.json' % self.base_url
+        return self._GetFriendsFollowers(url,
+                                         user_id,
+                                         screen_name,
+                                         cursor,
+                                         count,
+                                         total_count,
+                                         skip_status,
+                                         include_user_entities)
 
-        result = []
-        while True:
-            next_cursor, previous_cursor, data = self.GetFollowersPaged(user_id, screen_name, cursor, count,
-                                                                        skip_status, include_user_entities)
-            result += [User.NewFromJsonDict(x) for x in data['users']]
-            if next_cursor == 0 or next_cursor == previous_cursor:
-                break
-            else:
-                cursor = next_cursor
-            sec = self.GetSleepTime('/followers/list')
-            time.sleep(sec)
+    def GetFriends(self,
+                   user_id=None,
+                   screen_name=None,
+                   cursor=None,
+                   count=None,
+                   total_count=None,
+                   skip_status=False,
+                   include_user_entities=True):
+        """Fetch the sequence of twitter.User instances, one for each friend.
 
-        return result
+        If both user_id and screen_name are specified, this call will return
+        the followers of the user specified by screen_name, however this
+        behavior is undocumented by Twitter and may change without warning.
+
+        Args:
+          user_id:
+            The twitter id of the user whose friends you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          screen_name:
+            The twitter name of the user whose friends you are fetching.
+            If not specified, defaults to the authenticated user. [Optional]
+          cursor:
+            Should be set to -1 for the initial call and then is used to
+            control what result page Twitter returns.
+          count:
+            The number of users to return per page, up to a maximum of 200.
+            Defaults to 200. [Optional]
+          total_count:
+            The upper bound of number of users to return, defaults to None.
+          skip_status:
+            If True the statuses will not be returned in the user items.
+            [Optional]
+          include_user_entities:
+            When True, the user entities will be included. [Optional]
+
+        Returns:
+          A sequence of twitter.User instances, one for each friend
+        """
+        url = '%s/friends/list.json' % self.base_url
+        return self._GetFriendsFollowers(url,
+                                         user_id,
+                                         screen_name,
+                                         cursor,
+                                         count,
+                                         total_count,
+                                         skip_status,
+                                         include_user_entities)
 
     def UsersLookup(self,
                     user_id=None,
@@ -1909,8 +2412,6 @@ class Api(object):
         Users may be specified either as lists of either user_ids,
         screen_names, or twitter.User objects. The list of users that
         are queried is the union of all specified parameters.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           user_id:
@@ -1927,8 +2428,6 @@ class Api(object):
         Returns:
           A list of twitter.User objects for the requested users
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
         if not user_id and not screen_name and not users:
             raise TwitterError({'message': "Specify at least one of user_id, screen_name, or users."})
 
@@ -1964,8 +2463,6 @@ class Api(object):
                 include_entities=True):
         """Returns a single user.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           user_id:
             The id of the user to retrieve. [Optional]
@@ -1980,9 +2477,6 @@ class Api(object):
         Returns:
           A twitter.User instance representing that user
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         url = '%s/users/show.json' % (self.base_url)
         parameters = {}
         if user_id:
@@ -2008,8 +2502,6 @@ class Api(object):
                           full_text=False,
                           page=None):
         """Returns a list of the direct messages sent to the authenticating user.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           since_id:
@@ -2044,9 +2536,6 @@ class Api(object):
         Returns:
           A sequence of twitter.DirectMessage instances
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         url = '%s/direct_messages.json' % self.base_url
         parameters = {}
         if since_id:
@@ -2080,8 +2569,6 @@ class Api(object):
                               include_entities=True):
         """Returns a list of the direct messages sent by the authenticating user.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           since_id:
             Returns results with an ID greater than (that is, more recent
@@ -2107,9 +2594,6 @@ class Api(object):
         Returns:
           A sequence of twitter.DirectMessage instances
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         url = '%s/direct_messages/sent.json' % self.base_url
         parameters = {}
         if since_id:
@@ -2137,9 +2621,6 @@ class Api(object):
                           screen_name=None):
         """Post a twitter direct message from the authenticated user.
 
-        The twitter.Api instance must be authenticated. user_id or screen_name
-        must be specified.
-
         Args:
           text: The message text to be posted.  Must be less than 140 characters.
           user_id:
@@ -2150,9 +2631,6 @@ class Api(object):
         Returns:
           A twitter.DirectMessage instance representing the message posted
         """
-        if not self.__auth:
-            raise TwitterError({'message': "The twitter.Api instance must be authenticated."})
-
         url = '%s/direct_messages/new.json' % self.base_url
         data = {'text': text}
         if user_id:
@@ -2193,8 +2671,6 @@ class Api(object):
     def CreateFriendship(self, user_id=None, screen_name=None, follow=True):
         """Befriends the user specified by the user_id or screen_name.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           user_id:
             A user_id to follow [Optional]
@@ -2232,8 +2708,6 @@ class Api(object):
     def UpdateFriendship(self, user_id=None, screen_name=None, follow=True, **kwargs):  # api compat with Create
         """Updates a friendship with the user specified by the user_id or screen_name.
 
-        The twitter.Api instance must be authenticated.
-
         Args:
           user_id:
             A user_id to update [Optional]
@@ -2253,8 +2727,6 @@ class Api(object):
 
     def DestroyFriendship(self, user_id=None, screen_name=None):
         """Discontinues friendship with a user_id or screen_name.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           user_id:
@@ -2279,38 +2751,67 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
-    def LookupFriendship(self, user_id=None, screen_name=None):
-        """Lookup friendship status for user specified by user_id or screen_name.
+    def LookupFriendship(self,
+                         user_id=None,
+                         screen_name=None):
+        """Lookup friendship status for user to authed user.
 
-        Currently only supports one user at a time.
+        Users may be specified either as lists of either user_ids,
+        screen_names, or twitter.User objects. The list of users that
+        are queried is the union of all specified parameters.
 
-        The twitter.Api instance must be authenticated.
+        Up to 100 users may be specified.
 
         Args:
-          user_id:
-            A user_id to lookup [Optional]
-          screen_name:
-            A screen_name to lookup [Optional]
+          user_id (int, User, or list of ints or Users, optional):
+            A list of user_ids to retrieve extended information.
+          screen_name (string, User, or list of strings or Users, optional):
+            A list of screen_names to retrieve extended information.
 
         Returns:
-          A twitter.UserStatus instance representing the friendship status
+          list: A list of twitter.UserStatus instance representing the
+          friendship status between the specified users and the authenticated
+          user.
         """
         url = '%s/friendships/lookup.json' % (self.base_url)
-        data = {}
-        if user_id:
-            data['user_id'] = user_id
-        elif screen_name:
-            data['screen_name'] = screen_name
-        else:
-            raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
+        parameters = {}
 
-        resp = self._RequestUrl(url, 'GET', data=data)
+        if user_id:
+            if isinstance(user_id, list) or isinstance(user_id, tuple):
+                uids = list()
+                for user in user_id:
+                    if isinstance(user, User):
+                        uids.append(user.id)
+                    else:
+                        uids.append(enf_type('user_id', int, user))
+                parameters['user_id'] = ",".join([str(uid) for uid in uids])
+            else:
+                if isinstance(user_id, User):
+                    parameters['user_id'] = user_id.id
+                else:
+                    parameters['user_id'] = enf_type('user_id', int, user_id)
+        if screen_name:
+            if isinstance(screen_name, list) or isinstance(screen_name, tuple):
+                sn_list = list()
+                for user in screen_name:
+                    if isinstance(user, User):
+                        sn_list.append(user.screen_name)
+                    else:
+                        sn_list.append(enf_type('screen_name', str, user))
+                parameters['screen_name'] = ','.join(sn_list)
+            else:
+                if isinstance(screen_name, User):
+                    parameters['screen_name'] = screen_name.screen_name
+                else:
+                    parameters['screen_name'] = enf_type('screen_name', str, screen_name)
+        if not user_id and not screen_name:
+            raise TwitterError(
+                "Specify at least one of user_id or screen_name.")
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        if len(data) >= 1:
-            return UserStatus.NewFromJsonDict(data[0])
-        else:
-            return None
+        return [UserStatus.NewFromJsonDict(x) for x in data]
 
     def CreateFavorite(self,
                        status=None,
@@ -2319,8 +2820,6 @@ class Api(object):
         """Favorites the specified status object or id as the authenticating user.
 
         Returns the favorite status when successful.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           id:
@@ -2356,8 +2855,6 @@ class Api(object):
         """Un-Favorites the specified status object or id as the authenticating user.
 
         Returns the un-favorited status when successful.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           id:
@@ -2522,45 +3019,41 @@ class Api(object):
 
         return [Status.NewFromJsonDict(x) for x in data]
 
-    # List endpoint status
-    # done GET lists/list
-    # done GET lists/statuses
-    # done POST lists/subscribers/create
-    # done GET lists/subscribers/show
-    # done POST lists/subscribers/destroy
-    # done GET lists/members
-    # done POST lists/members/create
-    # done POST lists/members/create_all
-    # done POST lists/members/destroy
-    # done POST lists/members/destroy_all
-    #      GET lists/members/show
-    # done POST lists/create
-    # done POST lists/destroy
-    #      POST lists/update
-    #      GET lists/show
-    # done GET lists/subscriptions
-    # done GET lists/memberships
-    #      GET lists/subscribers
-    # done GET lists/ownerships
+    @staticmethod
+    def _IDList(list_id, slug, owner_id, owner_screen_name):
+        parameters = {}
+        if list_id is not None:
+            parameters['list_id'] = enf_type('list_id', int, list_id)
+        elif slug is not None:
+            parameters['slug'] = slug
+            if owner_id is not None:
+                parameters['owner_id'] = enf_type('owner_id', int, owner_id)
+            elif owner_screen_name is not None:
+                parameters['owner_screen_name'] = owner_screen_name
+            else:
+                raise TwitterError({'message': (
+                    'If specifying a list by slug, an owner_id or '
+                    'owner_screen_name must also be given.')})
+        else:
+            raise TwitterError({'message': (
+                'Either list_id or slug and one of owner_id and '
+                'owner_screen_name must be passed.')})
+
+        return parameters
 
     def CreateList(self, name, mode=None, description=None):
         """Creates a new list with the give name for the authenticated user.
 
-        The twitter.Api instance must be authenticated.
-
-        Twitter endpoint: /lists/create
-
         Args:
-          name:
+          name (str):
             New name for the list
-          mode:
-            'public' or 'private'.
-            Defaults to 'public'. [Optional]
-          description:
-            Description of the list. [Optional]
+          mode (str, optional):
+            'public' or 'private'. Defaults to 'public'.
+          description (str, optional):
+            Description of the list.
 
         Returns:
-          A twitter.List instance representing the new list
+          twitter.list.List: A twitter.List instance representing the new list
         """
         url = '%s/lists/create.json' % self.base_url
         parameters = {'name': name}
@@ -2579,49 +3072,36 @@ class Api(object):
                     owner_id=False,
                     list_id=None,
                     slug=None):
-        """Destroys the list identified by list_id or owner_screen_name/owner_id and slug.
-
-        The twitter.Api instance must be authenticated.
-
-        Twitter endpoint: /lists/destroy
+        """Destroys the list identified by list_id or slug and one of
+        owner_screen_name or owner_id.
 
         Args:
-          owner_screen_name:
-            The screen_name of the user who owns the list being requested by a slug.
-          owner_id:
-            The user ID of the user who owns the list being requested by a slug.
-          list_id:
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested
+            by a slug.
+          owner_id (int, optional):
+            The user ID of the user who owns the list being requested
+            by a slug.
+          list_id (int, optional):
             The numerical id of the list.
-          slug:
-            You can identify a list by its slug instead of its numerical id. If you
-            decide to do so, note that you'll also have to specify the list owner
-            using the owner_id or owner_screen_name parameters.
+          slug (str, optional):
+            You can identify a list by its slug instead of its numerical id.
+            If you decide to do so, note that you'll also have to specify
+            the list owner using the owner_id or owner_screen_name parameters.
 
         Returns:
-          A twitter.List instance representing the removed list.
+          twitter.list.List: A twitter.List instance representing the
+          removed list.
         """
         url = '%s/lists/destroy.json' % self.base_url
-        data = {}
-        if list_id:
-            try:
-                data['list_id'] = int(list_id)
-            except ValueError:
-                raise TwitterError({'message': "list_id must be an integer"})
-        elif slug:
-            data['slug'] = slug
-            if owner_id:
-                try:
-                    data['owner_id'] = int(owner_id)
-                except ValueError:
-                    raise TwitterError({'message': "owner_id must be an integer"})
-            elif owner_screen_name:
-                data['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
-        else:
-            raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+        parameters = {}
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
+
+        resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
@@ -2633,47 +3113,32 @@ class Api(object):
                            slug=None):
         """Creates a subscription to a list by the authenticated user.
 
-        The twitter.Api instance must be authenticated.
-
-        Twitter endpoint: /lists/subscribers/create
-
         Args:
-          owner_screen_name:
-            The screen_name of the user who owns the list being requested by a slug.
-          owner_id:
-            The user ID of the user who owns the list being requested by a slug.
-          list_id:
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested
+            by a slug.
+          owner_id (int, optional):
+            The user ID of the user who owns the list being requested
+            by a slug.
+          list_id (int, optional):
             The numerical id of the list.
-          slug:
-            You can identify a list by its slug instead of its numerical id. If you
-            decide to do so, note that you'll also have to specify the list owner
-            using the owner_id or owner_screen_name parameters.
+          slug (str, optional):
+            You can identify a list by its slug instead of its numerical id.
+            If you decide to do so, note that you'll also have to specify
+            the list owner using the owner_id or owner_screen_name parameters.
 
         Returns:
-          A twitter.User instance representing the user subscribed
+          twitter.user.User: A twitter.User instance representing the user subscribed
         """
-        url = '%s/lists/subscribers/create.json' % (self.base_url)
-        data = {}
-        if list_id:
-            try:
-                data['list_id'] = int(list_id)
-            except ValueError:
-                raise TwitterError({'message': "list_id must be an integer"})
-        elif slug:
-            data['slug'] = slug
-            if owner_id:
-                try:
-                    data['owner_id'] = int(owner_id)
-                except ValueError:
-                    raise TwitterError({'message': "owner_id must be an integer"})
-            elif owner_screen_name:
-                data['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
-        else:
-            raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+        url = '%s/lists/subscribers/create.json' % self.base_url
+        parameters = {}
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
+
+        resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
@@ -2685,47 +3150,33 @@ class Api(object):
                             slug=None):
         """Destroys the subscription to a list for the authenticated user.
 
-        The twitter.Api instance must be authenticated.
-
-        Twitter endpoint: /lists/subscribers/destroy
-
         Args:
-          owner_screen_name:
-            The screen_name of the user who owns the list being requested by a slug.
-          owner_id:
-            The user ID of the user who owns the list being requested by a slug.
-          list_id:
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested
+            by a slug.
+          owner_id (int, optional):
+            The user ID of the user who owns the list being requested
+            by a slug.
+          list_id (int, optional):
             The numerical id of the list.
-          slug:
-            You can identify a list by its slug instead of its numerical id. If you
-            decide to do so, note that you'll also have to specify the list owner
-            using the owner_id or owner_screen_name parameters.
+          slug (str, optional):
+            You can identify a list by its slug instead of its numerical id.
+            If you decide to do so, note that you'll also have to specify the
+            list owner using the owner_id or owner_screen_name parameters.
 
         Returns:
-          A twitter.List instance representing the removed list.
+          twitter.list.List: A twitter.List instance representing
+          the removed list.
         """
         url = '%s/lists/subscribers/destroy.json' % (self.base_url)
-        data = {}
-        if list_id:
-            try:
-                data['list_id'] = int(list_id)
-            except ValueError:
-                raise TwitterError({'message': "list_id must be an integer"})
-        elif slug:
-            data['slug'] = slug
-            if owner_id:
-                try:
-                    data['owner_id'] = int(owner_id)
-                except ValueError:
-                    raise TwitterError({'message': "owner_id must be an integer"})
-            elif owner_screen_name:
-                data['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
-        else:
-            raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+        parameters = {}
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
+
+        resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
@@ -2743,68 +3194,53 @@ class Api(object):
 
         Returns the user if they are subscriber.
 
-        The twitter.Api instance must be authenticated.
-
-        Twitter endpoint: /lists/subscribers/show
-
         Args:
-          owner_screen_name:
-            The screen_name of the user who owns the list being requested by a slug.
-          owner_id:
-            The user ID of the user who owns the list being requested by a slug.
-          list_id:
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested
+            by a slug.
+          owner_id (int, optional):
+            The user ID of the user who owns the list being requested
+            by a slug.
+          list_id (int, optional):
             The numerical ID of the list.
-          slug:
+          slug (str, optional):
             You can identify a list by its slug instead of its numerical ID.
             If you decide to do so, note that you'll also have to specify
             the list owner using the owner_id or owner_screen_name parameters.
-          user_id:
+          user_id (int, optional):
             The user_id or a list of user_id's to add to the list.
             If not given, then screen_name is required.
-          screen_name:
+          screen_name (str, optional):
             The screen_name or a list of screen_name's to add to the list.
             If not given, then user_id is required.
-          include_entities:
+          include_entities (bool, optional):
             If False, the timeline will not contain additional metadata.
-            Defaults to True. [Optional]
-          skip_status:
-            If True the statuses will not be returned in the user items. [Optional]
+            Defaults to True.
+          skip_status (bool, optional):
+            If True the statuses will not be returned in the user items.
+
         Returns:
-          A twitter.User instance representing the user requested
+          twitter.user.User: A twitter.User instance representing the user
+          requested.
         """
         url = '%s/lists/subscribers/show.json' % (self.base_url)
-        data = {}
-        if list_id:
-            try:
-                data['list_id'] = int(list_id)
-            except ValueError:
-                raise TwitterError({'message': "list_id must be an integer"})
-        elif slug:
-            data['slug'] = slug
-            if owner_id:
-                try:
-                    data['owner_id'] = int(owner_id)
-                except ValueError:
-                    raise TwitterError({'message': "owner_id must be an integer"})
-            elif owner_screen_name:
-                data['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
-        else:
-            raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
-        if user_id:
-            try:
-                data['user_id'] = int(user_id)
-            except ValueError:
-                raise TwitterError({'message': "user_id must be an integer"})
-        elif screen_name:
-            data['screen_name'] = screen_name
-        if skip_status:
-            data['skip_status'] = True
-        if include_entities:
-            data['include_entities'] = True
+        parameters = {}
 
-        resp = self._RequestUrl(url, 'GET', data=data)
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
+
+        if user_id:
+            parameters['user_id'] = enf_type('user_id', int, user_id)
+        elif screen_name:
+            parameters['screen_name'] = screen_name
+        if skip_status:
+            parameters['skip_status'] = True
+        if include_entities:
+            parameters['include_entities'] = True
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
@@ -2814,52 +3250,41 @@ class Api(object):
                          screen_name=None,
                          count=20,
                          cursor=-1):
-        """Obtain a collection of the lists the specified user is subscribed to.
+        """Obtain a collection of the lists the specified user is
+        subscribed to. If neither user_id or screen_name is specified, the
+        data returned will be for the authenticated user.
 
         The list will contain a maximum of 20 lists per page by default.
 
         Does not include the user's own lists.
 
-        The twitter.Api instance must be authenticated.
-
-        Twitter endpoint: /lists/subscriptions
-
         Args:
-          user_id:
-            The ID of the user for whom to return results for. [Optional]
-          screen_name:
-            The screen name of the user for whom to return results for. [Optional]
-          count:
+          user_id (int, optional):
+            The ID of the user for whom to return results for.
+          screen_name (str, optional):
+            The screen name of the user for whom to return results for.
+          count (int, optional):
            The amount of results to return per page.
-           No more than 1000 results will ever be returned in a single page.
-           Defaults to 20. [Optional]
-          cursor:
-            The "page" value that Twitter will use to start building the list sequence from.
-            Use the value of -1 to start at the beginning.
-            Twitter will return in the result the values for next_cursor and previous_cursor. [Optional]
+           No more than 1000 results will ever be returned in a single
+           page. Defaults to 20.
+          cursor (int, optional):
+            The "page" value that Twitter will use to start building the
+            list sequence from. Use the value of -1 to start at the
+            beginning. Twitter will return in the result the values for
+            next_cursor and previous_cursor.
 
         Returns:
-          A sequence of twitter.List instances, one for each list
+          twitter.list.List: A sequence of twitter.List instances,
+          one for each list
         """
         url = '%s/lists/subscriptions.json' % (self.base_url)
         parameters = {}
-        try:
-            parameters['cursor'] = int(cursor)
-        except ValueError:
-            raise TwitterError({'message': "cursor must be an integer"})
-        try:
-            parameters['count'] = int(count)
-        except ValueError:
-            raise TwitterError({'message': "count must be an integer"})
+        parameters['cursor'] = enf_type('cursor', int, cursor)
+        parameters['count'] = enf_type('count', int, count)
         if user_id is not None:
-            try:
-                parameters['user_id'] = int(user_id)
-            except ValueError:
-                raise TwitterError({'message': "user_id must be an integer"})
+            parameters['user_id'] = enf_type('user_id', int, user_id)
         elif screen_name is not None:
             parameters['screen_name'] = screen_name
-        else:
-            raise TwitterError({'message': "Specify user_id or screen_name"})
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -2872,102 +3297,89 @@ class Api(object):
                        count=20,
                        cursor=-1,
                        filter_to_owned_lists=False):
-        """Obtain the lists the specified user is a member of.
+        """Obtain the lists the specified user is a member of. If no user_id or
+        screen_name is specified, the data returned will be for the
+        authenticated user.
 
         Returns a maximum of 20 lists per page by default.
 
-        The twitter.Api instance must be authenticated.
-
-        Twitter endpoint: /lists/memberships
-
         Args:
-          user_id:
-            The ID of the user for whom to return results for. [Optional]
-          screen_name:
-            The screen name of the user for whom to return results for. [Optional]
-          count:
+          user_id (int, optional):
+            The ID of the user for whom to return results for.
+          screen_name (str, optional):
+            The screen name of the user for whom to return
+            results for.
+          count (int, optional):
            The amount of results to return per page.
            No more than 1000 results will ever be returned in a single page.
-           Defaults to 20. [Optional]
-          cursor:
-            The "page" value that Twitter will use to start building the list sequence from.
-            Use the value of -1 to start at the beginning.
-            Twitter will return in the result the values for next_cursor and previous_cursor. [Optional]
-          filter_to_owned_lists:
+           Defaults to 20.
+          cursor (int, optional):
+            The "page" value that Twitter will use to start building the list
+            sequence from. Use the value of -1 to start at the beginning.
+            Twitter will return in the result the values for next_cursor and
+            previous_cursor.
+          filter_to_owned_lists (bool, optional):
             Set to True to return only the lists the authenticating user
             owns, and the user specified by user_id or screen_name is a
-            member of.
-            Default value is False. [Optional]
+            member of. Default value is False.
 
         Returns:
-          A sequence of twitter.List instances, one for each list in which
-            the user specified by user_id or screen_name is a member
+          list: A list of twitter.List instances, one for each list in which
+          the user specified by user_id or screen_name is a member
         """
         url = '%s/lists/memberships.json' % (self.base_url)
         parameters = {}
-        try:
-            parameters['cursor'] = int(cursor)
-        except ValueError:
-            raise TwitterError({'message': "cursor must be an integer"})
-        try:
-            parameters['count'] = int(count)
-        except ValueError:
-            raise TwitterError({'message': "count must be an integer"})
-        try:
-            parameters['filter_to_owned_lists'] = bool(filter_to_owned_lists)
-        except ValueError:
-            raise TwitterError({'message': "filter_to_owned_lists \
-                                must be a boolean value"})
+        if cursor is not None:
+            parameters['cursor'] = enf_type('cursor', int, cursor)
+        if count is not None:
+            parameters['count'] = enf_type('count', int, count)
+        if filter_to_owned_lists:
+            parameters['filter_to_owned_lists'] = enf_type(
+                'filter_to_owned_lists', bool, filter_to_owned_lists)
+
         if user_id is not None:
-            try:
-                parameters['user_id'] = long(user_id)
-            except ValueError:
-                raise TwitterError({'message': "user_id must be an integer"})
+            parameters['user_id'] = enf_type('user_id', int, user_id)
         elif screen_name is not None:
             parameters['screen_name'] = screen_name
-        else:
-            raise TwitterError({'message': "Specify user_id or screen_name"})
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(resp.content)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [List.NewFromJsonDict(x) for x in data['lists']]
 
     def GetListsList(self,
-                     screen_name,
+                     screen_name=None,
                      user_id=None,
                      reverse=False):
         """Returns all lists the user subscribes to, including their own.
-
-        The twitter.Api instance must be authenticated.
-
-        Twitter endpoint: /lists/list
+        If no user_id or screen_name is specified, the data returned will be
+        for the authenticated user.
 
         Args:
-          screen_name:
+          screen_name (str, optional):
             Specifies the screen name of the user for whom to return the
             user_timeline. Helpful for disambiguating when a valid screen
             name is also a user ID.
-          user_id:
+          user_id (int, optional):
             Specifies the ID of the user for whom to return the
             user_timeline. Helpful for disambiguating when a valid user ID
-            is also a valid screen name. [Optional]
-          reverse:
-            If False, the owned lists will be returned first, othewise subscribed
-            lists will be at the top. Returns a maximum of 100 entries regardless.
-            Defaults to False. [Optional]
+            is also a valid screen name.
+          reverse (bool, optional):
+            If False, the owned lists will be returned first, othewise
+            subscribed lists will be at the top. Returns a maximum of 100
+            entries regardless. Defaults to False.
 
         Returns:
-          A list of twitter List items.
+          list: A sequence of twitter.List instances.
         """
         url = '%s/lists/list.json' % (self.base_url)
         parameters = {}
         if user_id:
-            parameters['user_id'] = user_id
+            parameters['user_id'] = enf_type('user_id', int, user_id)
         elif screen_name:
             parameters['screen_name'] = screen_name
         if reverse:
-            parameters['reverse'] = 'true'
+            parameters['reverse'] = enf_type('reverse', bool, reverse)
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -2975,8 +3387,8 @@ class Api(object):
         return [List.NewFromJsonDict(x) for x in data]
 
     def GetListTimeline(self,
-                        list_id,
-                        slug,
+                        list_id=None,
+                        slug=None,
                         owner_id=None,
                         owner_screen_name=None,
                         since_id=None,
@@ -2986,166 +3398,184 @@ class Api(object):
                         include_entities=True):
         """Fetch the sequence of Status messages for a given List ID.
 
-        The twitter.Api instance must be authenticated if the user is private.
-
-        Twitter endpoint: /lists/statuses
-
         Args:
-          list_id:
+          list_id (int, optional):
             Specifies the ID of the list to retrieve.
-          slug:
+          slug (str, optional):
             The slug name for the list to retrieve. If you specify None for the
-            list_id, then you have to provide either a owner_screen_name or owner_id.
-          owner_id:
+            list_id, then you have to provide either a owner_screen_name or
+            owner_id.
+          owner_id (int, optional):
             Specifies the ID of the user for whom to return the
             list timeline. Helpful for disambiguating when a valid user ID
-            is also a valid screen name. [Optional]
-          owner_screen_name:
+            is also a valid screen name.
+          owner_screen_name (str, optional):
             Specifies the screen name of the user for whom to return the
             user_timeline. Helpful for disambiguating when a valid screen
-            name is also a user ID. [Optional]
-          since_id:
+            name is also a user ID.
+          since_id (int, optional):
             Returns results with an ID greater than (that is, more recent than)
             the specified ID. There are limits to the number of Tweets which
             can be accessed through the API.
-            If the limit of Tweets has occurred since the since_id, the since_id
-            will be forced to the oldest ID available. [Optional]
-          max_id:
+            If the limit of Tweets has occurred since the since_id, the
+            since_id will be forced to the oldest ID available.
+          max_id (int, optional):
             Returns only statuses with an ID less than (that is, older than) or
-            equal to the specified ID. [Optional]
-          count:
+            equal to the specified ID.
+          count (int, optional):
             Specifies the number of statuses to retrieve.
-            May not be greater than 200. [Optional]
-          include_rts:
-            If True, the timeline will contain native retweets (if they exist) in
-            addition to the standard stream of tweets. [Optional]
-          include_entities:
+            May not be greater than 200.
+          include_rts (bool, optional):
+            If True, the timeline will contain native retweets (if they exist)
+            in addition to the standard stream of tweets.
+          include_entities (bool, optional):
             If False, the timeline will not contain additional metadata.
-            Defaults to True. [Optional]
+            Defaults to True.
 
         Returns:
-          A sequence of Status instances, one for each message up to count
+          list: A list of twitter.status.Status instances, one for each
+          message up to count.
         """
+        url = '%s/lists/statuses.json' % self.base_url
         parameters = {}
-        url = '%s/lists/statuses.json' % (self.base_url)
-        parameters['slug'] = slug
-        parameters['list_id'] = list_id
-        if list_id is None:
-            if slug is None:
-                raise TwitterError({'message': "list_id or slug required"})
-            if owner_id is None and not owner_screen_name:
-                raise TwitterError({
-                    'message': "if list_id is not given you have to include an owner to help identify the proper list"})
-        if owner_id:
-            parameters['owner_id'] = owner_id
-        if owner_screen_name:
-            parameters['owner_screen_name'] = owner_screen_name
+
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
+
         if since_id:
-            try:
-                parameters['since_id'] = int(since_id)
-            except ValueError:
-                raise TwitterError({'message': "since_id must be an integer"})
+            parameters['since_id'] = enf_type('since_id', int, since_id)
         if max_id:
-            try:
-                parameters['max_id'] = int(max_id)
-            except ValueError:
-                raise TwitterError({'message': "max_id must be an integer"})
+            parameters['max_id'] = enf_type('max_id', int, max_id)
         if count:
-            try:
-                parameters['count'] = int(count)
-            except ValueError:
-                raise TwitterError({'message': "count must be an integer"})
+            parameters['count'] = enf_type('count', int, count)
         if not include_rts:
-            parameters['include_rts'] = 'false'
+            parameters['include_rts'] = enf_type('include_rts', bool, include_rts)
         if not include_entities:
-            parameters['include_entities'] = 'false'
+            parameters['include_entities'] = enf_type('include_entities', bool, include_entities)
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [Status.NewFromJsonDict(x) for x in data]
 
+    def GetListMembersPaged(self,
+                            list_id=None,
+                            slug=None,
+                            owner_id=None,
+                            owner_screen_name=None,
+                            cursor=-1,
+                            count=100,
+                            skip_status=False,
+                            include_entities=True):
+        """Fetch the sequence of twitter.User instances, one for each member
+        of the given list_id or slug.
+
+        Args:
+          list_id (int, optional):
+            Specifies the ID of the list to retrieve.
+          slug (str, optional):
+            The slug name for the list to retrieve. If you specify None for the
+            list_id, then you have to provide either a owner_screen_name or
+            owner_id.
+          owner_id (int, optional):
+            Specifies the ID of the user for whom to return the
+            list timeline. Helpful for disambiguating when a valid user ID
+            is also a valid screen name.
+          owner_screen_name (str, optional):
+            Specifies the screen name of the user for whom to return the
+            user_timeline. Helpful for disambiguating when a valid screen
+            name is also a user ID.
+          cursor (int, optional):
+            Should be set to -1 for the initial call and then is used to
+            control what result page Twitter returns.
+          skip_status (bool, optional):
+            If True the statuses will not be returned in the user items.
+          include_entities (bool, optional):
+            If False, the timeline will not contain additional metadata.
+            Defaults to True.
+
+        Returns:
+          list: A sequence of twitter.user.User instances, one for each
+          member of the twitter.list.List.
+        """
+        url = '%s/lists/members.json' % self.base_url
+        parameters = {}
+
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
+
+        if count:
+            parameters['count'] = enf_type('count', int, count)
+        if cursor:
+            parameters['cursor'] = enf_type('cursor', int, cursor)
+
+        parameters['skip_status'] = enf_type('skip_status', bool, skip_status)
+        parameters['include_entities'] = enf_type('include_entities', bool, include_entities)
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        next_cursor = data.get('next_cursor', 0)
+        previous_cursor = data.get('previous_cursor', 0)
+        users = [User.NewFromJsonDict(user) for user in data.get('users', [])]
+
+        return next_cursor, previous_cursor, users
+
     def GetListMembers(self,
-                       list_id,
-                       slug,
+                       list_id=None,
+                       slug=None,
                        owner_id=None,
                        owner_screen_name=None,
-                       cursor=-1,
                        skip_status=False,
                        include_entities=False):
         """Fetch the sequence of twitter.User instances, one for each member
         of the given list_id or slug.
 
-        The twitter.Api instance must be authenticated.
-
-        Twitter endpoint: /lists/members
-
         Args:
-          list_id:
+          list_id (int, optional):
             Specifies the ID of the list to retrieve.
-          slug:
+          slug (str, optional):
             The slug name for the list to retrieve. If you specify None for the
-            list_id, then you have to provide either a owner_screen_name or owner_id.
-          owner_id:
+            list_id, then you have to provide either a owner_screen_name or
+            owner_id.
+          owner_id (int, optional):
             Specifies the ID of the user for whom to return the
             list timeline. Helpful for disambiguating when a valid user ID
-            is also a valid screen name. [Optional]
-          owner_screen_name:
+            is also a valid screen name.
+          owner_screen_name (str, optional):
             Specifies the screen name of the user for whom to return the
             user_timeline. Helpful for disambiguating when a valid screen
-            name is also a user ID. [Optional]
-          cursor:
-            Should be set to -1 for the initial call and then is used to
-            control what result page Twitter returns.
-          skip_status:
+            name is also a user ID.
+          skip_status (bool, optional):
             If True the statuses will not be returned in the user items.
-            [Optional]
-          include_entities:
+          include_entities (bool, optional):
             If False, the timeline will not contain additional metadata.
-            Defaults to True. [Optional]
+            Defaults to True.
 
         Returns:
-          A sequence of twitter.User instances, one for each follower
+          list: A sequence of twitter.user.User instances, one for each
+          member of the twitter.list.List.
         """
-        parameters = {}
-        url = '%s/lists/members.json' % (self.base_url)
-        parameters['slug'] = slug
-        parameters['list_id'] = list_id
-        if list_id is None:
-            if slug is None:
-                raise TwitterError({'message': "list_id or slug required"})
-            if owner_id is None and not owner_screen_name:
-                raise TwitterError({
-                    'message': "if list_id is not given you have to include an owner to help identify the proper list"})
-        if owner_id:
-            parameters['owner_id'] = owner_id
-        if owner_screen_name:
-            parameters['owner_screen_name'] = owner_screen_name
-        if cursor:
-            try:
-                parameters['cursor'] = int(cursor)
-            except ValueError:
-                raise TwitterError({'message': "cursor must be an integer"})
-        if skip_status:
-            parameters['skip_status'] = True
-        if include_entities:
-            parameters['include_user_entities'] = True
+        cursor = -1
         result = []
-
         while True:
-            parameters['cursor'] = cursor
-            resp = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-            result += [User.NewFromJsonDict(x) for x in data['users']]
-            if 'next_cursor' in data:
-                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
-                    break
-                else:
-                    cursor = data['next_cursor']
-            else:
+            next_cursor, previous_cursor, users = self.GetListMembersPaged(
+                list_id=list_id,
+                slug=slug,
+                owner_id=owner_id,
+                owner_screen_name=owner_screen_name,
+                cursor=cursor,
+                skip_status=skip_status,
+                include_entities=include_entities)
+            result += users
+
+            if next_cursor == 0 or next_cursor == previous_cursor:
                 break
-            sec = self.GetSleepTime('/followers/list')
-            time.sleep(sec)
+            else:
+                cursor = next_cursor
 
         return result
 
@@ -3156,74 +3586,60 @@ class Api(object):
                           screen_name=None,
                           owner_screen_name=None,
                           owner_id=None):
-        """Add a new member (or list of members) to a user's list.
-
-        The twitter.Api instance must be authenticated.
-
-        Twitter endpoint: /lists/members/create or /lists/members/create_all
+        """Add a new member (or list of members) to the specified list.
 
         Args:
-          list_id:
+          list_id (int, optional):
             The numerical id of the list.
-          slug:
-            You can identify a list by its slug instead of its numerical id. If you
-            decide to do so, note that you'll also have to specify the list owner
-            using the owner_id or owner_screen_name parameters.
-          user_id:
+          slug (str, optional):
+            You can identify a list by its slug instead of its numerical id.
+            If you decide to do so, note that you'll also have to specify the
+            list owner using the owner_id or owner_screen_name parameters.
+          user_id (int, optional):
             The user_id or a list of user_id's to add to the list.
             If not given, then screen_name is required.
-          screen_name:
+          screen_name (str, optional):
             The screen_name or a list of screen_name's to add to the list.
             If not given, then user_id is required.
-          owner_screen_name:
-            The screen_name of the user who owns the list being requested by a slug.
-          owner_id:
-            The user ID of the user who owns the list being requested by a slug.
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested by
+            a slug.
+          owner_id (int, optional):
+            The user ID of the user who owns the list being requested by
+            a slug.
 
         Returns:
-          A twitter.List instance representing the list subscribed to
+          twitter.list.List: A twitter.List instance representing the list
+          subscribed to.
         """
-        isList = False
-        data = {}
-        if list_id:
-            try:
-                data['list_id'] = int(list_id)
-            except ValueError:
-                raise TwitterError({'message': "list_id must be an integer"})
-        elif slug:
-            data['slug'] = slug
-            if owner_id:
-                try:
-                    data['owner_id'] = int(owner_id)
-                except ValueError:
-                    raise TwitterError({'message': "owner_id must be an integer"})
-            elif owner_screen_name:
-                data['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
-        else:
-            raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+        is_list = False
+        parameters = {}
+
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
+
         if user_id:
-            try:
-                if isinstance(user_id, types.ListType) or isinstance(user_id, types.TupleType):
-                    isList = True
-                    data['user_id'] = '%s' % ','.join(user_id)
-                else:
-                    data['user_id'] = int(user_id)
-            except ValueError:
-                raise TwitterError({'message': "user_id must be an integer"})
-        elif screen_name:
-            if isinstance(screen_name, types.ListType) or isinstance(screen_name, types.TupleType):
-                isList = True
-                data['screen_name'] = '%s' % ','.join(screen_name)
+            if isinstance(user_id, list) or isinstance(user_id, tuple):
+                is_list = True
+                uids = [str(enf_type('user_id', int, uid)) for uid in user_id]
+                parameters['user_id'] = ','.join(uids)
             else:
-                data['screen_name'] = screen_name
-        if isList:
+                parameters['user_id'] = enf_type('user_id', int, user_id)
+
+        elif screen_name:
+            if isinstance(screen_name, list) or isinstance(screen_name, tuple):
+                is_list = True
+                parameters['screen_name'] = ','.join(screen_name)
+            else:
+                parameters['screen_name'] = screen_name
+        if is_list:
             url = '%s/lists/members/create_all.json' % self.base_url
         else:
             url = '%s/lists/members/create.json' % self.base_url
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
@@ -3237,131 +3653,148 @@ class Api(object):
                            screen_name=None):
         """Destroys the subscription to a list for the authenticated user.
 
-        The twitter.Api instance must be authenticated.
-
-        Twitter endpoint: /lists/subscribers/destroy
-
         Args:
-          list_id:
+          list_id (int, optional):
             The numerical id of the list.
-          slug:
+          slug (str, optional):
             You can identify a list by its slug instead of its numerical id.
             If you decide to do so, note that you'll also have to specify
             the list owner using the owner_id or owner_screen_name parameters.
-          owner_screen_name:
-            The screen_name of the user who owns the list being requested by a slug.
-          owner_id:
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested by a
+            slug.
+          owner_id (int, optional):
             The user ID of the user who owns the list being requested by a slug.
-          user_id:
+          user_id (int, optional):
             The user_id or a list of user_id's to add to the list.
             If not given, then screen_name is required.
-          screen_name:
+          screen_name (str, optional):
             The screen_name or a list of Screen_name's to add to the list.
             If not given, then user_id is required.
 
         Returns:
-          A twitter.List instance representing the removed list.
+          twitter.list.List: A twitter.List instance representing the
+          removed list.
         """
-        isList = False
-        data = {}
-        if list_id:
-            try:
-                data['list_id'] = int(list_id)
-            except ValueError:
-                raise TwitterError({'message': "list_id must be an integer"})
-        elif slug:
-            data['slug'] = slug
-            if owner_id:
-                try:
-                    data['owner_id'] = int(owner_id)
-                except ValueError:
-                    raise TwitterError({'message': "owner_id must be an integer"})
-            elif owner_screen_name:
-                data['owner_screen_name'] = owner_screen_name
-            else:
-                raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
-        else:
-            raise TwitterError({'message': "Identify list by list_id or owner_screen_name/owner_id and slug"})
+        is_list = False
+        parameters = {}
+
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
+
         if user_id:
-            try:
-                if isinstance(user_id, types.ListType) or isinstance(user_id, types.TupleType):
-                    isList = True
-                    data['user_id'] = '%s' % ','.join(user_id)
-                else:
-                    data['user_id'] = int(user_id)
-            except ValueError:
-                raise TwitterError({'message': "user_id must be an integer"})
-        elif screen_name:
-            if isinstance(screen_name, types.ListType) or isinstance(screen_name, types.TupleType):
-                isList = True
-                data['screen_name'] = '%s' % ','.join(screen_name)
+            if isinstance(user_id, list) or isinstance(user_id, tuple):
+                is_list = True
+                uids = [str(enf_type('user_id', int, uid)) for uid in user_id]
+                parameters['user_id'] = ','.join(uids)
             else:
-                data['screen_name'] = screen_name
-        if isList:
+                parameters['user_id'] = int(user_id)
+        elif screen_name:
+            if isinstance(screen_name, list) or isinstance(screen_name, tuple):
+                is_list = True
+                parameters['screen_name'] = ','.join(screen_name)
+            else:
+                parameters['screen_name'] = screen_name
+
+        if is_list:
             url = '%s/lists/members/destroy_all.json' % self.base_url
         else:
-            url = '%s/lists/members/destroy.json' % (self.base_url)
+            url = '%s/lists/members/destroy.json' % self.base_url
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return List.NewFromJsonDict(data)
 
+    def GetListsPaged(self,
+                      user_id=None,
+                      screen_name=None,
+                      cursor=-1,
+                      count=20):
+        """ Fetch the sequence of lists for a user. If no user_id or
+        screen_name is passed, the data returned will be for the
+        authenticated user.
+
+        Args:
+          user_id (int, optional):
+            The ID of the user for whom to return results for.
+          screen_name (str, optional):
+            The screen name of the user for whom to return results
+            for.
+          count (int, optional):
+            The amount of results to return per page. No more than 1000 results
+            will ever be returned in a single page. Defaults to 20.
+          cursor (int, optional):
+            The "page" value that Twitter will use to start building the list
+            sequence from. Use the value of -1 to start at the beginning.
+            Twitter will return in the result the values for next_cursor and
+            previous_cursor.
+
+        Returns:
+          next_cursor (int), previous_cursor (int), list of twitter.List
+          instances, one for each list
+        """
+        url = '%s/lists/ownerships.json' % self.base_url
+        parameters = {}
+        if user_id is not None:
+            parameters['user_id'] = enf_type('user_id', int, user_id)
+        elif screen_name is not None:
+            parameters['screen_name'] = screen_name
+
+        if count is not None:
+            parameters['count'] = enf_type('count', int, count)
+
+        parameters['cursor'] = enf_type('cursor', int, cursor)
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        next_cursor = data.get('next_cursor', 0)
+        previous_cursor = data.get('previous_cursor', 0)
+        lists = [List.NewFromJsonDict(x) for x in data.get('lists', [])]
+
+        return next_cursor, previous_cursor, lists
+
     def GetLists(self,
                  user_id=None,
-                 screen_name=None,
-                 count=None,
-                 cursor=-1):
-        """Fetch the sequence of lists for a user.
-
-        The twitter.Api instance must be authenticated.
-
-        Twitter endpoint: /lists/ownerships
+                 screen_name=None):
+        """Fetch the sequence of lists for a user. If no user_id or screen_name
+        is passed, the data returned will be for the authenticated user.
 
         Args:
           user_id:
             The ID of the user for whom to return results for. [Optional]
           screen_name:
-            The screen name of the user for whom to return results for. [Optional]
+            The screen name of the user for whom to return results
+            for. [Optional]
           count:
             The amount of results to return per page.
             No more than 1000 results will ever be returned in a single page.
             Defaults to 20. [Optional]
           cursor:
-            The "page" value that Twitter will use to start building the list sequence from.
-            Use the value of -1 to start at the beginning.
-            Twitter will return in the result the values for next_cursor and previous_cursor. [Optional]
+            The "page" value that Twitter will use to start building the list
+            sequence from. Use the value of -1 to start at the beginning.
+            Twitter will return in the result the values for next_cursor and
+            previous_cursor. [Optional]
 
         Returns:
           A sequence of twitter.List instances, one for each list
         """
-        url = '%s/lists/ownerships.json' % self.base_url
         result = []
-        parameters = {}
-        if user_id is not None:
-            try:
-                parameters['user_id'] = int(user_id)
-            except ValueError:
-                raise TwitterError({'message': "user_id must be an integer"})
-        elif screen_name is not None:
-            parameters['screen_name'] = screen_name
-        else:
-            raise TwitterError({'message': "Specify user_id or screen_name"})
-        if count is not None:
-            parameters['count'] = count
+        cursor = -1
 
         while True:
-            parameters['cursor'] = cursor
-            resp = self._RequestUrl(url, 'GET', data=parameters)
-            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-            result += [List.NewFromJsonDict(x) for x in data['lists']]
-            if 'next_cursor' in data:
-                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
-                    break
-                else:
-                    cursor = data['next_cursor']
-            else:
+            next_cursor, prev_cursor, lists = self.GetListsPaged(
+                user_id=user_id,
+                screen_name=screen_name,
+                cursor=cursor)
+            result += lists
+            if next_cursor == 0 or next_cursor == prev_cursor:
                 break
+            else:
+                cursor = next_cursor
 
         return result
 
@@ -3374,8 +3807,6 @@ class Api(object):
                       include_entities=False,
                       skip_status=False):
         """Update's the authenticated user's profile data.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           name:
@@ -3471,6 +3902,7 @@ class Api(object):
             data['skip_status'] = 1
 
         resp = self._RequestUrl(url, 'POST', data=data)
+
         if resp.status_code in [200, 201, 202]:
             return True
         if resp.status_code == 400:
@@ -3483,8 +3915,6 @@ class Api(object):
                      include_entities=False,
                      skip_status=False):
         """Updates the authenticated users profile banner.
-
-        The twitter.Api instance must be authenticated.
 
         Args:
           image:
@@ -3513,6 +3943,7 @@ class Api(object):
             data['skip_status'] = 1
 
         resp = self._RequestUrl(url, 'POST', data=data)
+
         if resp.status_code in [200, 201, 202]:
             return True
         if resp.status_code == 400:
@@ -3538,7 +3969,7 @@ class Api(object):
         resp = self._RequestStream(url, 'GET')
         for line in resp.iter_lines():
             if line:
-                data = self._ParseAndCheckTwitter(line)
+                data = self._ParseAndCheckTwitter(line.decode('utf-8'))
                 yield data
 
     def GetStreamFilter(self,
@@ -3583,7 +4014,7 @@ class Api(object):
         resp = self._RequestStream(url, 'POST', data=data)
         for line in resp.iter_lines():
             if line:
-                data = self._ParseAndCheckTwitter(line)
+                data = self._ParseAndCheckTwitter(line.decode('utf-8'))
                 yield data
 
     def GetUserStream(self,
@@ -3592,7 +4023,7 @@ class Api(object):
                       track=None,
                       locations=None,
                       delimited=None,
-                      stall_warning=None,
+                      stall_warnings=None,
                       stringify_friend_ids=False):
         """Returns the data from the user stream.
 
@@ -3633,13 +4064,13 @@ class Api(object):
             data['locations'] = ','.join(locations)
         if delimited is not None:
             data['delimited'] = str(delimited)
-        if delimited is not None:
-            data['stall_warning'] = str(stall_warning)
+        if stall_warnings is not None:
+            data['stall_warnings'] = str(stall_warnings)
 
         resp = self._RequestStream(url, 'POST', data=data)
         for line in resp.iter_lines():
             if line:
-                data = self._ParseAndCheckTwitter(line)
+                data = self._ParseAndCheckTwitter(line.decode('utf-8'))
                 yield data
 
     def VerifyCredentials(self):
@@ -3649,8 +4080,6 @@ class Api(object):
           A twitter.User instance representing that user if the
           credentials are valid, None otherwise.
         """
-        if not self.__auth:
-            raise TwitterError({'message': "Api instance must first be given user credentials."})
         url = '%s/account/verify_credentials.json' % self.base_url
         resp = self._RequestUrl(url, 'GET')  # No_cache
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -3730,86 +4159,44 @@ class Api(object):
         """
         self._default_params['source'] = source
 
-    def GetRateLimitStatus(self, resource_families=None):
-        """Fetch the rate limit status for the currently authorized user.
-
-        Args:
-          resources:
-            A comma seperated list of resource families you want to know the current
-            rate limit disposition of. [Optional]
+    def InitializeRateLimit(self):
+        """ Make a call to the Twitter API to get the rate limit
+        status for the currently authenticated user or application.
 
         Returns:
-          A dictionary containing the time the limit will reset (reset_time),
-          the number of remaining hits allowed before the reset (remaining_hits),
-          the number of hits allowed in a 60-minute period (hourly_limit), and
-          the time of the reset in seconds since The Epoch (reset_time_in_seconds).
-        """
-        url = '%s/application/rate_limit_status.json' % self.base_url
-        parameters = {}
-        if resource_families is not None:
-            parameters['resources'] = resource_families
+            None.
 
-        resp = self._RequestUrl(url, 'GET', data=parameters)  # No-Cache
+        """
+        _sleep = self.sleep_on_rate_limit
+        if self.sleep_on_rate_limit:
+            self.sleep_on_rate_limit = False
+
+        url = '%s/application/rate_limit_status.json' % self.base_url
+
+        resp = self._RequestUrl(url, 'GET')  # No-Cache
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        return data
+        self.sleep_on_rate_limit = _sleep
+        self.rate_limit = RateLimit(**data)
 
-    def GetAverageSleepTime(self, resources):
-        """Determines the minimum number of seconds that a program must wait
-        before hitting the server again without exceeding the rate_limit
-        imposed for the currently authenticated user.
+    def CheckRateLimit(self, url):
+        """ Checks a URL to see the rate limit status for that endpoint.
 
-        Returns:
-          The average seconds that the api must have to sleep
-        """
-        if resources[0] == '/':
-            resources = resources[1:]
-        resource_families = resources[:resources.find('/')] if '/' in resources else resources
-        rate_status = self.GetRateLimitStatus(resource_families)
-        try:
-            reset_time = rate_status['resources'][resource_families]['/' + resources]['reset']
-            remaining = rate_status['resources'][resource_families]['/' + resources]['remaining']
-        except:
-            raise TwitterError({'message': 'Wrong resources'})
-        utc_now = datetime.datetime.utcnow()
-        utc_stuct = utc_now.timetuple()
-        current_time = timegm(utc_stuct)
-        delta = reset_time - current_time
-
-        if remaining == 0:
-            return remaining
-        else:
-            return old_div(delta, remaining)
-
-    def GetSleepTime(self, resources):
-        """Determines the minimum number of seconds that a program must wait
-        before hitting the server again without exceeding the rate_limit
-        imposed for the currently authenticated user.
+        Args:
+            url (str):
+                URL to check against the current rate limits.
 
         Returns:
-          The minimum seconds that the api must have to sleep before query again
-        """
-        if resources[0] == '/':
-            resources = resources[1:]
-        resource_families = resources[:resources.find('/')] if '/' in resources else resources
-        rate_status = self.GetRateLimitStatus(resource_families)
-        try:
-            reset_time = rate_status['resources'][resource_families]['/' + resources]['reset']
-            remaining = rate_status['resources'][resource_families]['/' + resources]['remaining']
-        except:
-            raise TwitterError({'message': 'Wrong resources'})
+            namedtuple: EndpointRateLimit namedtuple.
 
-        if remaining == 0:
-            utc_now = datetime.datetime.utcnow()
-            utc_stuct = utc_now.timetuple()
-            current_time = timegm(utc_stuct)
-            delta = reset_time - current_time
-            if delta < 0:
-                return 0
-            else:
-                return delta
-        else:
-            return 0
+        """
+        if not self.rate_limit:
+            self.InitializeRateLimit()
+
+        if url:
+            limit = self.rate_limit.get_limit(url)
+
+        return limit
 
     def _BuildUrl(self, url, path_elements=None, extra_params=None):
         # Break url into constituent parts
@@ -3938,54 +4325,88 @@ class Api(object):
         if 'errors' in data:
             raise TwitterError(data['errors'])
 
+    def _RequestChunkedUpload(self, url, headers, data):
+        try:
+            return requests.post(
+                url,
+                headers=headers,
+                data=data,
+                auth=self.__auth,
+                timeout=self._timeout
+            )
+        except requests.RequestException as e:
+            raise TwitterError(str(e))
+
     def _RequestUrl(self, url, verb, data=None):
         """Request a url.
 
-           Args:
-             url:
-               The web location we want to retrieve.
-             verb:
-               Either POST or GET.
-             data:
-               A dict of (str, unicode) key/value pairs.
+        Args:
+            url:
+                The web location we want to retrieve.
+            verb:
+                Either POST or GET.
+            data:
+                A dict of (str, unicode) key/value pairs.
 
-           Returns:
-             A JSON object.
+        Returns:
+            A JSON object.
         """
+        if not self.__auth:
+            raise TwitterError(
+                "The twitter.Api instance must be authenticated.")
+
+        if url and self.sleep_on_rate_limit:
+            limit = self.CheckRateLimit(url)
+
+            if limit.remaining == 0:
+                try:
+                    time.sleep(int(limit.reset - time.time()))
+                except ValueError:
+                    pass
+
         if verb == 'POST':
             if 'media_ids' in data:
                 url = self._BuildUrl(url, extra_params={'media_ids': data['media_ids']})
+
             if 'media' in data:
                 try:
-                    return requests.post(
-                        url,
-                        files=data,
-                        auth=self.__auth,
-                        timeout=self._timeout
-                    )
+                    resp = requests.post(url,
+                                         files=data,
+                                         auth=self.__auth,
+                                         timeout=self._timeout)
                 except requests.RequestException as e:
                     raise TwitterError(str(e))
             else:
                 try:
-                    return requests.post(
-                        url,
-                        data=data,
-                        auth=self.__auth,
-                        timeout=self._timeout
-                    )
+                    resp = requests.post(url,
+                                         data=data,
+                                         auth=self.__auth,
+                                         timeout=self._timeout)
+
                 except requests.RequestException as e:
                     raise TwitterError(str(e))
-        if verb == 'GET':
+
+        elif verb == 'GET':
             url = self._BuildUrl(url, extra_params=data)
             try:
-                return requests.get(
-                    url,
-                    auth=self.__auth,
-                    timeout=self._timeout
-                )
+                resp = requests.get(url,
+                                    auth=self.__auth,
+                                    timeout=self._timeout)
+
             except requests.RequestException as e:
                 raise TwitterError(str(e))
-        return 0  # if not a POST or GET request
+
+        else:
+            resp = 0  # if not a POST or GET request
+
+        if url and self.sleep_on_rate_limit and self.rate_limit:
+            limit = resp.headers.get('x-rate-limit-limit', 0)
+            remaining = resp.headers.get('x-rate-limit-remaining', 0)
+            reset = resp.headers.get('x-rate-limit-reset', 0)
+
+            self.rate_limit.set_limit(url, limit, remaining, reset)
+
+        return resp
 
     def _RequestStream(self, url, verb, data=None):
         """Request a stream of data.
