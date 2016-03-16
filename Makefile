@@ -11,7 +11,7 @@ env:
 	pip install -r requirements.txt
 
 dev: env
-	pip install -r requirements-test.txt
+	pip install -r requirements.testing.txt
 
 info:
 	python --version
