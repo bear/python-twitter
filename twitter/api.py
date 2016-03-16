@@ -26,15 +26,11 @@ import gzip
 import time
 import base64
 import re
-import datetime
-from calendar import timegm
 import requests
 from requests_oauthlib import OAuth1
 import io
 import warnings
 from uuid import uuid4
-
-from past.utils import old_div
 
 try:
     # python 3
@@ -142,7 +138,7 @@ class Api(object):
                  base_url=None,
                  stream_url=None,
                  upload_url=None,
-                 chunk_size=1024*1024,
+                 chunk_size=1024 * 1024,
                  use_gzip_compression=False,
                  debugHTTP=False,
                  timeout=None,
