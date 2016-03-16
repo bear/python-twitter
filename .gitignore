@@ -18,6 +18,8 @@ var
 sdist
 develop-eggs
 .installed.cfg
+.eggs
+.cache
 
 # Installer logs
 pip-log.txt
@@ -25,6 +27,7 @@ pip-log.txt
 # Unit test / coverage reports
 .coverage
 .tox
+htmlcov
 
 # PyCharm data
 .idea
@@ -37,3 +40,5 @@ pip-log.txt
 
 #Environment
 env
+
+violations.flake8.txt

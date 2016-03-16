@@ -1,0 +1,11 @@
+machine:
+  python:
+      version: 2.7.10  pre:
+
+dependencies:
+  override:
+    - make deps-test
+
+test:
+  override:
+    - make coverage

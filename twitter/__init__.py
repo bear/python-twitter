@@ -19,8 +19,15 @@
 """A library that provides a Python interface to the Twitter API"""
 from __future__ import absolute_import
 
-__author__ = 'python-twitter@googlegroups.com'
-__version__ = '3.0rc1'
+__author__       = 'The Python-Twitter Developers'
+__email__        = 'python-twitter@googlegroups.com'
+__copyright__    = 'Copyright (c) 2007-2016 The Python-Twitter Developers'
+__license__      = 'Apache License 2.0'
+__version__      = '3.0rc1'
+__url__          = 'https://github.com/bear/python-twitter'
+__download_url__ = 'https://pypi.python.org/pypi/python-twitter'
+__description__  = 'A Python wrapper around the Twitter API'
+
 
 import json                                 # noqa
 
