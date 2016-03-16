@@ -13,6 +13,11 @@ env:
 dev: env
 	pip install -r requirements-test.txt
 
+info:
+	python --version
+	pyenv --version
+	pip --version
+
 clean:
 	rm -fr build
 	rm -fr dist
