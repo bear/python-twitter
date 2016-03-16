@@ -18,37 +18,13 @@ from __future__ import absolute_import, print_function
 # limitations under the License.
 
 import os
-import sys
 import re
 import codecs
 
 from setuptools import setup, find_packages
-from setuptools.command.test import test as TestCommand
+
 
 cwd = os.path.abspath(os.path.dirname(__file__))
-
-class PyTest(TestCommand):
-    """You can pass a single string of arguments using the
-    --pytest-args or -a command-line option:
-        python setup.py test -a "--durations=5"
-    is equivalent to running:
-        py.test --durations=5
-    """
-    user_options = [('pytest-args=', 'a', 'Arguments to pass to py.test')]
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = ['--strict', '--verbose', '--tb=long', 'tests']
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-
-    def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(self.pytest_args)
-        sys.exit(errno)
-
 
 def read(filename):
     with codecs.open(os.path.join(cwd, filename), 'rb', 'utf-8') as h:
