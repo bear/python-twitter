@@ -3,7 +3,7 @@ import re
 try:
     from urllib.parse import urlparse
 except ImportError:
-    from urlparse import urlparse, urlunparse
+    from urlparse import urlparse
 
 from twitter.twitter_utils import enf_type
 

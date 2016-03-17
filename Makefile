@@ -1,21 +1,22 @@
 
 help:
-	@echo "  env         create a development environment using virtualenv"
-	@echo "  deps        install dependencies"
+	@echo "  env         install all production dependencies"
+	@echo "  dev         install all dev and production dependencies (virtualenv is assumed)"
 	@echo "  clean       remove unwanted stuff"
 	@echo "  lint        check style with flake8"
-	@echo "  coverage    run tests with code coverage"
 	@echo "  test        run tests"
+	@echo "  coverage    run tests with code coverage"
 
 env:
-	sudo easy_install pip && \
-	pip install virtualenv && \
-	virtualenv env && \
-	. env/bin/activate && \
-	make deps
+	pip install -r requirements.txt
 
-deps:
-	pip install -r requirements.txt --use-mirrors
+dev: env
+	pip install -r requirements.testing.txt
+
+info:
+	python --version
+	pyenv --version
+	pip --version
 
 clean:
 	rm -fr build
@@ -27,13 +28,16 @@ clean:
 lint:
 	flake8 twitter > violations.flake8.txt
 
-coverage:
-	nosetests --with-coverage --cover-package=twitter
+test: lint
+	python setup.py test
 
-test:
-	nosetests
+coverage: clean test
+	coverage run --source=twitter setup.py test --addopts "--ignore=venv"
+	coverage html
+	coverage report
 
 build: clean
+	python setup.py check
 	python setup.py sdist
 	python setup.py bdist_wheel
 

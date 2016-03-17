@@ -6,11 +6,11 @@ import urllib
 import unittest
 import twitter
 
-from .apikey import (CONSUMER_KEY,
-                     CONSUMER_SECRET,
-                     ACCESS_TOKEN_KEY,
-                     ACCESS_TOKEN_SECRET)
 
+CONSUMER_KEY = os.getenv('CONSUMER_KEY', None)
+CONSUMER_SECRET = os.getenv('CONSUMER_SECRET', None)
+ACCESS_TOKEN_KEY = os.getenv('ACCESS_TOKEN_KEY', None)
+ACCESS_TOKEN_SECRET = os.getenv('ACCESS_TOKEN_SECRET', None)
 
 @unittest.skipIf(not CONSUMER_KEY and not CONSUMER_SECRET, "No tokens provided")
 class ApiTest(unittest.TestCase):
