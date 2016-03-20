@@ -31,13 +31,13 @@ Extract the source distribution and run::
 Testing
 =======
 
-Run::
+The following requires ``pip install pytest`` and ``pip install pytest-cov``. Run::
 
-    $ python test.py
+    $ make test
 
-If you would like to see coverage information and have `Nose <https://nose.readthedocs.org>`_ installed::
+If you would like to see coverage information:: 
 
-    $ nosetests --with-coverage
+    $ make coverage
 
 
 Getting the code

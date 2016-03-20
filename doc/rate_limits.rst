@@ -1,5 +1,8 @@
 Rate Limiting
-------------
+-------------
+
+Overview
+++++++++
 
 Twitter imposes rate limiting based either on user tokens or application
 tokens. Please see: `API Rate Limits
@@ -66,9 +69,9 @@ pass ``sleep_on_rate_limit=True`` to your API instance. This will cause the API
 to raise a hard error when attempting to make call #15 above.
 
 Technical
----------
++++++++++
 
-The twitter/ratelimit.py file contains the code that handles storing and
+The ``twitter/ratelimit.py`` file contains the code that handles storing and
 checking rate limits for endpoints. Since Twitter does not send any information
 regarding the endpoint that you are requesting with the ``x-rate-limit-*``
 headers, the endpoint is determined by some regex using the URL.

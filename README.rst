@@ -24,7 +24,7 @@ By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
 Introduction
 ============
 
-This library provides a pure Python interface for the `Twitter API <https://dev.twitter.com/>`_. It works with Python versions from 2.7+ and python 3.
+This library provides a pure Python interface for the `Twitter API <https://dev.twitter.com/>`_. It works with Python versions from 2.7+ and Python 3.
 
 `Twitter <http://twitter.com>`_ provides a service that allows people to connect via the web, IM, and SMS. Twitter exposes a `web services API <https://dev.twitter.com/overview/documentation>`_ and this library is intended to make it even easier for Python programmers to use.
 
@@ -47,18 +47,27 @@ Check out the latest development version anonymously with::
     $ git clone git://github.com/bear/python-twitter.git
     $ cd python-twitter
 
-Setup a virtual environment and install dependencies::
+To install dependencies, run either::
 
-	$ make env-devel
+	$ make dev
 
-Activate the virtual environment created::
+or::
 
-	$ source env/bin/activate
+    $ pip install -r requirements.testing.txt
+
+To install the minimal dependencies for production use (i.e., what is installed
+with ``pip install python-twitter``) run::
+
+    $ make env
+
+or::
+
+    $ pip install -r requirements.txt
 
 =============
 Running Tests
 =============
-Note that tests require ```pip install pytest``` and optionally ```pip install pytest-cov``` (these are included if you have installed dependencies from ```requirements.devel.txt``` or run ```make env-devel```)
+Note that tests require ```pip install pytest``` and optionally ```pip install pytest-cov``` (these are included if you have installed dependencies from ```requirements.testing.txt```)
 
 To run the unit tests::
 
@@ -139,17 +148,17 @@ To see if your credentials are successful::
 
 **NOTE**: much more than the small sample given here will print
 
-To fetch a single user's public status messages, where ``user`` is a Twitter *short name* (i.e., a user's screen name)::
+To fetch a single user's public status messages, where ``user`` is a Twitter user's screen name::
 
     >>> statuses = api.GetUserTimeline(screen_name=user)
     >>> print([s.text for s in statuses])
 
-To fetch a list a user's friends (requires authentication)::
+To fetch a list a user's friends::
 
     >>> users = api.GetFriends()
     >>> print([u.name for u in users])
 
-To post a Twitter status message (requires authentication)::
+To post a Twitter status message::
 
     >>> status = api.PostUpdate('I love python-twitter!')
     >>> print(status.text)
