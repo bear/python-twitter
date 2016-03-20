@@ -17,6 +17,8 @@ class TwitterModel(object):
         self.param_defaults = {}
 
     def __str__(self):
+        """ Returns a string representation of TwitterModel. By default
+        this is the same as AsJsonString(). """
         return self.AsJsonString()
 
     def __eq__(self, other):
@@ -26,6 +28,8 @@ class TwitterModel(object):
         return not self.__eq__(other)
 
     def AsJsonString(self):
+        """ Returns the TwitterModel as a JSON string based on key/value
+        pairs returned from the AsDict() method. """
         return json.dumps(self.AsDict(), sort_keys=True)
 
     def AsDict(self):
@@ -341,7 +345,7 @@ class User(TwitterModel):
     @classmethod
     def NewFromJsonDict(cls, data, **kwargs):
         from twitter import Status
-        if data.get('status'):
+        if data.get('status', None):
             status = Status.NewFromJsonDict(data.get('status'))
             return super(cls, cls).NewFromJsonDict(data=data, status=status)
         else:
