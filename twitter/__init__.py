@@ -40,17 +40,17 @@ from ._file_cache import _FileCache         # noqa
 from .error import TwitterError             # noqa
 from .parse_tweet import ParseTweet         # noqa
 
-from .models import (
-    Category,
-    DirectMessage,
-    Hashtag,
-    List,
-    Media,
-    Trend,
-    Url,
-    User,
-    UserStatus,
+from .models import (                       # noqa
+    Category,                               # noqa
+    DirectMessage,                          # noqa
+    Hashtag,                                # noqa
+    List,                                   # noqa
+    Media,                                  # noqa
+    Trend,                                  # noqa
+    Url,                                    # noqa
+    User,                                   # noqa
+    UserStatus,                             # noqa
+    Status                                  # noqa
 )
 
-from .models import Status                  # noqa
 from .api import Api                        # noqa
