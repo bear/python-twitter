@@ -39,7 +39,8 @@ class TwitterModel(object):
             # dicts created by an object supporting the AsDict() method,
             # i.e., if it inherits from TwitterModel. If the item in the list
             # doesn't support the AsDict() method, then we assign the value
-            # directly.
+            # directly. An example being a list of Media objects contained
+            # within a Status object.
             if isinstance(getattr(self, key, None), (list, tuple, set)):
                 data[key] = list()
                 for subobj in getattr(self, key, None):
@@ -50,7 +51,8 @@ class TwitterModel(object):
 
             # Not a list, *but still a subclass of TwitterModel* and
             # and we can assign the data[key] directly with the AsDict()
-            # method of the object.
+            # method of the object. An example being a Status object contained
+            # within a User object.
             elif getattr(getattr(self, key, None), 'AsDict', None):
                 data[key] = getattr(self, key).AsDict()
 
