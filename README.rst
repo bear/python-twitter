@@ -24,7 +24,7 @@ By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
 Introduction
 ============
 
-This library provides a pure Python interface for the `Twitter API <https://dev.twitter.com/>`_. It works with Python versions from 2.6+. Python 3 support is under development.
+This library provides a pure Python interface for the `Twitter API <https://dev.twitter.com/>`_. It works with Python versions from 2.7+ and Python 3.
 
 `Twitter <http://twitter.com>`_ provides a service that allows people to connect via the web, IM, and SMS. Twitter exposes a `web services API <https://dev.twitter.com/overview/documentation>`_ and this library is intended to make it even easier for Python programmers to use.
 
@@ -47,38 +47,49 @@ Check out the latest development version anonymously with::
     $ git clone git://github.com/bear/python-twitter.git
     $ cd python-twitter
 
-Setup a virtual environment and install dependencies:
+To install dependencies, run either::
 
-	$ make env
+	$ make dev
 
-Activate the virtual environment created:
+or::
 
-	$ source env/bin/activate
+    $ pip install -r requirements.testing.txt
+
+To install the minimal dependencies for production use (i.e., what is installed
+with ``pip install python-twitter``) run::
+
+    $ make env
+
+or::
+
+    $ pip install -r requirements.txt
 
 =============
 Running Tests
 =============
-Note that tests require ```pip install nose``` and optionally ```pip install coverage```:
+Note that tests require ```pip install pytest``` and optionally ```pip install pytest-cov``` (these are included if you have installed dependencies from ```requirements.testing.txt```)
 
-To run the unit tests:
+To run the unit tests::
 
-	$ make test
+    $ make test
 
-to also run code coverage:
+to also run code coverage::
 
     $ make coverage
+
 
 =============
 Documentation
 =============
 
-View the last release API documentation at: https://dev.twitter.com/overview/documentation
+View the latest python-twitter documentation at
+https://python-twitter.readthedocs.org. You can view Twitter's API documentation at: https://dev.twitter.com/overview/documentation
 
 =====
 Using
 =====
 
-The library provides a Python wrapper around the Twitter API and the Twitter data model.
+The library provides a Python wrapper around the Twitter API and the Twitter data model. To get started, check out the examples in the examples/ folder or read the documentation at https://python-twitter.readthedocs.org which contains information about getting your authentication keys from Twitter and using the library.
 
 ----
 Using with Django
@@ -86,17 +97,25 @@ Using with Django
 
 Additional template tags that expand tweet urls and urlize tweet text. See the django template tags available for use with python-twitter: https://github.com/radzhome/python-twitter-django-tags
 
------
-Model
------
+------
+Models
+------
 
-The three model classes are ``twitter.Status``, ``twitter.User``, and ``twitter.DirectMessage``. The API methods return instances of these classes.
+The library utilizes models to represent various data structures returned by Twitter. Those models are:
+    * twitter.Category
+    * twitter.DirectMessage
+    * twitter.Hashtag
+    * twitter.List
+    * twitter.Media
+    * twitter.Status
+    * twitter.Trend
+    * twitter.Url
+    * twitter.User
+    * twitter.UserStatus
 
-To read the full API for ``twitter.Status``, ``twitter.User``, or ``twitter.DirectMessage``, run::
+To read the documentation for any of these models, run::
 
-    $ pydoc twitter.Status
-    $ pydoc twitter.User
-    $ pydoc twitter.DirectMessage
+    $ pydoc twitter.[model]
 
 ---
 API
@@ -104,7 +123,7 @@ API
 
 The API is exposed via the ``twitter.Api`` class.
 
-The python-twitter library now only supports OAuth authentication as the Twitter devs have indicated that OAuth is the only method that will be supported moving forward.
+The python-twitter requires the use of OAuth keys for nearly all operations. As of Twitter's API v1.1, authentication is required for most, if not all, endpoints. Therefore, you will need to register an app with Twitter in order to use this library. Please see the "Getting Started" guide on https://python-twitter.readthedocs.org for a more information.
 
 To generate an Access Token you have to pick what type of access your application requires and then do one of the following:
 
@@ -129,39 +148,45 @@ To see if your credentials are successful::
 
 **NOTE**: much more than the small sample given here will print
 
-To fetch a single user's public status messages, where ``user`` is a Twitter *short name*::
+To fetch a single user's public status messages, where ``user`` is a Twitter user's screen name::
 
     >>> statuses = api.GetUserTimeline(screen_name=user)
     >>> print([s.text for s in statuses])
 
-To fetch a list a user's friends (requires authentication)::
+To fetch a list a user's friends::
 
     >>> users = api.GetFriends()
     >>> print([u.name for u in users])
 
-To post a Twitter status message (requires authentication)::
+To post a Twitter status message::
 
     >>> status = api.PostUpdate('I love python-twitter!')
     >>> print(status.text)
     I love python-twitter!
 
-There are many more API methods, to read the full API documentation::
+There are many more API methods, to read the full API documentation either
+check out the documentation on `readthedocs
+<https://python-twitter.readthedocs.org>`_, build the documentation locally
+with::
+
+    $ make docs
+
+or check out the inline documentation with::
 
     $ pydoc twitter.Api
-
-
 
 ----
 Todo
 ----
 
-Patches and bug reports are `welcome <https://github.com/bear/python-twitter/issues/new>`_, just please keep the style consistent with the original source.
+Patches, pull requests, and bug reports are `welcome <https://github.com/bear/python-twitter/issues/new>`_, just please keep the style consistent with the original source.
 
-Add more example scripts.
+In particular, having more example scripts would be a huge help. If you have
+a program that uses python-twitter and would like a link in the documentation,
+submit a pull request against ``twitter/doc/getting_started.rst`` and add your
+program at the bottom.
 
 The twitter.Status and ``twitter.User`` classes are going to be hard to keep in sync with the API if the API changes. More of the code could probably be written with introspection.
-
-Statement coverage of ``twitter_test`` is only about 80% of twitter.py.
 
 The ``twitter.Status`` and ``twitter.User`` classes could perform more validation on the property setters.
 
@@ -183,7 +208,7 @@ Now it's a full-on open source project with many contributors over time. See AUT
 License
 -------
 
-| Copyright 2007-2014 The Python-Twitter Developers
+| Copyright 2007-2016 The Python-Twitter Developers
 |
 | Licensed under the Apache License, Version 2.0 (the 'License');
 | you may not use this file except in compliance with the License.
