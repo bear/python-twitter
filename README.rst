@@ -8,9 +8,13 @@ By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
     :target: https://pypi.python.org/pypi/python-twitter/
     :alt: Downloads
 
-.. image:: https://travis-ci.org/bear/python-twitter.svg?branch=master
-    :target: https://travis-ci.org/bear/python-twitter
-    :alt: Travis CI
+.. image:: https://readthedocs.org/projects/python-twitter/badge/?version=latest
+    :target: http://python-twitter.readthedocs.org/en/latest/?badge=latest
+    :alt: Documentation Status
+
+.. image:: https://circleci.com/gh/bear/python-twitter/master.svg?style=shield&circle-token=42abb9ffa9e9db463b565f2d47eb0966039bce2d
+    :target: https://circleci.org/gh/bear/python-twitter
+    :alt: Circle CI
 
 .. image:: http://codecov.io/github/bear/python-twitter/coverage.svg?branch=master
     :target: http://codecov.io/github/bear/python-twitter
