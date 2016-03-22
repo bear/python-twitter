@@ -1334,13 +1334,13 @@ class ApiTest(unittest.TestCase):
 
         # Local file
         resp = self.api.PostUpdate(media='testdata/168NQ.jpg', status='test')
-        self.assertEqual(697007311538229248, resp.AsDict()['media'][0].id)
+        self.assertEqual(697007311538229248, resp.AsDict()['media'][0]['id'])
         self.assertEqual(resp.text, "hi this is a test for media uploads with statuses https://t.co/FHgqb6iLOX")
 
         # File object
         with open('testdata/168NQ.jpg', 'rb') as f:
             resp = self.api.PostUpdate(media=[f], status='test')
-        self.assertEqual(697007311538229248, resp.AsDict()['media'][0].id)
+        self.assertEqual(697007311538229248, resp.AsDict()['media'][0]['id'])
         self.assertEqual(resp.text, "hi this is a test for media uploads with statuses https://t.co/FHgqb6iLOX")
 
         # Media ID as int
@@ -1424,6 +1424,7 @@ class ApiTest(unittest.TestCase):
             match_querystring=True,
             status=200)
         resp = self.api.LookupFriendship(screen_name='dickc')
+        self.assertEqual(resp[0].blocking, False)
         self.assertEqual(resp[0].muting, True)
 
     @responses.activate
