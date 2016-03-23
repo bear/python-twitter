@@ -3981,7 +3981,7 @@ class Api(object):
           track:
             A list of expressions to track. [Optional]
           locations:
-            A list of Latitude,Longitude pairs (as strings) specifying
+            A list of Longitude,Latitude pairs (as strings) specifying
             bounding boxes for the tweets' origin. [Optional]
           delimited:
             Specifies a message length. [Optional]
