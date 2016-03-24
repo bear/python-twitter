@@ -4,6 +4,16 @@ Migration from v2 to v3
 Changes to Existing Methods
 ===========================
 
+:py:func:`twitter.api.Api.CreateFavorite`
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* kwarg param has been changed to ``status_id`` from ``id`` to be consistent
+  with other method calls and avoid shadowing builtin function ``id``.
+
+:py:func:`twitter.api.Api.DestroyFavorite`
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* kwarg param has been changed to ``status_id`` from ``id`` to be consistent
+  with other method calls and avoid shadowing builtin function ``id``.
+
 :py:func:`twitter.api.Api.GetBlocks`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * Method no longer accepts parameters ``user_id`` or ``screen_name`` as these are not honored by Twitter. The data returned will be for the authenticated user only.
@@ -35,9 +45,21 @@ Changes to Existing Methods
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * No longer accepts ``cursor`` parameter. If you require granular control over the paging of the twitter.list.List members, please user twitter.api.Api.GetListMembersPaged instead.
 
+
+:py:func:`twitter.api.Api.GetStatusOembed`
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* Kwarg ``id`` has been changed to ``status_id`` in keeping with the rest of
+  the Api and to avoid shadowing a builtin.
+
 :py:func:`twitter.api.Api.GetSearch`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * Adds ``raw_query`` method. See :ref:`raw_queries` for more information.
+
+
+:py:func:`twitter.api.Api.GetTrendsWoeid`
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* Kwarg ``id`` has been changed to ``woeid`` in order to avoid shadowing
+  a builtin and be more descriptive.
 
 :py:func:`twitter.api.Api.GetUserStream`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
