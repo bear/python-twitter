@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 #
-# vim: sw=2 ts=2 sts=2
 #
 # Copyright 2007 The Python-Twitter Developers
 #
@@ -490,9 +489,9 @@ class Api(object):
         Returns:
           A list with 10 entries. Each entry contains a trend.
         """
-        return self.GetTrendsWoeid(id=1, exclude=exclude)
+        return self.GetTrendsWoeid(woeid=1, exclude=exclude)
 
-    def GetTrendsWoeid(self, id, exclude=None):
+    def GetTrendsWoeid(self, woeid, exclude=None):
         """Return the top 10 trending topics for a specific WOEID, if trending
         information is available for it.
 
@@ -507,7 +506,7 @@ class Api(object):
           A list with 10 entries. Each entry contains a trend.
         """
         url = '%s/trends/place.json' % (self.base_url)
-        parameters = {'id': id}
+        parameters = {'id': woeid}
 
         if exclude:
             parameters['exclude'] = exclude
@@ -771,7 +770,7 @@ class Api(object):
         return Status.NewFromJsonDict(data)
 
     def GetStatusOembed(self,
-                        id=None,
+                        status_id=None,
                         url=None,
                         maxwidth=None,
                         hide_media=False,
@@ -2810,7 +2809,7 @@ class Api(object):
 
     def CreateFavorite(self,
                        status=None,
-                       id=None,
+                       status_id=None,
                        include_entities=True):
         """Favorites the specified status object or id as the authenticating user.
 
@@ -2845,7 +2844,7 @@ class Api(object):
 
     def DestroyFavorite(self,
                         status=None,
-                        id=None,
+                        status_id=None,
                         include_entities=True):
         """Un-Favorites the specified status object or id as the authenticating user.
 
