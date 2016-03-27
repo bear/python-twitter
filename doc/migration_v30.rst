@@ -14,9 +14,14 @@ Changes to Existing Methods
 * kwarg param has been changed to ``status_id`` from ``id`` to be consistent
   with other method calls and avoid shadowing builtin function ``id``.
 
+:py:func:`twitter.api.Api.DestroyBlock`
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* Kwarg ``id`` has been changed to ``user_id`` in order to avoid shadowing
+  a builtin and be more descriptive.
+
 :py:func:`twitter.api.Api.DestroyStatus`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-* Kwarg ``id`` has been changed to ``status_id`` in keeping with the rest of
+* kwarg ``id`` has been changed to ``status_id`` in keeping with the rest of
   the Api and to avoid shadowing a builtin.
 
 :py:func:`twitter.api.Api.GetBlocks`
@@ -74,10 +79,8 @@ Changes to Existing Methods
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * Parameter 'stall_warning' is now 'stall_warnings' in line with GetStreamFilter and Twitter's naming convention. This should now actually return stall warnings, whereas it did not have any effect previously.
 
-
 :py:func:`twitter.api.Api.LookupFriendship`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 * Method will now accept a list for either ``user_id`` or ``screen_name``. The list can contain either ints, strings, or :py:mod:`twitter.user.User` objects for either ``user_id`` or ``screen_name``.
 * Return value is a list of :py:mod:`twitter.user.UserStatus` objects.
 
@@ -87,6 +90,10 @@ Changes to Existing Methods
 * ``media_additional_owners`` should be a list of user ids representing Twitter users that should be able to use the uploaded media in their tweets. If you pass a list of media, then **additional owners will apply to each object.** If you need more granular control, please use the UploadMedia* methods.
 * ``media_category``: Only for use with the AdsAPI. See https://dev.twitter.com/ads/creative/promoted-video-overview if this applies to your application.
 
+:py:func:`twitter.api.Api.PostRetweet`
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* Kwarg ``original_id`` has been changed to ``status_id`` in order to avoid shadowing
+  a builtin and be more descriptive.
 
 Deprecation
 ===========

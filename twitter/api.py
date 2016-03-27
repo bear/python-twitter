@@ -785,7 +785,7 @@ class Api(object):
         Specify tweet by the id or url parameter.
 
         Args:
-          id:
+          status_id:
             The numeric ID of the status you are trying to embed.
           url:
             The url of the status you are trying to embed.
@@ -815,15 +815,15 @@ class Api(object):
 
         parameters = {}
 
-        if id is not None:
+        if status_id is not None:
             try:
-                parameters['id'] = int(id)
+                parameters['id'] = int(status_id)
             except ValueError:
-                raise TwitterError({'message': "'id' must be an integer."})
+                raise TwitterError({'message': "'status_id' must be an integer."})
         elif url is not None:
             parameters['url'] = url
         else:
-            raise TwitterError({'message': "Must specify either 'id' or 'url'"})
+            raise TwitterError({'message': "Must specify either 'status_id' or 'url'"})
 
         if maxwidth is not None:
             parameters['maxwidth'] = maxwidth
@@ -858,7 +858,7 @@ class Api(object):
         status.
 
         Args:
-          id:
+          status_id:
             The numerical ID of the status you're trying to destroy.
 
         Returns:
@@ -867,7 +867,7 @@ class Api(object):
         try:
             post_data = {'id': int(status_id)}
         except ValueError:
-            raise TwitterError({'message': "id must be an integer"})
+            raise TwitterError({'message': "status_id must be an integer"})
         url = '%s/statuses/destroy/%s.json' % (self.base_url, status_id)
         if trim_user:
             post_data['trim_user'] = 1
@@ -1405,11 +1405,11 @@ class Api(object):
 
         return results
 
-    def PostRetweet(self, original_id, trim_user=False):
+    def PostRetweet(self, status_id, trim_user=False):
         """Retweet a tweet with the Retweet API.
 
         Args:
-          original_id:
+          status_id:
             The numerical id of the tweet that will be retweeted
           trim_user:
             If True the returned payload will only contain the user IDs,
@@ -1420,13 +1420,13 @@ class Api(object):
           A twitter.Status instance representing the original tweet with retweet details embedded.
         """
         try:
-            if int(original_id) <= 0:
-                raise TwitterError({'message': "'original_id' must be a positive number"})
+            if int(status_id) <= 0:
+                raise TwitterError({'message': "'status_id' must be a positive number"})
         except ValueError:
-            raise TwitterError({'message': "'original_id' must be an integer"})
+            raise TwitterError({'message': "'status_id' must be an integer"})
 
-        url = '%s/statuses/retweet/%s.json' % (self.base_url, original_id)
-        data = {'id': original_id}
+        url = '%s/statuses/retweet/%s.json' % (self.base_url, status_id)
+        data = {'id': status_id}
         if trim_user:
             data['trim_user'] = 'true'
         resp = self._RequestUrl(url, 'POST', data=data)
@@ -1770,7 +1770,7 @@ class Api(object):
 
         return result
 
-    def DestroyBlock(self, id, trim_user=False):
+    def DestroyBlock(self, user_id, trim_user=False):
         """Destroys the block for the user specified by the required ID
         parameter.
 
@@ -1778,16 +1778,16 @@ class Api(object):
         required ID parameter.
 
         Args:
-          id:
+          user_id:
             The numerical ID of the user to be un-blocked.
 
         Returns:
           A twitter.User instance representing the un-blocked user.
         """
         try:
-            post_data = {'user_id': int(id)}
+            post_data = {'user_id': int(user_id)}
         except ValueError:
-            raise TwitterError({'message': "id must be an integer"})
+            raise TwitterError({'message': "user_id must be an integer"})
         url = '%s/blocks/destroy.json' % (self.base_url)
         if trim_user:
             post_data['trim_user'] = 1
