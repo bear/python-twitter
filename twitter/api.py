@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 #
-# vim: sw=2 ts=2 sts=2
 #
 # Copyright 2007 The Python-Twitter Developers
 #
@@ -107,15 +106,15 @@ class Api(object):
         >>> api.GetReplies()
         >>> api.GetUserTimeline(user)
         >>> api.GetHomeTimeline()
-        >>> api.GetStatus(id)
-        >>> api.DestroyStatus(id)
+        >>> api.GetStatus(status_id)
+        >>> api.DestroyStatus(status_id)
         >>> api.GetFriends(user)
         >>> api.GetFollowers()
         >>> api.GetFeatured()
         >>> api.GetDirectMessages()
         >>> api.GetSentDirectMessages()
         >>> api.PostDirectMessage(user, text)
-        >>> api.DestroyDirectMessage(id)
+        >>> api.DestroyDirectMessage(message_id)
         >>> api.DestroyFriendship(user)
         >>> api.CreateFriendship(user)
         >>> api.LookupFriendship(user)
@@ -490,9 +489,9 @@ class Api(object):
         Returns:
           A list with 10 entries. Each entry contains a trend.
         """
-        return self.GetTrendsWoeid(id=1, exclude=exclude)
+        return self.GetTrendsWoeid(woeid=1, exclude=exclude)
 
-    def GetTrendsWoeid(self, id, exclude=None):
+    def GetTrendsWoeid(self, woeid, exclude=None):
         """Return the top 10 trending topics for a specific WOEID, if trending
         information is available for it.
 
@@ -507,7 +506,7 @@ class Api(object):
           A list with 10 entries. Each entry contains a trend.
         """
         url = '%s/trends/place.json' % (self.base_url)
-        parameters = {'id': id}
+        parameters = {'id': woeid}
 
         if exclude:
             parameters['exclude'] = exclude
@@ -723,14 +722,14 @@ class Api(object):
         return [Status.NewFromJsonDict(x) for x in data]
 
     def GetStatus(self,
-                  id,
+                  status_id,
                   trim_user=False,
                   include_my_retweet=True,
                   include_entities=True):
-        """Returns a single status message, specified by the id parameter.
+        """Returns a single status message, specified by the status_id parameter.
 
         Args:
-          id:
+          status_id:
             The numeric ID of the status you are trying to retrieve.
           trim_user:
             When set to True, each tweet returned in a timeline will include
@@ -754,9 +753,9 @@ class Api(object):
         parameters = {}
 
         try:
-            parameters['id'] = int(id)
+            parameters['id'] = int(status_id)
         except ValueError:
-            raise TwitterError({'message': "'id' must be an integer."})
+            raise TwitterError({'message': "'status_id' must be an integer."})
 
         if trim_user:
             parameters['trim_user'] = 1
@@ -771,7 +770,7 @@ class Api(object):
         return Status.NewFromJsonDict(data)
 
     def GetStatusOembed(self,
-                        id=None,
+                        status_id=None,
                         url=None,
                         maxwidth=None,
                         hide_media=False,
@@ -786,7 +785,7 @@ class Api(object):
         Specify tweet by the id or url parameter.
 
         Args:
-          id:
+          status_id:
             The numeric ID of the status you are trying to embed.
           url:
             The url of the status you are trying to embed.
@@ -816,15 +815,15 @@ class Api(object):
 
         parameters = {}
 
-        if id is not None:
+        if status_id is not None:
             try:
-                parameters['id'] = int(id)
+                parameters['id'] = int(status_id)
             except ValueError:
-                raise TwitterError({'message': "'id' must be an integer."})
+                raise TwitterError({'message': "'status_id' must be an integer."})
         elif url is not None:
             parameters['url'] = url
         else:
-            raise TwitterError({'message': "Must specify either 'id' or 'url'"})
+            raise TwitterError({'message': "Must specify either 'status_id' or 'url'"})
 
         if maxwidth is not None:
             parameters['maxwidth'] = maxwidth
@@ -852,24 +851,24 @@ class Api(object):
 
         return data
 
-    def DestroyStatus(self, id, trim_user=False):
+    def DestroyStatus(self, status_id, trim_user=False):
         """Destroys the status specified by the required ID parameter.
 
         The authenticating user must be the author of the specified
         status.
 
         Args:
-          id:
+          status_id:
             The numerical ID of the status you're trying to destroy.
 
         Returns:
           A twitter.Status instance representing the destroyed status message
         """
         try:
-            post_data = {'id': int(id)}
+            post_data = {'id': int(status_id)}
         except ValueError:
-            raise TwitterError({'message': "id must be an integer"})
-        url = '%s/statuses/destroy/%s.json' % (self.base_url, id)
+            raise TwitterError({'message': "status_id must be an integer"})
+        url = '%s/statuses/destroy/%s.json' % (self.base_url, status_id)
         if trim_user:
             post_data['trim_user'] = 1
 
@@ -1406,11 +1405,11 @@ class Api(object):
 
         return results
 
-    def PostRetweet(self, original_id, trim_user=False):
+    def PostRetweet(self, status_id, trim_user=False):
         """Retweet a tweet with the Retweet API.
 
         Args:
-          original_id:
+          status_id:
             The numerical id of the tweet that will be retweeted
           trim_user:
             If True the returned payload will only contain the user IDs,
@@ -1421,13 +1420,13 @@ class Api(object):
           A twitter.Status instance representing the original tweet with retweet details embedded.
         """
         try:
-            if int(original_id) <= 0:
-                raise TwitterError({'message': "'original_id' must be a positive number"})
+            if int(status_id) <= 0:
+                raise TwitterError({'message': "'status_id' must be a positive number"})
         except ValueError:
-            raise TwitterError({'message': "'original_id' must be an integer"})
+            raise TwitterError({'message': "'status_id' must be an integer"})
 
-        url = '%s/statuses/retweet/%s.json' % (self.base_url, original_id)
-        data = {'id': original_id}
+        url = '%s/statuses/retweet/%s.json' % (self.base_url, status_id)
+        data = {'id': status_id}
         if trim_user:
             data['trim_user'] = 'true'
         resp = self._RequestUrl(url, 'POST', data=data)
@@ -1771,7 +1770,7 @@ class Api(object):
 
         return result
 
-    def DestroyBlock(self, id, trim_user=False):
+    def DestroyBlock(self, user_id, trim_user=False):
         """Destroys the block for the user specified by the required ID
         parameter.
 
@@ -1779,16 +1778,16 @@ class Api(object):
         required ID parameter.
 
         Args:
-          id:
+          user_id:
             The numerical ID of the user to be un-blocked.
 
         Returns:
           A twitter.User instance representing the un-blocked user.
         """
         try:
-            post_data = {'user_id': int(id)}
+            post_data = {'user_id': int(user_id)}
         except ValueError:
-            raise TwitterError({'message': "id must be an integer"})
+            raise TwitterError({'message': "user_id must be an integer"})
         url = '%s/blocks/destroy.json' % (self.base_url)
         if trim_user:
             post_data['trim_user'] = 1
@@ -2640,7 +2639,7 @@ class Api(object):
 
         return DirectMessage.NewFromJsonDict(data)
 
-    def DestroyDirectMessage(self, id, include_entities=True):
+    def DestroyDirectMessage(self, message_id, include_entities=True):
         """Destroys the direct message specified in the required ID parameter.
 
         The twitter.Api instance must be authenticated, and the
@@ -2648,13 +2647,13 @@ class Api(object):
         message.
 
         Args:
-          id: The id of the direct message to be destroyed
+          message_id: The id of the direct message to be destroyed
 
         Returns:
           A twitter.DirectMessage instance representing the message destroyed
         """
         url = '%s/direct_messages/destroy.json' % self.base_url
-        data = {'id': id}
+        data = {'id': message_id}
         if not include_entities:
             data['include_entities'] = 'false'
 
@@ -2810,14 +2809,14 @@ class Api(object):
 
     def CreateFavorite(self,
                        status=None,
-                       id=None,
+                       status_id=None,
                        include_entities=True):
         """Favorites the specified status object or id as the authenticating user.
 
         Returns the favorite status when successful.
 
         Args:
-          id:
+          status_id:
             The id of the twitter status to mark as a favorite. [Optional]
           status:
             The twitter.Status object to mark as a favorite. [Optional]
@@ -2829,12 +2828,12 @@ class Api(object):
         """
         url = '%s/favorites/create.json' % self.base_url
         data = {}
-        if id:
-            data['id'] = id
+        if status_id:
+            data['id'] = status_id
         elif status:
             data['id'] = status.id
         else:
-            raise TwitterError({'message': "Specify id or status"})
+            raise TwitterError({'message': "Specify status_id or status"})
         if not include_entities:
             data['include_entities'] = 'false'
 
@@ -2845,14 +2844,14 @@ class Api(object):
 
     def DestroyFavorite(self,
                         status=None,
-                        id=None,
+                        status_id=None,
                         include_entities=True):
         """Un-Favorites the specified status object or id as the authenticating user.
 
         Returns the un-favorited status when successful.
 
         Args:
-          id:
+          status_id:
             The id of the twitter status to unmark as a favorite. [Optional]
           status:
             The twitter.Status object to unmark as a favorite. [Optional]
@@ -2864,12 +2863,12 @@ class Api(object):
         """
         url = '%s/favorites/destroy.json' % self.base_url
         data = {}
-        if id:
-            data['id'] = id
+        if status_id:
+            data['id'] = status_id
         elif status:
             data['id'] = status.id
         else:
-            raise TwitterError({'message': "Specify id or status"})
+            raise TwitterError({'message': "Specify status_id or status"})
         if not include_entities:
             data['include_entities'] = 'false'
 
