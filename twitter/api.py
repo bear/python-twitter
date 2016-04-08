@@ -1074,7 +1074,7 @@ class Api(object):
         parameters['media_id'] = media_id
         if alt_text:
             parameters['alt_text'] = { "text": alt_text }
- 
+
         resp = self._RequestUrl(url, 'POST', data=parameters)
 
         return resp
