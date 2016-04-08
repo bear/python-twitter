@@ -2745,7 +2745,7 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
-    def ShowFriendship(self, 
+    def ShowFriendship(self,
                        source_user_id=None,
                        source_screen_name=None,
                        target_user_id=None,
@@ -2768,15 +2768,15 @@ class Api(object):
         url = '%s/friendships/show.json' % self.base_url
         data = {}
         if source_user_id:
-            data['source_user_id'] = user_id
+            data['source_user_id'] = source_user_id
         elif source_screen_name:
-            data['source_screen_name'] = screen_name
+            data['source_screen_name'] = source_screen_name
         else:
             raise TwitterError({'message': "Specify at least one of source_user_id or source_screen_name."})
         if target_user_id:
-            data['target_user_id'] = user_id
+            data['target_user_id'] = target_user_id
         elif target_screen_name:
-            data['target_screen_name'] = screen_name
+            data['target_screen_name'] = target_screen_name
         else:
             raise TwitterError({'message': "Specify at least one of target_user_id or target_screen_name."})
 
