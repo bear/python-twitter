@@ -571,8 +571,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            '{base_url}/followers/ids.json?count=5000&cursor=-1&screen_name=GirlsMakeGames'.format(
-                base_url=self.api.base_url),
+            'https://api.twitter.com/1.1/followers/ids.json?cursor=-1&stringify_ids=False&count=5000&screen_name=GirlsMakeGames',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -582,8 +581,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            '{base_url}/followers/ids.json?cursor=1482201362283529597&count=5000&screen_name=GirlsMakeGames'.format(
-                base_url=self.api.base_url),
+            'https://api.twitter.com/1.1/followers/ids.json?count=5000&screen_name=GirlsMakeGames&cursor=1482201362283529597&stringify_ids=False',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -594,9 +592,6 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(type(resp[0]) is int)
 
         # Error checking
-        self.assertRaises(
-            twitter.TwitterError,
-            lambda: self.api.GetFollowerIDs(count='infinity'))
         self.assertRaises(
             twitter.TwitterError,
             lambda: self.api.GetFollowerIDs(total_count='infinity'))
@@ -653,8 +648,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            '{base_url}/followers/ids.json?count=5000&stringify_ids=False&screen_name=himawari8bot&cursor=-1'.format(
-                base_url=self.api.base_url),
+            'https://api.twitter.com/1.1/followers/ids.json?count=5000&stringify_ids=False&cursor=-1&screen_name=himawari8bot',
             body=resp_data,
             match_querystring=True,
             status=200)

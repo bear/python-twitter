@@ -725,7 +725,8 @@ class Api(object):
                   status_id,
                   trim_user=False,
                   include_my_retweet=True,
-                  include_entities=True):
+                  include_entities=True,
+                  include_ext_alt_text=True):
         """Returns a single status message, specified by the status_id parameter.
 
         Args:
@@ -758,11 +759,13 @@ class Api(object):
             raise TwitterError({'message': "'status_id' must be an integer."})
 
         if trim_user:
-            parameters['trim_user'] = 1
+            parameters['trim_user'] = True
         if include_my_retweet:
-            parameters['include_my_retweet'] = 1
-        if not include_entities:
-            parameters['include_entities'] = 'none'
+            parameters['include_my_retweet'] = True
+        if include_entities:
+            parameters['include_entities'] = True
+        if include_ext_alt_text:
+            parameters['include_ext_alt_text'] = True
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -1072,10 +1075,11 @@ class Api(object):
         parameters = {}
 
         parameters['media_id'] = media_id
-        if alt_text:
-            parameters['alt_text'] = { "text": alt_text }
 
-        resp = self._RequestUrl(url, 'POST', data=parameters)
+        if alt_text:
+            parameters['alt_text'] = {"text": alt_text}
+
+        resp = self._RequestUrl(url, 'POST', json=parameters)
 
         return resp
 
@@ -1891,12 +1895,12 @@ class Api(object):
           one for each follower
         """
         url = '%s/followers/ids.json' % self.base_url
-        return self._GetIDsPaged(url,
-                                 user_id,
-                                 screen_name,
-                                 cursor,
-                                 stringify_ids,
-                                 count)
+        return self._GetIDsPaged(url=url,
+                                 user_id=user_id,
+                                 screen_name=screen_name,
+                                 cursor=cursor,
+                                 stringify_ids=stringify_ids,
+                                 count=count)
 
     def GetFriendIDsPaged(self,
                           user_id=None,
@@ -1949,22 +1953,12 @@ class Api(object):
                               total_count=None):
         """ Common method for GetFriendIDs and GetFollowerIDs """
 
-        if cursor is not None or count is not None:
-            warnings.warn(
-                "Use of 'cursor' and 'count' parameters are deprecated as of "
-                "python-twitter 3.0. Please use GetFriendIDsPaged or "
-                "GetFollowerIDsPaged instead.",
-                DeprecationWarning, stacklevel=2)
-
         count = 5000
         cursor = -1
         result = []
 
         if total_count:
-            try:
-                total_count = int(total_count)
-            except ValueError:
-                raise TwitterError({'message': "total_count must be an integer"})
+            total_count = enf_type('total_count', int, total_count)
 
         if total_count and total_count < count:
             count = total_count
@@ -1974,12 +1968,12 @@ class Api(object):
                 break
 
             next_cursor, previous_cursor, data = self._GetIDsPaged(
-                url,
-                user_id,
-                screen_name,
-                cursor,
-                stringify_ids,
-                count)
+                url=url,
+                user_id=user_id,
+                screen_name=screen_name,
+                cursor=cursor,
+                stringify_ids=stringify_ids,
+                count=count)
 
             result.extend([x for x in data])
 
@@ -2025,13 +2019,13 @@ class Api(object):
           A list of integers, one for each user id.
         """
         url = '%s/followers/ids.json' % self.base_url
-        return self._GetFriendFollowerIDs(url,
-                                          user_id,
-                                          screen_name,
-                                          cursor,
-                                          stringify_ids,
-                                          count,
-                                          total_count)
+        return self._GetFriendFollowerIDs(url=url,
+                                          user_id=user_id,
+                                          screen_name=screen_name,
+                                          cursor=cursor,
+                                          stringify_ids=stringify_ids,
+                                          count=count,
+                                          total_count=total_count)
 
     def GetFriendIDs(self,
                      user_id=None,
@@ -4353,7 +4347,7 @@ class Api(object):
         except requests.RequestException as e:
             raise TwitterError(str(e))
 
-    def _RequestUrl(self, url, verb, data=None):
+    def _RequestUrl(self, url, verb, data=None, json=None):
         """Request a url.
 
         Args:
@@ -4381,36 +4375,22 @@ class Api(object):
                     pass
 
         if verb == 'POST':
-            if 'media_ids' in data:
-                url = self._BuildUrl(url, extra_params={'media_ids': data['media_ids']})
-
-            if 'media' in data:
-                try:
-                    resp = requests.post(url,
-                                         files=data,
-                                         auth=self.__auth,
-                                         timeout=self._timeout)
-                except requests.RequestException as e:
-                    raise TwitterError(str(e))
+            if data:
+                if 'media_ids' in data:
+                    url = self._BuildUrl(url, extra_params={'media_ids': data['media_ids']})
+                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout)
+                elif 'media' in data:
+                    resp = requests.post(url, files=data, auth=self.__auth, timeout=self._timeout)
+                else:
+                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout)
+            elif json:
+                resp = requests.post(url, json=json, auth=self.__auth, timeout=self._timeout)
             else:
-                try:
-                    resp = requests.post(url,
-                                         data=data,
-                                         auth=self.__auth,
-                                         timeout=self._timeout)
-
-                except requests.RequestException as e:
-                    raise TwitterError(str(e))
+                resp = 0  # POST request, but without data or json
 
         elif verb == 'GET':
             url = self._BuildUrl(url, extra_params=data)
-            try:
-                resp = requests.get(url,
-                                    auth=self.__auth,
-                                    timeout=self._timeout)
-
-            except requests.RequestException as e:
-                raise TwitterError(str(e))
+            resp = requests.get(url, auth=self.__auth, timeout=self._timeout)
 
         else:
             resp = 0  # if not a POST or GET request
