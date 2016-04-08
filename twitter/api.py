@@ -1057,6 +1057,28 @@ class Api(object):
         except KeyError:
             raise TwitterError({'message': 'Media could not be uploaded.'})
 
+    def PostMediaMetadata(self,
+                          media_id,
+                          alt_text=None):
+        """Provide addtional data for uploaded media.
+
+        Args:
+            media_id:
+                ID of a previously uploaded media item.
+            alt_text:
+                Image Alternate Text.
+        """
+        url = '%s/media/metadata/create.json' % self.upload_url
+        parameters = {}
+
+        parameters['media_id'] = media_id
+        if alt_text:
+            parameters['alt_text'] = { "text": alt_text }
+ 
+        resp = self._RequestUrl(url, 'POST', data=parameters)
+
+        return resp
+
     def UploadMediaChunked(self,
                            media,
                            additional_owners=None,
