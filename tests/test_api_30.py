@@ -1434,3 +1434,92 @@ class ApiTest(unittest.TestCase):
         resp = self.api.LookupFriendship(screen_name='dickc')
         self.assertEqual(resp[0].muting, True)
         self.assertEqual(resp[0].blocking, True)
+
+    @responses.activate
+    def testPostMediaMetadata(self):
+        responses.add(
+            responses.POST,
+            'https://upload.twitter.com/1.1/media/metadata/create.json',
+            body=b'',
+            status=200)
+        resp = self.api.PostMediaMetadata(media_id=718561981427396608, alt_text='test')
+
+        # At the moment, all we can do is test if the method call works. The response
+        # body should be blank, with a 200 status on success.
+        self.assertTrue(resp)
+
+    @responses.activate
+    def testGetStatusWithExtAltText(self):
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/statuses')
+
+    @responses.activate
+    def testGetStatus(self):
+        with open('testdata/get_status.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/statuses/show.json?include_entities=True&include_my_retweet=True&include_ext_alt_text=True&id=397',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetStatus(status_id=397)
+
+        self.assertTrue(type(resp) is twitter.Status)
+        self.assertEqual(resp.id, 397)
+        self.assertEqual(resp.user.id, 12)
+        self.assertFalse(resp != resp)
+
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.GetStatus(status_id='test'))
+
+    @responses.activate
+    def testGetStatusExtraParams(self):
+        with open('testdata/get_status_extra_params.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/statuses/show.json?include_ext_alt_text=True&id=397&include_my_retweet=True&trim_user=True',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetStatus(status_id=397, trim_user=True, include_entities=False)
+        self.assertFalse(resp.user.screen_name)
+
+
+    @responses.activate
+    def testGetStatusOembed(self):
+        with open('testdata/get_status_oembed.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/statuses/oembed.json?id=397',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/statuses/oembed.json?url=https://twitter.com/jack/statuses/397',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp_id = self.api.GetStatusOembed(status_id=397)
+        self.assertEqual(resp_id['url'], 'https://twitter.com/jack/statuses/397')
+        self.assertEqual(resp_id['provider_url'], 'https://twitter.com')
+        self.assertEqual(resp_id['provider_name'], 'Twitter')
+
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.GetStatusOembed(status_id='test'))
+
+        resp_url = self.api.GetStatusOembed(url="https://twitter.com/jack/statuses/397")
+        self.assertEqual(resp_id, resp_url)
+
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.GetStatusOembed(status_id=None, url=None))
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.GetStatusOembed(status_id=397, align='test'))
