@@ -2745,6 +2745,46 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
+    def ShowFriendship(self,
+                       source_user_id=None,
+                       source_screen_name=None,
+                       target_user_id=None,
+                       target_screen_name=None):
+        """Returns information about the relationship between the two users.
+
+        Args:
+          source_id:
+            The user_id of the subject user [Optional]
+          source_screen_name:
+            The screen_name of the subject user [Optional]
+          target_id:
+            The user_id of the target user [Optional]
+          target_screen_name:
+            The screen_name of the target user [Optional]
+
+        Returns:
+          A Twitter Json structure.
+        """
+        url = '%s/friendships/show.json' % self.base_url
+        data = {}
+        if source_user_id:
+            data['source_user_id'] = source_user_id
+        elif source_screen_name:
+            data['source_screen_name'] = source_screen_name
+        else:
+            raise TwitterError({'message': "Specify at least one of source_user_id or source_screen_name."})
+        if target_user_id:
+            data['target_user_id'] = target_user_id
+        elif target_screen_name:
+            data['target_screen_name'] = target_screen_name
+        else:
+            raise TwitterError({'message': "Specify at least one of target_user_id or target_screen_name."})
+
+        resp = self._RequestUrl(url, 'GET', data=data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return data
+
     def LookupFriendship(self,
                          user_id=None,
                          screen_name=None):
@@ -2806,6 +2846,96 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return [UserStatus.NewFromJsonDict(x) for x in data]
+
+    def IncomingFriendship(self,
+                           cursor=None,
+                           stringify_ids=None):
+        """Returns a collection of user IDs belonging to users who have
+        pending request to follow the authenticated user.
+
+        Args:
+          cursor:
+            breaks the ids into pages of no more than 5000.
+          stringify_ids:
+            returns the IDs as unicode strings. [Optional]
+
+        Returns:
+          A list of user IDs
+        """
+        url = '%s/friendships/incoming.json' % (self.base_url)
+        parameters = {}
+        if stringify_ids:
+            parameters['stringify_ids'] = 'true'
+        result = []
+
+        total_count = 0
+        while True:
+            if cursor:
+                try:
+                    parameters['count'] = int(cursor)
+                except ValueError:
+                    raise TwitterError({'message': "cursor must be an integer"})
+                    break
+            resp = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+            result += [x for x in data['ids']]
+            if 'next_cursor' in data:
+                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+                    break
+                else:
+                    cursor = data['next_cursor']
+                    total_count -= len(data['ids'])
+                    if total_count < 1:
+                        break
+            else:
+                break
+
+        return result
+
+    def OutgoingFriendship(self,
+                           cursor=None,
+                           stringify_ids=None):
+        """Returns a collection of user IDs for every protected user
+        for whom the authenticated user has a pending follow request.
+
+        Args:
+          cursor:
+            breaks the ids into pages of no more than 5000.
+          stringify_ids:
+            returns the IDs as unicode strings. [Optional]
+
+        Returns:
+          A list of user IDs
+        """
+        url = '%s/friendships/outgoing.json' % (self.base_url)
+        parameters = {}
+        if stringify_ids:
+            parameters['stringify_ids'] = 'true'
+        result = []
+
+        total_count = 0
+        while True:
+            if cursor:
+                try:
+                    parameters['count'] = int(cursor)
+                except ValueError:
+                    raise TwitterError({'message': "cursor must be an integer"})
+                    break
+            resp = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+            result += [x for x in data['ids']]
+            if 'next_cursor' in data:
+                if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+                    break
+                else:
+                    cursor = data['next_cursor']
+                    total_count -= len(data['ids'])
+                    if total_count < 1:
+                        break
+            else:
+                break
+
+        return result
 
     def CreateFavorite(self,
                        status=None,
