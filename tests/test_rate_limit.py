@@ -1,15 +1,15 @@
 # encoding: utf-8
 
+import re
 import sys
 import unittest
-
-import twitter
-
 import warnings
 
-warnings.filterwarnings('ignore', category=DeprecationWarning)
-
+import twitter
 import responses
+
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+DEF_URL_RE = re.compile(r'https?://.*\.twitter.com/1\.1/.*')
 
 
 class ErrNull(object):
@@ -60,6 +60,13 @@ class RateLimitTests(unittest.TestCase):
         self.assertTrue(self.api.rate_limit)
         self.assertTrue(self.api.sleep_on_rate_limit)
 
+        responses.add(responses.GET, url=DEF_URL_RE, body=b'{}', status=200)
+        try:
+            self.api.GetStatus(status_id=1234)
+            self.api.GetUser(screen_name='test')
+        except Exception as e:
+            self.fail(e)
+
     @responses.activate
     def testCheckRateLimit(self):
         with open('testdata/ratelimit.json') as f:
@@ -104,6 +111,7 @@ class RateLimitMethodsTests(unittest.TestCase):
             status=200)
         self.api.InitializeRateLimit()
         self.assertTrue(self.api.rate_limit)
+
 
     def tearDown(self):
         sys.stderr = self._stderr

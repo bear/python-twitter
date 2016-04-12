@@ -17,8 +17,8 @@ GEO_ID_PLACE_ID = ResourceEndpoint(re.compile(r'/geo/id/\d+'), "/geo/id/:place_i
 SAVED_SEARCHES_DESTROY_ID = ResourceEndpoint(re.compile(r'/saved_searches/destroy/\d+'), "/saved_searches/destroy/:id")
 SAVED_SEARCHES_SHOW_ID = ResourceEndpoint(re.compile(r'/saved_searches/show/\d+'), "/saved_searches/show/:id")
 STATUSES_RETWEETS_ID = ResourceEndpoint(re.compile(r'/statuses/retweets/\d+'), "/statuses/retweets/:id")
-STATUSES_SHOW_ID = ResourceEndpoint(re.compile(r'/statuses/show/\d+'), "/statuses/show/:id")
-USERS_SHOW_ID = ResourceEndpoint(re.compile(r'/users/show/\d+'), "/users/show/:id")
+STATUSES_SHOW_ID = ResourceEndpoint(re.compile(r'/statuses/show'), "/statuses/show/:id")
+USERS_SHOW_ID = ResourceEndpoint(re.compile(r'/users/show'), "/users/show/:id")
 USERS_SUGGESTIONS_SLUG = ResourceEndpoint(re.compile(r'/users/suggestions/\w+$'), "/users/suggestions/:slug")
 USERS_SUGGESTIONS_SLUG_MEMBERS = ResourceEndpoint(re.compile(r'/users/suggestions/.+/members'), "/users/suggestions/:slug/members")
 
@@ -144,7 +144,6 @@ class RateLimit(object):
             reset (int):
                 Epoch time at which the rate limit window will reset.
         """
-
         endpoint = self.url_to_resource(url)
         resource_family = endpoint.split('/')[1]
         self.__dict__['resources'].update(
@@ -174,6 +173,11 @@ class RateLimit(object):
             family_rates = self.resources.get(resource_family).get(endpoint)
         except AttributeError:
             return EndpointRateLimit(limit=15, remaining=15, reset=0)
+
+        if not family_rates:
+            self.set_unknown_limit(url, limit=15, remaining=15, reset=0)
+            return EndpointRateLimit(limit=15, remaining=15, reset=0)
+
         return EndpointRateLimit(family_rates['limit'],
                                  family_rates['remaining'],
                                  family_rates['reset'])
