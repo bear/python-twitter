@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import json
 from calendar import timegm
 
@@ -135,7 +138,7 @@ class List(TwitterModel):
             self.user = User.NewFromJsonDict(kwargs.get('user'))
 
     def __repr__(self):
-        return "List(ID={list_id}, FullName={full_name}, Slug={slug}, User={user})".format(
+        return "List(ID={list_id}, FullName={full_name!r}, Slug={slug}, User={user})".format(
             list_id=self.id,
             full_name=self.full_name,
             slug=self.slug,
@@ -157,7 +160,7 @@ class Category(TwitterModel):
             setattr(self, param, kwargs.get(param, default))
 
     def __repr__(self):
-        return "Category(Name={name}, Slug={slug}, Size={size})".format(
+        return "Category(Name={name!r}, Slug={slug}, Size={size})".format(
             name=self.name,
             slug=self.slug,
             size=self.size)
@@ -186,7 +189,7 @@ class DirectMessage(TwitterModel):
             text = "{text}[...]".format(text=self.text[:140])
         else:
             text = self.text
-        return "DirectMessage(ID={dm_id}, Sender={sender}, Created={time}, Text='{text}')".format(
+        return "DirectMessage(ID={dm_id}, Sender={sender}, Created={time}, Text='{text!r}')".format(
             dm_id=self.id,
             sender=self.sender_screen_name,
             time=self.created_at,
@@ -212,10 +215,10 @@ class Trend(TwitterModel):
             setattr(self, param, kwargs.get(param, default))
 
     def __repr__(self):
-        return "Trend(Name={name}, Time={ts}, URL={url})".format(
-            name=self.name,
-            ts=self.timestamp,
-            url=self.url)
+        return "Trend(Name={0!r}, Time={1}, URL={2})".format(
+            self.name,
+            self.timestamp,
+            self.url)
 
 
 class Hashtag(TwitterModel):
@@ -231,7 +234,7 @@ class Hashtag(TwitterModel):
             setattr(self, param, kwargs.get(param, default))
 
     def __repr__(self):
-        return "Hashtag(Text={text})".format(
+        return "Hashtag(Text={text!r})".format(
             text=self.text)
 
 
@@ -461,13 +464,13 @@ class Status(TwitterModel):
             the ID of status, username and datetime.
         """
         if self.user:
-            return "Status(ID={0}, ScreenName='{1}', Created='{2}', Text={3})".format(
+            return "Status(ID={0}, ScreenName={1}, Created={2}, Text={3!r})".format(
                 self.id,
                 self.user.screen_name,
                 self.created_at,
                 self.text)
         else:
-            return "Status(ID={0}, Created='{1}', Text={2})".format(
+            return u"Status(ID={0}, Created={1}, Text={2!r})".format(
                 self.id,
                 self.created_at,
                 self.text)
