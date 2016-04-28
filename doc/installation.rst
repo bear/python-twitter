@@ -14,7 +14,7 @@ Installation
 Install the dependencies:
 
 - `Requests <http://docs.python-requests.org/en/latest/>`_
-- `Requests OAuthlib <https://requests-oauthlib.readthedocs.org/en/latest/>`_
+- `Requests OAuthlib <https://requests-oauthlib.readthedocs.io/en/latest/>`_
 
 Alternatively use `pip`::
 
