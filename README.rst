@@ -8,8 +8,8 @@ By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
     :target: https://pypi.python.org/pypi/python-twitter/
     :alt: Downloads
 
-.. image:: https://readthedocs.org/projects/python-twitter/badge/?version=latest
-    :target: http://python-twitter.readthedocs.org/en/latest/?badge=latest
+.. image:: https://readthedocs.io/projects/python-twitter/badge/?version=latest
+    :target: http://python-twitter.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
 .. image:: https://circleci.com/gh/bear/python-twitter/master.svg?style=shield&circle-token=42abb9ffa9e9db463b565f2d47eb0966039bce2d
@@ -87,13 +87,13 @@ Documentation
 =============
 
 View the latest python-twitter documentation at
-https://python-twitter.readthedocs.org. You can view Twitter's API documentation at: https://dev.twitter.com/overview/documentation
+https://python-twitter.readthedocs.io. You can view Twitter's API documentation at: https://dev.twitter.com/overview/documentation
 
 =====
 Using
 =====
 
-The library provides a Python wrapper around the Twitter API and the Twitter data model. To get started, check out the examples in the examples/ folder or read the documentation at https://python-twitter.readthedocs.org which contains information about getting your authentication keys from Twitter and using the library.
+The library provides a Python wrapper around the Twitter API and the Twitter data model. To get started, check out the examples in the examples/ folder or read the documentation at https://python-twitter.readthedocs.io which contains information about getting your authentication keys from Twitter and using the library.
 
 ----
 Using with Django
@@ -127,7 +127,7 @@ API
 
 The API is exposed via the ``twitter.Api`` class.
 
-The python-twitter requires the use of OAuth keys for nearly all operations. As of Twitter's API v1.1, authentication is required for most, if not all, endpoints. Therefore, you will need to register an app with Twitter in order to use this library. Please see the "Getting Started" guide on https://python-twitter.readthedocs.org for a more information.
+The python-twitter requires the use of OAuth keys for nearly all operations. As of Twitter's API v1.1, authentication is required for most, if not all, endpoints. Therefore, you will need to register an app with Twitter in order to use this library. Please see the "Getting Started" guide on https://python-twitter.readthedocs.io for a more information.
 
 To generate an Access Token you have to pick what type of access your application requires and then do one of the following:
 
@@ -170,7 +170,7 @@ To post a Twitter status message::
 
 There are many more API methods, to read the full API documentation either
 check out the documentation on `readthedocs
-<https://python-twitter.readthedocs.org>`_, build the documentation locally
+<https://python-twitter.readthedocs.io>`_, build the documentation locally
 with::
 
     $ make docs
