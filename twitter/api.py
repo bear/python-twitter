@@ -4370,7 +4370,7 @@ class Api(object):
 
     def _Encode(self, s):
         if self._input_encoding:
-            return str(s, self._input_encoding).encode('utf-8')
+            return str(s).encode(self._input_encoding)
         else:
             return str(s).encode('utf-8')
 
