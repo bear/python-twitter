@@ -4374,9 +4374,8 @@ class Api(object):
         Values of None are not included in the output string.
 
         Args:
-          parameters:
-            A dict of (key, value) tuples, where value is encoded as
-            specified by self._encoding
+          parameters (dict): dictionary of query parameters to be converted into a
+          string for encoding and sending to Twitter.
 
         Returns:
           A URL-encoded string in "key=value&key=value" form
