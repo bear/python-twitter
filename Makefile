@@ -1,4 +1,6 @@
 
+
+
 help:
 	@echo "  env         install all production dependencies"
 	@echo "  dev         install all dev and production dependencies (virtualenv is assumed)"
@@ -7,6 +9,9 @@ help:
 	@echo "  lint        check style with flake8"
 	@echo "  test        run tests"
 	@echo "  coverage    run tests with code coverage"
+
+tox:
+	export PYENV_VERSION="2.7:3.5.1:pypy-5.0.0" && tox
 
 env:
 	pip install -r requirements.txt
@@ -32,7 +37,7 @@ docs:
 lint:
 	flake8 twitter > violations.flake8.txt
 
-test: lint
+test:
 	python setup.py test
 
 coverage: clean test

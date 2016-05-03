@@ -4368,48 +4368,24 @@ class Api(object):
             url_data = raw_data
         return url_data
 
-    def _Encode(self, s):
-        if self._input_encoding:
-            return str(s).encode(self._input_encoding)
-        else:
-            return str(s).encode('utf-8')
-
     def _EncodeParameters(self, parameters):
         """Return a string in key=value&key=value form.
 
         Values of None are not included in the output string.
 
         Args:
-          parameters:
-            A dict of (key, value) tuples, where value is encoded as
-            specified by self._encoding
+          parameters (dict): dictionary of query parameters to be converted into a
+          string for encoding and sending to Twitter.
 
         Returns:
           A URL-encoded string in "key=value&key=value" form
         """
         if parameters is None:
             return None
+        if not isinstance(parameters, dict):
+            raise TwitterError("`parameters` must be a dict.")
         else:
-            return urlencode(dict([(k, self._Encode(v)) for k, v in list(parameters.items()) if v is not None]))
-
-    def _EncodePostData(self, post_data):
-        """Return a string in key=value&key=value form.
-
-        Values are assumed to be encoded in the format specified by self._encoding,
-        and are subsequently URL encoded.
-
-        Args:
-          post_data:
-            A dict of (key, value) tuples, where value is encoded as
-            specified by self._encoding
-
-        Returns:
-          A URL-encoded string in "key=value&key=value" form
-        """
-        if post_data is None:
-            return None
-        else:
-            return urlencode(dict([(k, self._Encode(v)) for k, v in list(post_data.items())]))
+            return urlencode(dict((k,v) for k, v in parameters.items() if v is not None))
 
     def _ParseAndCheckTwitter(self, json_data):
         """Try and parse the JSON returned from Twitter and return
