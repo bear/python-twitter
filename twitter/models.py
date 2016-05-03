@@ -404,7 +404,7 @@ class Status(TwitterModel):
         the epoch (1 Jan 1970).
 
         Returns:
-            string: The time this status message was posted, in seconds since
+            int: The time this status message was posted, in seconds since
             the epoch.
         """
         return timegm(parsedate(self.created_at))
