@@ -42,51 +42,8 @@ class StatusTest(unittest.TestCase):
         status.created_at = 'Fri Jan 26 23:17:14 +0000 2007'
         self.assertEqual('Fri Jan 26 23:17:14 +0000 2007', status.created_at)
         self.assertEqual(created_at, status.created_at_in_seconds)
-        status.now = created_at + 10
-        self.assertEqual('about 10 seconds ago', status.relative_created_at)
         status.user = self._GetSampleUser()
         self.assertEqual(718443, status.user.id)
-
-    def _ParseDate(self, string):
-        return calendar.timegm(time.strptime(string, '%b %d %H:%M:%S %Y'))
-
-    def test_relative_created_at(self):
-        '''Test various permutations of Status relative_created_at'''
-        status = twitter.Status(created_at='Fri Jan 01 12:00:00 +0000 2007')
-        status.now = self._ParseDate('Jan 01 12:00:00 2007')
-        self.assertEqual('about a second ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 12:00:01 2007')
-        self.assertEqual('about a second ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 12:00:02 2007')
-        self.assertEqual('about 2 seconds ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 12:00:05 2007')
-        self.assertEqual('about 5 seconds ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 12:00:50 2007')
-        self.assertEqual('about a minute ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 12:01:00 2007')
-        self.assertEqual('about a minute ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 12:01:10 2007')
-        self.assertEqual('about a minute ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 12:02:00 2007')
-        self.assertEqual('about 2 minutes ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 12:31:50 2007')
-        self.assertEqual('about 31 minutes ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 12:50:00 2007')
-        self.assertEqual('about an hour ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 13:00:00 2007')
-        self.assertEqual('about an hour ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 13:10:00 2007')
-        self.assertEqual('about an hour ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 14:00:00 2007')
-        self.assertEqual('about 2 hours ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 01 19:00:00 2007')
-        self.assertEqual('about 7 hours ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 02 11:30:00 2007')
-        self.assertEqual('about a day ago', status.relative_created_at)
-        status.now = self._ParseDate('Jan 04 12:00:00 2007')
-        self.assertEqual('about 3 days ago', status.relative_created_at)
-        status.now = self._ParseDate('Feb 04 12:00:00 2007')
-        self.assertEqual('about 34 days ago', status.relative_created_at)
 
     @unittest.skipIf(sys.version_info.major >= 3, "skipped until fix found for v3 python")
     def testAsJsonString(self):
@@ -117,7 +74,3 @@ class StatusTest(unittest.TestCase):
         data = json.loads(StatusTest.SAMPLE_JSON)
         status = twitter.Status.NewFromJsonDict(data)
         self.assertEqual(self._GetSampleStatus(), status)
-
-    # def testStatusRepresentation(self):
-    #     status = self._GetSampleStatus()
-    #     self.assertEqual("Status(ID=4391023, ScreenName='kesuke', Created='Fri Jan 26 23:17:14 +0000 2007')", status.__repr__())
