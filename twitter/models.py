@@ -377,7 +377,6 @@ class Status(TwitterModel):
             'lang': None,
             'location': None,
             'media': None,
-            'now': None,
             'place': None,
             'possibly_sensitive': None,
             'retweet_count': None,
@@ -408,52 +407,6 @@ class Status(TwitterModel):
             the epoch.
         """
         return timegm(parsedate(self.created_at))
-
-    @property
-    def relative_created_at(self):
-        """Get a human readable string representing the posting time
-
-        Returns:
-          A human readable string representing the posting time
-        """
-        fudge = 1.25
-        delta = int(self.now) - int(self.created_at_in_seconds)
-
-        if delta < (1 * fudge):
-            return 'about a second ago'
-        elif delta < (60 * (1 / fudge)):
-            return 'about %d seconds ago' % (delta)
-        elif delta < (60 * fudge):
-            return 'about a minute ago'
-        elif delta < (60 * 60 * (1 / fudge)):
-            return 'about %d minutes ago' % (delta / 60)
-        elif delta < (60 * 60 * fudge) or delta / (60 * 60) == 1:
-            return 'about an hour ago'
-        elif delta < (60 * 60 * 24 * (1 / fudge)):
-            return 'about %d hours ago' % (delta / (60 * 60))
-        elif delta < (60 * 60 * 24 * fudge) or delta / (60 * 60 * 24) == 1:
-            return 'about a day ago'
-        else:
-            return 'about %d days ago' % (delta / (60 * 60 * 24))
-
-    @property
-    def Now(self):
-        """Get the wallclock time for this status message.
-
-        Used to calculate relative_created_at.  Defaults to the time
-        the object was instantiated.
-
-        Returns:
-            int: Whatever the status instance believes the current time to be,
-            in seconds since the epoch.
-        """
-        if self._now is None:
-            self._now = time.time()
-        return self._now
-
-    @Now.setter
-    def Now(self, now):
-        self._now = now
 
     def __repr__(self):
         """ A string representation of this twitter.Status instance.
