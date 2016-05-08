@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Copyright 2016 The Python-Twitter Developers
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# ------------------------------------------------------------------------
+# Change History
+# 2010-10-01
+#   Initial commit by @jsteiner207
+#
+# 2014-12-29
+#   PEP8 update by @radzhome
+#
+# 2016-05-07
+#   Update for Python3 by @jeremylow
+#
+
+from __future__ import print_function
 import twitter
 
 CONSUMER_KEY = 'WWWWWWWW'
