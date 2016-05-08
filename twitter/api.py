@@ -4385,7 +4385,7 @@ class Api(object):
         if not isinstance(parameters, dict):
             raise TwitterError("`parameters` must be a dict.")
         else:
-            return urlencode(dict((k,v) for k, v in parameters.items() if v is not None))
+            return urlencode(dict((k, v) for k, v in parameters.items() if v is not None))
 
     def _ParseAndCheckTwitter(self, json_data):
         """Try and parse the JSON returned from Twitter and return
