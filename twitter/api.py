@@ -132,7 +132,6 @@ class Api(object):
                  input_encoding=None,
                  request_headers=None,
                  cache=DEFAULT_CACHE,
-                 shortner=None,
                  base_url=None,
                  stream_url=None,
                  upload_url=None,
@@ -161,9 +160,6 @@ class Api(object):
           cache:
             The cache instance to use. Defaults to DEFAULT_CACHE.
             Use None to disable caching. [Optional]
-          shortner:
-            The shortner instance to use.  Defaults to None.
-            See shorten_url.py for an example shortner. [Optional]
           base_url:
             The base URL to use to contact the Twitter API.
             Defaults to https://api.twitter.com. [Optional]
@@ -1561,7 +1557,6 @@ class Api(object):
                     parameters['count'] = int(cursor)
                 except ValueError:
                     raise TwitterError({'message': "cursor must be an integer"})
-                    break
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [x for x in data['ids']]

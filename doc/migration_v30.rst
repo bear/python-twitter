@@ -4,6 +4,11 @@ Migration from v2 to v3
 Changes to Existing Methods
 ===========================
 
+:py:func:`twitter.api.Api()`
+++++++++++++++++++++++++++++
+* ``shortner`` parameter has been removed. Please see `Issue
+  #298 <https://github.com/bear/python-twitter/issues/298>`_.
+
 :py:func:`twitter.api.Api.CreateFavorite`
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * kwarg param has been changed to ``status_id`` from ``id`` to be consistent
