@@ -9,8 +9,6 @@ try:
 except ImportError:
     from email.utils import parsedate
 
-import time
-
 
 class TwitterModel(object):
 
