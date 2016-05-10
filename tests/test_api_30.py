@@ -1,16 +1,19 @@
 # encoding: utf-8
+from __future__ import unicode_literals, print_function
 
 import json
+import re
 import sys
 import unittest
+import warnings
 
 import twitter
-
-import warnings
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 import responses
+
+DEFAULT_URL = re.compile(r'https?://.*\.twitter.com/1\.1/.*')
 
 
 class ErrNull(object):
@@ -1450,9 +1453,12 @@ class ApiTest(unittest.TestCase):
 
     @responses.activate
     def testGetStatusWithExtAltText(self):
-        responses.add(
-            responses.GET,
-            'https://api.twitter.com/1.1/statuses')
+        with open('testdata/get_status_ext_alt.json') as f:
+            resp_data = f.read() 
+        responses.add(responses.GET, DEFAULT_URL, body=resp_data, status=200)
+        resp = self.api.GetStatus(status_id=724441953534877696)
+        self.assertEqual(resp.media[0].ext_alt_text, "\u201cJon Snow is dead.\u2026\u201d from \u201cGAME OF THRONES SEASON 6 EPISODES\u201d by HBO PR.")
+
 
     @responses.activate
     def testGetStatus(self):
