@@ -93,6 +93,7 @@ class Media(TwitterModel):
         self.param_defaults = {
             'display_url': None,
             'expanded_url': None,
+            'ext_alt_text': None,
             'id': None,
             'media_url': None,
             'media_url_https': None,
