@@ -1653,38 +1653,59 @@ class Api(object):
 
         return [Status.NewFromJsonDict(s) for s in data]
 
-    def GetBlocksPaged(self,
-                       cursor=-1,
-                       skip_status=False,
-                       include_user_entities=False):
+    def _GetBlocksMutesPaged(self,
+                             endpoint,
+                             action,
+                             cursor=-1,
+                             skip_status=False,
+                             include_entities=False,
+                             stringify_ids=False):
         """ Fetch a page of the users (as twitter.User instances)
-        blocked by the currently authenticated user.
+        blocked or muted by the currently authenticated user.
 
         Args:
+          endpoint (str):
+            Either "mute" or "block".
+          action (str):
+            Either 'list' or 'ids' depending if you want to return fully-hydrated
+            twitter.User objects or a list of user IDs as ints.
           cursor:
             Should be set to -1 if you want the first page, thereafter denotes
-            the page of blocked users that you want to return.
+            the page of users that you want to return.
           skip_status:
             If True the statuses will not be returned in the user items.
             [Optional]
-          include_user_entities:
+          include_entities:
             When True, the user entities will be included. [Optional]
 
         Returns:
           next_cursor, previous_cursor, list of twitter.User instances,
-          one for each blocked user.
+          one for each user.
         """
-        url = '%s/blocks/list.json' % self.base_url
+        urls = {
+            'mute': {
+                'list': '%s/mutes/users/list.json' % self.base_url,
+                'ids': '%s/mutes/users/ids.json' % self.base_url
+            },
+            'block': {
+                'list': '%s/blocks/list.json' % self.base_url,
+                'ids': '%s/blocks/ids.json' % self.base_url
+            }
+        }
+
+        url = urls[endpoint][action]
+
         result = []
         parameters = {}
         if skip_status:
             parameters['skip_status'] = True
-        if include_user_entities:
-            parameters['include_user_entities'] = True
+        if include_entities:
+            parameters['include_entities'] = True
         parameters['cursor'] = cursor
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
         result += [User.NewFromJsonDict(x) for x in data['users']]
         next_cursor = data.get('next_cursor', 0)
         previous_cursor = data.get('previous_cursor', 0)
@@ -1693,7 +1714,7 @@ class Api(object):
 
     def GetBlocks(self,
                   skip_status=False,
-                  include_user_entities=False):
+                  include_entities=False):
         """ Fetch the sequence of all users (as twitter.User instances),
         blocked by the currently authenticated user.
 
@@ -1701,7 +1722,7 @@ class Api(object):
           skip_status:
             If True the statuses will not be returned in the user items.
             [Optional]
-          include_user_entities:
+          include_entities:
             When True, the user entities will be included. [Optional]
 
         Returns:
@@ -1714,7 +1735,7 @@ class Api(object):
             next_cursor, previous_cursor, users = self.GetBlocksPaged(
                 cursor=cursor,
                 skip_status=skip_status,
-                include_user_entities=include_user_entities)
+                include_entities=include_entities)
             result += users
             if next_cursor == 0 or next_cursor == previous_cursor:
                 break
@@ -1723,12 +1744,12 @@ class Api(object):
 
         return result
 
-    def GetBlocksIDsPaged(self,
-                          cursor=-1,
-                          skip_status=None,
-                          include_user_entities=None):
-        """ Fetch a page of the user IDs (integers) blocked by the currently
-        authenticated user.
+    def GetBlocksPaged(self,
+                       cursor=-1,
+                       skip_status=False,
+                       include_entities=False):
+        """ Fetch a page of the users (as twitter.User instances)
+        blocked by the currently authenticated user.
 
         Args:
           cursor:
@@ -1737,40 +1758,27 @@ class Api(object):
           skip_status:
             If True the statuses will not be returned in the user items.
             [Optional]
-          include_user_entities:
+          include_entities:
             When True, the user entities will be included. [Optional]
 
         Returns:
-          next_cursor, previous_cursor, list of user IDs of blocked users.
+          next_cursor, previous_cursor, list of twitter.User instances,
+          one for each blocked user.
         """
-        url = '%s/blocks/ids.json' % self.base_url
-        parameters = {}
-        if skip_status:
-            parameters['skip_status'] = True
-        if include_user_entities:
-            parameters['include_user_entities'] = True
-        parameters['cursor'] = cursor
-
-        resp = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        user_ids = data.get('ids', [])
-        next_cursor = data.get('next_cursor', 0)
-        previous_cursor = data.get('previous_cursor', 0)
-
-        return next_cursor, previous_cursor, user_ids
+        return self._GetBlocksMutesPaged(endpoint='block',
+                                         action='list',
+                                         cursor=cursor,
+                                         skip_status=skip_status,
+                                         include_entities=include_entities)
 
     def GetBlocksIDs(self,
-                     skip_status=None,
-                     include_user_entities=None):
-        """ Fetch the sequence of all users (as integer user ids),
-        blocked by the currently authenticated user.
+                     stringify_ids=False):
+        """Fetch the sequence of all user IDs blocked by the
+        currently authenticated user.
 
         Args:
-          skip_status:
-            If True the statuses will not be returned in the user items.
-            [Optional]
-          include_user_entities:
-            When True, the user entities will be included. [Optional]
+          stringify_ids (bool, optional):
+            If True user IDs will be returned as strings rather than integers.
 
         Returns:
           A list of user IDs for all blocked users.
@@ -1781,8 +1789,7 @@ class Api(object):
         while True:
             next_cursor, previous_cursor, user_ids = self.GetBlocksIDsPaged(
                 cursor=cursor,
-                skip_status=skip_status,
-                include_user_entities=include_user_entities)
+                stringify_ids=stringify_ids)
             result += user_ids
             if next_cursor == 0 or next_cursor == previous_cursor:
                 break
@@ -1791,32 +1798,304 @@ class Api(object):
 
         return result
 
-    def DestroyBlock(self, user_id, trim_user=False):
-        """Destroys the block for the user specified by the required ID
-        parameter.
-
-        The authenticating user must have blocked the user specified by the
-        required ID parameter.
+    def GetBlocksIDsPaged(self,
+                          cursor=-1,
+                          stringify_ids=False):
+        """ Fetch a page of the user IDs blocked by the currently
+        authenticated user.
 
         Args:
-          user_id:
-            The numerical ID of the user to be un-blocked.
+          cursor (int, optional):
+            Should be set to -1 if you want the first page, thereafter denotes
+            the page of blocked users that you want to return.
+          stringify_ids (bool, optional):
+            If True user IDs will be returned as strings rather than integers.
 
         Returns:
-          A twitter.User instance representing the un-blocked user.
+          next_cursor, previous_cursor, list of user IDs of blocked users.
         """
-        try:
-            post_data = {'user_id': int(user_id)}
-        except ValueError:
-            raise TwitterError({'message': "user_id must be an integer"})
-        url = '%s/blocks/destroy.json' % (self.base_url)
-        if trim_user:
-            post_data['trim_user'] = 1
+        return self._GetBlocksMutesPaged(endpoint='block',
+                                         action='ids',
+                                         cursor=cursor,
+                                         stringify_ids=False)
+
+    def GetMutes(self,
+                 skip_status=False,
+                 include_entities=False):
+        """ Fetch the sequence of all users (as twitter.User instances),
+        muted by the currently authenticated user.
+
+        Args:
+          skip_status (bool, optional):
+            If True the statuses will not be returned in the user items.
+          include_entities (bool, optional):
+            When True, the user entities will be included.
+
+        Returns:
+          A list of twitter.User instances, one for each muted user.
+        """
+        result = []
+        cursor = -1
+
+        while True:
+            next_cursor, previous_cursor, users = self.GetMutesPaged(
+                cursor=cursor,
+                skip_status=skip_status,
+                include_entities=include_entities)
+            result += users
+            if next_cursor == 0 or next_cursor == previous_cursor:
+                break
+            else:
+                cursor = next_cursor
+
+        return result
+
+    def GetMutesPaged(self,
+                       cursor=-1,
+                       skip_status=False,
+                       include_entities=False):
+        """ Fetch a page of the users (as twitter.User instances)
+        muted by the currently authenticated user.
+
+        Args:
+          cursor (int, optional):
+            Should be set to -1 if you want the first page, thereafter denotes
+            the page of muted users that you want to return.
+          skip_status (bool, optional):
+            If True the statuses will not be returned in the user items.
+          include_entities (bool, optional):
+            When True, the user entities will be included.
+
+        Returns:
+          next_cursor, previous_cursor, list of twitter.User instances,
+          one for each muted user.
+        """
+
+        return self._GetBlocksMutesPaged(endpoint='mute',
+                                         action='list',
+                                         cursor=cursor,
+                                         skip_status=skip_status,
+                                         include_entities=include_entities)
+
+    def GetMutesIDs(self,
+                    stringify_ids=False):
+        """Fetch the sequence of all user IDs muted by the
+        currently authenticated user.
+
+        Args:
+          stringify_ids (bool, optional):
+            If True user IDs will be returned as strings rather than integers.
+
+        Returns:
+          A list of user IDs for all muted users.
+        """
+        result = []
+        cursor = -1
+
+        while True:
+            next_cursor, previous_cursor, user_ids = self.GetMutesIDsPaged(
+                cursor=cursor,
+                stringify_ids=stringify_ids)
+            result += user_ids
+            if next_cursor == 0 or next_cursor == previous_cursor:
+                break
+            else:
+                cursor = next_cursor
+
+        return result
+
+    def GetMutesIDsPaged(self,
+                         cursor=-1,
+                         stringify_ids=False):
+        """ Fetch a page of the user IDs muted by the currently
+        authenticated user.
+
+        Args:
+          cursor (int, optional):
+            Should be set to -1 if you want the first page, thereafter denotes
+            the page of muted users that you want to return.
+          stringify_ids (bool, optional):
+            If True user IDs will be returned as strings rather than integers.
+
+        Returns:
+          next_cursor, previous_cursor, list of user IDs of muted users.
+        """
+        return self._GetBlocksMutesPaged(endpoint='mute',
+                                         action='ids',
+                                         cursor=cursor,
+                                         skip_status=skip_status,
+                                         include_entities=include_entities)
+
+    def _BlockMute(self,
+                   action,
+                   endpoint,
+                   user_id=None,
+                   screen_name=None,
+                   include_entities=True,
+                   skip_status=False):
+        """Create or destroy a block or mute on behalf of the authenticated user.
+
+        Args:
+          action (str):
+            Either 'create' or 'destroy'.
+          endpoint (str):
+            Either 'block' or 'mute'.
+          user_id (int, optional)
+            The numerical ID of the user to block/mute.
+          screen_name (str, optional):
+            The screen name of the user to block/mute.
+          include_entities (bool, optional):
+            The entities node will not be included if set to False.
+          skip_status (bool, optional):
+              When set to False, the blocked User's statuses will not be included
+              with the returned User object.
+        Returns:
+          twitter.User: twitter.User object representing the blocked/muted user.
+        """
+
+        urls = {
+            'block': {
+                'create': '%s/blocks/create.json' % (self.base_url),
+                'destroy': '%s/blocks/destroy.json' % (self.base_url),
+            },
+            'mute': {
+                'create': '%s/mutes/users/create.json' % (self.base_url),
+                'destroy': '%s/mutes/users/destroy.json' % (self.base_url)
+            }
+        }
+
+        url = urls[endpoint][action]
+        post_data = {}
+
+        if user_id:
+            post_data['user_id'] = enf_type('user_id', int, user_id)
+        elif screen_name:
+            post_data['screen_name'] = screen_name
+        else:
+            raise TwitterError("You must specify either a user_id or screen_name")
+
+        if include_entities:
+            post_data['include_entities'] = enf_type('include_entities', bool, include_entities)
+        if skip_status:
+            post_data['skip_status'] = enf_type('skip_status', bool, skip_status)
 
         resp = self._RequestUrl(url, 'POST', data=post_data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        return Status.NewFromJsonDict(data)
+        return User.NewFromJsonDict(data)
+
+
+    def CreateBlock(self,
+                    user_id=None,
+                    screen_name=None,
+                    include_entities=True,
+                    skip_status=False):
+        """Blocks the user specified by either user_id or screen_name.
+
+        Args:
+          user_id (int, optional)
+            The numerical ID of the user to block.
+          screen_name (str, optional):
+            The screen name of the user to block.
+          include_entities (bool, optional):
+            The entities node will not be included if set to False.
+          skip_status (bool, optional):
+            When set to False, the blocked User's statuses will not be included
+            with the returned User object.
+
+        Returns:
+          A twitter.User instance representing the blocked user.
+        """
+        return self._BlockMute(action='create',
+                               endpoint='block',
+                               user_id=user_id,
+                               screen_name=screen_name,
+                               include_entities=include_entities,
+                               skip_status=skip_status)
+
+    def DestroyBlock(self,
+                     user_id=None,
+                     screen_name=None,
+                     include_entities=True,
+                     skip_status=False):
+        """Unlocks the user specified by either user_id or screen_name.
+
+        Args:
+          user_id (int, optional)
+            The numerical ID of the user to block.
+          screen_name (str, optional):
+            The screen name of the user to block.
+          include_entities (bool, optional):
+            The entities node will not be included if set to False.
+          skip_status (bool, optional):
+            When set to False, the blocked User's statuses will not be included
+            with the returned User object.
+
+        Returns:
+          A twitter.User instance representing the blocked user.
+        """
+        return self._BlockMute(action='destroy',
+                               endpoint='block',
+                               user_id=user_id,
+                               screen_name=screen_name,
+                               include_entities=include_entities,
+                               skip_status=skip_status)
+
+    def CreateMute(self,
+                   user_id=None,
+                   screen_name=None,
+                   include_entities=True,
+                   skip_status=False):
+        """Mutes the user specified by either user_id or screen_name.
+
+        Args:
+          user_id (int, optional)
+            The numerical ID of the user to mute.
+          screen_name (str, optional):
+            The screen name of the user to mute.
+          include_entities (bool, optional):
+            The entities node will not be included if set to False.
+          skip_status (bool, optional):
+            When set to False, the muted User's statuses will not be included
+            with the returned User object.
+
+        Returns:
+          A twitter.User instance representing the muted user.
+        """
+        return self._BlockMute(action='create',
+                               endpoint='mute',
+                               user_id=user_id,
+                               screen_name=screen_name,
+                               include_entities=include_entities,
+                               skip_status=skip_status)
+
+    def DestroyMute(self,
+                    user_id=None,
+                    screen_name=None,
+                    include_entities=True,
+                    skip_status=False):
+        """Unlocks the user specified by either user_id or screen_name.
+
+        Args:
+          user_id (int, optional)
+            The numerical ID of the user to mute.
+          screen_name (str, optional):
+            The screen name of the user to mute.
+          include_entities (bool, optional):
+            The entities node will not be included if set to False.
+          skip_status (bool, optional):
+            When set to False, the muted User's statuses will not be included
+            with the returned User object.
+
+        Returns:
+          A twitter.User instance representing the muted user.
+        """
+        return self._BlockMute(action='destroy',
+                               endpoint='mute',
+                               user_id=user_id,
+                               screen_name=screen_name,
+                               include_entities=include_entities,
+                               skip_status=skip_status)
 
     def _GetIDsPaged(self,
                      url,
