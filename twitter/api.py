@@ -1706,7 +1706,10 @@ class Api(object):
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        result += [User.NewFromJsonDict(x) for x in data['users']]
+        if action == 'ids':
+            result += data.get('ids')
+        else:
+            result += [User.NewFromJsonDict(x) for x in data['users']]
         next_cursor = data.get('next_cursor', 0)
         previous_cursor = data.get('previous_cursor', 0)
 
