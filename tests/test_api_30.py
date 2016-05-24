@@ -1529,3 +1529,148 @@ class ApiTest(unittest.TestCase):
         self.assertRaises(
             twitter.TwitterError,
             lambda: self.api.GetStatusOembed(status_id=397, align='test'))
+
+    @responses.activate
+    def testGetMutes(self):
+        # First iteration of the loop to get all the user's mutes
+        with open('testdata/get_mutes_users_list_loop_0.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/mutes/users/list.json?cursor=-1&include_entities=True',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+
+        # Last interation of that loop.
+        with open('testdata/get_mutes_users_list_loop_1.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/mutes/users/list.json?cursor=1535206520056388207&include_entities=True',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetMutes(include_entities=True)
+        self.assertEqual(len(resp), 82)
+        self.assertTrue(isinstance(resp[0], twitter.User))
+
+
+    @responses.activate
+    def testGetMutesIDs(self):
+        # First iteration of the loop to get all the user's mutes
+        with open('testdata/get_mutes_users_ids_loop_0.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/mutes/users/ids.json?cursor=-1',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+
+        # Last interation of that loop.
+        with open('testdata/get_mutes_users_ids_loop_1.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/mutes/users/ids.json?cursor=1535206520056565155',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetMutesIDs()
+        self.assertEqual(len(resp), 82)
+        self.assertTrue(isinstance(resp[0], int))
+
+    @responses.activate
+    def testCreateBlock(self):
+        with open('testdata/post_blocks_create.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/blocks/create.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.CreateBlock(screen_name='jack')
+        self.assertTrue(isinstance(resp, twitter.User))
+        self.assertEqual(resp.screen_name, 'jack')
+
+        resp = self.api.CreateBlock(user_id=12)
+        self.assertTrue(isinstance(resp, twitter.User))
+        self.assertEqual(resp.id, 12)
+
+    @responses.activate
+    def testDestroyBlock(self):
+        with open('testdata/post_blocks_destroy.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/blocks/destroy.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.DestroyBlock(screen_name='jack')
+        self.assertTrue(isinstance(resp, twitter.User))
+        self.assertEqual(resp.screen_name, 'jack')
+
+        resp = self.api.DestroyBlock(user_id=12)
+        self.assertTrue(isinstance(resp, twitter.User))
+        self.assertEqual(resp.id, 12)
+
+    @responses.activate
+    def testCreateMute(self):
+        with open('testdata/post_mutes_users_create.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/mutes/users/create.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.CreateMute(screen_name='jack')
+        self.assertTrue(isinstance(resp, twitter.User))
+        self.assertEqual(resp.screen_name, 'jack')
+
+        resp = self.api.CreateMute(user_id=12)
+        self.assertTrue(isinstance(resp, twitter.User))
+        self.assertEqual(resp.id, 12)
+
+    @responses.activate
+    def testDestroyMute(self):
+        with open('testdata/post_mutes_users_destroy.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/mutes/users/destroy.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.DestroyMute(screen_name='jack')
+        self.assertTrue(isinstance(resp, twitter.User))
+        self.assertEqual(resp.screen_name, 'jack')
+
+        resp = self.api.DestroyMute(user_id=12)
+        self.assertTrue(isinstance(resp, twitter.User))
+        self.assertEqual(resp.id, 12)
+
+    @responses.activate
+    def testMuteBlockParamsAndErrors(self):
+        # Basic type/error checking
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.CreateMute(user_id='test'))
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.CreateMute())
+
+        with open('testdata/post_mutes_users_create_skip_status.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            'https://api.twitter.com/1.1/mutes/users/create.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.CreateMute(screen_name='jack', skip_status=True)
+        self.assertTrue(isinstance(resp, twitter.User))
+        self.assertFalse(resp.status)
