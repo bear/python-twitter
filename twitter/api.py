@@ -1669,14 +1669,13 @@ class Api(object):
           action (str):
             Either 'list' or 'ids' depending if you want to return fully-hydrated
             twitter.User objects or a list of user IDs as ints.
-          cursor:
+          cursor (int, optional):
             Should be set to -1 if you want the first page, thereafter denotes
             the page of users that you want to return.
-          skip_status:
+          skip_status (bool, optional):
             If True the statuses will not be returned in the user items.
-            [Optional]
-          include_entities:
-            When True, the user entities will be included. [Optional]
+          include_entities (bool, optional):
+            When True, the user entities will be included.
 
         Returns:
           next_cursor, previous_cursor, list of twitter.User instances,
@@ -1722,11 +1721,10 @@ class Api(object):
         blocked by the currently authenticated user.
 
         Args:
-          skip_status:
+          skip_status (bool, optional):
             If True the statuses will not be returned in the user items.
-            [Optional]
-          include_entities:
-            When True, the user entities will be included. [Optional]
+          include_entities (bool, optional):
+            When True, the user entities will be included.
 
         Returns:
           A list of twitter.User instances, one for each blocked user.
@@ -1755,14 +1753,13 @@ class Api(object):
         blocked by the currently authenticated user.
 
         Args:
-          cursor:
+          cursor (int, optional):
             Should be set to -1 if you want the first page, thereafter denotes
             the page of blocked users that you want to return.
-          skip_status:
+          skip_status (bool, optional):
             If True the statuses will not be returned in the user items.
-            [Optional]
-          include_entities:
-            When True, the user entities will be included. [Optional]
+          include_entities (bool, optional):
+            When True, the user entities will be included.
 
         Returns:
           next_cursor, previous_cursor, list of twitter.User instances,
@@ -1854,9 +1851,9 @@ class Api(object):
         return result
 
     def GetMutesPaged(self,
-                       cursor=-1,
-                       skip_status=False,
-                       include_entities=False):
+                      cursor=-1,
+                      skip_status=False,
+                      include_entities=False):
         """ Fetch a page of the users (as twitter.User instances)
         muted by the currently authenticated user.
 
@@ -1926,8 +1923,7 @@ class Api(object):
         return self._GetBlocksMutesPaged(endpoint='mute',
                                          action='ids',
                                          cursor=cursor,
-                                         skip_status=skip_status,
-                                         include_entities=include_entities)
+                                         stringify_ids=stringify_ids)
 
     def _BlockMute(self,
                    action,
