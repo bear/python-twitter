@@ -9,7 +9,7 @@ help:
 	@echo "  coverage    run tests with code coverage"
 
 tox:
-	export PYENV_VERSION="2.7:3.5.1:pypy-5.0.0" && tox
+	export PYENV_VERSION="2.7.11:3.5.1:pypy-5.0.0" && tox
 
 env:
 	pip install -r requirements.txt
