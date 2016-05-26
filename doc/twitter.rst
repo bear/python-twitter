@@ -13,52 +13,12 @@ API
 Models
 ---------------------
 
-.. automodule:: twitter.category
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: twitter.direct_message
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: twitter.hashtag
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: twitter.list
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: twitter.media
+.. automodule:: twitter.models
     :members:
     :undoc-members:
     :show-inheritance:
 
 .. automodule:: twitter.ratelimit
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: twitter.status
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: twitter.trend
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: twitter.url
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: twitter.user
     :members:
     :undoc-members:
     :show-inheritance:

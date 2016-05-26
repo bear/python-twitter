@@ -16,6 +16,7 @@ Contents:
    getting_started.rst
    contributing.rst
    migration_v30.rst
+   changelog.rst
    rate_limits.rst
    models.rst
    searching.rst
