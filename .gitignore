@@ -40,6 +40,7 @@ htmlcov
 
 #Environment
 env
+.python-version
 
 violations.flake8.txt
 

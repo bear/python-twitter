@@ -1,3 +1,6 @@
+2016-05-25
+  Going forward all changes will be tracked in docs/changelog.rst
+
 2015-12-28
   Large number of changes related to making the code Python v3 compatible.
   See the messy details at https://github.com/bear/python-twitter/pull/251

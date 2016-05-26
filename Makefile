@@ -1,6 +1,4 @@
 
-
-
 help:
 	@echo "  env         install all production dependencies"
 	@echo "  dev         install all dev and production dependencies (virtualenv is assumed)"
@@ -40,7 +38,7 @@ lint:
 test:
 	python setup.py test
 
-coverage: clean test
+coverage: clean
 	coverage run --source=twitter setup.py test --addopts "--ignore=venv"
 	coverage html
 	coverage report
