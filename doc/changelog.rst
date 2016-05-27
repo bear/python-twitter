@@ -36,6 +36,9 @@ What's New
 
 * Google App Engine support has been reintegrated into the library. Check out `PR #383 <https://github.com/bear/python-twitter/pull/383>`_.
 
+* Adds support for ``/statuses/unretweet/:id.json`` endpoint via :py:func:`twitter.api.Api.DestroyRetweet()` method allowing you to unretweet a tweet on behalf of the authenticated user.
+
+
 What's Changed
 --------------
 
@@ -57,10 +60,8 @@ Bugfixes
 
 * Fix for 401 errors that were occuring in the Streaming Endpoints. `PR #364 <https://github.com/bear/python-twitter/pull/364>`_
 
-
-
 Version 3.1
-==========
+===========
 
 What's New
 ____________
