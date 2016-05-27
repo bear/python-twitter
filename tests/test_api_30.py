@@ -1674,3 +1674,13 @@ class ApiTest(unittest.TestCase):
         resp = self.api.CreateMute(screen_name='jack', skip_status=True)
         self.assertTrue(isinstance(resp, twitter.User))
         self.assertFalse(resp.status)
+
+    @responses.activate
+    def testDestroyRetweet(self):
+        with open('testdata/post_statuses_unretweet_id.json') as f:
+            resp_data = f.read()
+        responses.add(responses.POST, DEFAULT_URL, body=resp_data, status=True)
+        resp = self.api.DestroyRetweet(status_id=735890565523509248)
+
+        self.assertTrue(isinstance(resp, twitter.Status))
+        self.assertEqual(resp.id, 735890565523509248)
