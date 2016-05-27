@@ -1713,3 +1713,14 @@ class ApiTest(unittest.TestCase):
         with warnings.catch_warnings(record=True) as w:
             resp = self.api.UpdateBackgroundImage(image='testdata/168NQ.jpg')
             self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+
+    @responses.activate
+    def testDestroyRetweet(self):
+        with open('testdata/post_statuses_unretweet_id.json') as f:
+            resp_data = f.read()
+        responses.add(responses.POST, DEFAULT_URL, body=resp_data, status=True)
+        resp = self.api.DestroyRetweet(status_id=735890565523509248)
+
+        self.assertTrue(isinstance(resp, twitter.Status))
+        self.assertEqual(resp.id, 735890565523509248)
+
