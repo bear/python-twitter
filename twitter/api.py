@@ -595,18 +595,21 @@ class Api(object):
     def GetUserSuggestion(self, category):
         """ Returns a list of users in a category
         Args:
-            category:
+            category (str, twitter.Category):
                 The Category object to limit the search by
         Returns:
-            A list of users in that category
+            list: A list of users in that category
         """
-        url = '%s/users/suggestions/%s.json' % (self.base_url, category.slug)
-
+        if isinstance(category, Category):
+            slug = category.slug
+        elif isinstance(category, str):
+            slug = category
+        url = '%s/users/suggestions/%s.json' % (self.base_url, slug)
         resp = self._RequestUrl(url, verb='GET')
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         users = []
-        for user in data['users']:
+        for user in data.get('users', None):
             users.append(User.NewFromJsonDict(user))
         return users
 
@@ -1561,15 +1564,14 @@ class Api(object):
         return results
 
     def PostRetweet(self, status_id, trim_user=False):
-        """Retweet a tweet with the Retweet API.
+        """Retweet a tweet with the given ``status_id``.
 
         Args:
-          status_id:
+          status_id (int):
             The numerical id of the tweet that will be retweeted
-          trim_user:
+          trim_user (bool, optional):
             If True the returned payload will only contain the user IDs,
             otherwise the payload will contain the full user data item.
-            [Optional]
 
         Returns:
           A twitter.Status instance representing the original tweet with retweet details embedded.
@@ -1588,6 +1590,34 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
+
+    def DestroyRetweet(self, status_id, trim_user=False):
+        """Unretweet a tweet with the given ``status_id``.
+
+        Args:
+          status_id (int):
+            The numerical id of the tweet to be unretweeted (not the id of the retweet).
+          trim_user (bool, optional):
+            If True the returned payload will only contain the user IDs,
+            otherwise the payload will contain the full user data item.
+
+        Returns:
+          twitter.models.Status: Status object representing the original tweet with
+          retweet details embedded.
+        """
+
+        url = '%s/statuses/unretweet/%s.json' % (self.base_url, status_id)
+
+        post_data = {
+            'id': enf_type('status_id', int, status_id),
+            'trim_user': enf_type('trim_user', bool, trim_user)
+        }
+
+        resp = self._RequestUrl(url, 'POST', data=post_data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return Status.NewFromJsonDict(data)
+
 
     def GetUserRetweets(self,
                         count=None,
