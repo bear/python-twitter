@@ -1,8 +1,19 @@
 Changelog
 ---------
 
+Version 3.2
+===========
+
+What's New
+__________
+
+* Adds support for ``/statuses/unretweet/:id.json`` endpoint via
+  :py:func:`twitter.api.Api.DestroyRetweet()` method allowing you to unretweet
+  a tweet on behalf of the authenticated user.
+
+
 Version 3.1
-==========
+===========
 
 What's New
 ____________
