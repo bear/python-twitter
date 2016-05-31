@@ -59,6 +59,13 @@ Bugfixes
 * Fix for :py:func:`twitter.api.Api.PostUpdate()` where a passing an integer to the ``media`` parameter would cause an iteration error to occur. `PR #347 <https://github.com/bear/python-twitter/pull/347>`_
 
 * Fix for 401 errors that were occuring in the Streaming Endpoints. `PR #364 <https://github.com/bear/python-twitter/pull/364>`_
+=======
+* Adds support for ``/accounts/settings.json`` endpoint via
+  :py:func:`twitter.api.Api.GetAccountSettings` method. Note that this is only
+  to retreive settings for the currently authenticated user. If you want to
+  update the user's settings, use
+  :py:func:`twitter.api.Api.UpdateAccountSettings`.
+
 
 Version 3.1
 ===========

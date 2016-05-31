@@ -1718,9 +1718,18 @@ class ApiTest(unittest.TestCase):
     def testDestroyRetweet(self):
         with open('testdata/post_statuses_unretweet_id.json') as f:
             resp_data = f.read()
-        responses.add(responses.POST, DEFAULT_URL, body=resp_data, status=True)
+        responses.add(responses.POST, DEFAULT_URL, body=resp_data, status=200)
         resp = self.api.DestroyRetweet(status_id=735890565523509248)
 
         self.assertTrue(isinstance(resp, twitter.Status))
         self.assertEqual(resp.id, 735890565523509248)
 
+    @responses.activate
+    def testGetAccountSettings(self):
+        with open('testdata/get_account_settings.json') as f:
+            resp_data = f.read()
+        responses.add(responses.GET, DEFAULT_URL, body=resp_data, status=200)
+        resp = self.api.GetAccountSettings()
+
+        self.assertTrue(resp['protected'])
+        self.assertTrue(resp['geo_enabled'])

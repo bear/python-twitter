@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-#
 #
 # Copyright 2007-2016 The Python-Twitter Developers
 #
@@ -310,6 +308,17 @@ class Api(object):
                                  access_token_key, access_token_secret)
 
         self._config = None
+
+    def GetAccountSettings(self):
+        """Returns dictionary of the current user's account settings.
+
+        Returns:
+            dict: dictionary representing the currently authenticated user's account settings.
+        """
+        url = "%s/account/settings.json" % self.base_url
+        resp = self._RequestUrl(url, 'GET')
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        return data
 
     def GetHelpConfiguration(self):
         """Get basic help configuration details from Twitter.
