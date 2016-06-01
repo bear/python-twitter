@@ -1079,11 +1079,11 @@ class Api(object):
 
         return resp
 
-    def UploadMediaChunked(self,
-                           media,
-                           additional_owners=None,
-                           media_category=None):
-        """ Upload a media file to Twitter in multiple requests.
+    def _UploadMediaChunkedInit(self,
+                                media,
+                                additional_owners=None,
+                                media_category=None):
+        """Start a chunked upload to Twitter.
 
         Args:
             media:
@@ -1096,8 +1096,8 @@ class Api(object):
                 API & video files.
 
         Returns:
-            media_id:
-                ID of the uploaded media returned by the Twitter API or 0.
+            tuple: media_id (returned from Twitter), file-handler object (i.e., has .read()
+            method), filename media file.
         """
         url = '%s/media/upload.json' % self.upload_url
 
@@ -1129,10 +1129,33 @@ class Api(object):
         except KeyError:
             raise TwitterError({'message': 'Media could not be uploaded'})
 
-        boundary = bytes("--{0}".format(uuid4()), 'utf-8')
-        media_id_bytes = bytes(str(media_id).encode('utf-8'))
+        return (media_id, media_fp, filename)
+
+
+    def _UploadMediaChunkedAppend(self,
+                                  media_id,
+                                  media_fp,
+                                  filename):
+        """Appends (i.e., actually uploads) media file to Twitter.
+
+        Args:
+            media_id (int):
+                ID of the media file received from Init method.
+            media_fp (file):
+                File-like object representing media file (must have .read() method)
+            filename (str):
+                Filename of the media file being uploaded.
+
+        Returns:
+            True if successful. Raises otherwise.
+        """
+        url = '%s/media/upload.json' % self.upload_url
+
+        boundary = "--{0}".format(uuid4().hex).encode('utf-8')
+        media_id_bytes = str(media_id).encode('utf-8')
         headers = {'Content-Type': 'multipart/form-data; boundary={0}'.format(
-            str(boundary[2:], 'utf-8'))}
+            boundary.decode('utf8')[2:]
+        )}
 
         segment_id = 0
         while True:
@@ -1154,9 +1177,9 @@ class Api(object):
                 boundary,
                 b'Content-Disposition: form-data; name="segment_index"',
                 b'',
-                bytes(str(segment_id).encode('utf-8')),
+                str(segment_id).encode('utf-8'),
                 boundary,
-                bytes('Content-Disposition: form-data; name="media"; filename="{0}"'.format(filename), 'utf-8'),
+                'Content-Disposition: form-data; name="media"; filename="{0}"'.format(filename).encode('utf8'),
                 b'Content-Type: application/octet-stream',
                 b'',
                 data,
@@ -1182,7 +1205,20 @@ class Api(object):
         except:
             pass
 
-        # Finalizing the upload:
+        return True
+
+    def _UploadMediaChunkedFinalize(self, media_id):
+        """Finalize chunked upload to Twitter.
+
+        Args:
+            media_id (int):
+                ID of the media file for which to finalize the upload.
+
+        Returns:
+            json: JSON string of data from Twitter.
+        """
+        url = '%s/media/upload.json' % self.upload_url
+
         parameters = {
             'command': 'FINALIZE',
             'media_id': media_id
@@ -1191,10 +1227,49 @@ class Api(object):
         resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
+        return data
+
+
+    def UploadMediaChunked(self,
+                           media,
+                           additional_owners=None,
+                           media_category=None):
+        """Upload a media file to Twitter in multiple requests.
+
+        Args:
+            media:
+                File-like object to upload.
+            additional_owners: additional Twitter users that are allowed to use
+                The uploaded media. Should be a list of integers. Maximum
+                number of additional owners is capped at 100 by Twitter.
+            media_category:
+                Category with which to identify media upload. Only use with Ads
+                API & video files.
+
+        Returns:
+            media_id:
+                ID of the uploaded media returned by the Twitter API. Raises if
+                unsuccesful.
+        """
+
+        media_id, media_fp, filename = self._UploadMediaChunkedInit(media=media,
+                                                                    additional_owners=additional_owners,
+                                                                    media_category=media_category)
+
+        append = self._UploadMediaChunkedAppend(media_id=media_id,
+                                                media_fp=media_fp,
+                                                filename=filename)
+
+        if not append:
+            TwitterError('Media could not be uploaded.')
+
+        data = self._UploadMediaChunkedFinalize(media_id)
+
         try:
             return data['media_id']
         except KeyError:
-            raise TwitterError({'message': 'Media could not be uploaded.'})
+            raise TwitterError('Media could not be uploaded.')
+
 
     def PostMedia(self,
                   status,
