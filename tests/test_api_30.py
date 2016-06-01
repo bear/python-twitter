@@ -1682,7 +1682,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(responses.POST, DEFAULT_URL, body=resp_data, status=200)
 
-        with open('/home/jeremy/Desktop/corgi.gif', 'rb') as fp:
+        with open('testdata/corgi.gif', 'rb') as fp:
             resp = self.api._UploadMediaChunkedInit(fp)
         self.assertEqual(len(responses.calls), 1)
         self.assertEqual(resp[0], 737956420046356480)
@@ -1690,7 +1690,7 @@ class ApiTest(unittest.TestCase):
     @responses.activate
     def testPostUploadMediaChunkedAppend(self):
         media_fp, filename, _, _ = twitter.twitter_utils.parse_media_file(
-            '/home/jeremy/Desktop/corgi.gif')
+            'testdata/corgi.gif')
         responses.add(responses.POST, DEFAULT_URL, body='', status=200)
 
         resp = self.api._UploadMediaChunkedAppend(media_id=737956420046356480,
