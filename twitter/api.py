@@ -985,9 +985,8 @@ class Api(object):
             else:
                 _, _, file_size, _ = parse_media_file(media)
                 if file_size > self.chunk_size:
-                    media_ids = self.UploadMediaChunked(
-                        media,
-                        media_additional_owners)
+                    media_ids.append(self.UploadMediaChunked(media,
+                                                             media_additional_owners))
                 else:
                     media_ids.append(
                         self.UploadMediaSimple(media,
