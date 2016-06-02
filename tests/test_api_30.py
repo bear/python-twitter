@@ -33,7 +33,8 @@ class ApiTest(unittest.TestCase):
             consumer_secret='test',
             access_token_key='test',
             access_token_secret='test',
-            sleep_on_rate_limit=False)
+            sleep_on_rate_limit=False,
+            chunk_size=500*1024)
         self.base_url = 'https://api.twitter.com/1.1'
         self._stderr = sys.stderr
         sys.stderr = ErrNull()
@@ -1674,3 +1675,37 @@ class ApiTest(unittest.TestCase):
         resp = self.api.CreateMute(screen_name='jack', skip_status=True)
         self.assertTrue(isinstance(resp, twitter.User))
         self.assertFalse(resp.status)
+
+    @responses.activate
+    def testPostUploadMediaChunkedInit(self):
+        with open('testdata/post_upload_chunked_INIT.json') as f:
+            resp_data = f.read()
+        responses.add(responses.POST, DEFAULT_URL, body=resp_data, status=200)
+
+        with open('testdata/corgi.gif', 'rb') as fp:
+            resp = self.api._UploadMediaChunkedInit(fp)
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(resp[0], 737956420046356480)
+
+    @responses.activate
+    def testPostUploadMediaChunkedAppend(self):
+        media_fp, filename, _, _ = twitter.twitter_utils.parse_media_file(
+            'testdata/corgi.gif')
+        responses.add(responses.POST, DEFAULT_URL, body='', status=200)
+
+        resp = self.api._UploadMediaChunkedAppend(media_id=737956420046356480,
+                                                  media_fp=media_fp,
+                                                  filename=filename)
+        self.assertEqual(len(responses.calls), 7)
+        self.assertTrue(resp)
+
+    @responses.activate
+    def testPostUploadMediaChunkedFinalize(self):
+        with open('testdata/post_upload_chunked_FINAL.json') as f:
+            resp_data = f.read()
+
+        responses.add(responses.POST, DEFAULT_URL, body=resp_data, status=200)
+
+        resp = self.api._UploadMediaChunkedFinalize(media_id=737956420046356480)
+        self.assertEqual(len(responses.calls), 1)
+        self.assertTrue(resp)
