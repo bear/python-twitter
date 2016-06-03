@@ -41,7 +41,7 @@ At this point, you can test out your application using the keys under "Your Appl
     import twitter
     api = twitter.Api(consumer_key=[consumer key],
                       consumer_secret=[consumer secret],
-                      access_token_key=[access token]
+                      access_token_key=[access token],
                       access_token_secret=[access token secret])
 
 If you are creating an application for end users/consumers, then you will want them to authorize you application, but that is outside the scope of this document.
