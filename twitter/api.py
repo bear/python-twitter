@@ -60,7 +60,8 @@ from twitter.twitter_utils import (
     calc_expected_status_length,
     is_url,
     parse_media_file,
-    enf_type)
+    enf_type,
+    parse_jsonp)
 
 from twitter.error import (
     TwitterError,
@@ -4535,7 +4536,77 @@ class Api(object):
 
         raise TwitterError({'message': "Unkown banner image upload issue"})
 
-    def GetStreamSample(self, delimited=False, stall_warnings=True):
+    def GetReverseGeocode(self,
+                          latitude,
+                          longitude,
+                          accuracy=None,
+                          granularity=None,
+                          max_results=None,
+                          callback=None):
+
+        """Returns up to 20 Place IDs for a given lat,long pair
+
+        Args:
+            latitude (float):
+                The latitude to search around. Must be between -90.0 & +90.0
+            longitude (float):
+                The longitude to search around. Must be between -180.0 & +180.0
+            accuracy (int or str, optional):
+                A hint on the "region" in which to search. If type is int, then
+                Twitter will interpret this as meters, otherwise, you can pass
+                a string in the form of "5ft" and feet will be respected.
+            granularity (str, optional):
+                This is the minimal granularity of place types to return and
+                must be one of: "poi", "neighborhood", "city", "admin", or
+                "country". Twitter defaults to "neighborhood" if not passed.
+            max_results (int, optional):
+                Hint as to the number of "nearby" results to return.
+                Not guaranteed to return ``max_results``.
+            callback (str, optional):
+                If supplied, the response will use the JSONP format with a
+                callback of the given name.
+
+        Returns:
+            List of dictionaries representing nearby places. If ``callback`` is passed,
+            returns a namedtuple of the following type:
+                JSONP(callback='xxx', json='yyy', jsonp='zzz')
+            where ``callback`` is the name of the callback provided, ``json`` is the JSON
+            dict returned from Twitter, and ``jsonp`` is the raw JSONP response
+            from Twitter.
+        """
+        url = "%s/get/reverse_geocode.json" % self.base_url
+        parameters = {
+            'lat': enf_type('latitude', float, latitude),
+            'long': enf_type('longitude', float, longitude),
+        }
+
+        if not -90 <= latitude <= 90:
+            raise TwitterError('latitude must be between -90 & 90')
+        if not -180 <= longitude <= 180:
+            raise TwitterError('longitude must be between -180 & 180')
+
+        if accuracy is not None:
+            parameters['accuracy'] = accuracy
+        if granularity is not None:
+            parameters['granularity'] = str(granularity)
+        if max_results is not None:
+            parameters['max_results'] = enf_type('max_results', int, max_results)
+        if callback is not None:
+            parameters['callback'] = str(callback)
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+
+        if callback is not None:
+            data = parse_jsonp(resp.content.decode('utf-8'))
+            self._ParseAndCheckTwitter(json.dumps(data.json))
+            return data
+        else:
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return data.get('result').get('places')
+
+
+    def GetStreamSample(self, delimited=None, stall_warnings=None):
         """Returns a small sample of public statuses.
 
         Args:

@@ -1,6 +1,8 @@
 # encoding: utf-8
 from __future__ import unicode_literals
 
+from collections import namedtuple
+import json
 import mimetypes
 import os
 import re
@@ -270,3 +272,24 @@ def enf_type(field, _type, val):
         raise TwitterError({
             'message': '"{0}" must be type {1}'.format(field, _type.__name__)
         })
+
+
+def parse_jsonp(jsonp):
+    """Returns the name of the callback and the JSON string from a JSONP object.
+
+    Args:
+        jsonp (str):
+            String representing JSONP object. Twitter will provide in the form of:
+            /**/callback_name({"result": [result]});
+    Returns:
+        tuple: tuple of callback name and JSON string
+    """
+    regex = re.compile(r"\/\*\*\/(.*)\(")
+    match = re.match(regex, jsonp)
+
+    callback = match.groups()[0]
+    json_dict = json.loads(jsonp[match.span()[1]:-2])
+
+    JSONP = namedtuple('JSONP', 'callback json jsonp')
+
+    return JSONP(callback=callback, json=json_dict, jsonp=jsonp)
