@@ -1734,6 +1734,9 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(resp['protected'])
         self.assertTrue(resp['geo_enabled'])
 
+        self.assertEqual(len(responses.calls), 1)
+        self.assertTrue(resp)
+
     @responses.activate
     def testGetReverseGeocode(self):
         with open('testdata/get_reverse_geocode.json') as f:
