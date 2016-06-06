@@ -1761,3 +1761,12 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(isinstance(resp.jsonp, str))
         self.assertEqual(resp.callback, 'test')
         self.assertTrue(isinstance(resp.json, dict))
+
+    @responses.activate
+    def testGeoSearchLatLong(self):
+        with open('testdata/get_geo_search_by_latlong.json') as f:
+            resp_data = f.read()
+        responses.add(responses.GET, DEFAULT_URL, body=resp_data, status=200)
+        resp = self.api.GetGeoSearch(latitude=37.7821120598956, longitude=-122.400612831116)
+
+        self.assertTrue(isinstance(resp, list))

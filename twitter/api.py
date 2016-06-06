@@ -4574,7 +4574,7 @@ class Api(object):
             dict returned from Twitter, and ``jsonp`` is the raw JSONP response
             from Twitter.
         """
-        url = "%s/get/reverse_geocode.json" % self.base_url
+        url = "%s/geo/reverse_geocode.json" % self.base_url
         parameters = {
             'lat': enf_type('latitude', float, latitude),
             'long': enf_type('longitude', float, longitude),
@@ -4605,6 +4605,90 @@ class Api(object):
 
         return data.get('result').get('places')
 
+    def GetGeoSearch(self,
+                     latitude=None,
+                     longitude=None,
+                     query=None,
+                     ip=None,
+                     granularity=None,
+                     accuracy=None,
+                     max_results=None,
+                     contained_within=None,
+                     callback=None):
+        """Returns a list of places near/at either lat & long, query, or ip.
+
+        You must specify one of (latitude AND longitude), query, or ip.
+
+        Args:
+            latitude (float, optional):
+                Latitude around which to search.
+            longitude (float, optional):
+                Longitude around which to search.
+            query (str, optional):
+                Text-based query string to search. For example "Twitter HQ".
+            ip (str, optional):
+                Attempt to geolocate and return nearby places based on IP address.
+            granularity (str, optional):
+                This is the minimal granularity of place types to return and
+                must be one of: "poi", "neighborhood", "city", "admin", or
+                "country". Twitter defaults to "neighborhood" if not passed.
+            accuracy (int or str, optional):
+                A hint on the "region" in which to search. If type is int, then
+                Twitter will interpret this as meters, otherwise, you can pass
+            max_results (int, optional):
+                Hint as to the number of "nearby" results to return.
+                Not guaranteed to return ``max_results``.
+            contained_within (str, optional):
+                ``place_id`` to which to restrict the search results.
+            callback (str, optional):
+                If supplied, the response will use the JSONP format with a
+                callback of the given name.
+
+        Returns:
+            List of dictionaries representing places within or matching the search
+            parameters given. If ``callback`` is passed, returns a namedtuple of
+            the following type:
+                JSONP(callback='xxx', json='yyy', jsonp='zzz')
+            where ``callback`` is the name of the callback provided, ``json`` is
+            the JSON dict returned from Twitter, and ``jsonp`` is the raw JSONP
+            response.
+        """
+        url = "%s/geo/search.json" % self.base_url
+        parameters = {}
+
+        if not all([latitude, longitude]):
+            raise TwitterError("You must provide both latitude and longitude parameters")
+        if not all([latitude, longitude]) or query or ip:
+            raise TwitterError("You must specify one of (latitude AND longitude), query, or ip.")
+
+        if latitude:
+            if not -90 <= latitude <= 90:
+                raise TwitterError('latitude must be between -90 & 90')
+        if longitude:
+            if not -180 <= longitude <= 180:
+                raise TwitterError('longitude must be between -180 & 180')
+
+        if accuracy is not None:
+            parameters['accuracy'] = accuracy
+        if granularity is not None:
+            parameters['granularity'] = str(granularity)
+        if max_results is not None:
+            parameters['max_results'] = enf_type('max_results', int, max_results)
+        if contained_within is not None:
+            parameters['contained_within'] = str(contained_within)
+        if callback is not None:
+            parameters['callback'] = str(callback)
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+
+        if callback is not None:
+            data = parse_jsonp(resp.content.decode('utf-8'))
+            self._ParseAndCheckTwitter(json.dumps(data.json))
+            return data
+        else:
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return data.get('result').get('places')
 
     def GetStreamSample(self, delimited=None, stall_warnings=None):
         """Returns a small sample of public statuses.

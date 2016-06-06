@@ -66,6 +66,14 @@ Bugfixes
   update the user's settings, use
   :py:func:`twitter.api.Api.UpdateAccountSettings`.
 
+* Adds support for ``/geo/reverse_geocode.json`` endpoint via
+  :py:func:`twitter.api.Api.GetReverseGeocode` method. This method can be used
+  to return a list of ``place_id`` dicts.
+
+* Adds support for ``geo/search.json`` endpoint via
+  :py:func:`twitter.api.Api.GetGeoSearch` method. This method accepts
+  a lat/long, query string, IP address and returns a ``place_id`` dict.
+
 
 Version 3.1
 ===========
