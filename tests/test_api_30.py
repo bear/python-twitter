@@ -1770,3 +1770,12 @@ class ApiTest(unittest.TestCase):
         resp = self.api.GetGeoSearch(latitude=37.7821120598956, longitude=-122.400612831116)
 
         self.assertTrue(isinstance(resp, list))
+
+    @responses.activate
+    def testGetGeoPlaceID(self):
+        with open('testdata/get_geo_id_df51dec6f4ee2b2c.json') as f:
+            resp_data = f.read()
+        responses.add(responses.GET, DEFAULT_URL, body=resp_data, status=200)
+        resp = self.api.GetGeoPlaceId(place_id="5122804691e5fecc")
+        self.assertTrue(isinstance(resp, dict))
+        self.assertEqual(resp['id'], 'df51dec6f4ee2b2c')

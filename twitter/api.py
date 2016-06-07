@@ -4690,6 +4690,27 @@ class Api(object):
 
         return data.get('result').get('places')
 
+    def GetGeoPlaceId(self, place_id):
+        """Return information about a given ``place_id``.
+
+        Args:
+            place_id (str):
+                Place about which to return information.
+
+        Returns:
+            json: JSON dict containing information about a given ``place_id``.
+        """
+        url = "%s/geo/id/%s.json" % (self.base_url, place_id)
+
+        if not place_id:
+            raise TwitterError("You must specify a place_id")
+        parameters = {'place_id': place_id}
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return data
+
     def GetStreamSample(self, delimited=None, stall_warnings=None):
         """Returns a small sample of public statuses.
 

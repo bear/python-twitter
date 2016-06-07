@@ -74,6 +74,10 @@ Bugfixes
   :py:func:`twitter.api.Api.GetGeoSearch` method. This method accepts
   a lat/long, query string, IP address and returns a ``place_id`` dict.
 
+* Adds support for ``geo/id/:place_id.json`` endpoint via
+  :py:func:`twitter.api.Api.GetGeoPlaceId` method. This method takes
+  a ``place_id`` and returns all the information Twitter has about that place.
+
 
 Version 3.1
 ===========
