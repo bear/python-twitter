@@ -862,6 +862,12 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(lst.slug, "test")
 
     @responses.activate
+    def testGetListSubscribersPaged(self):
+        with open('testdata/get_list_subscribers_paged.json') as f:
+            resp_data = f.read()
+        pass
+
+    @responses.activate
     def testGetListMembers(self):
         with open('testdata/get_list_members_0.json') as f:
             resp_data = f.read()

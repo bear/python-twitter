@@ -3745,6 +3745,68 @@ class Api(object):
 
         return List.NewFromJsonDict(data)
 
+    def GetListSubscribersPaged(self,
+                                owner_screen_name=False,
+                                owner_id=False,
+                                list_id=None,
+                                slug=None,
+                                count=None,
+                                cursor=-1,
+                                include_entities=True,
+                                skip_status=False):
+        """Returns a page of subscribers to the specified list.
+
+        Args:
+          owner_screen_name (str, optional):
+            The screen_name of the user who owns the list being requested
+            by a slug.
+          owner_id (int, optional):
+            The user ID of the user who owns the list being requested
+            by a slug.
+          list_id (int, optional):
+            The numerical ID of the list.
+          slug (str, optional):
+            You can identify a list by its slug instead of its numerical ID.
+            If you decide to do so, note that you'll also have to specify
+            the list owner using the owner_id or owner_screen_name parameters.
+          count (int, optional):
+            Number of subscribers to return per page. Default is set by Twitter
+            20.
+          cursor (int, optional):
+            ID of the page of subscribers to return. Subscribers are broken into
+            pages of size ``count``.
+          include_entities (bool, optional):
+            If False, the timeline will not contain additional metadata.
+            Defaults to True.
+          skip_status (bool, optional):
+            If True the statuses will not be returned in the user items.
+
+        Returns:
+          twitter.user.User: A twitter.User instance representing the user
+          requested.
+        """
+        url = '%s/lists/subscribers.json' % self.base_url
+        parameters = {
+            'include_entities': enf_type('include_entities', bool, include_entities),
+            'skip_status': enf_type('skip_status', bool, skip_status)
+        }
+
+        parameters.update(self._IDList(list_id=list_id,
+                                       slug=slug,
+                                       owner_id=owner_id,
+                                       owner_screen_name=owner_screen_name))
+
+        if count:
+            parameters['count'] = enf_type('count', int, count)
+        if cursor:
+            parameters['cursor'] = enf_type('cursor', int, cursor)
+
+        resp = self._RequestUrl(url, 'POST', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        users = [User.NewFromJsonDict(user) for user in data.get('users', [])]
+
+        return data.get('next_cursor', 0), data.get('previous_cursor', 0), users
+
     def ShowSubscription(self,
                          owner_screen_name=False,
                          owner_id=False,

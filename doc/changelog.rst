@@ -78,6 +78,10 @@ Bugfixes
   :py:func:`twitter.api.Api.GetGeoPlaceId` method. This method takes
   a ``place_id`` and returns all the information Twitter has about that place.
 
+* Adds support for ``lists/subscribers.json`` endpoint via
+  :py:func:`twitter.api.Api.GetListSubscribersPaged` method. The method will return
+  a page (default: 20) of subscribers to a particular list.
+
 
 Version 3.1
 ===========
