@@ -79,15 +79,14 @@ class RateLimit(object):
         kwargs and maps to the object's dictionary. So for something like:
 
         {"resources": {
-                "help": {
-                    /help/privacy": {
-                        "limit": 15,
-                        "remaining": 15,
-                        "reset": 1452254278
-                    }
+            "help": {
+                /help/privacy": {
+                    "limit": 15,
+                    "remaining": 15,
+                    "reset": 1452254278
                 }
             }
-        }
+        }}
 
         the RateLimit object will have an attribute 'resources' from which you
         can perform a lookup like:

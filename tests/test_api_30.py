@@ -1764,7 +1764,11 @@ class ApiTest(unittest.TestCase):
         responses.add(responses.GET, DEFAULT_URL, body=resp_data, match_querystring=True, status=200)
         resp = self.api.GetReverseGeocode(latitude=37, longitude=-122, callback='test')
 
-        self.assertTrue(isinstance(resp.jsonp, str))
+        # In py27, jsonp will be a unicode string and in py35 it will be a string
+        try:
+            self.assertTrue(isinstance(resp.jsonp, unicode))
+        except NameError:
+            self.assertTrue(isinstance(resp.jsonp, str))
         self.assertEqual(resp.callback, 'test')
         self.assertTrue(isinstance(resp.json, dict))
 
