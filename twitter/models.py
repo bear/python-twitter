@@ -310,6 +310,7 @@ class User(TwitterModel):
             'description': None,
             'favourites_count': None,
             'followers_count': None,
+            'following': None,
             'friends_count': None,
             'geo_enabled': None,
             'id': None,
