@@ -540,7 +540,7 @@ class Api(object):
         Returns:
             A list of users in that category
         """
-        url = '%s/users/suggestions/%s.json' % (self.base_url, category.Slug)
+        url = '%s/users/suggestions/%s.json' % (self.base_url, category.slug)
 
         resp = self._RequestUrl(url, verb='GET')
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
