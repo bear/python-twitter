@@ -1709,3 +1709,25 @@ class ApiTest(unittest.TestCase):
         resp = self.api._UploadMediaChunkedFinalize(media_id=737956420046356480)
         self.assertEqual(len(responses.calls), 1)
         self.assertTrue(resp)
+
+    @responses.activate
+    def testGetUserSuggestionCategories(self):
+        with open('testdata/get_user_suggestion_categories.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/users/suggestions.json',
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetUserSuggestionCategories()
+        self.assertTrue(type(resp[0]) is twitter.Category)
+
+    @responses.activate
+    def testGetUserSuggestion(self):
+        with open('testdata/get_user_suggestion.json') as f:
+            resp_data = f.read()
+        responses.add(responses.GET, DEFAULT_URL, body=resp_data, status=200)
+        category = twitter.Category(name='Funny', slug='funny', size=20)
+        resp = self.api.GetUserSuggestion(category=category)
+        self.assertTrue(type(resp[0]) is twitter.User)
