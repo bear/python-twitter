@@ -97,6 +97,7 @@ class Media(TwitterModel):
             'id': None,
             'media_url': None,
             'media_url_https': None,
+            'sizes': None,
             'type': None,
             'url': None,
         }
