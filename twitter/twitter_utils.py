@@ -228,9 +228,9 @@ def parse_media_file(passed_media):
         data_file.seek(0)
     except:
         pass
-	
+
     media_type = mimetypes.guess_type(os.path.basename(filename))[0]
-    if not media_type is None:
+    if media_type is not None:
         if media_type in img_formats and file_size > 5 * 1048576:
             raise TwitterError({'message': 'Images must be less than 5MB.'})
         elif media_type in video_formats and file_size > 15 * 1048576:

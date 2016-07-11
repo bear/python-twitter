@@ -1130,7 +1130,6 @@ class Api(object):
 
         return (media_id, media_fp, filename)
 
-
     def _UploadMediaChunkedAppend(self,
                                   media_id,
                                   media_fp,
@@ -1228,7 +1227,6 @@ class Api(object):
 
         return data
 
-
     def UploadMediaChunked(self,
                            media,
                            additional_owners=None,
@@ -1268,7 +1266,6 @@ class Api(object):
             return data['media_id']
         except KeyError:
             raise TwitterError('Media could not be uploaded.')
-
 
     def PostMedia(self,
                   status,
@@ -2056,7 +2053,6 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
-
 
     def CreateBlock(self,
                     user_id=None,
