@@ -4759,15 +4759,23 @@ class Api(object):
         """
         try:
             data = json.loads(json_data)
-            self._CheckForTwitterError(data)
-        except ValueError:
-            if "<title>Twitter / Over capacity</title>" in json_data:
-                raise TwitterError({'message': "Capacity Error"})
-            if "<title>Twitter / Error</title>" in json_data:
-                raise TwitterError({'message': "Technical Error"})
-            if "Exceeded connection limit for user" in json_data:
-                raise TwitterError({'message': "Exceeded connection limit for user"})
-            raise TwitterError({'message': "json decoding"})
+            try:
+                self._CheckForTwitterError(data)
+
+            except ValueError:
+                if "<title>Twitter / Over capacity</title>" in json_data:
+                    raise TwitterError({'message': "Capacity Error"})
+                if "<title>Twitter / Error</title>" in json_data:
+                    raise TwitterError({'message': "Technical Error"})
+                if "Exceeded connection limit for user" in json_data:
+                    raise TwitterError({'message': "Exceeded connection limit for user"})
+                if "Error 401 Unauthorized" in json_data:
+                    raise TwitterError({'message': "Unauthorized"})
+                raise TwitterError({'message': "Unknown error, try addeding "})
+
+        except:
+            if "Error 401 Unauthorized" in json_data:
+                raise TwitterError({'message': "Unauthorized"})
 
         return data
 
