@@ -4776,7 +4776,6 @@ class Api(object):
         except:
             if "Error 401 Unauthorized" in json_data:
                 raise TwitterError({'message': "Unauthorized"})
-            raise TwitterError({'message': "json decoding"})
 
         return data
 
