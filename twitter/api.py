@@ -4753,6 +4753,7 @@ class Api(object):
         This is a purely defensive check because during some Twitter
         network outages it will return an HTML failwhale page.
         """
+        data = None
         try:
             data = json.loads(json_data)
             try:
