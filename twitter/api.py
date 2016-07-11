@@ -4823,7 +4823,7 @@ class Api(object):
 
             if limit.remaining == 0:
                 try:
-                    time.sleep(int(limit.reset - time.time()))
+                    time.sleep(max(int(limit.reset - time.time()), 0))
                 except ValueError:
                     pass
 
