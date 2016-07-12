@@ -186,7 +186,7 @@ class Api(object):
         self._InitializeUserAgent()
         self._InitializeDefaultParameters()
 
-        self.rate_limit = None
+        self.rate_limit = RateLimit()
         self.sleep_on_rate_limit = sleep_on_rate_limit
 
         if base_url is None:
@@ -4673,7 +4673,7 @@ class Api(object):
             namedtuple: EndpointRateLimit namedtuple.
 
         """
-        if not self.rate_limit:
+        if not self.rate_limit.__dict__.get('resources', None):
             self.InitializeRateLimit()
 
         if url:
@@ -4853,7 +4853,7 @@ class Api(object):
         else:
             resp = 0  # if not a POST or GET request
 
-        if url and self.sleep_on_rate_limit and self.rate_limit:
+        if url and self.rate_limit:
             limit = resp.headers.get('x-rate-limit-limit', 0)
             remaining = resp.headers.get('x-rate-limit-remaining', 0)
             reset = resp.headers.get('x-rate-limit-reset', 0)
