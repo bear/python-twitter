@@ -18,9 +18,9 @@ dev: env
 	pip install -r requirements.testing.txt
 
 info:
-	python --version
-	pyenv --version
-	pip --version
+	@python --version
+	@pyenv --version
+	@pip --version
 
 clean:
 	rm -fr build
@@ -42,6 +42,9 @@ coverage: clean
 	coverage run --source=twitter setup.py test --addopts "--ignore=venv"
 	coverage html
 	coverage report
+
+ci: info coverage
+	CODECOV_TOKEN=`cat .codecov-token` codecov
 
 build: clean
 	python setup.py check
