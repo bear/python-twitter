@@ -24,6 +24,10 @@ By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
      :target: https://requires.io/github/bear/python-twitter/requirements/?branch=master
      :alt: Requirements Status
 
+.. image:: https://dependencyci.com/github/bear/python-twitter/badge
+     :target: https://dependencyci.com/github/bear/python-twitter
+     :alt: Dependency Status
+
 ============
 Introduction
 ============
