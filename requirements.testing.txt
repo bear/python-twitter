@@ -3,14 +3,14 @@ requests
 requests_oauthlib
 responses
 
-pytest>=2.9.1
-pytest-cov>=2.2.1
-pytest-runner>=2.8
-mccabe>=0.4.0
-flake8>=2.5.2
-mock>=2.00
-six>=1.10.0
-coverage>=4.1
-coveralls>=1.1
-codecov>=1.6.3
-check-manifest>=0.31
+pytest
+pytest-cov
+pytest-runner
+mccabe
+flake8
+mock
+six
+coverage
+coveralls
+codecov
+check-manifest
