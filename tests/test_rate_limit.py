@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+import time
 import re
 import sys
 import unittest
@@ -9,7 +10,11 @@ import twitter
 import responses
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
-DEF_URL_RE = re.compile(r'https?://.*\.twitter.com/1\.1/.*')
+DEFAULT_URL = re.compile(r'https?://.*\.twitter.com/1\.1/.*')
+
+HEADERS = {'x-rate-limit-limit': '63',
+           'x-rate-limit-remaining': '63',
+           'x-rate-limit-reset': '626672700'}
 
 
 class ErrNull(object):
@@ -60,7 +65,7 @@ class RateLimitTests(unittest.TestCase):
         self.assertTrue(self.api.rate_limit)
         self.assertTrue(self.api.sleep_on_rate_limit)
 
-        responses.add(responses.GET, url=DEF_URL_RE, body=b'{}', status=200)
+        responses.add(responses.GET, url=DEFAULT_URL, body=b'{}', status=200)
         try:
             self.api.GetStatus(status_id=1234)
             self.api.GetUser(screen_name='test')
@@ -112,7 +117,6 @@ class RateLimitMethodsTests(unittest.TestCase):
         self.api.InitializeRateLimit()
         self.assertTrue(self.api.rate_limit)
 
-
     def tearDown(self):
         sys.stderr = self._stderr
         pass
@@ -124,12 +128,15 @@ class RateLimitMethodsTests(unittest.TestCase):
         self.assertEqual(lim.reset, 1452254278)
 
     def testNonStandardEndpointRateLimit(self):
-        lim = self.api.rate_limit.get_limit('https://api.twitter.com/1.1/geo/id/312.json?skip_status=True')
+        lim = self.api.rate_limit.get_limit(
+            'https://api.twitter.com/1.1/geo/id/312.json?skip_status=True')
         self.assertEqual(lim.limit, 47)
 
-        lim = self.api.rate_limit.get_limit('https://api.twitter.com/1.1/saved_searches/destroy/312.json')
+        lim = self.api.rate_limit.get_limit(
+            'https://api.twitter.com/1.1/saved_searches/destroy/312.json')
         self.assertEqual(lim.limit, 15)
-        lim = self.api.rate_limit.get_limit('https://api.twitter.com/1.1/statuses/retweets/312.json?skip_status=True')
+        lim = self.api.rate_limit.get_limit(
+            'https://api.twitter.com/1.1/statuses/retweets/312.json?skip_status=True')
         self.assertEqual(lim.limit, 23)
 
     def testSetRateLimit(self):
@@ -157,3 +164,67 @@ class RateLimitMethodsTests(unittest.TestCase):
         limit = self.api.rate_limit.get_limit(
             url='https://api.twitter.com/1.1/not/a/real/endpoint.json')
         self.assertEqual(limit.remaining, 14)
+
+    @responses.activate
+    def testLimitsViaHeadersNoSleep(self):
+        api = twitter.Api(
+            consumer_key='test',
+            consumer_secret='test',
+            access_token_key='test',
+            access_token_secret='test',
+            sleep_on_rate_limit=False)
+
+        # Get initial rate limit data to populate api.rate_limit object
+        with open('testdata/ratelimit.json') as f:
+            resp_data = f.read()
+        url = '%s/application/rate_limit_status.json' % self.api.base_url
+        responses.add(responses.GET, url, body=resp_data, match_querystring=True)
+
+        # Add a test URL just to have headers present
+        responses.add(
+            method=responses.GET, url=DEFAULT_URL, body='{}', adding_headers=HEADERS)
+        resp = api.GetSearch(term='test')
+        self.assertTrue(api.rate_limit.__dict__)
+        self.assertEqual(api.rate_limit.get_limit('/search/tweets').limit, 63)
+        self.assertEqual(api.rate_limit.get_limit('/search/tweets').remaining, 63)
+        self.assertEqual(api.rate_limit.get_limit('/search/tweets').reset, 626672700)
+
+        # No other resource families should be set during above operation.
+        test_url = '/lists/subscribers/show.json'
+        self.assertEqual(
+            api.rate_limit.__dict__.get('resources').get(test_url), None
+        )
+
+        # But if we check them, it should go to default 15/15
+        self.assertEqual(api.rate_limit.get_limit(test_url).remaining, 15)
+        self.assertEqual(api.rate_limit.get_limit(test_url).limit, 15)
+
+    @responses.activate
+    def testLimitsViaHeadersWithSleep(self):
+        api = twitter.Api(
+            consumer_key='test',
+            consumer_secret='test',
+            access_token_key='test',
+            access_token_secret='test',
+            sleep_on_rate_limit=True)
+
+        # Add handler for ratelimit check
+        url = '%s/application/rate_limit_status.json' % api.base_url
+        responses.add(
+            method=responses.GET, url=url, body='{}', match_querystring=True)
+
+        # Get initial rate limit data to populate api.rate_limit object
+        url = "{0}/search/tweets.json?result_type=mixed&q=test&count=15".format(
+            api.base_url)
+        responses.add(
+            method=responses.GET,
+            url=url,
+            body='{}',
+            match_querystring=True,
+            adding_headers=HEADERS)
+
+        resp = api.GetSearch(term='test')
+        self.assertTrue(api.rate_limit)
+        self.assertEqual(api.rate_limit.get_limit('/search/tweets').limit, 63)
+        self.assertEqual(api.rate_limit.get_limit('/search/tweets').remaining, 63)
+        self.assertEqual(api.rate_limit.get_limit('/search/tweets').reset, 626672700)

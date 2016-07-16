@@ -146,6 +146,12 @@ class RateLimit(object):
         """
         endpoint = self.url_to_resource(url)
         resource_family = endpoint.split('/')[1]
+
+        # This is a conversative check against a situation in which a user has
+        # set api.sleep_on_rate_limit to True, but hasn't made a call
+        if not self.__dict__.get('resources', None):
+            self.__dict__['resources'] = {}
+
         self.__dict__['resources'].update(
             {resource_family: {
                 endpoint: {
