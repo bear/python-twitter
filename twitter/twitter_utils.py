@@ -200,7 +200,7 @@ def parse_media_file(passed_media):
                    'image/gif',
                    'image/bmp',
                    'image/webp']
-    video_formats = ['video/mp4,
+    video_formats = ['video/mp4',
                      'video/quicktime']
 
     # If passed_media is a string, check if it points to a URL, otherwise,
