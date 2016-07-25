@@ -1455,7 +1455,7 @@ class ApiTest(unittest.TestCase):
     @responses.activate
     def testGetStatusWithExtAltText(self):
         with open('testdata/get_status_ext_alt.json') as f:
-            resp_data = f.read() 
+            resp_data = f.read()
         responses.add(responses.GET, DEFAULT_URL, body=resp_data, status=200)
         resp = self.api.GetStatus(status_id=724441953534877696)
         self.assertEqual(resp.media[0].ext_alt_text, "\u201cJon Snow is dead.\u2026\u201d from \u201cGAME OF THRONES SEASON 6 EPISODES\u201d by HBO PR.")
@@ -1731,3 +1731,13 @@ class ApiTest(unittest.TestCase):
         category = twitter.Category(name='Funny', slug='funny', size=20)
         resp = self.api.GetUserSuggestion(category=category)
         self.assertTrue(type(resp[0]) is twitter.User)
+
+    @responses.activate
+    def testDestroyRetweet(self):
+        with open('testdata/post_statuses_unretweet_id.json') as f:
+            resp_data = f.read()
+        responses.add(responses.POST, DEFAULT_URL, body=resp_data, status=True)
+        resp = self.api.DestroyRetweet(status_id=735890565523509248)
+
+        self.assertTrue(isinstance(resp, twitter.Status))
+        self.assertEqual(resp.id, 735890565523509248)
