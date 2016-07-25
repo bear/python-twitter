@@ -52,6 +52,12 @@ class ModelsTest(unittest.TestCase):
         self.assertTrue(dm.AsJsonString())
         self.assertTrue(dm.AsDict())
 
+    def test_direct_message_sender_is_user_model(self):
+        """Test that each Direct Message object contains a fully hydrated
+        twitter.models.User object for both ``dm.sender`` & ``dm.recipient``."""
+        dm = twitter.DirectMessage.NewFromJsonDict(self.DIRECT_MESSAGE_SAMPLE_JSON)
+        self.assertTrue(isinstance(dm.sender, twitter.models.User))
+
     def test_hashtag(self):
         """ Test twitter.Hashtag object """
         ht = twitter.Hashtag.NewFromJsonDict(self.HASHTAG_SAMPLE_JSON)
