@@ -174,6 +174,7 @@ class DirectMessage(TwitterModel):
         self.param_defaults = {
             'created_at': None,
             'id': None,
+            'recipient': None,
             'recipient_id': None,
             'recipient_screen_name': None,
             'sender': None,
@@ -186,6 +187,8 @@ class DirectMessage(TwitterModel):
             setattr(self, param, kwargs.get(param, default))
         if 'sender' in kwargs:
             self.sender = User.NewFromJsonDict(kwargs.get('sender', None))
+        if 'recipient' in kwargs:
+            self.recipient = User.NewFromJsonDict(kwargs.get('recipient', None))
 
     def __repr__(self):
         if self.text and len(self.text) > 140:
