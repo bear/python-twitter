@@ -220,6 +220,10 @@ class Trend(TwitterModel):
             self.timestamp,
             self.url)
 
+    @property
+    def volume(self):
+        return self.tweet_volume
+
 
 class Hashtag(TwitterModel):
 
