@@ -208,7 +208,7 @@ class Trend(TwitterModel):
             'query': None,
             'timestamp': None,
             'url': None,
-            'volume': None,
+            'tweet_volume': None,
         }
 
         for (param, default) in self.param_defaults.items():
