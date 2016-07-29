@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+Version 3.2
+===========
+
+What's Changed
+--------------
+
+* :py:func:`twitter.models.Trend`'s `volume` attribute has been renamed `tweet_volume` in line with Twitter's naming convention. This change should allow users to access the number of tweets being tweeted for a given Trend.
+
 Version 3.1
 ==========
 

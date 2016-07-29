@@ -208,7 +208,7 @@ class Trend(TwitterModel):
             'query': None,
             'timestamp': None,
             'url': None,
-            'volume': None,
+            'tweet_volume': None,
         }
 
         for (param, default) in self.param_defaults.items():
@@ -219,6 +219,10 @@ class Trend(TwitterModel):
             self.name,
             self.timestamp,
             self.url)
+
+    @property
+    def volume(self):
+        return self.tweet_volume
 
 
 class Hashtag(TwitterModel):
