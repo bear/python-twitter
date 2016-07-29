@@ -117,6 +117,7 @@ class ModelsTest(unittest.TestCase):
         self.assertTrue(trend.AsJsonString())
         self.assertTrue(trend.AsDict())
         self.assertEqual(trend.tweet_volume, 104403)
+        self.assertEqual(trend.volume, trend.tweet_volume)
 
     def test_url(self):
         url = twitter.Url.NewFromJsonDict(self.URL_SAMPLE_JSON)
