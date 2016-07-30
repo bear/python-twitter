@@ -249,12 +249,7 @@ class ApiTest(unittest.TestCase):
     def testGetUserTimeline(self):
         with open('testdata/get_user_timeline.json') as f:
             resp_data = f.read()
-        responses.add(
-            responses.GET,
-            'https://api.twitter.com/1.1/statuses/user_timeline.json?user_id=673483',
-            body=resp_data,
-            match_querystring=True,
-            status=200)
+        responses.add(responses.GET, DEFAULT_URL, body=resp_data, status=200)
         resp = self.api.GetUserTimeline(user_id=673483)
         self.assertTrue(type(resp[0]) is twitter.Status)
         self.assertTrue(type(resp[0].user) is twitter.User)
@@ -275,25 +270,29 @@ class ApiTest(unittest.TestCase):
         with open('testdata/get_retweets.json') as f:
             resp_data = f.read()
         responses.add(
-            responses.GET,
-            'https://api.twitter.com/1.1/statuses/retweets/397.json',
-            body=resp_data,
-            match_querystring=True,
-            status=200)
+            responses.GET, DEFAULT_URL, body=resp_data, status=200)
         resp = self.api.GetRetweets(statusid=397)
         self.assertTrue(type(resp[0]) is twitter.Status)
         self.assertTrue(type(resp[0].user) is twitter.User)
 
     @responses.activate
-    def testGetRetweeters(self):
-        with open('testdata/get_retweeters.json') as f:
+    def testGetRetweetsCount(self):
+        with open('testdata/get_retweets_count.json') as f:
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/statuses/retweeters/ids.json?id=397',
+            DEFAULT_URL,
             body=resp_data,
             match_querystring=True,
             status=200)
+        resp = self.api.GetRetweets(statusid=312, count=63)
+        self.assertTrue(len(resp), 63)
+
+    @responses.activate
+    def testGetRetweeters(self):
+        with open('testdata/get_retweeters.json') as f:
+            resp_data = f.read()
+        responses.add(responses.GET, DEFAULT_URL, body=resp_data, status=200)
         resp = self.api.GetRetweeters(status_id=397)
         self.assertTrue(type(resp) is list)
         self.assertTrue(type(resp[0]) is int)
@@ -1469,7 +1468,7 @@ class ApiTest(unittest.TestCase):
     @responses.activate
     def testGetStatusWithExtAltText(self):
         with open('testdata/get_status_ext_alt.json') as f:
-            resp_data = f.read() 
+            resp_data = f.read()
         responses.add(responses.GET, DEFAULT_URL, body=resp_data, status=200)
         resp = self.api.GetStatus(status_id=724441953534877696)
         self.assertEqual(resp.media[0].ext_alt_text, "\u201cJon Snow is dead.\u2026\u201d from \u201cGAME OF THRONES SEASON 6 EPISODES\u201d by HBO PR.")
@@ -1479,12 +1478,7 @@ class ApiTest(unittest.TestCase):
     def testGetStatus(self):
         with open('testdata/get_status.json') as f:
             resp_data = f.read()
-        responses.add(
-            responses.GET,
-            'https://api.twitter.com/1.1/statuses/show.json?include_entities=True&include_my_retweet=True&include_ext_alt_text=True&id=397',
-            body=resp_data,
-            match_querystring=True,
-            status=200)
+        responses.add(responses.GET, DEFAULT_URL, body=resp_data, status=200)
         resp = self.api.GetStatus(status_id=397)
 
         self.assertTrue(type(resp) is twitter.Status)
@@ -1500,12 +1494,7 @@ class ApiTest(unittest.TestCase):
     def testGetStatusExtraParams(self):
         with open('testdata/get_status_extra_params.json') as f:
             resp_data = f.read()
-        responses.add(
-            responses.GET,
-            'https://api.twitter.com/1.1/statuses/show.json?include_ext_alt_text=True&id=397&include_my_retweet=True&trim_user=True',
-            body=resp_data,
-            match_querystring=True,
-            status=200)
+        responses.add(responses.GET, DEFAULT_URL, body=resp_data, status=200)
         resp = self.api.GetStatus(status_id=397, trim_user=True, include_entities=False)
         self.assertFalse(resp.user.screen_name)
 
@@ -1745,3 +1734,65 @@ class ApiTest(unittest.TestCase):
         category = twitter.Category(name='Funny', slug='funny', size=20)
         resp = self.api.GetUserSuggestion(category=category)
         self.assertTrue(type(resp[0]) is twitter.User)
+
+    @responses.activate
+    def testGetUserTimeSinceMax(self):
+        with open('testdata/get_user_timeline_sincemax.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            DEFAULT_URL,
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetUserTimeline(user_id=12, since_id=757782013914951680, max_id=758097930670645248)
+        self.assertEqual(len(resp), 6)
+
+    @responses.activate
+    def testGetUserTimelineCount(self):
+        with open('testdata/get_user_timeline_count.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            DEFAULT_URL,
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.GetUserTimeline(user_id=12, count=63)
+        self.assertEqual(len(resp), 63)
+
+    @responses.activate
+    def testDestroyStatus(self):
+        with open('testdata/post_destroy_status.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            DEFAULT_URL,
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.DestroyStatus(status_id=746507834003578880)
+        self.assertTrue(isinstance(resp, twitter.models.Status))
+        self.assertEqual(resp.id, 746507834003578880)
+
+    @responses.activate
+    def testCreateFavorite(self):
+        with open('testdata/post_create_favorite.json') as f:
+            resp_data = f.read()
+        responses.add(responses.POST, DEFAULT_URL, body=resp_data, status=200)
+        resp = self.api.CreateFavorite(status_id=757283981683412992)
+        self.assertEqual(resp.id, 757283981683412992)
+        status = twitter.models.Status(id=757283981683412992)
+        resp = self.api.CreateFavorite(status)
+        self.assertEqual(resp.id, 757283981683412992)
+
+    @responses.activate
+    def testDestroyFavorite(self):
+        with open('testdata/post_destroy_favorite.json') as f:
+            resp_data = f.read()
+        responses.add(responses.POST, DEFAULT_URL, body=resp_data, status=200)
+        resp = self.api.DestroyFavorite(status_id=757283981683412992)
+        self.assertEqual(resp.id, 757283981683412992)
+        status = twitter.models.Status(id=757283981683412992)
+        resp = self.api.DestroyFavorite(status)
+        self.assertEqual(resp.id, 757283981683412992)

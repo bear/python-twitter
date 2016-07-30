@@ -650,78 +650,66 @@ class Api(object):
                         max_id=None,
                         count=None,
                         include_rts=True,
-                        trim_user=None,
-                        exclude_replies=None):
+                        trim_user=False,
+                        exclude_replies=False):
         """Fetch the sequence of public Status messages for a single user.
 
         The twitter.Api instance must be authenticated if the user is private.
 
         Args:
-          user_id:
+          user_id (int, optional):
             Specifies the ID of the user for whom to return the
             user_timeline. Helpful for disambiguating when a valid user ID
-            is also a valid screen name. [Optional]
-          screen_name:
+            is also a valid screen name.
+          screen_name (str, optional):
             Specifies the screen name of the user for whom to return the
             user_timeline. Helpful for disambiguating when a valid screen
-            name is also a user ID. [Optional]
-          since_id:
+            name is also a user ID.
+          since_id (int, optional):
             Returns results with an ID greater than (that is, more recent
             than) the specified ID. There are limits to the number of
             Tweets which can be accessed through the API. If the limit of
             Tweets has occurred since the since_id, the since_id will be
-            forced to the oldest ID available. [Optional]
-          max_id:
+            forced to the oldest ID available.
+          max_id (int, optional):
             Returns only statuses with an ID less than (that is, older
-            than) or equal to the specified ID. [Optional]
-          count:
+            than) or equal to the specified ID.
+          count (int, optional):
             Specifies the number of statuses to retrieve. May not be
-            greater than 200. [Optional]
-          include_rts:
+            greater than 200.
+          include_rts (bool, optional):
             If True, the timeline will contain native retweets (if they
-            exist) in addition to the standard stream of tweets. [Optional]
-          trim_user:
+            exist) in addition to the standard stream of tweets.
+          trim_user (bool, optional):
             If True, statuses will only contain the numerical user ID only.
             Otherwise a full user object will be returned for each status.
-            [Optional]
-          exclude_replies:
+          exclude_replies (bool, optional)
             If True, this will prevent replies from appearing in the returned
             timeline. Using exclude_replies with the count parameter will mean you
             will receive up-to count tweets - this is because the count parameter
             retrieves that many tweets before filtering out retweets and replies.
-            This parameter is only supported for JSON and XML responses. [Optional]
+            This parameter is only supported for JSON and XML responses.
 
         Returns:
           A sequence of Status instances, one for each message up to count
         """
-        parameters = {}
         url = '%s/statuses/user_timeline.json' % (self.base_url)
+        parameters = {}
 
         if user_id:
-            parameters['user_id'] = user_id
+            parameters['user_id'] = enf_type('user_id', int, user_id)
         elif screen_name:
             parameters['screen_name'] = screen_name
         if since_id:
-            try:
-                parameters['since_id'] = int(since_id)
-            except ValueError:
-                raise TwitterError({'message': "since_id must be an integer"})
+            parameters['since_id'] = enf_type('since_id', int, since_id)
         if max_id:
-            try:
-                parameters['max_id'] = int(max_id)
-            except ValueError:
-                raise TwitterError({'message': "max_id must be an integer"})
+            parameters['max_id'] = enf_type('max_id', int, max_id)
         if count:
-            try:
-                parameters['count'] = int(count)
-            except ValueError:
-                raise TwitterError({'message': "count must be an integer"})
-        if not include_rts:
-            parameters['include_rts'] = 0
-        if trim_user:
-            parameters['trim_user'] = 1
-        if exclude_replies:
-            parameters['exclude_replies'] = 1
+            parameters['count'] = enf_type('count', int, count)
+
+        parameters['include_rts'] = enf_type('include_rts', bool, include_rts)
+        parameters['trim_user'] = enf_type('trim_user', bool, trim_user)
+        parameters['exclude_replies'] = enf_type('exclude_replies', bool, exclude_replies)
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -758,21 +746,13 @@ class Api(object):
         """
         url = '%s/statuses/show.json' % (self.base_url)
 
-        parameters = {}
-
-        try:
-            parameters['id'] = int(status_id)
-        except ValueError:
-            raise TwitterError({'message': "'status_id' must be an integer."})
-
-        if trim_user:
-            parameters['trim_user'] = True
-        if include_my_retweet:
-            parameters['include_my_retweet'] = True
-        if include_entities:
-            parameters['include_entities'] = True
-        if include_ext_alt_text:
-            parameters['include_ext_alt_text'] = True
+        parameters = {
+            'id': enf_type('status_id', int, status_id),
+            'trim_user': enf_type('trim_user', bool, trim_user),
+            'include_my_retweet': enf_type('include_my_retweet', bool, include_my_retweet),
+            'include_entities': enf_type('include_entities', bool, include_entities),
+            'include_ext_alt_text': enf_type('include_ext_alt_text', bool, include_ext_alt_text)
+        }
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -868,19 +848,21 @@ class Api(object):
         status.
 
         Args:
-          status_id:
+          status_id (int):
             The numerical ID of the status you're trying to destroy.
+          trim_user (bool, optional):
+            When set to True, each tweet returned in a timeline will include
+            a user object including only the status authors numerical ID.
 
         Returns:
           A twitter.Status instance representing the destroyed status message
         """
-        try:
-            post_data = {'id': int(status_id)}
-        except ValueError:
-            raise TwitterError({'message': "status_id must be an integer"})
         url = '%s/statuses/destroy/%s.json' % (self.base_url, status_id)
-        if trim_user:
-            post_data['trim_user'] = 1
+
+        post_data = {
+            'id': enf_type('status_id', int, status_id),
+            'trim_user': enf_type('trim_user', bool, trim_user)
+        }
 
         resp = self._RequestUrl(url, 'POST', data=post_data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -1606,27 +1588,24 @@ class Api(object):
         by statusid
 
         Args:
-          statusid:
+          statusid (int):
             The ID of the tweet for which retweets should be searched for
-          count:
-            The number of status messages to retrieve. [Optional]
-          trim_user:
+          count (int, optional):
+            The number of status messages to retrieve.
+          trim_user (bool, optional):
             If True the returned payload will only contain the user IDs,
             otherwise the payload will contain the full user data item.
-            [Optional]
 
         Returns:
           A list of twitter.Status instances, which are retweets of statusid
         """
         url = '%s/statuses/retweets/%s.json' % (self.base_url, statusid)
-        parameters = {}
-        if trim_user:
-            parameters['trim_user'] = 'true'
+        parameters = {
+            'trim_user': enf_type('trim_user', bool, trim_user),
+        }
+
         if count:
-            try:
-                parameters['count'] = int(count)
-            except ValueError:
-                raise TwitterError({'message': "count must be an integer"})
+            parameters['count'] = enf_type('count', int, count)
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -1636,7 +1615,8 @@ class Api(object):
     def GetRetweeters(self,
                       status_id,
                       cursor=None,
-                      stringify_ids=None):
+                      count=100,
+                      stringify_ids=False):
         """Returns a collection of up to 100 user IDs belonging to users who have
         retweeted the tweet specified by the status_id parameter.
 
@@ -1652,10 +1632,11 @@ class Api(object):
           A list of user IDs
         """
         url = '%s/statuses/retweeters/ids.json' % (self.base_url)
-        parameters = {}
-        parameters['id'] = status_id
-        if stringify_ids:
-            parameters['stringify_ids'] = 'true'
+        parameters = {
+            'status_id': enf_type('status_id', int, status_id),
+            'stringify_ids': enf_type('stringify_ids', bool, stringify_ids)
+        }
+
         result = []
 
         total_count = 0
@@ -3316,12 +3297,12 @@ class Api(object):
         Returns the favorite status when successful.
 
         Args:
-          status_id:
-            The id of the twitter status to mark as a favorite. [Optional]
-          status:
-            The twitter.Status object to mark as a favorite. [Optional]
-          include_entities:
-            The entities node will be omitted when set to False. [Optional]
+          status_id (int, optional):
+            The id of the twitter status to mark as a favorite.
+          status (twitter.Status, optional):
+            The twitter.Status object to mark as a favorite.
+          include_entities (bool, optional):
+            The entities node will be omitted when set to False.
 
         Returns:
           A twitter.Status instance representing the newly-marked favorite.
@@ -3334,8 +3315,7 @@ class Api(object):
             data['id'] = status.id
         else:
             raise TwitterError({'message': "Specify status_id or status"})
-        if not include_entities:
-            data['include_entities'] = 'false'
+        data['include_entities'] = enf_type('include_entities', bool, include_entities)
 
         resp = self._RequestUrl(url, 'POST', data=data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -3351,26 +3331,26 @@ class Api(object):
         Returns the un-favorited status when successful.
 
         Args:
-          status_id:
-            The id of the twitter status to unmark as a favorite. [Optional]
-          status:
-            The twitter.Status object to unmark as a favorite. [Optional]
-          include_entities:
-            The entities node will be omitted when set to False. [Optional]
+          status_id (int, optional):
+            The id of the twitter status to mark as a favorite.
+          status (twitter.Status, optional):
+            The twitter.Status object to mark as a favorite.
+          include_entities (bool, optional):
+            The entities node will be omitted when set to False.
 
         Returns:
           A twitter.Status instance representing the newly-unmarked favorite.
         """
         url = '%s/favorites/destroy.json' % self.base_url
         data = {}
+
         if status_id:
             data['id'] = status_id
         elif status:
             data['id'] = status.id
         else:
             raise TwitterError({'message': "Specify status_id or status"})
-        if not include_entities:
-            data['include_entities'] = 'false'
+        data['include_entities'] = enf_type('include_entities', bool, include_entities)
 
         resp = self._RequestUrl(url, 'POST', data=data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -3389,28 +3369,28 @@ class Api(object):
         Returns up to 200 most recent tweets for the authenticated user.
 
         Args:
-          user_id:
+          user_id (int, optional):
             Specifies the ID of the user for whom to return the
             favorites. Helpful for disambiguating when a valid user ID
-            is also a valid screen name. [Optional]
-          screen_name:
+            is also a valid screen name.
+          screen_name (str, optional):
             Specifies the screen name of the user for whom to return the
             favorites. Helpful for disambiguating when a valid screen
-            name is also a user ID. [Optional]
-          since_id:
+            name is also a user ID.
+          since_id (int, optional):
             Returns results with an ID greater than (that is, more recent
             than) the specified ID. There are limits to the number of
             Tweets which can be accessed through the API. If the limit of
             Tweets has occurred since the since_id, the since_id will be
-            forced to the oldest ID available. [Optional]
-          max_id:
+            forced to the oldest ID available.
+          max_id (int, optional):
             Returns only statuses with an ID less than (that is, older
-            than) or equal to the specified ID. [Optional]
-          count:
+            than) or equal to the specified ID.
+          count (int, optional):
             Specifies the number of statuses to retrieve. May not be
-            greater than 200. [Optional]
-          include_entities:
-            The entities node will be omitted when set to False. [Optional]
+            greater than 200.
+          include_entities (bool, optional):
+            The entities node will be omitted when set to False.
 
         Returns:
           A sequence of Status instances, one for each favorited tweet up to count
@@ -3418,26 +3398,16 @@ class Api(object):
         parameters = {}
         url = '%s/favorites/list.json' % self.base_url
         if user_id:
-            parameters['user_id'] = user_id
+            parameters['user_id'] = enf_type('user_id', int, user_id)
         elif screen_name:
             parameters['screen_name'] = screen_name
         if since_id:
-            try:
-                parameters['since_id'] = int(since_id)
-            except ValueError:
-                raise TwitterError({'message': "since_id must be an integer"})
+            parameters['since_id'] = enf_type('since_id', int, since_id)
         if max_id:
-            try:
-                parameters['max_id'] = int(max_id)
-            except ValueError:
-                raise TwitterError({'message': "max_id must be an integer"})
+            parameters['max_id'] = enf_type('max_id', int, max_id)
         if count:
-            try:
-                parameters['count'] = int(count)
-            except ValueError:
-                raise TwitterError({'message': "count must be an integer"})
-        if include_entities:
-            parameters['include_entities'] = True
+            parameters['count'] = enf_type('count', int, count)
+        parameters['include_entities'] = enf_type('include_entities', bool, include_entities)
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -3487,20 +3457,11 @@ class Api(object):
         parameters = {}
 
         if count:
-            try:
-                parameters['count'] = int(count)
-            except ValueError:
-                raise TwitterError({'message': "count must be an integer"})
+            parameters['count'] = enf_type('count', int, count)
         if since_id:
-            try:
-                parameters['since_id'] = int(since_id)
-            except ValueError:
-                raise TwitterError({'message': "since_id must be an integer"})
+            parameters['since_id'] = enf_type('since_id', int, since_id)
         if max_id:
-            try:
-                parameters['max_id'] = int(max_id)
-            except ValueError:
-                raise TwitterError({'message': "max_id must be an integer"})
+            parameters['max_id'] = enf_type('max_id', int, max_id)
         if trim_user:
             parameters['trim_user'] = 1
         if contributor_details:
