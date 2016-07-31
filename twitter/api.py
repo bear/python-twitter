@@ -4584,7 +4584,7 @@ class Api(object):
             # TODO: not sure why but the twitter API needs string true, not a 1
             data['include_email'] = 'true'
         resp = self._RequestUrl(url, 'GET', data)  # No_cache
-        data = self._ParseAndCheckTwitter(resp.content)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
