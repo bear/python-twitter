@@ -1,0 +1,16 @@
+future
+requests
+requests_oauthlib
+responses
+
+pytest
+pytest-cov
+pytest-runner
+mccabe
+flake8
+mock
+six
+coverage
+coveralls
+codecov
+check-manifest

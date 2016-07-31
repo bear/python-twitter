@@ -20,7 +20,8 @@ class _FileCache(object):
     def Get(self, key):
         path = self._GetPath(key)
         if os.path.exists(path):
-            return open(path).read()
+            with open(path) as f:
+                return f.read()
         else:
             return None
 
@@ -65,7 +66,7 @@ class _FileCache(object):
                    os.getenv('USERNAME') or \
                    os.getlogin() or \
                    'nobody'
-        except (AttributeError, IOError, OSError), e:
+        except (AttributeError, IOError, OSError):
             return 'nobody'
 
     def _GetTmpCachePath(self):
@@ -79,7 +80,7 @@ class _FileCache(object):
         root_directory = os.path.abspath(root_directory)
         try:
             os.mkdir(root_directory)
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.EEXIST and os.path.isdir(root_directory):
                 # directory already exists
                 pass
@@ -90,7 +91,7 @@ class _FileCache(object):
 
     def _GetPath(self, key):
         try:
-            hashed_key = md5(key).hexdigest()
+            hashed_key = md5(key.encode('utf-8')).hexdigest()
         except TypeError:
             hashed_key = md5.new(key).hexdigest()
 
@@ -102,11 +103,11 @@ class _FileCache(object):
         return os.path.sep.join(hashed_key[0:_FileCache.DEPTH])
 
 
-class ParseTweet:
+class ParseTweet(object):
     # compile once on import
     regexp = {"RT": "^RT", "MT": r"^MT", "ALNUM": r"(@[a-zA-Z0-9_]+)",
               "HASHTAG": r"(#[\w\d]+)", "URL": r"([http://]?[a-zA-Z\d\/]+[\.]+[a-zA-Z\d\/\.]+)"}
-    regexp = dict((key, re.compile(value)) for key, value in regexp.items())
+    regexp = dict((key, re.compile(value)) for key, value in list(regexp.items()))
 
     def __init__(self, timeline_owner, tweet):
         """ timeline_owner : twitter handle of user account. tweet - 140 chars from feed; object does all computation on construction
@@ -131,17 +132,18 @@ class ParseTweet:
     def __str__(self):
         """ for display method """
         return "owner %s, urls: %d, hashtags %d, user_handles %d, len_tweet %d, RT = %s, MT = %s" % (
-        self.Owner, len(self.URLs), len(self.Hashtags), len(self.UserHandles), len(self.tweet), self.RT, self.MT)
+                self.Owner, len(self.URLs), len(self.Hashtags), len(self.UserHandles),
+                len(self.tweet), self.RT, self.MT)
 
     @staticmethod
     def getAttributeRT(tweet):
         """ see if tweet is a RT """
-        return re.search(ParseTweet.regexp["RT"], tweet.strip()) != None
+        return re.search(ParseTweet.regexp["RT"], tweet.strip()) is not None
 
     @staticmethod
     def getAttributeMT(tweet):
         """ see if tweet is a MT """
-        return re.search(ParseTweet.regexp["MT"], tweet.strip()) != None
+        return re.search(ParseTweet.regexp["MT"], tweet.strip()) is not None
 
     @staticmethod
     def getUserHandles(tweet):
