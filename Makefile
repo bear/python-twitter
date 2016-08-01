@@ -40,7 +40,7 @@ test: lint
 	python setup.py test
 
 tox: clean
-	export PYENV_VERSION="2.7.11:3.5.1:pypy-5.0.0" && tox
+	tox
 
 coverage: clean
 	coverage run --source=twitter setup.py test --addopts "--ignore=venv"
