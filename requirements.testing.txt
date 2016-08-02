@@ -16,3 +16,4 @@ codecov
 check-manifest
 tox
 tox-pyenv
+pycodestyle
