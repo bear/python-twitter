@@ -8,14 +8,15 @@ help:
 	@echo "  test        run tests"
 	@echo "  coverage    run tests with code coverage"
 
-tox:
-	export PYENV_VERSION="2.7.11:3.5.1:pypy-5.0.0" && tox
-
 env:
-	pip install -r requirements.txt
+	pip install -Ur requirements.txt
 
 dev: env
-	pip install -r requirements.testing.txt
+	pip install -Ur requirements.testing.txt
+	pyenv install -s 2.7.11
+	pyenv install -s 3.5.2
+	pyenv install -s pypy-5.3
+	pyenv local 2.7.11 3.5.2 pypy-5.3
 
 info:
 	@python --version
@@ -35,15 +36,18 @@ docs:
 lint:
 	flake8 twitter > violations.flake8.txt
 
-test:
+test: lint
 	python setup.py test
+
+tox: clean
+	tox
 
 coverage: clean
 	coverage run --source=twitter setup.py test --addopts "--ignore=venv"
 	coverage html
 	coverage report
 
-ci: info coverage
+ci: tox coverage
 	CODECOV_TOKEN=`cat .codecov-token` codecov
 
 build: clean

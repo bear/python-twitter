@@ -61,7 +61,10 @@ To install dependencies, run either::
 
 or::
 
-    $ pip install -r requirements.testing.txt
+    $ pip install -Ur requirements.testing.txt
+    $ pip install -Ur requirerments.txt
+
+Note that ```make dev``` will install into your local ```pyenv``` all of the versions needed for test runs using ```tox```.
 
 To install the minimal dependencies for production use (i.e., what is installed
 with ``pip install python-twitter``) run::
@@ -70,14 +73,16 @@ with ``pip install python-twitter``) run::
 
 or::
 
-    $ pip install -r requirements.txt
+    $ pip install -Ur requirements.txt
 
 =============
 Running Tests
 =============
+The test suite can be run against a single Python version or against a range of them depending on which Makefile target you select.
+
 Note that tests require ```pip install pytest``` and optionally ```pip install pytest-cov``` (these are included if you have installed dependencies from ```requirements.testing.txt```)
 
-To run the unit tests::
+To run the unit tests with a single Python version::
 
     $ make test
 
@@ -85,6 +90,9 @@ to also run code coverage::
 
     $ make coverage
 
+To run the unit tests against a set of Python versions::
+
+    $ make tox
 
 =============
 Documentation

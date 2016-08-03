@@ -14,3 +14,6 @@ coverage
 coveralls
 codecov
 check-manifest
+tox
+tox-pyenv
+pycodestyle
