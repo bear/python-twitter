@@ -1,4 +1,10 @@
 
+ifeq ($(shell uname -m),x86_64)
+PYPY53 = pypy-5.3-src
+else
+PYPY53 = pypy-5.3
+endif
+
 help:
 	@echo "  env         install all production dependencies"
 	@echo "  dev         install all dev and production dependencies (virtualenv is assumed)"
@@ -15,8 +21,8 @@ dev: env
 	pip install -Ur requirements.testing.txt
 	pyenv install -s 2.7.11
 	pyenv install -s 3.5.2
-	pyenv install -s pypy-5.3
-	pyenv local 2.7.11 3.5.2 pypy-5.3
+	pyenv install -s $(PYPY53)
+	pyenv local 2.7.11 3.5.2 $(PYPY53)
 
 info:
 	@python --version
