@@ -313,6 +313,7 @@ class User(TwitterModel):
             'default_profile': None,
             'default_profile_image': None,
             'description': None,
+            'email': None,
             'favourites_count': None,
             'followers_count': None,
             'following': None,
