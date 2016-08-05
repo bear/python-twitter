@@ -1,8 +1,10 @@
 
 ifeq ($(shell uname -m),x86_64)
+ifeq ($(shell uname -s),Linux)
 PYPY53 = pypy-5.3-src
 else
 PYPY53 = pypy-5.3
+endif
 endif
 
 help:
