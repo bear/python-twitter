@@ -3004,9 +3004,10 @@ class Api(object):
           A twitter.DirectMessage instance representing the message destroyed
         """
         url = '%s/direct_messages/destroy.json' % self.base_url
-        data = {'id': message_id}
-        if not include_entities:
-            data['include_entities'] = 'false'
+        data = {
+            'id': enf_type('message_id', int, message_id),
+            'include_entities': enf_type('include_entities', bool, include_entities)
+        }
 
         resp = self._RequestUrl(url, 'POST', data=data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -3119,13 +3120,13 @@ class Api(object):
         url = '%s/friendships/show.json' % self.base_url
         data = {}
         if source_user_id:
-            data['source_user_id'] = source_user_id
+            data['source_id'] = source_user_id
         elif source_screen_name:
             data['source_screen_name'] = source_screen_name
         else:
             raise TwitterError({'message': "Specify at least one of source_user_id or source_screen_name."})
         if target_user_id:
-            data['target_user_id'] = target_user_id
+            data['target_id'] = target_user_id
         elif target_screen_name:
             data['target_screen_name'] = target_screen_name
         else:

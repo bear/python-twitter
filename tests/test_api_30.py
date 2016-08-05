@@ -1796,3 +1796,61 @@ class ApiTest(unittest.TestCase):
         status = twitter.models.Status(id=757283981683412992)
         resp = self.api.DestroyFavorite(status)
         self.assertEqual(resp.id, 757283981683412992)
+
+    @responses.activate
+    def testPostDirectMessage(self):
+        with open('testdata/post_post_direct_message.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            DEFAULT_URL,
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.PostDirectMessage(text="test message", user_id=372018022)
+        self.assertEqual(resp.text, "test message")
+
+        resp = self.api.PostDirectMessage(text="test message", screen_name="__jcbl__")
+        self.assertEqual(resp.sender_id, 4012966701)
+        self.assertEqual(resp.recipient_id, 372018022)
+
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.PostDirectMessage(text="test message"))
+
+    @responses.activate
+    def testDestroyDirectMessage(self):
+        with open('testdata/post_destroy_direct_message.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.POST,
+            DEFAULT_URL,
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.DestroyDirectMessage(message_id=761517675243679747)
+
+    @responses.activate
+    def testShowFriendship(self):
+        with open('testdata/get_show_friendship.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            DEFAULT_URL,
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.ShowFriendship(source_user_id=4012966701, target_user_id=372018022)
+        self.assertTrue(resp['relationship']['target'].get('following', None))
+
+        resp = self.api.ShowFriendship(source_screen_name='notinourselves', target_screen_name='__jcbl__')
+
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.ShowFriendship(source_screen_name='notinourselves')
+        )
+
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.ShowFriendship(target_screen_name='__jcbl__')
+        )
