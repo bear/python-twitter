@@ -864,6 +864,20 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(resp.name, 'notinourselves')
 
     @responses.activate
+    def testVerifyCredentialsIncludeEmail(self):
+        with open('testdata/get_verify_credentials_include_email.json') as f:
+            resp_data = f.read()
+        responses.add(
+            responses.GET,
+            DEFAULT_URL,
+            body=resp_data,
+            match_querystring=True,
+            status=200)
+        resp = self.api.VerifyCredentials(skip_status=True, include_email=True)
+        self.assertTrue(isinstance(resp, twitter.User))
+        self.assertEqual(resp.email, 'test@example.com')
+
+    @responses.activate
     def testUpdateBanner(self):
         responses.add(
             responses.POST,

@@ -4558,32 +4558,33 @@ class Api(object):
 
     def VerifyCredentials(self, include_entities=None, skip_status=None, include_email=None):
         """Returns a twitter.User instance if the authenticating user is valid.
-        
+
         Args:
           include_entities:
             Specifies whether to return additional @replies in the stream.
           skip_status:
-            When set to either true, t or 1 statuses will not be included in the returned user object.
+            When set to either true, t or 1 statuses will not be included in the
+            returned user object.
           include_email:
             Use of this parameter requires whitelisting.
-            When set to true email will be returned in the user objects as a string. If the user does 
-            not have an email address on their account, or if the email address is un-verified, 
-            null will be returned.
+            When set to true email will be returned in the user objects as a string.
+            If the user does not have an email address on their account, or if the
+            email address is un-verified, null will be returned. If your app is
+            not whitelisted, then the 'email' key will not be present in the json
+            response.
 
         Returns:
           A twitter.User instance representing that user if the
           credentials are valid, None otherwise.
         """
         url = '%s/account/verify_credentials.json' % self.base_url
-        data = {}
-        if include_entities:
-            data['include_entities'] = 1
-        if skip_status:
-            data['skip_status'] = 1
-        if include_email:
-            # TODO: not sure why but the twitter API needs string true, not a 1
-            data['include_email'] = 'true'
-        resp = self._RequestUrl(url, 'GET', data)  # No_cache
+        data = {
+            'include_entities': enf_type('include_entities', bool, include_entities),
+            'skip_status': enf_type('skip_status', bool, skip_status),
+            'include_email': enf_type('include_email', bool, include_email)
+        }
+
+        resp = self._RequestUrl(url, 'GET', data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
