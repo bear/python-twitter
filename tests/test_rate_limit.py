@@ -169,6 +169,16 @@ class RateLimitMethodsTests(unittest.TestCase):
             url='https://api.twitter.com/1.1/not/a/real/endpoint.json')
         self.assertEqual(limit.remaining, 14)
 
+    def testSetUnknownRateLimit(self):
+        self.api.rate_limit.set_unknown_limit(
+            url='https://api.twitter.com/1.1/not/a/real/endpoint.json',
+            limit=15,
+            remaining=14,
+            reset=100)
+        limit = self.api.rate_limit.get_limit(
+            url='https://api.twitter.com/1.1/not/a/real/endpoint.json')
+        self.assertEqual(limit.remaining, 14)
+
     @responses.activate
     def testLimitsViaHeadersNoSleep(self):
         api = twitter.Api(

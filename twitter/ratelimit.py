@@ -121,6 +121,9 @@ class RateLimit(object):
         else:
             return resource
 
+    def set_unknown_limit(self, url, limit, remaining, reset):
+        return self.set_limit(url, limit, remaining, reset)
+
     def set_limit(self, url, limit, remaining, reset):
         """ If a resource family is unknown, add it to the object's
         dictionary. This is to deal with new endpoints being added to
