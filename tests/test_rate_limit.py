@@ -141,6 +141,8 @@ class RateLimitMethodsTests(unittest.TestCase):
 
     def testSetRateLimit(self):
         previous_limit = self.api.rate_limit.get_limit('/lists/members')
+        self.assertEqual(previous_limit.remaining, 180)
+
         self.api.rate_limit.set_limit(
             url='https://api.twitter.com/1.1/lists/members.json?skip_status=True',
             limit=previous_limit.limit,
@@ -148,6 +150,8 @@ class RateLimitMethodsTests(unittest.TestCase):
             reset=previous_limit.reset)
         new_limit = self.api.rate_limit.get_limit('/lists/members')
         self.assertEqual(new_limit.remaining, previous_limit.remaining - 1)
+        self.assertEqual(new_limit.limit, previous_limit.limit)
+        self.assertEqual(new_limit.reset, previous_limit.reset)
 
     def testFamilyNotFound(self):
         limit = self.api.rate_limit.get_limit('/tests/test')
@@ -157,6 +161,16 @@ class RateLimitMethodsTests(unittest.TestCase):
 
     def testSetUnknownRateLimit(self):
         self.api.rate_limit.set_limit(
+            url='https://api.twitter.com/1.1/not/a/real/endpoint.json',
+            limit=15,
+            remaining=14,
+            reset=100)
+        limit = self.api.rate_limit.get_limit(
+            url='https://api.twitter.com/1.1/not/a/real/endpoint.json')
+        self.assertEqual(limit.remaining, 14)
+
+    def testSetUnknownRateLimit(self):
+        self.api.rate_limit.set_unknown_limit(
             url='https://api.twitter.com/1.1/not/a/real/endpoint.json',
             limit=15,
             remaining=14,
