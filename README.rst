@@ -62,7 +62,7 @@ To install dependencies, run either::
 or::
 
     $ pip install -Ur requirements.testing.txt
-    $ pip install -Ur requirerments.txt
+    $ pip install -Ur requirements.txt
 
 Note that ```make dev``` will install into your local ```pyenv``` all of the versions needed for test runs using ```tox```.
 
