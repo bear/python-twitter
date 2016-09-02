@@ -26,6 +26,9 @@ import time
 import base64
 import re
 import requests
+import requests_toolbelt.adapters.appengine
+# App Engine Requests adapter. This makes sure that Requests uses URLFetch.
+requests_toolbelt.adapters.appengine.monkeypatch()
 from requests_oauthlib import OAuth1
 import io
 import warnings
@@ -4596,6 +4599,7 @@ class Api(object):
           cache:
             An instance that supports the same API as the twitter._FileCache
         """
+        cache = None # App Engine does not like this caching strategy, disable caching.
         if cache == DEFAULT_CACHE:
             self._cache = _FileCache()
         else:
