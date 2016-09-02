@@ -49,3 +49,7 @@ When using twitter-python on App Engine, caching is disabled. You'll have to add
 Datastore
 ^^^^^^^^^
 If you plan to store tweets or other information returned by the API in Datastore, you'll probably want to make your own NDP models to store the desired components of the response rather than shoving the whole response into an entity.
+
+Sockets
+^^^^^^^^^
+When urllib3 is imported on App Engine it will throw a warning about sockets: ``AppEnginePlatformWarning: urllib3 is using URLFetch on Google App Engine sandbox...`` This is just a warning that you'd have to use the Sockets API if you intend to use the sockets feature of the library, which we don't use in python-twitter so it can be ignored.
