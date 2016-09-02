@@ -26,11 +26,11 @@ import time
 import base64
 import re
 import requests
-import requests_toolbelt.adapters.appengine
 from requests_oauthlib import OAuth1
 import io
 import warnings
 from uuid import uuid4
+import os
 
 try:
     # python 3
@@ -54,8 +54,6 @@ from twitter.twitter_utils import (
     parse_media_file,
     enf_type)
 
-# App Engine Requests adapter. This makes sure that Requests uses URLFetch.
-requests_toolbelt.adapters.appengine.monkeypatch()
 
 warnings.simplefilter('always', DeprecationWarning)
 
@@ -177,6 +175,14 @@ class Api(object):
             Set timeout (in seconds) of the http/https requests. If None the
             requests lib default will be used.  Defaults to None. [Optional]
         """
+
+        # check to see if the library is running on a Google App Engine instance
+        # see GAE.rst for more information
+        if 'Google App Engine' in os.environ['SERVER_SOFTWARE']:
+            import requests_toolbelt.adapters.appengine  # Adapter ensures requests use app engine's urlfetch
+            requests_toolbelt.adapters.appengine.monkeypatch()
+            cache = None  # App Engine does not like this caching strategy, disable caching
+
         self.SetCache(cache)
         self._cache_timeout = Api.DEFAULT_CACHE_TIMEOUT
         self._input_encoding = input_encoding
@@ -4600,8 +4606,6 @@ class Api(object):
           cache:
             An instance that supports the same API as the twitter._FileCache
         """
-        # App Engine does not like this caching strategy, disable caching.
-        cache = None
         if cache == DEFAULT_CACHE:
             self._cache = _FileCache()
         else:
