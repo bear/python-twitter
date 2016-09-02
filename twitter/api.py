@@ -27,8 +27,6 @@ import base64
 import re
 import requests
 import requests_toolbelt.adapters.appengine
-# App Engine Requests adapter. This makes sure that Requests uses URLFetch.
-requests_toolbelt.adapters.appengine.monkeypatch()
 from requests_oauthlib import OAuth1
 import io
 import warnings
@@ -55,6 +53,9 @@ from twitter.twitter_utils import (
     is_url,
     parse_media_file,
     enf_type)
+
+# App Engine Requests adapter. This makes sure that Requests uses URLFetch.
+requests_toolbelt.adapters.appengine.monkeypatch()
 
 warnings.simplefilter('always', DeprecationWarning)
 
@@ -4599,7 +4600,8 @@ class Api(object):
           cache:
             An instance that supports the same API as the twitter._FileCache
         """
-        cache = None # App Engine does not like this caching strategy, disable caching.
+        # App Engine does not like this caching strategy, disable caching.
+        cache = None
         if cache == DEFAULT_CACHE:
             self._cache = _FileCache()
         else:
