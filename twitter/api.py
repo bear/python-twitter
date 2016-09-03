@@ -178,10 +178,11 @@ class Api(object):
 
         # check to see if the library is running on a Google App Engine instance
         # see GAE.rst for more information
-        if os.environ and 'Google App Engine' in os.environ.get('SERVER_SOFTWARE', False):
-            import requests_toolbelt.adapters.appengine  # Adapter ensures requests use app engine's urlfetch
-            requests_toolbelt.adapters.appengine.monkeypatch()
-            cache = None  # App Engine does not like this caching strategy, disable caching
+        if os.environ:
+			if 'Google App Engine' in os.environ.get('SERVER_SOFTWARE', None):
+				import requests_toolbelt.adapters.appengine  # Adapter ensures requests use app engine's urlfetch
+				requests_toolbelt.adapters.appengine.monkeypatch()
+				cache = None  # App Engine does not like this caching strategy, disable caching
 
         self.SetCache(cache)
         self._cache_timeout = Api.DEFAULT_CACHE_TIMEOUT
