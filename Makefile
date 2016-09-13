@@ -48,7 +48,13 @@ coverage: clean
 	coverage html
 	coverage report
 
-ci: dev
+ci:
+	pyenv install -s 2.7.11
+	pyenv install -s 3.5.1
+	pyenv install -s pypy-5.3
+	pyenv install -s pypy3-2.4.0
+	pyenv local 2.7.11 3.5.2 pypy-5.3 pypy3-2.4.0
+	pip install -Ur requirements.testing.txt
 	tox
 	CODECOV_TOKEN=`cat .codecov-token` codecov
 
