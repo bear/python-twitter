@@ -1,12 +1,4 @@
 
-ifeq ($(shell uname -m),x86_64)
-ifeq ($(shell uname -s),Linux)
-PYPY53 = pypy-5.3-src
-else
-PYPY53 = pypy-5.3
-endif
-endif
-
 help:
 	@echo "  env         install all production dependencies"
 	@echo "  dev         install all dev and production dependencies (virtualenv is assumed)"
@@ -20,11 +12,12 @@ env:
 	pip install -Ur requirements.txt
 
 dev: env
-	pip install -Ur requirements.testing.txt
 	pyenv install -s 2.7.11
 	pyenv install -s 3.5.2
-	pyenv install -s $(PYPY53)
-	pyenv local 2.7.11 3.5.2 $(PYPY53)
+	pyenv install -s pypy-5.4
+	pyenv install -s pypy3-2.4.0
+	pyenv local 2.7.11 3.5.2 pypy-5.4 pypy3-2.4.0
+	pip install -Ur requirements.testing.txt
 
 info:
 	@python --version
@@ -55,7 +48,8 @@ coverage: clean
 	coverage html
 	coverage report
 
-ci: tox coverage
+ci: dev
+	tox
 	CODECOV_TOKEN=`cat .codecov-token` codecov
 
 build: clean
