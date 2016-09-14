@@ -4,10 +4,41 @@ Changelog
 Version 3.2
 ===========
 
+What's New
+----------
+
+* :py:class:`twitter.models.User` now contains a ``following`` attribute, which describes whether the authenticated user is following the User. `PR #351 <https://github.com/bear/python-twitter/pull/351>`_
+
+* :py:class:`twitter.models.DirectMessage` now contains a full :py:class:`twitter.models.User` object for both the ``DirectMessage.sender`` and ``DirectMessage.recipient`` properties. `PR #384 <https://github.com/bear/python-twitter/pull/384>`_.
+
+* You can now upload Quicktime movies (``*.mov``). `PR #372 <https://github.com/bear/python-twitter/pull/372>`_.
+
+* If you have a whitelisted app, you can now get the authenticated user's email address through a call to :py:func:`twitter.api.Api.VerifyCredentials()`. If your app isn't whitelisted, no error is returned. `PR #376 <https://github.com/bear/python-twitter/pull/376>`_.
+
+* **Google App Engine support has been reintegrated into the library!** Check out `PR #383 <https://github.com/bear/python-twitter/pull/383>`_.
+
 What's Changed
 --------------
 
-* :py:func:`twitter.models.Trend`'s `volume` attribute has been renamed `tweet_volume` in line with Twitter's naming convention. This change should allow users to access the number of tweets being tweeted for a given Trend.
+* :py:class:`twitter.models.Trend`'s `volume` attribute has been renamed `tweet_volume` in line with Twitter's naming convention. This change should allow users to access the number of tweets being tweeted for a given Trend. `PR #375 <https://github.com/bear/python-twitter/pull/375>`_
+
+* :py:class:`twitter.ratelimit.RateLimit` should behave better now and adds a 1-second padding to requests after sleeping.
+
+* :py:class:`twitter.ratelimit.RateLimit` now keeps track of your rate limit status even if you don't have ``sleep_on_rate_limit`` set to ``True`` when instatiating the API. If you want to add different behavior on hitting a rate limit, you should be able to now by querying the rate limit object. See `PR #370 <https://github.com/bear/python-twitter/pull/370>`_ for the technical details of the change. There should be no difference in behavior for the defaults, but let us know.
+
+
+Bugfixes
+--------
+
+* :py:class:`twitter.models.Media` again contains a ``sizes`` attribute, which was missed back in the Version 3.0 release. `PR #360 <https://github.com/bear/python-twitter/pull/360>`_
+
+* The previously bloated :py:func:`twitter.api.Api.UploadMediaChunked()` function has been broken out into three related functions and fixes two an incompatibility with python 2.7. Behavior remains the same, but this should simplify matters. `PR #347 <https://github.com/bear/python-twitter/pull/347>`_
+
+* Fix for :py:func:`twitter.api.Api.PostUpdate()` where a passing an integer to the ``media`` parameter would cause an iteration error to occur. `PR #347 <https://github.com/bear/python-twitter/pull/347>`_
+
+* Fix for 401 errors that were occuring in the Streaming Endpoints. `PR #364 <https://github.com/bear/python-twitter/pull/364>`_
+
+
 
 Version 3.1
 ==========
