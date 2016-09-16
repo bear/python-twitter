@@ -20,6 +20,7 @@
 from __future__ import division
 from __future__ import print_function
 
+import json
 import sys
 import gzip
 import time
@@ -43,8 +44,17 @@ except ImportError:
     from urllib import urlencode
     from urllib import __version__ as urllib_version
 
-from twitter import (__version__, _FileCache, json, DirectMessage, List,
-                     Status, Trend, TwitterError, User, UserStatus, Category)
+from twitter import (
+    __version__,
+    _FileCache,
+    Category,
+    DirectMessage,
+    List,
+    Status,
+    Trend,
+    User,
+    UserStatus,
+)
 
 from twitter.ratelimit import RateLimit
 
@@ -53,6 +63,11 @@ from twitter.twitter_utils import (
     is_url,
     parse_media_file,
     enf_type)
+
+from twitter.error import (
+    TwitterError,
+    PythonTwitterDeprecationWarning330,
+)
 
 
 warnings.simplefilter('always', DeprecationWarning)
@@ -1299,7 +1314,7 @@ class Api(object):
             "PostUpdate() instead. Details of Twitter's deprecation can be "
             "found at: "
             "dev.twitter.com/rest/reference/post/statuses/update_with_media"),
-            DeprecationWarning)
+            PythonTwitterDeprecationWarning330)
 
         url = '%s/statuses/update_with_media.json' % self.base_url
 
@@ -1366,7 +1381,7 @@ class Api(object):
         warnings.warn((
             "This method is deprecated. Please use PostUpdate instead, "
             "passing a list of media that you would like to associate "
-            "with the updated."), DeprecationWarning, stacklevel=2)
+            "with the update."), PythonTwitterDeprecationWarning330)
         if type(media) is not list:
             raise TwitterError("Must by multiple media elements")
 
@@ -2614,7 +2629,7 @@ class Api(object):
             warnings.warn(
                 "Use of 'cursor' and 'count' parameters are deprecated as of "
                 "python-twitter 3.0. Please use GetFriendsPaged instead.",
-                DeprecationWarning, stacklevel=2)
+                PythonTwitterDeprecationWarning330)
 
         count = 200
         cursor = -1
@@ -4320,6 +4335,10 @@ class Api(object):
                               include_entities=False,
                               skip_status=False):
 
+        warnings.warn((
+            "This method has been deprecated by Twitter as of July 2015 and "
+            "will be removed in future versions of python-twitter."
+            ), PythonTwitterDeprecationWarning330)
         url = '%s/account/update_profile_background_image.json' % (self.base_url)
         with open(image, 'rb') as image_file:
             encoded_image = base64.b64encode(image_file.read())
