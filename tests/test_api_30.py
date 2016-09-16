@@ -1854,3 +1854,10 @@ class ApiTest(unittest.TestCase):
             twitter.TwitterError,
             lambda: self.api.ShowFriendship(target_screen_name='__jcbl__')
         )
+    @responses.activate
+    def test_UpdateBackgroundImage_deprecation(self):
+        responses.add(responses.POST, DEFAULT_URL, body='{}', status=200)
+        warnings.simplefilter("always")
+        with warnings.catch_warnings(record=True) as w:
+            resp = self.api.UpdateBackgroundImage(image='testdata/168NQ.jpg')
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
