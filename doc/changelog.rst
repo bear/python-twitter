@@ -4,18 +4,37 @@ Changelog
 Version 3.2
 ===========
 
+Deprecations
+------------
+
+Nothing is being deprecationed this version, however here's what's being deprecated as of v. 3.3.0:
+
+* :py:func:`twitter.api.Api.UpdateBackgroundImage`. Please make sure that your code does not call this function as it will be returning a hard error. There is no replace function. This was deprecated by Twitter around July 2015.
+
+* :py:func:`twitter.api.Api.PostMedia` will be removed. Please use :py:func:`twitter.api.Api.PostUpdate` instead.
+
+* :py:func:`twitter.api.Api.PostMultipleMedia`. Please use :py:func:`twitter.api.Api.PostUpdate` instead.
+
+* :py:func:`twitter.api.GetFriends` will no longer accept a `cursor` or `count` parameter. Please use :py:func:`twitter.api.GetFriendsPaged` instead.
+
+* :py:func:`twitter.api.GetFollowers` will no longer accept a `cursor` or `count` parameter. Please use :py:func:`twitter.api.GetFollowersPaged` instead.
+
+
 What's New
 ----------
 
+* We've added new deprecation warnings, so it's easier to track when things go away. All of python-twitter's deprecation warnings will be a subclass of :py:class:`twitter.error.PythonTwitterDeprecationWarning` and will have a version number associated with them such as :py:class:`twitter.error.PythonTwitterDeprecationWarning330`.
+
+
 * :py:class:`twitter.models.User` now contains a ``following`` attribute, which describes whether the authenticated user is following the User. `PR #351 <https://github.com/bear/python-twitter/pull/351>`_
 
-* :py:class:`twitter.models.DirectMessage` now contains a full :py:class:`twitter.models.User` object for both the ``DirectMessage.sender`` and ``DirectMessage.recipient`` properties. `PR #384 <https://github.com/bear/python-twitter/pull/384>`_.
+* :py:class:`twitter.models.DirectMessage` contains a full :py:class:`twitter.models.User` object for both the ``DirectMessage.sender`` and ``DirectMessage.recipient`` properties. `PR #384 <https://github.com/bear/python-twitter/pull/384>`_.
 
 * You can now upload Quicktime movies (``*.mov``). `PR #372 <https://github.com/bear/python-twitter/pull/372>`_.
 
 * If you have a whitelisted app, you can now get the authenticated user's email address through a call to :py:func:`twitter.api.Api.VerifyCredentials()`. If your app isn't whitelisted, no error is returned. `PR #376 <https://github.com/bear/python-twitter/pull/376>`_.
 
-* **Google App Engine support has been reintegrated into the library!** Check out `PR #383 <https://github.com/bear/python-twitter/pull/383>`_.
+* Google App Engine support has been reintegrated into the library. Check out `PR #383 <https://github.com/bear/python-twitter/pull/383>`_.
 
 What's Changed
 --------------

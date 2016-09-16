@@ -10,6 +10,11 @@ API
     :undoc-members:
     :show-inheritance:
 
+.. automodule:: twitter.error
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Models
 ---------------------
 
