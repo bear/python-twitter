@@ -2628,7 +2628,8 @@ class Api(object):
         if cursor is not None or count is not None:
             warnings.warn(
                 "Use of 'cursor' and 'count' parameters are deprecated as of "
-                "python-twitter 3.0. Please use GetFriendsPaged instead.",
+                "python-twitter 3.0. Please use GetFriendsPaged or "
+                "GetFollowersPaged instead.",
                 PythonTwitterDeprecationWarning330)
 
         count = 200
@@ -4337,8 +4338,8 @@ class Api(object):
 
         warnings.warn((
             "This method has been deprecated by Twitter as of July 2015 and "
-            "will be removed in future versions of python-twitter."
-            ), PythonTwitterDeprecationWarning330)
+            "will be removed in future versions of python-twitter."),
+            PythonTwitterDeprecationWarning330)
         url = '%s/account/update_profile_background_image.json' % (self.base_url)
         with open(image, 'rb') as image_file:
             encoded_image = base64.b64encode(image_file.read())
