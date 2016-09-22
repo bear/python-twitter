@@ -1185,7 +1185,7 @@ class Api(object):
                 b'',
                 str(segment_id).encode('utf-8'),
                 boundary,
-                'Content-Disposition: form-data; name="media"; filename="{0}"'.format(filename).encode('utf8'),
+                'Content-Disposition: form-data; name="media"; filename="{0!r}"'.format(filename).encode('utf8'),
                 b'Content-Type: application/octet-stream',
                 b'',
                 data,

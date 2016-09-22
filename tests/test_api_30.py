@@ -1703,6 +1703,18 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(resp)
 
     @responses.activate
+    def testPostUploadMediaChunkedAppendNonASCIIFilename(self):
+        media_fp, filename, _, _ = twitter.twitter_utils.parse_media_file(
+            'testdata/corgi.gif')
+        filename = "عَرَبِيّ"
+        responses.add(responses.POST, DEFAULT_URL, body='', status=200)
+
+        resp = self.api._UploadMediaChunkedAppend(media_id=737956420046356480,
+                                                  media_fp=media_fp,
+                                                  filename=filename)
+        self.assertEqual(len(responses.calls), 7)
+
+    @responses.activate
     def testPostUploadMediaChunkedFinalize(self):
         with open('testdata/post_upload_chunked_FINAL.json') as f:
             resp_data = f.read()
