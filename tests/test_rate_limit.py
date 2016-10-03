@@ -8,6 +8,7 @@ import warnings
 
 import twitter
 import responses
+from responses import GET, POST
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 DEFAULT_URL = re.compile(r'https?://.*\.twitter.com/1\.1/.*')
@@ -48,14 +49,8 @@ class RateLimitTests(unittest.TestCase):
     def testInitializeRateLimit(self):
         with open('testdata/ratelimit.json') as f:
             resp_data = f.read()
+        responses.add(GET, DEFAULT_URL, body=resp_data)
 
-        url = '%s/application/rate_limit_status.json' % self.api.base_url
-        responses.add(
-            responses.GET,
-            url,
-            body=resp_data,
-            match_querystring=True,
-            status=200)
         self.api.InitializeRateLimit()
         self.assertTrue(self.api.rate_limit)
 
@@ -76,13 +71,8 @@ class RateLimitTests(unittest.TestCase):
     def testCheckRateLimit(self):
         with open('testdata/ratelimit.json') as f:
             resp_data = f.read()
-        url = '%s/application/rate_limit_status.json' % self.api.base_url
-        responses.add(
-            responses.GET,
-            url,
-            body=resp_data,
-            match_querystring=True,
-            status=200)
+        responses.add(GET, DEFAULT_URL, body=resp_data)
+
         rt = self.api.CheckRateLimit('https://api.twitter.com/1.1/help/privacy.json')
         self.assertEqual(rt.limit, 15)
         self.assertEqual(rt.remaining, 15)
@@ -228,8 +218,7 @@ class RateLimitMethodsTests(unittest.TestCase):
             method=responses.GET, url=url, body='{}', match_querystring=True)
 
         # Get initial rate limit data to populate api.rate_limit object
-        url = "{0}/search/tweets.json?result_type=mixed&q=test&count=15".format(
-            api.base_url)
+        url = "https://api.twitter.com/1.1/search/tweets.json?tweet_mode=compatibility&q=test&count=15&result_type=mixed"
         responses.add(
             method=responses.GET,
             url=url,
