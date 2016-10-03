@@ -1064,7 +1064,7 @@ class Api(object):
         url = '%s/media/upload.json' % self.upload_url
         parameters = {}
 
-        media_fp, filename, file_size, media_type = parse_media_file(media)
+        media_fp, _, _, _ = parse_media_file(media)
 
         parameters['media'] = media_fp.read()
 
@@ -3263,7 +3263,6 @@ class Api(object):
                     parameters['count'] = int(cursor)
                 except ValueError:
                     raise TwitterError({'message': "cursor must be an integer"})
-                    break
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [x for x in data['ids']]
@@ -3308,7 +3307,6 @@ class Api(object):
                     parameters['count'] = int(cursor)
                 except ValueError:
                     raise TwitterError({'message': "cursor must be an integer"})
-                    break
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [x for x in data['ids']]
@@ -4786,27 +4784,19 @@ class Api(object):
         This is a purely defensive check because during some Twitter
         network outages it will return an HTML failwhale page.
         """
-        data = None
         try:
             data = json.loads(json_data)
-            try:
-                self._CheckForTwitterError(data)
-
-            except ValueError:
-                if "<title>Twitter / Over capacity</title>" in json_data:
-                    raise TwitterError({'message': "Capacity Error"})
-                if "<title>Twitter / Error</title>" in json_data:
-                    raise TwitterError({'message': "Technical Error"})
-                if "Exceeded connection limit for user" in json_data:
-                    raise TwitterError({'message': "Exceeded connection limit for user"})
-                if "Error 401 Unauthorized" in json_data:
-                    raise TwitterError({'message': "Unauthorized"})
-                raise TwitterError({'message': "Unknown error, try addeding "})
-
-        except:
+        except ValueError:
+            if "<title>Twitter / Over capacity</title>" in json_data:
+                raise TwitterError({'message': "Capacity Error"})
+            if "<title>Twitter / Error</title>" in json_data:
+                raise TwitterError({'message': "Technical Error"})
+            if "Exceeded connection limit for user" in json_data:
+                raise TwitterError({'message': "Exceeded connection limit for user"})
             if "Error 401 Unauthorized" in json_data:
                 raise TwitterError({'message': "Unauthorized"})
-
+            raise TwitterError({'Unknown error: {0}'.format(json_data)})
+        self._CheckForTwitterError(data)
         return data
 
     def _CheckForTwitterError(self, data):
