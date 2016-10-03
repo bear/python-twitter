@@ -218,7 +218,7 @@ class RateLimitMethodsTests(unittest.TestCase):
             method=responses.GET, url=url, body='{}', match_querystring=True)
 
         # Get initial rate limit data to populate api.rate_limit object
-        url = "https://api.twitter.com/1.1/search/tweets.json?tweet_mode=compatibility&q=test&count=15&result_type=mixed"
+        url = "https://api.twitter.com/1.1/search/tweets.json?tweet_mode=compat&q=test&count=15&result_type=mixed"
         responses.add(
             method=responses.GET,
             url=url,
