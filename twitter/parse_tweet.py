@@ -51,7 +51,7 @@ class ParseTweet(object):
         self.Emoticon = ParseTweet.getAttributeEmoticon(tweet)
 
         # additional intelligence
-        if ( self.RT and len(self.UserHandles) > 0 ):  # change the owner of tweet?
+        if (self.RT and len(self.UserHandles) > 0):  # change the owner of tweet?
             self.Owner = self.UserHandles[0]
         return
 
@@ -66,10 +66,10 @@ class ParseTweet(object):
         emoji = list()
         for tok in re.split(ParseTweet.regexp["SPACES"], tweet.strip()):
             if tok in Emoticons.POSITIVE:
-                emoji.append( tok )
+                emoji.append(tok)
                 continue
             if tok in Emoticons.NEGATIVE:
-                emoji.append( tok )
+                emoji.append(tok)
         return emoji
 
     @staticmethod

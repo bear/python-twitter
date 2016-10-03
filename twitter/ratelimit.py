@@ -118,8 +118,7 @@ class RateLimit(object):
         for non_std_endpoint in NON_STANDARD_ENDPOINTS:
             if re.match(non_std_endpoint.regex, resource):
                 return non_std_endpoint.resource
-        else:
-            return resource
+        return resource
 
     def set_unknown_limit(self, url, limit, remaining, reset):
         return self.set_limit(url, limit, remaining, reset)

@@ -9,10 +9,11 @@ import warnings
 
 import twitter
 
-warnings.filterwarnings('ignore', category=DeprecationWarning)
-
 import responses
 from responses import GET, POST
+
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+
 
 DEFAULT_URL = re.compile(r'https?://.*\.twitter.com/1\.1/.*')
 
@@ -204,7 +205,6 @@ class ApiTest(unittest.TestCase):
     #     self.assertRaises(twitter.TwitterError,
     #                       lambda: self.api.GetHomeTimeline(
     #                           since_id='still infinity'))
-
 
     #     # TODO: Get data for this call against which we can test exclusions.
     #     responses.add(
@@ -461,29 +461,29 @@ class ApiTest(unittest.TestCase):
     # @responses.activate
     # def testGetFriends(self):
 
-        # """
-        # This is tedious, but the point is to add a responses endpoint for
-        # each call that GetFriends() is going to make against the API and
-        # have it return the appropriate json data.
-        # """
+    #     """
+    #     This is tedious, but the point is to add a responses endpoint for
+    #     each call that GetFriends() is going to make against the API and
+    #     have it return the appropriate json data.
+    #     """
 
-        # cursor = -1
-        # for i in range(0, 5):
-            # with open('testdata/get_friends_{0}.json'.format(i)) as f:
-                # resp_data = f.read()
-            # endpoint = '/friends/list.json?screen_name=codebear&count=200&skip_status=False&include_user_entities=True&cursor={0}'.format(cursor)
+    #     cursor = -1
+    #     for i in range(0, 5):
+    #         with open('testdata/get_friends_{0}.json'.format(i)) as f:
+    #             resp_data = f.read()
+    #         endpoint = '/friends/list.json?screen_name=codebear&count=200&skip_status=False&include_user_entities=True&cursor={0}'.format(cursor)
 
-            # responses.add(
-                # responses.GET,
-                # '{base_url}{endpoint}'.format(
-                    # base_url=self.api.base_url,
-                    # endpoint=endpoint),
-                # body=resp_data, match_querystring=True, status=200)
+    #         responses.add(
+    #             responses.GET,
+    #             '{base_url}{endpoint}'.format(
+    #                 base_url=self.api.base_url,
+    #                 endpoint=endpoint),
+    #             body=resp_data, match_querystring=True, status=200)
 
-            # cursor = json.loads(resp_data)['next_cursor']
+    #         cursor = json.loads(resp_data)['next_cursor']
 
-        # resp = self.api.GetFriends(screen_name='codebear')
-        # self.assertEqual(len(resp), 819)
+    #     resp = self.api.GetFriends(screen_name='codebear')
+    #     self.assertEqual(len(resp), 819)
 
     @responses.activate
     def testGetFriendsWithLimit(self):
@@ -1353,7 +1353,6 @@ class ApiTest(unittest.TestCase):
         resp = self.api.GetStatus(status_id=724441953534877696)
         self.assertEqual(resp.media[0].ext_alt_text, "\u201cJon Snow is dead.\u2026\u201d from \u201cGAME OF THRONES SEASON 6 EPISODES\u201d by HBO PR.")
 
-
     @responses.activate
     def testGetStatus(self):
         with open('testdata/get_status.json') as f:
@@ -1379,7 +1378,6 @@ class ApiTest(unittest.TestCase):
 
         resp = self.api.GetStatus(status_id=397, trim_user=True, include_entities=False)
         self.assertFalse(resp.user.screen_name)
-
 
     # @responses.activate
     # def testGetStatusOembed(self):

@@ -8,11 +8,10 @@ import unittest
 import warnings
 
 import twitter
-
-warnings.filterwarnings('ignore', category=DeprecationWarning)
-
 import responses
 from responses import GET
+
+warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 DEFAULT_URL = re.compile(r'https?://.*\.twitter.com/1\.1/.*')
 

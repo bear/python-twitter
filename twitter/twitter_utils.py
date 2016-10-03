@@ -2,10 +2,9 @@
 import mimetypes
 import os
 import re
-
-import requests
 from tempfile import NamedTemporaryFile
 
+import requests
 from twitter import TwitterError
 
 
@@ -171,10 +170,7 @@ def is_url(text):
     Returns:
         Boolean of whether the text should be treated as a URL or not.
     """
-    if re.findall(URL_REGEXP, text):
-        return True
-    else:
-        return False
+    return bool(re.findall(URL_REGEXP, text))
 
 
 def http_to_file(http):
