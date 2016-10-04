@@ -909,6 +909,7 @@ class Api(object):
                    in_reply_to_status_id=None,
                    auto_populate_reply_metadata=False,
                    exclude_reply_user_ids=None,
+                   attachment_url=None,
                    latitude=None,
                    longitude=None,
                    place_id=None,
@@ -920,53 +921,58 @@ class Api(object):
         https://dev.twitter.com/docs/api/1.1/post/statuses/update
 
         Args:
-          status:
-            The message text to be posted. Must be less than or equal to 140
-            characters.
-          media:
-            A URL, a local file, or a file-like object (something with a read()
-            method), or a list of any combination of the above.
-          media_additional_owners:
-            A list of user ids representing Twitter users that should be able
-            to use the uploaded media in their tweets. If you pass a list of
-            media, then additional_owners will apply to each object. If you
-            need more granular control, please use the UploadMedia* methods.
-          media_category:
-            Only for use with the AdsAPI. See
-            https://dev.twitter.com/ads/creative/promoted-video-overview if
-            this applies to your application.
-          in_reply_to_status_id:
-            The ID of an existing status that the status to be posted is
-            in reply to.  This implicitly sets the in_reply_to_user_id
-            attribute of the resulting status to the user ID of the
-            message being replied to.  Invalid/missing status IDs will be
-            ignored. [Optional]
-          latitude:
-            Latitude coordinate of the tweet in degrees. Will only work
-            in conjunction with longitude argument. Both longitude and
-            latitude will be ignored by twitter if the user has a false
-            geo_enabled setting. [Optional]
-          longitude:
-            Longitude coordinate of the tweet in degrees. Will only work
-            in conjunction with latitude argument. Both longitude and
-            latitude will be ignored by twitter if the user has a false
-            geo_enabled setting. [Optional]
-          place_id:
-            A place in the world. These IDs can be retrieved from
-            GET geo/reverse_geocode. [Optional]
-          display_coordinates:
-            Whether or not to put a pin on the exact coordinates a tweet
-            has been sent from. [Optional]
-          trim_user:
-            If True the returned payload will only contain the user IDs,
-            otherwise the payload will contain the full user data item.
-            [Optional]
-          verify_status_length:
-            If True, api throws a hard error that the status is over
-            140 characters. If False, Api will attempt to post the
-            status. [Optional]
+            status (str):
+                The message text to be posted. Must be less than or equal to 140
+                characters.
+            media (int, str, fp, optional):
+                A URL, a local file, or a file-like object (something with a read()
+                method), or a list of any combination of the above.
+            media_additional_owners (list, optional):
+                A list of user ids representing Twitter users that should be able
+                to use the uploaded media in their tweets. If you pass a list of
+                media, then additional_owners will apply to each object. If you
+                need more granular control, please use the UploadMedia* methods.
+            media_category (str, optional):
+                Only for use with the AdsAPI. See
+                https://dev.twitter.com/ads/creative/promoted-video-overview if
+                this applies to your application.
+            in_reply_to_status_id (int, optional):
+                The ID of an existing status that the status to be posted is
+                in reply to.  This implicitly sets the in_reply_to_user_id
+                attribute of the resulting status to the user ID of the
+                message being replied to.  Invalid/missing status IDs will be
+                ignored.
+            auto_populate_reply_metadata (bool, optional):
+                Automatically include the @usernames of the users mentioned or
+                participating in the tweet to which this tweet is in reply.
+            exclude_reply_user_ids (list, optional):
+                Remove given user_ids (*not* @usernames) from the tweet's
+                automatically generated reply metadata.
+            latitude (float, optional):
+                Latitude coordinate of the tweet in degrees. Will only work
+                in conjunction with longitude argument. Both longitude and
+                latitude will be ignored by twitter if the user has a false
+                geo_enabled setting.
+            longitude (float, optional):
+                Longitude coordinate of the tweet in degrees. Will only work
+                in conjunction with latitude argument. Both longitude and
+                latitude will be ignored by twitter if the user has a false
+                geo_enabled setting.
+            place_id (int, optional):
+                A place in the world. These IDs can be retrieved from
+                GET geo/reverse_geocode.
+            display_coordinates (bool, optional):
+                Whether or not to put a pin on the exact coordinates a tweet
+                has been sent from.
+            trim_user (bool, optional):
+                If True the returned payload will only contain the user IDs,
+                otherwise the payload will contain the full user data item.
+            verify_status_length (bool, optional):
+                If True, api throws a hard error that the status is over
+                140 characters. If False, Api will attempt to post the
+                status.
         Returns:
-          A twitter.Status instance representing the message posted.
+            (twitter.Status) A twitter.Status instance representing the message posted.
         """
         url = '%s/statuses/update.json' % self.base_url
 
@@ -988,6 +994,7 @@ class Api(object):
             'place_id': place_id,
             'display_coordinates': display_coordinates,
             'trim_user': trim_user,
+            'exclude_reply_user_ids': ','.join([str(u) for u in exclude_reply_user_ids or []])
         }
 
         if media:
@@ -4803,11 +4810,12 @@ class Api(object):
         """Raises a TwitterError if twitter returns an error message.
 
         Args:
-          data:
-            A python dict created from the Twitter json response
+            data (dict):
+                A python dict created from the Twitter json response
 
         Raises:
-          TwitterError wrapping the twitter error message if one exists.
+            (twitter.TwitterError): TwitterError wrapping the twitter error
+            message if one exists.
         """
         # Twitter errors are relatively unlikely, so it is faster
         # to check first, rather than try and catch the exception
