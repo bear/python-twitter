@@ -97,7 +97,7 @@ class RateLimitMethodsTests(unittest.TestCase):
         with open('testdata/ratelimit.json') as f:
             resp_data = f.read()
 
-        url = '%s/application/rate_limit_status.json' % self.api.base_url
+        url = '%s/application/rate_limit_status.json?tweet_mode=compat' % self.api.base_url
         responses.add(
             responses.GET,
             url,
@@ -213,7 +213,7 @@ class RateLimitMethodsTests(unittest.TestCase):
             sleep_on_rate_limit=True)
 
         # Add handler for ratelimit check
-        url = '%s/application/rate_limit_status.json' % api.base_url
+        url = '%s/application/rate_limit_status.json?tweet_mode=compat' % api.base_url
         responses.add(
             method=responses.GET, url=url, body='{}', match_querystring=True)
 

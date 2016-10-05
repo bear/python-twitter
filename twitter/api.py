@@ -4836,7 +4836,7 @@ class Api(object):
         except requests.RequestException as e:
             raise TwitterError(str(e))
 
-    def _RequestUrl(self, url, verb, data=None, json=None):
+    def _RequestUrl(self, url, verb, data=dict(), json=None):
         """Request a url.
 
         Args:
@@ -4877,8 +4877,7 @@ class Api(object):
                 resp = 0  # POST request, but without data or json
 
         elif verb == 'GET':
-            if data:
-                data['tweet_mode'] = self.tweet_mode
+            data['tweet_mode'] = self.tweet_mode
             url = self._BuildUrl(url, extra_params=data)
             resp = requests.get(url, auth=self.__auth, timeout=self._timeout)
 
