@@ -312,6 +312,14 @@ class Api(object):
         self._config = None
 
     def GetHelpConfiguration(self):
+        """Get basic help configuration details from Twitter.
+
+        Args:
+            None
+
+        Returns:
+            dict: Sets self._config and returns dict of help config values.
+        """
         if self._config is None:
             url = '%s/help/configuration.json' % self.base_url
             resp = self._RequestUrl(url, 'GET')
@@ -320,6 +328,15 @@ class Api(object):
         return self._config
 
     def GetShortUrlLength(self, https=False):
+        """Returns number of characters reserved per URL included in a tweet.
+
+        Args:
+            https (bool, optional):
+                If True, return number of characters reserved for https urls
+                or, if False, return number of character reserved for http urls.
+        Returns:
+            (int): Number of characters reserved per URL.
+        """
         config = self.GetHelpConfiguration()
         if https:
             return config['short_url_length_https']
@@ -4360,7 +4377,8 @@ class Api(object):
                               tile=False,
                               include_entities=False,
                               skip_status=False):
-
+        """Deprecated function. Used to update the background of a User's
+        Twitter profile. Removed in approx. July, 2015"""
         warnings.warn((
             "This method has been deprecated by Twitter as of July 2015 and "
             "will be removed in future versions of python-twitter."),
@@ -4390,6 +4408,20 @@ class Api(object):
                     image,
                     include_entities=False,
                     skip_status=False):
+        """Update a User's profile image. Change may not be immediately
+        reflected due to image processing on Twitter's side.
+
+        Args:
+            image (str):
+                Location of local image file to use.
+            include_entities (bool, optional):
+                Include the entities node in the return data.
+            skip_status (bool, optional):
+                Include the User's last Status in the User entity returned.
+
+        Returns:
+            (twitter.models.User): Updated User object.
+        """
 
         url = '%s/account/update_profile_image.json' % (self.base_url)
         with open(image, 'rb') as image_file:
@@ -4454,7 +4486,7 @@ class Api(object):
 
         raise TwitterError({'message': "Unkown banner image upload issue"})
 
-    def GetStreamSample(self, delimited=None, stall_warnings=None):
+    def GetStreamSample(self, delimited=False, stall_warnings=True):
         """Returns a small sample of public statuses.
 
         Args:
@@ -4467,7 +4499,11 @@ class Api(object):
           A Twitter stream
         """
         url = '%s/statuses/sample.json' % self.stream_url
-        resp = self._RequestStream(url, 'GET')
+        parameters = {
+            'delimited': bool(delimited),
+            'stall_warnings': bool(stall_warnings)
+        }
+        resp = self._RequestStream(url, 'GET', data=parameters)
         for line in resp.iter_lines():
             if line:
                 data = self._ParseAndCheckTwitter(line.decode('utf-8'))
@@ -4757,7 +4793,8 @@ class Api(object):
     def _InitializeDefaultParameters(self):
         self._default_params = {}
 
-    def _DecompressGzippedResponse(self, response):
+    @staticmethod
+    def _DecompressGzippedResponse(response):
         raw_data = response.read()
         if response.headers.get('content-encoding', None) == 'gzip':
             url_data = gzip.GzipFile(fileobj=io.StringIO(raw_data)).read()
@@ -4765,7 +4802,8 @@ class Api(object):
             url_data = raw_data
         return url_data
 
-    def _EncodeParameters(self, parameters):
+    @staticmethod
+    def _EncodeParameters(parameters):
         """Return a string in key=value&key=value form.
 
         Values of None are not included in the output string.
@@ -4806,7 +4844,8 @@ class Api(object):
         self._CheckForTwitterError(data)
         return data
 
-    def _CheckForTwitterError(self, data):
+    @staticmethod
+    def _CheckForTwitterError(data):
         """Raises a TwitterError if twitter returns an error message.
 
         Args:
@@ -4836,7 +4875,7 @@ class Api(object):
         except requests.RequestException as e:
             raise TwitterError(str(e))
 
-    def _RequestUrl(self, url, verb, data=dict(), json=None):
+    def _RequestUrl(self, url, verb, data=None, json=None):
         """Request a url.
 
         Args:
@@ -4861,6 +4900,8 @@ class Api(object):
                     time.sleep(max(int(limit.reset - time.time()) + 2, 0))
                 except ValueError:
                     pass
+        if not data:
+            data = {}
 
         if verb == 'POST':
             if data:

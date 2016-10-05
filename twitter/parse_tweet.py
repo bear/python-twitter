@@ -2,6 +2,7 @@
 
 import re
 
+
 class Emoticons:
     POSITIVE = ["*O", "*-*", "*O*", "*o*", "* *",
                 ":P", ":D", ":d", ":p",
@@ -26,6 +27,7 @@ class Emoticons:
                 ":,)", ":'{",
                 "[:", ";]"
                 ]
+
 
 class ParseTweet(object):
     # compile once on import

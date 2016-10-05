@@ -47,7 +47,7 @@ class _FileCache(object):
         path = self._GetPath(key)
         if not path.startswith(self._root_directory):
             raise _FileCacheError('%s does not appear to live under %s' %
-                                  (path, self._root_directory ))
+                                  (path, self._root_directory))
         if os.path.exists(path):
             os.remove(path)
 

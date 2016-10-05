@@ -14,6 +14,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 DEFAULT_URL = re.compile(r'https?://.*\.twitter.com/1\.1/.*')
 
+
 class ErrNull(object):
     """ Suppress output of tests while writing to stdout or stderr. This just
     takes in data and does nothing with it.

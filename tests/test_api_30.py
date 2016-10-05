@@ -906,10 +906,10 @@ class ApiTest(unittest.TestCase):
             match_querystring=True,
             status=200)
         _, _, resp = self.api.GetListMembersPaged(list_id=93527328,
-                                            cursor=4611686020936348428,
-                                            skip_status=True,
-                                            include_entities=False,
-                                            count=100)
+                                                  cursor=4611686020936348428,
+                                                  skip_status=True,
+                                                  include_entities=False,
+                                                  count=100)
         self.assertFalse(resp[0].status)
 
     @responses.activate
