@@ -7,7 +7,6 @@ pytest
 pytest-cov
 pytest-runner
 mccabe
-flake8
 mock
 six
 coverage
