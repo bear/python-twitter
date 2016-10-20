@@ -942,8 +942,8 @@ class Api(object):
                 The message text to be posted. Must be less than or equal to 140
                 characters.
             media (int, str, fp, optional):
-                A URL, a local file, or a file-like object (something with a read()
-                method), or a list of any combination of the above.
+                A URL, a local file, or a file-like object (something with a
+                read() method), or a list of any combination of the above.
             media_additional_owners (list, optional):
                 A list of user ids representing Twitter users that should be able
                 to use the uploaded media in their tweets. If you pass a list of
@@ -965,6 +965,12 @@ class Api(object):
             exclude_reply_user_ids (list, optional):
                 Remove given user_ids (*not* @usernames) from the tweet's
                 automatically generated reply metadata.
+            attachment_url (str, optional):
+                URL to an attachment resource: one to four photos, a GIF,
+                video, Quote Tweet, or DM deep link. If not specified and
+                media parameter is not None, we will attach the first media
+                object as the attachment URL. If a bad URL is passed, Twitter
+                will raise an error.
             latitude (float, optional):
                 Latitude coordinate of the tweet in degrees. Will only work
                 in conjunction with longitude argument. Both longitude and
@@ -989,7 +995,8 @@ class Api(object):
                 140 characters. If False, Api will attempt to post the
                 status.
         Returns:
-            (twitter.Status) A twitter.Status instance representing the message posted.
+            (twitter.Status) A twitter.Status instance representing the
+            message posted.
         """
         url = '%s/statuses/update.json' % self.base_url
 
@@ -1011,8 +1018,11 @@ class Api(object):
             'place_id': place_id,
             'display_coordinates': display_coordinates,
             'trim_user': trim_user,
-            'exclude_reply_user_ids': ','.join([str(u) for u in exclude_reply_user_ids or []])
+            'exclude_reply_user_ids': ','.join([str(u) for u in exclude_reply_user_ids or []]),
         }
+
+        if attachment_url:
+            parameters['attachment_url'] = attachment_url
 
         if media:
             media_ids = []
