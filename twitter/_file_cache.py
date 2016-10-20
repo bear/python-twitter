@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import errno
 import os
-import re
 import tempfile
 
 from hashlib import md5
