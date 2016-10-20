@@ -1,4 +1,6 @@
 # encoding: utf-8
+from __future__ import unicode_literals
+
 import mimetypes
 import os
 import re
@@ -137,7 +139,14 @@ TLDS = [
     "淡马锡", "游戏", "点看", "移动", "组织机构", "网址", "网店", "网络", "谷歌", "集团",
     "飞利浦", "餐厅", "닷넷", "닷컴", "삼성", "onion"]
 
-URL_REGEXP = re.compile(r'(?i)((?:https?://|www\\.)*(?:[\w+-_]+[.])(?:' + r'\b|'.join(TLDS) + r'\b|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))+(?:[:\w+\/]?[a-z0-9!\*\'\(\);:&=\+\$/%#\[\]\-_\.,~?])*)', re.UNICODE)
+URL_REGEXP = re.compile((
+    r'('
+    r'^(?!(https?://|www\.)?\.|ftps?://|([0-9]+\.){{1,3}}\d+)'  # exclude urls that start with "."
+    r'(?:https?://|www\.)*^(?!.*@)(?:[\w+-_]+[.])'              # beginning of url
+    r'(?:{0}\b|'                                                # all tlds
+    r'(?:[:0-9]))'                                              # port numbers & close off TLDs
+    r'(?:[\w+\/]?[a-z0-9!\*\'\(\);:&=\+\$/%#\[\]\-_\.,~?])*'    # path/query params
+    r')').format(r'\b|'.join(TLDS)), re.U | re.I | re.X)
 
 
 def calc_expected_status_length(status, short_url_length=23):
