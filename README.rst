@@ -44,7 +44,7 @@ You can install python-twitter using::
 
     $ pip install python-twitter
 
-	
+
 If you are using python-twitter on Google App Engine, see `more information <GAE.rst>`_ about including 3rd party vendor library dependencies in your App Engine project.
 
 
