@@ -78,11 +78,14 @@ class TwitterModel(object):
 
         """
 
+        json_data = data.copy()
         if kwargs:
             for key, val in kwargs.items():
-                data[key] = val
+                json_data[key] = val
 
-        return cls(**data)
+        c = cls(**json_data)
+        c._json = data
+        return c
 
 
 class Media(TwitterModel):
@@ -379,6 +382,7 @@ class Status(TwitterModel):
             'current_user_retweet': None,
             'favorite_count': None,
             'favorited': None,
+            'full_text': None,
             'geo': None,
             'hashtags': None,
             'id': None,
@@ -408,6 +412,11 @@ class Status(TwitterModel):
 
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
+
+        if kwargs.get('full_text', None):
+            self.tweet_mode = 'extended'
+        else:
+            self.tweet_mode = 'compatibility'
 
     @property
     def created_at_in_seconds(self):

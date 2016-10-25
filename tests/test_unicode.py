@@ -14,6 +14,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 DEFAULT_URL = re.compile(r'https?://.*\.twitter.com/1\.1/.*')
 
+
 class ErrNull(object):
     """ Suppress output of tests while writing to stdout or stderr. This just
     takes in data and does nothing with it.
@@ -67,11 +68,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
 
         responses.add(
-            responses.GET,
-            'https://api.twitter.com/1.1/trends/place.json?id=1',
-            body=resp_data,
-            status=200,
-            match_querystring=True)
+            responses.GET, DEFAULT_URL, body=resp_data, match_querystring=True)
 
         resp = self.api.GetTrendsCurrent()
         for r in resp:

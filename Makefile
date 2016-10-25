@@ -35,7 +35,7 @@ docs:
 	$(MAKE) -C doc html
 
 lint:
-	flake8 twitter > violations.flake8.txt
+	pycodestyle --config={toxinidir}/setup.cfg twitter tests
 
 test: lint
 	python setup.py test

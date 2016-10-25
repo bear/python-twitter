@@ -10,7 +10,7 @@ class MediaTest(unittest.TestCase):
              'thumb': {'h': 150, 'resize': 'crop', 'w': 150}}
     RAW_JSON = '''{"display_url": "pic.twitter.com/lX5LVZO", "expanded_url": "http://twitter.com/fakekurrik/status/244204973972410368/photo/1", "id": 244204973989187584, "id_str": "244204973989187584", "indices": [44,63], "media_url": "http://pbs.twimg.com/media/A2OXIUcCUAAXj9k.png", "media_url_https": "https://pbs.twimg.com/media/A2OXIUcCUAAXj9k.png", "sizes": {"large": {"h": 175, "resize": "fit", "w": 333}, "medium": {"h": 175, "resize": "fit", "w": 333}, "small": {"h": 175, "resize": "fit", "w": 333}, "thumb": {"h": 150, "resize": "crop", "w": 150}}, "type": "photo", "url": "http://t.co/lX5LVZO"}'''
     SAMPLE_JSON = '''{"display_url": "pic.twitter.com/lX5LVZO", "expanded_url": "http://twitter.com/fakekurrik/status/244204973972410368/photo/1", "id": 244204973989187584, "media_url": "http://pbs.twimg.com/media/A2OXIUcCUAAXj9k.png", "media_url_https": "https://pbs.twimg.com/media/A2OXIUcCUAAXj9k.png", "sizes": {"large": {"h": 175, "resize": "fit", "w": 333}, "medium": {"h": 175, "resize": "fit", "w": 333}, "small": {"h": 175, "resize": "fit", "w": 333}, "thumb": {"h": 150, "resize": "crop", "w": 150}}, "type": "photo", "url": "http://t.co/lX5LVZO"}'''
-# '''{"display_url": "pic.twitter.com/lX5LVZO", "expanded_url": "http://twitter.com/fakekurrik/status/244204973972410368/photo/1", "id": 244204973989187584, "media_url": "http://pbs.twimg.com/media/A2OXIUcCUAAXj9k.png", "media_url_https": "https://pbs.twimg.com/media/A2OXIUcCUAAXj9k.png", "type": "photo", "url": "http://t.co/lX5LVZO"}'''
+
     def _GetSampleMedia(self):
         return twitter.Media(
             id=244204973989187584,
