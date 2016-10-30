@@ -1628,7 +1628,6 @@ class Api(object):
 
         return Status.NewFromJsonDict(data)
 
-
     def GetUserRetweets(self,
                         count=None,
                         since_id=None,
