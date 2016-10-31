@@ -36,6 +36,8 @@ What's New
 
 * Google App Engine support has been reintegrated into the library. Check out `PR #383 <https://github.com/bear/python-twitter/pull/383>`_.
 
+* `video_info` is now available on a `twitter.models.Media` object, which allows access to video urls/bitrates/etc. in the `extended_entities` node of a tweet.
+
 What's Changed
 --------------
 
