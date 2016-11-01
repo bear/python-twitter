@@ -377,6 +377,7 @@ class Api(object):
             type checking and ensuring that the query string is properly
             formatted, as it will only be URL-encoded before be passed directly
             to Twitter with no other checks performed. For advanced usage only.
+            *This will override any other parameters passed*
           since_id (int, optional):
             Returns results with an ID greater than (that is, more recent
             than) the specified ID. There are limits to the number of
