@@ -16,9 +16,9 @@
 
 # ----------------------------------------------------------------------
 
-# This file demonstrates how to track mentions of a specific set of users and
-# archive those mentions to a local file. The output file will contain one
-# JSON string per line per Tweet.
+# This file demonstrates how to track mentions of a specific set of users in
+# english language and archive those mentions to a local file. The output file
+# will contain one JSON string per line per Tweet.
 
 # To use this example, replace the W/X/Y/Zs with your keys obtained from
 # Twitter, or uncomment the lines for getting an environment variable. If you
