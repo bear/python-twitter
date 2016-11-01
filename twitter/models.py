@@ -103,6 +103,7 @@ class Media(TwitterModel):
             'sizes': None,
             'type': None,
             'url': None,
+            'video_info': None,
         }
 
         for (param, default) in self.param_defaults.items():

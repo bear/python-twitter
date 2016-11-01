@@ -1,6 +1,9 @@
-import twitter
+# -*- coding: utf-8 -*-
+
 import json
 import unittest
+
+import twitter
 
 
 class MediaTest(unittest.TestCase):
@@ -103,3 +106,14 @@ class MediaTest(unittest.TestCase):
         data = json.loads(MediaTest.RAW_JSON)
         media = twitter.Media.NewFromJsonDict(data)
         self.assertEqual(self._GetSampleMedia(), media)
+
+    def test_media_info(self):
+        with open('testdata/get_status_promoted_video_tweet.json', 'r') as f:
+            tweet = twitter.Status.NewFromJsonDict(json.loads(f.read()))
+        media = tweet.media[0]
+        self.assertTrue(isinstance(tweet.media, list))
+        self.assertTrue(media.video_info)
+        self.assertTrue(media.video_info.get('variants', None))
+        self.assertTrue(
+            media.video_info.get('variants', None)[0]['url'],
+            'https://video.twimg.com/amplify_video/778025997606105089/vid/320x180/5Qr0z_HeycC2DvRj.mp4')
