@@ -4465,14 +4465,14 @@ class Api(object):
           locations:
             A list of Longitude,Latitude pairs (as strings) specifying
             bounding boxes for the tweets' origin. [Optional]
-          languages:
-            A list of Languages.
-            Will only return Tweets that have been detected as being
-            written in the specified languages. [Optional]
           delimited:
             Specifies a message length. [Optional]
           stall_warnings:
             Set to True to have Twitter deliver stall warnings. [Optional]
+          languages:
+            A list of Languages.
+            Will only return Tweets that have been detected as being
+            written in the specified languages. [Optional]
 
         Returns:
           A twitter stream
@@ -4487,12 +4487,12 @@ class Api(object):
             data['track'] = ','.join(track)
         if locations is not None:
             data['locations'] = ','.join(locations)
-        if languages is not None:
-            data['language'] = ','.join(languages)
         if delimited is not None:
             data['delimited'] = str(delimited)
         if stall_warnings is not None:
             data['stall_warnings'] = str(stall_warnings)
+        if languages is not None:
+            data['language'] = ','.join(languages)
 
         resp = self._RequestStream(url, 'POST', data=data)
         for line in resp.iter_lines():
