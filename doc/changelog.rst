@@ -99,3 +99,5 @@ ______________
 * Updated examples, specifically ``examples/twitter-to-xhtml.py``, ``examples/view_friends.py``, ``examples/shorten_url.py``
 
 * Updated ``get_access_token.py`` script to be python3 compatible.
+
+* :py:func:`twitter.api.Api.GetStreamFilter()` now accepts an optional languages parameter as a list.
