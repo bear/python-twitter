@@ -16,9 +16,9 @@
 
 # ----------------------------------------------------------------------
 
-# This file demonstrates how to track mentions of a specific set of users and
-# archive those mentions to a local file. The output file will contain one
-# JSON string per line per Tweet.
+# This file demonstrates how to track mentions of a specific set of users in 
+# english language and archive those mentions to a local file. The output
+# file will contain one JSON string per line per Tweet.
 
 # To use this example, replace the W/X/Y/Zs with your keys obtained from
 # Twitter, or uncomment the lines for getting an environment variable. If you
@@ -52,6 +52,10 @@ USERS = ['@twitter',
          '@twitterapi',
          '@support']
 
+# Languages to filter tweets by is a list. This will be joined by Twitter
+# to return data mentioning tweets only in the english language.
+LANGUAGES = ['en']
+
 # Since we're going to be using a streaming endpoint, there is no need to worry
 # about rate limits.
 api = Api(CONSUMER_KEY,
@@ -64,7 +68,7 @@ def main():
     with open('output.txt', 'a') as f:
         # api.GetStreamFilter will return a generator that yields one status
         # message (i.e., Tweet) at a time as a JSON dictionary.
-        for line in api.GetStreamFilter(track=USERS):
+        for line in api.GetStreamFilter(track=USERS, languages=LANGUAGES):
             f.write(json.dumps(line))
             f.write('\n')
 
