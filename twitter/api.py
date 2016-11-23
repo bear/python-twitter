@@ -927,13 +927,13 @@ class Api(object):
                    in_reply_to_status_id=None,
                    auto_populate_reply_metadata=False,
                    exclude_reply_user_ids=None,
-                   attachment_url=None,
                    latitude=None,
                    longitude=None,
                    place_id=None,
                    display_coordinates=False,
                    trim_user=False,
-                   verify_status_length=True):
+                   verify_status_length=True,
+                   attachment_url=None):
         """Post a twitter status message from the authenticated user.
 
         https://dev.twitter.com/docs/api/1.1/post/statuses/update
