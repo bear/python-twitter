@@ -2,7 +2,7 @@
 
 #
 #
-# Copyright 2007 The Python-Twitter Developers
+# Copyright 2007-2016 The Python-Twitter Developers
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -156,39 +156,55 @@ class Api(object):
                  use_gzip_compression=False,
                  debugHTTP=False,
                  timeout=None,
-                 sleep_on_rate_limit=False):
+                 sleep_on_rate_limit=False,
+                 tweet_mode='compat'):
         """Instantiate a new twitter.Api object.
 
         Args:
-          consumer_key:
+          consumer_key (str):
             Your Twitter user's consumer_key.
-          consumer_secret:
+          consumer_secret (str):
             Your Twitter user's consumer_secret.
-          access_token_key:
+          access_token_key (str):
             The oAuth access token key value you retrieved
             from running get_access_token.py.
-          access_token_secret:
+          access_token_secret (str):
             The oAuth access token's secret, also retrieved
             from the get_access_token.py run.
-          input_encoding:
-            The encoding used to encode input strings. [Optional]
-          request_header:
-            A dictionary of additional HTTP request headers. [Optional]
-          cache:
+          input_encoding (str, optional):
+            The encoding used to encode input strings.
+          request_header (dict, optional):
+            A dictionary of additional HTTP request headers.
+          cache (object, optional):
             The cache instance to use. Defaults to DEFAULT_CACHE.
-            Use None to disable caching. [Optional]
-          base_url:
+            Use None to disable caching.
+          base_url (str, optional):
             The base URL to use to contact the Twitter API.
-            Defaults to https://api.twitter.com. [Optional]
-          use_gzip_compression:
+            Defaults to https://api.twitter.com.
+          stream_url (str, optional):
+            The base URL to use for streaming endpoints.
+            Defaults to 'https://stream.twitter.com/1.1'.
+          upload_url (str, optional):
+            The base URL to use for uploads. Defaults to 'https://upload.twitter.com/1.1'.
+          chunk_size (int, optional):
+            Chunk size to use for chunked (multi-part) uploads of images/videos/gifs.
+            Defaults to 1MB. Anything under 16KB and you run the risk of erroring out
+            on 15MB files.
+          use_gzip_compression (bool, optional):
             Set to True to tell enable gzip compression for any call
-            made to Twitter.  Defaults to False. [Optional]
-          debugHTTP:
+            made to Twitter.  Defaults to False.
+          debugHTTP (bool, optional):
             Set to True to enable debug output from urllib2 when performing
-            any HTTP requests.  Defaults to False. [Optional]
-          timeout:
+            any HTTP requests.  Defaults to False.
+          timeout (int, optional):
             Set timeout (in seconds) of the http/https requests. If None the
-            requests lib default will be used.  Defaults to None. [Optional]
+            requests lib default will be used.  Defaults to None.
+          sleep_on_rate_limit (bool, optional):
+            Whether to sleep an appropriate amount of time if a rate limit is hit for
+            an endpoint.
+          tweet_mode (str, optional):
+            Whether to use the new (as of Sept. 2016) extended tweet mode. See docs for
+            details. Choices are ['compatibility', 'extended'].
         """
 
         # check to see if the library is running on a Google App Engine instance
@@ -214,6 +230,7 @@ class Api(object):
 
         self.rate_limit = RateLimit()
         self.sleep_on_rate_limit = sleep_on_rate_limit
+        self.tweet_mode = tweet_mode
 
         if base_url is None:
             self.base_url = 'https://api.twitter.com/1.1'
@@ -295,6 +312,14 @@ class Api(object):
         self._config = None
 
     def GetHelpConfiguration(self):
+        """Get basic help configuration details from Twitter.
+
+        Args:
+            None
+
+        Returns:
+            dict: Sets self._config and returns dict of help config values.
+        """
         if self._config is None:
             url = '%s/help/configuration.json' % self.base_url
             resp = self._RequestUrl(url, 'GET')
@@ -303,6 +328,15 @@ class Api(object):
         return self._config
 
     def GetShortUrlLength(self, https=False):
+        """Returns number of characters reserved per URL included in a tweet.
+
+        Args:
+            https (bool, optional):
+                If True, return number of characters reserved for https urls
+                or, if False, return number of character reserved for http urls.
+        Returns:
+            (int): Number of characters reserved per URL.
+        """
         config = self.GetHelpConfiguration()
         if https:
             return config['short_url_length_https']
@@ -343,6 +377,7 @@ class Api(object):
             type checking and ensuring that the query string is properly
             formatted, as it will only be URL-encoded before be passed directly
             to Twitter with no other checks performed. For advanced usage only.
+            *This will override any other parameters passed*
           since_id (int, optional):
             Returns results with an ID greater than (that is, more recent
             than) the specified ID. There are limits to the number of
@@ -890,64 +925,79 @@ class Api(object):
                    media_additional_owners=None,
                    media_category=None,
                    in_reply_to_status_id=None,
+                   auto_populate_reply_metadata=False,
+                   exclude_reply_user_ids=None,
                    latitude=None,
                    longitude=None,
                    place_id=None,
                    display_coordinates=False,
                    trim_user=False,
-                   verify_status_length=True):
+                   verify_status_length=True,
+                   attachment_url=None):
         """Post a twitter status message from the authenticated user.
 
         https://dev.twitter.com/docs/api/1.1/post/statuses/update
 
         Args:
-          status:
-            The message text to be posted. Must be less than or equal to 140
-            characters.
-          media:
-            A URL, a local file, or a file-like object (something with a read()
-            method), or a list of any combination of the above.
-          media_additional_owners:
-            A list of user ids representing Twitter users that should be able
-            to use the uploaded media in their tweets. If you pass a list of
-            media, then additional_owners will apply to each object. If you
-            need more granular control, please use the UploadMedia* methods.
-          media_category:
-            Only for use with the AdsAPI. See
-            https://dev.twitter.com/ads/creative/promoted-video-overview if
-            this applies to your application.
-          in_reply_to_status_id:
-            The ID of an existing status that the status to be posted is
-            in reply to.  This implicitly sets the in_reply_to_user_id
-            attribute of the resulting status to the user ID of the
-            message being replied to.  Invalid/missing status IDs will be
-            ignored. [Optional]
-          latitude:
-            Latitude coordinate of the tweet in degrees. Will only work
-            in conjunction with longitude argument. Both longitude and
-            latitude will be ignored by twitter if the user has a false
-            geo_enabled setting. [Optional]
-          longitude:
-            Longitude coordinate of the tweet in degrees. Will only work
-            in conjunction with latitude argument. Both longitude and
-            latitude will be ignored by twitter if the user has a false
-            geo_enabled setting. [Optional]
-          place_id:
-            A place in the world. These IDs can be retrieved from
-            GET geo/reverse_geocode. [Optional]
-          display_coordinates:
-            Whether or not to put a pin on the exact coordinates a tweet
-            has been sent from. [Optional]
-          trim_user:
-            If True the returned payload will only contain the user IDs,
-            otherwise the payload will contain the full user data item.
-            [Optional]
-          verify_status_length:
-            If True, api throws a hard error that the status is over
-            140 characters. If False, Api will attempt to post the
-            status. [Optional]
+            status (str):
+                The message text to be posted. Must be less than or equal to 140
+                characters.
+            media (int, str, fp, optional):
+                A URL, a local file, or a file-like object (something with a
+                read() method), or a list of any combination of the above.
+            media_additional_owners (list, optional):
+                A list of user ids representing Twitter users that should be able
+                to use the uploaded media in their tweets. If you pass a list of
+                media, then additional_owners will apply to each object. If you
+                need more granular control, please use the UploadMedia* methods.
+            media_category (str, optional):
+                Only for use with the AdsAPI. See
+                https://dev.twitter.com/ads/creative/promoted-video-overview if
+                this applies to your application.
+            in_reply_to_status_id (int, optional):
+                The ID of an existing status that the status to be posted is
+                in reply to.  This implicitly sets the in_reply_to_user_id
+                attribute of the resulting status to the user ID of the
+                message being replied to.  Invalid/missing status IDs will be
+                ignored.
+            auto_populate_reply_metadata (bool, optional):
+                Automatically include the @usernames of the users mentioned or
+                participating in the tweet to which this tweet is in reply.
+            exclude_reply_user_ids (list, optional):
+                Remove given user_ids (*not* @usernames) from the tweet's
+                automatically generated reply metadata.
+            attachment_url (str, optional):
+                URL to an attachment resource: one to four photos, a GIF,
+                video, Quote Tweet, or DM deep link. If not specified and
+                media parameter is not None, we will attach the first media
+                object as the attachment URL. If a bad URL is passed, Twitter
+                will raise an error.
+            latitude (float, optional):
+                Latitude coordinate of the tweet in degrees. Will only work
+                in conjunction with longitude argument. Both longitude and
+                latitude will be ignored by twitter if the user has a false
+                geo_enabled setting.
+            longitude (float, optional):
+                Longitude coordinate of the tweet in degrees. Will only work
+                in conjunction with latitude argument. Both longitude and
+                latitude will be ignored by twitter if the user has a false
+                geo_enabled setting.
+            place_id (int, optional):
+                A place in the world. These IDs can be retrieved from
+                GET geo/reverse_geocode.
+            display_coordinates (bool, optional):
+                Whether or not to put a pin on the exact coordinates a tweet
+                has been sent from.
+            trim_user (bool, optional):
+                If True the returned payload will only contain the user IDs,
+                otherwise the payload will contain the full user data item.
+            verify_status_length (bool, optional):
+                If True, api throws a hard error that the status is over
+                140 characters. If False, Api will attempt to post the
+                status.
         Returns:
-          A twitter.Status instance representing the message posted.
+            (twitter.Status) A twitter.Status instance representing the
+            message posted.
         """
         url = '%s/statuses/update.json' % self.base_url
 
@@ -959,7 +1009,21 @@ class Api(object):
         if verify_status_length and calc_expected_status_length(u_status) > 140:
             raise TwitterError("Text must be less than or equal to 140 characters.")
 
-        parameters = {'status': u_status}
+        if auto_populate_reply_metadata and not in_reply_to_status_id:
+            raise TwitterError("If auto_populate_reply_metadata is True, you must set in_reply_to_status_id")
+
+        parameters = {
+            'status': u_status,
+            'in_reply_to_status_id': in_reply_to_status_id,
+            'auto_populate_reply_metadata': auto_populate_reply_metadata,
+            'place_id': place_id,
+            'display_coordinates': display_coordinates,
+            'trim_user': trim_user,
+            'exclude_reply_user_ids': ','.join([str(u) for u in exclude_reply_user_ids or []]),
+        }
+
+        if attachment_url:
+            parameters['attachment_url'] = attachment_url
 
         if media:
             media_ids = []
@@ -993,25 +1057,16 @@ class Api(object):
             else:
                 _, _, file_size, _ = parse_media_file(media)
                 if file_size > self.chunk_size:
-                    media_ids.append(self.UploadMediaChunked(media,
-                                                             media_additional_owners))
+                    media_ids.append(
+                        self.UploadMediaChunked(media, media_additional_owners))
                 else:
                     media_ids.append(
-                        self.UploadMediaSimple(media,
-                                               media_additional_owners))
+                        self.UploadMediaSimple(media, media_additional_owners))
             parameters['media_ids'] = ','.join([str(mid) for mid in media_ids])
 
-        if in_reply_to_status_id:
-            parameters['in_reply_to_status_id'] = in_reply_to_status_id
         if latitude is not None and longitude is not None:
             parameters['lat'] = str(latitude)
             parameters['long'] = str(longitude)
-        if place_id is not None:
-            parameters['place_id'] = str(place_id)
-        if display_coordinates:
-            parameters['display_coordinates'] = 'true'
-        if trim_user:
-            parameters['trim_user'] = 'true'
 
         resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -1044,7 +1099,7 @@ class Api(object):
         url = '%s/media/upload.json' % self.upload_url
         parameters = {}
 
-        media_fp, filename, file_size, media_type = parse_media_file(media)
+        media_fp, _, _, _ = parse_media_file(media)
 
         parameters['media'] = media_fp.read()
 
@@ -3243,7 +3298,6 @@ class Api(object):
                     parameters['count'] = int(cursor)
                 except ValueError:
                     raise TwitterError({'message': "cursor must be an integer"})
-                    break
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [x for x in data['ids']]
@@ -3288,7 +3342,6 @@ class Api(object):
                     parameters['count'] = int(cursor)
                 except ValueError:
                     raise TwitterError({'message': "cursor must be an integer"})
-                    break
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             result += [x for x in data['ids']]
@@ -4335,7 +4388,8 @@ class Api(object):
                               tile=False,
                               include_entities=False,
                               skip_status=False):
-
+        """Deprecated function. Used to update the background of a User's
+        Twitter profile. Removed in approx. July, 2015"""
         warnings.warn((
             "This method has been deprecated by Twitter as of July 2015 and "
             "will be removed in future versions of python-twitter."),
@@ -4365,6 +4419,20 @@ class Api(object):
                     image,
                     include_entities=False,
                     skip_status=False):
+        """Update a User's profile image. Change may not be immediately
+        reflected due to image processing on Twitter's side.
+
+        Args:
+            image (str):
+                Location of local image file to use.
+            include_entities (bool, optional):
+                Include the entities node in the return data.
+            skip_status (bool, optional):
+                Include the User's last Status in the User entity returned.
+
+        Returns:
+            (twitter.models.User): Updated User object.
+        """
 
         url = '%s/account/update_profile_image.json' % (self.base_url)
         with open(image, 'rb') as image_file:
@@ -4429,7 +4497,7 @@ class Api(object):
 
         raise TwitterError({'message': "Unkown banner image upload issue"})
 
-    def GetStreamSample(self, delimited=None, stall_warnings=None):
+    def GetStreamSample(self, delimited=False, stall_warnings=True):
         """Returns a small sample of public statuses.
 
         Args:
@@ -4442,7 +4510,11 @@ class Api(object):
           A Twitter stream
         """
         url = '%s/statuses/sample.json' % self.stream_url
-        resp = self._RequestStream(url, 'GET')
+        parameters = {
+            'delimited': bool(delimited),
+            'stall_warnings': bool(stall_warnings)
+        }
+        resp = self._RequestStream(url, 'GET', data=parameters)
         for line in resp.iter_lines():
             if line:
                 data = self._ParseAndCheckTwitter(line.decode('utf-8'))
@@ -4452,6 +4524,7 @@ class Api(object):
                         follow=None,
                         track=None,
                         locations=None,
+                        languages=None,
                         delimited=None,
                         stall_warnings=None):
         """Returns a filtered view of public statuses.
@@ -4468,6 +4541,10 @@ class Api(object):
             Specifies a message length. [Optional]
           stall_warnings:
             Set to True to have Twitter deliver stall warnings. [Optional]
+          languages:
+            A list of Languages.
+            Will only return Tweets that have been detected as being
+            written in the specified languages. [Optional]
 
         Returns:
           A twitter stream
@@ -4486,6 +4563,8 @@ class Api(object):
             data['delimited'] = str(delimited)
         if stall_warnings is not None:
             data['stall_warnings'] = str(stall_warnings)
+        if languages is not None:
+            data['language'] = ','.join(languages)
 
         resp = self._RequestStream(url, 'POST', data=data)
         for line in resp.iter_lines():
@@ -4732,7 +4811,8 @@ class Api(object):
     def _InitializeDefaultParameters(self):
         self._default_params = {}
 
-    def _DecompressGzippedResponse(self, response):
+    @staticmethod
+    def _DecompressGzippedResponse(response):
         raw_data = response.read()
         if response.headers.get('content-encoding', None) == 'gzip':
             url_data = gzip.GzipFile(fileobj=io.StringIO(raw_data)).read()
@@ -4740,7 +4820,8 @@ class Api(object):
             url_data = raw_data
         return url_data
 
-    def _EncodeParameters(self, parameters):
+    @staticmethod
+    def _EncodeParameters(parameters):
         """Return a string in key=value&key=value form.
 
         Values of None are not included in the output string.
@@ -4766,38 +4847,32 @@ class Api(object):
         This is a purely defensive check because during some Twitter
         network outages it will return an HTML failwhale page.
         """
-        data = None
         try:
             data = json.loads(json_data)
-            try:
-                self._CheckForTwitterError(data)
-
-            except ValueError:
-                if "<title>Twitter / Over capacity</title>" in json_data:
-                    raise TwitterError({'message': "Capacity Error"})
-                if "<title>Twitter / Error</title>" in json_data:
-                    raise TwitterError({'message': "Technical Error"})
-                if "Exceeded connection limit for user" in json_data:
-                    raise TwitterError({'message': "Exceeded connection limit for user"})
-                if "Error 401 Unauthorized" in json_data:
-                    raise TwitterError({'message': "Unauthorized"})
-                raise TwitterError({'message': "Unknown error, try addeding "})
-
-        except:
+        except ValueError:
+            if "<title>Twitter / Over capacity</title>" in json_data:
+                raise TwitterError({'message': "Capacity Error"})
+            if "<title>Twitter / Error</title>" in json_data:
+                raise TwitterError({'message': "Technical Error"})
+            if "Exceeded connection limit for user" in json_data:
+                raise TwitterError({'message': "Exceeded connection limit for user"})
             if "Error 401 Unauthorized" in json_data:
                 raise TwitterError({'message': "Unauthorized"})
-
+            raise TwitterError({'Unknown error: {0}'.format(json_data)})
+        self._CheckForTwitterError(data)
         return data
 
-    def _CheckForTwitterError(self, data):
+    @staticmethod
+    def _CheckForTwitterError(data):
         """Raises a TwitterError if twitter returns an error message.
 
         Args:
-          data:
-            A python dict created from the Twitter json response
+            data (dict):
+                A python dict created from the Twitter json response
 
         Raises:
-          TwitterError wrapping the twitter error message if one exists.
+            (twitter.TwitterError): TwitterError wrapping the twitter error
+            message if one exists.
         """
         # Twitter errors are relatively unlikely, so it is faster
         # to check first, rather than try and catch the exception
@@ -4833,8 +4908,7 @@ class Api(object):
             A JSON object.
         """
         if not self.__auth:
-            raise TwitterError(
-                "The twitter.Api instance must be authenticated.")
+            raise TwitterError("The twitter.Api instance must be authenticated.")
 
         if url and self.sleep_on_rate_limit:
             limit = self.CheckRateLimit(url)
@@ -4844,6 +4918,8 @@ class Api(object):
                     time.sleep(max(int(limit.reset - time.time()) + 2, 0))
                 except ValueError:
                     pass
+        if not data:
+            data = {}
 
         if verb == 'POST':
             if data:
@@ -4860,6 +4936,7 @@ class Api(object):
                 resp = 0  # POST request, but without data or json
 
         elif verb == 'GET':
+            data['tweet_mode'] = self.tweet_mode
             url = self._BuildUrl(url, extra_params=data)
             resp = requests.get(url, auth=self.__auth, timeout=self._timeout)
 

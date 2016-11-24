@@ -12,6 +12,7 @@ CONSUMER_SECRET = os.getenv('CONSUMER_SECRET', None)
 ACCESS_TOKEN_KEY = os.getenv('ACCESS_TOKEN_KEY', None)
 ACCESS_TOKEN_SECRET = os.getenv('ACCESS_TOKEN_SECRET', None)
 
+
 @unittest.skipIf(not CONSUMER_KEY and not CONSUMER_SECRET, "No tokens provided")
 class ApiTest(unittest.TestCase):
     def setUp(self):

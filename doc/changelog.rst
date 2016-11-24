@@ -36,6 +36,8 @@ What's New
 
 * Google App Engine support has been reintegrated into the library. Check out `PR #383 <https://github.com/bear/python-twitter/pull/383>`_.
 
+* `video_info` is now available on a `twitter.models.Media` object, which allows access to video urls/bitrates/etc. in the `extended_entities` node of a tweet.
+
 What's Changed
 --------------
 
@@ -99,3 +101,5 @@ ______________
 * Updated examples, specifically ``examples/twitter-to-xhtml.py``, ``examples/view_friends.py``, ``examples/shorten_url.py``
 
 * Updated ``get_access_token.py`` script to be python3 compatible.
+
+* :py:func:`twitter.api.Api.GetStreamFilter()` now accepts an optional languages parameter as a list.

@@ -3,6 +3,7 @@
 import unittest
 import twitter
 
+
 class ParseTest(unittest.TestCase):
     """ Test the ParseTweet class """
 
