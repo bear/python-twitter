@@ -11,12 +11,14 @@ help:
 env:
 	pip install -Ur requirements.txt
 
-dev: env
+pyenv:
 	pyenv install -s 2.7.11
 	pyenv install -s 3.5.1
 	pyenv install -s pypy-5.3.1
-	pyenv install -s pypy3-2.4.0
-	pyenv local 2.7.11 3.5.1 pypy-5.3.1 pypy3-2.4.0
+	# pyenv install -s pypy3-2.4.0
+	pyenv local 2.7.11 3.5.1 pypy-5.3.1 # pypy3-2.4.0
+
+dev: env pyenv
 	pip install -Ur requirements.testing.txt
 
 info:
@@ -48,13 +50,7 @@ coverage: clean
 	coverage html
 	coverage report
 
-ci:
-	pyenv install -s 2.7.11
-	pyenv install -s 3.5.1
-	pyenv install -s pypy-5.3.1
-	pyenv install -s pypy3-2.4.0
-	pyenv local 2.7.11 3.5.1 pypy-5.3.1 pypy3-2.4.0
-	pip install -Ur requirements.testing.txt
+ci: pyenv
 	tox
 	CODECOV_TOKEN=`cat .codecov-token` codecov
 
