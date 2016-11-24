@@ -63,6 +63,6 @@ upload: clean
 	pyenv 2.7.11
 	python setup.py sdist upload
 	python setup.py bdist_wheel upload
-  pyenv 3.5.2
-  python setup.py bdist_wheel upload
-  pyenv local 2.7.11 3.5.2 pypy-5.3.2
+	pyenv 3.5.2
+	python setup.py bdist_wheel upload
+	pyenv local 2.7.11 3.5.2 pypy-5.3.2
