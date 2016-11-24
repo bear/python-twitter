@@ -1435,7 +1435,7 @@ class Api(object):
         line_length = 0
         words = re.split(r'\s', status)
 
-        if len(words) == 1 and not is_url(words):
+        if len(words) == 1 and not is_url(words[0]):
             if len(words[0]) > 140:
                 raise TwitterError({"message": "Unable to split status into tweetable parts. Word was: {0}/{1}".format(len(words[0]), char_lim)})
             else:
