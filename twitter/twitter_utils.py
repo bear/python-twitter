@@ -161,12 +161,13 @@ def calc_expected_status_length(status, short_url_length=23):
         Expected length of the status message as an integer.
 
     """
-    replaced_chars = 0
-    status_length = len(status)
-    match = re.findall(URL_REGEXP, status)
-    if len(match) >= 1:
-        replaced_chars = len(''.join(match))
-    status_length = status_length - replaced_chars + (short_url_length * len(match))
+    status_length = 0
+    for word in re.split(r'\s', status):
+        if is_url(word):
+            status_length += short_url_length
+        else:
+            status_length += len(word)
+    status_length += len(re.findall(r'\s', status))
     return status_length
 
 

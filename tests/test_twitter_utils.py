@@ -5,6 +5,7 @@ import unittest
 import twitter
 
 from twitter.twitter_utils import (
+    calc_expected_status_length,
     parse_media_file
 )
 
@@ -58,3 +59,18 @@ class ApiTest(unittest.TestCase):
         self.assertRaises(
             twitter.TwitterError,
             lambda: twitter.twitter_utils.enf_type('test', int, 'hi'))
+
+    def test_calc_expected_status_length(self):
+        status = 'hi a tweet there'
+        len_status = calc_expected_status_length(status)
+        self.assertEqual(len_status, 16)
+
+    def test_calc_expected_status_length_with_url(self):
+        status = 'hi a tweet there example.com'
+        len_status = calc_expected_status_length(status)
+        self.assertEqual(len_status, 40)
+
+    def test_calc_expected_status_length_with_url_and_extra_spaces(self):
+        status = 'hi a tweet          there               example.com'
+        len_status = calc_expected_status_length(status)
+        self.assertEqual(len_status, 63)
