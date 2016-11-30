@@ -1551,11 +1551,10 @@ class Api(object):
         tweets = self._TweetTextWrap(status=status, char_lim=char_limit)
 
         if len(tweets) == 1:
-            results.append(self.PostUpdate(status=tweets[0]))
+            results.append(self.PostUpdate(status=tweets[0], **kwargs))
             return results
 
         for tweet in tweets[0:-1]:
-            print('tweeting', tweet)
             results.append(self.PostUpdate(status=tweet + continuation, **kwargs))
         results.append(self.PostUpdate(status=tweets[-1], **kwargs))
 
