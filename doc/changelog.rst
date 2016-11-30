@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+Version 3.2.1
+=============
+
+* :py:func:`twitter.twitter_utils.calc_expected_status_length` should now function properly. Previously, URLs would be counted incorrectly. See `PR #416 <https://github.com/bear/python-twitter/pull/416>`_
+
+* :py:func:`twitter.api.Api.PostUpdates` now passes any keyword arguments on the edge case that only one tweet was actually being posted.
+
+
 Version 3.2
 ===========
 
