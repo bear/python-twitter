@@ -498,3 +498,51 @@ class Status(TwitterModel):
                                                urls=urls,
                                                user=user,
                                                user_mentions=user_mentions)
+
+
+class Collection(TwitterModel):
+    """A class representing the Collection structure used by the twitter API."""
+
+    def __init__(self, **kwargs):
+        self.param_defaults = {
+            'id': None,
+            'collection_type': None,
+            'collection_url': None,
+            'custom_timeline_type': None,
+            'custom_timeline_url': None,
+            'description': None,
+            'entries': None,
+            'name': None,
+            'name_entities': None,
+            'statuses': None,
+            'timeline': None,
+            'timeline_order': None,
+            'truncated': None,
+            'user': None,
+            'user_id': None,
+            'visibility': None,
+        }
+
+        for (param, default) in self.param_defaults.items():
+            setattr(self, param, kwargs.get(param, default))
+
+    def __repr__(self):
+        return 'Collection(ID={id}, Name="{name}")'.format(
+            id=self.id,
+            name=self.name)
+
+    @classmethod
+    def NewFromJsonDict(cls, data, **kwargs):
+        """ Create a new instance based on a JSON dict.
+
+        Args:
+            data: A JSON dict, as converted from the JSON in the twitter API
+
+        Returns:
+            A twitter.Collection instance
+        """
+        if not kwargs.get('was_truncated'):
+            data['was_truncated'] = data.get('response', {}).get('position', {}).get('was_truncated', False)
+        if not kwargs.get('timeline'):
+            data['timeline'] = data.get('response', {}).get('timeline', None)
+        return super(cls, cls).NewFromJsonDict(data=data, **kwargs)

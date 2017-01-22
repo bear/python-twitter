@@ -42,6 +42,7 @@ from .parse_tweet import ParseTweet         # noqa
 
 from .models import (                       # noqa
     Category,                               # noqa
+    Collection,                             # noqa
     DirectMessage,                          # noqa
     Hashtag,                                # noqa
     List,                                   # noqa

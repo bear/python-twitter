@@ -17,8 +17,7 @@
 # limitations under the License.
 
 """A library that provides a Python interface to the Twitter API"""
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function
 
 import json
 import sys
@@ -32,6 +31,7 @@ import io
 import warnings
 from uuid import uuid4
 import os
+from operator import itemgetter
 
 try:
     # python 3
@@ -48,6 +48,7 @@ from twitter import (
     __version__,
     _FileCache,
     Category,
+    Collection,
     DirectMessage,
     List,
     Status,
@@ -69,8 +70,6 @@ from twitter.error import (
     PythonTwitterDeprecationWarning330,
 )
 
-
-warnings.simplefilter('always', DeprecationWarning)
 
 CHARACTER_LIMIT = 140
 
@@ -4495,6 +4494,88 @@ class Api(object):
             raise TwitterError({'message': "The image could not be resized or is too large."})
 
         raise TwitterError({'message': "Unkown banner image upload issue"})
+
+    def GetCollectionList(self,
+                          user_id=None,
+                          screen_name=None,
+                          status_id=None,
+                          count=200,
+                          cursor=None):
+        url = "%s/1.1/collections/list.json" % self.base_url
+        parameters = {
+            'user_id': user_id,
+            'screen_name': screen_name,
+            'status_id': status_id,
+            'count': count,
+            'cursor': cursor,
+        }
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        collections = []
+        for collection_id, collection_data in data['objects']['timelines'].items():
+            # The collections list contains a bunch of User objects as well,
+            # but in a different json node, so we attempt to retrieve them
+            # and them by user_id and then attach to the relevant collection.
+            try:
+                user = User.NewFromJsonDict(data['objects']['users'][collection_data['user_id']])
+            except KeyError as e:
+                user = None
+            collections.append(Collection.NewFromJsonDict(collection_data, id=collection_id, user=user))
+        next_cursor = data.get('cursors', {}).get('next_cursor', None)
+        previous_cursor = data.get('cursors', {}).get('previous_cursor', None)
+        return next_cursor, previous_cursor, collections
+
+    def GetCollection(self, collection_id=None):
+        url = "%s/collections/show.json" % self.base_url
+        parameters = {
+            'id': collection_id,
+        }
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        # Essentially the same as in GetCollectionList
+        collection_id = data['response']['timeline_id']
+        collection_data = data['objects']['timelines'][collection_id]
+        user = User.NewFromJsonDict(data['objects']['users'][collection_data['user_id']])
+        return Collection.NewFromJsonDict(collection_data, id=collection_id, user=user)
+
+    def GetCollectionEntries(self,
+                             collection_id,
+                             count=200,
+                             max_position=None,
+                             min_position=None):
+        url = "%s/collections/entries.json" % self.base_url
+
+        parameters = {
+            'id': collection_id,
+            'count': count,
+            'max_position': max_position,
+            'min_position': min_position,
+        }
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        collection_id = data['response']['timeline_id']
+        collection_data = data['objects']['timelines'][collection_id]
+        user = User.NewFromJsonDict(data['objects']['users'][collection_data['user_id']])
+
+        # This is a bit of a mess.
+        timeline = sorted([t['tweet'] for t in data['response']['timeline']], key=itemgetter('sort_index'))
+
+        statuses = []
+        statuses_list = [tweet_node['id'] for tweet_node in timeline]
+        for status_id in statuses_list:
+            status_data = data['objects']['tweets'][status_id]
+            status_user = User.NewFromJsonDict(data['objects']['users'][status_data['user']['id_str']])
+            statuses.append(Status.NewFromJsonDict(status_data, user=status_user))
+
+        return Collection.NewFromJsonDict(collection_data,
+                                          id=collection_id,
+                                          user=user,
+                                          statuses=statuses,
+                                          timeline=timeline)
 
     def GetStreamSample(self, delimited=False, stall_warnings=True):
         """Returns a small sample of public statuses.
