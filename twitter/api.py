@@ -1702,7 +1702,7 @@ class Api(object):
         """
         url = '%s/statuses/retweeters/ids.json' % (self.base_url)
         parameters = {
-            'status_id': enf_type('status_id', int, status_id),
+            'id': enf_type('id', int, status_id),
             'stringify_ids': enf_type('stringify_ids', bool, stringify_ids)
         }
 
