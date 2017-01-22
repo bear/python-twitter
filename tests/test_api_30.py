@@ -1324,7 +1324,7 @@ class ApiTest(unittest.TestCase):
         responses.add(GET, DEFAULT_URL, body=resp_data)
 
         resp = self.api.GetStatus(status_id=724441953534877696)
-        self.assertEqual(resp.media[0].ext_alt_text, "\u201cJon Snow is dead.\u2026\u201d from \u201cGAME OF THRONES SEASON 6 EPISODES\u201d by HBO PR.")
+        self.assertEqual(resp.media[1].ext_alt_text, "\u201cJon Snow is dead.\u2026\u201d from \u201cGAME OF THRONES SEASON 6 EPISODES\u201d by HBO PR.")
 
     @responses.activate
     def testGetStatus(self):

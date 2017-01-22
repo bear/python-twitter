@@ -460,40 +460,40 @@ class Status(TwitterModel):
         Returns:
             A twitter.Status instance
         """
-        current_user_retweet = None
-        hashtags = None
-        media = None
-        retweeted_status = None
-        urls = None
-        user = None
-        user_mentions = None
+        current_user_retweet = kwargs.get('current_user_retweet', None)
+        hashtags = kwargs.get('hashtags', None)
+        media = kwargs.get('media', [])
+        retweeted_status = kwargs.get('retweeted_status', None)
+        urls = kwargs.get('urls', None)
+        user = kwargs.get('user', None)
+        user_mentions = kwargs.get('user_mentions', None)
 
-        if 'user' in data:
+        if user is None and 'user' in data:
             user = User.NewFromJsonDict(data['user'])
-        if 'retweeted_status' in data:
+        if retweeted_status is None and 'retweeted_status' in data:
             retweeted_status = Status.NewFromJsonDict(data['retweeted_status'])
-        if 'current_user_retweet' in data:
+        if current_user_retweet is None and 'current_user_retweet' in data:
             current_user_retweet = data['current_user_retweet']['id']
 
         if 'entities' in data:
-            if 'urls' in data['entities']:
+            if urls is None and 'urls' in data['entities']:
                 urls = [Url.NewFromJsonDict(u) for u in data['entities']['urls']]
-            if 'user_mentions' in data['entities']:
+            if user_mentions is None and 'user_mentions' in data['entities']:
                 user_mentions = [User.NewFromJsonDict(u) for u in data['entities']['user_mentions']]
-            if 'hashtags' in data['entities']:
+            if hashtags is None and 'hashtags' in data['entities']:
                 hashtags = [Hashtag.NewFromJsonDict(h) for h in data['entities']['hashtags']]
-            if 'media' in data['entities']:
+            if media == [] and 'media' in data['entities']:
                 media = [Media.NewFromJsonDict(m) for m in data['entities']['media']]
 
         # the new extended entities
         if 'extended_entities' in data:
             if 'media' in data['extended_entities']:
-                media = [Media.NewFromJsonDict(m) for m in data['extended_entities']['media']]
+                media += [Media.NewFromJsonDict(m) for m in data['extended_entities']['media']]
 
         return super(cls, cls).NewFromJsonDict(data=data,
                                                current_user_retweet=current_user_retweet,
                                                hashtags=hashtags,
-                                               media=media,
+                                               media=media or None,
                                                retweeted_status=retweeted_status,
                                                urls=urls,
                                                user=user,

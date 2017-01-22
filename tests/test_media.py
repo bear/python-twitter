@@ -110,7 +110,7 @@ class MediaTest(unittest.TestCase):
     def test_media_info(self):
         with open('testdata/get_status_promoted_video_tweet.json', 'r') as f:
             tweet = twitter.Status.NewFromJsonDict(json.loads(f.read()))
-        media = tweet.media[0]
+        media = tweet.media[1]
         self.assertTrue(isinstance(tweet.media, list))
         self.assertTrue(media.video_info)
         self.assertTrue(media.video_info.get('variants', None))
