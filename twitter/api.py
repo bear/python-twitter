@@ -4501,6 +4501,23 @@ class Api(object):
                           status_id=None,
                           count=200,
                           cursor=None):
+        """Returns a list of Collection given by screen_name, user_id, or status_id.
+
+        Args:
+          user_id (int, optional):
+            ID of user owning the collections you want to retrieve.
+          screen_name (str, optional):
+            screenname of user owning the collections you want to retrieve.
+          status_id (int, optional):
+            Get all collections containing this status.
+          count (int, optional):
+            Numer of collections to return (up to max of 200).
+          cursor (str, optional):
+            "Page" identifier to use for paging through results.
+
+        Returns:
+          (list) List of twitter.models.Collections instances.
+        """
         url = "%s/1.1/collections/list.json" % self.base_url
         parameters = {
             'user_id': user_id,
@@ -4527,6 +4544,16 @@ class Api(object):
         return next_cursor, previous_cursor, collections
 
     def GetCollection(self, collection_id=None):
+        """Returns a Collection instance given by the collection_id param.
+
+        Args:
+          collection_id (str):
+            ID of the Collection you want to retrieve.
+
+        Returns:
+          (twitter.models.Collection) twitter.models.Collections instance
+          given by collection_id.
+        """
         url = "%s/collections/show.json" % self.base_url
         parameters = {
             'id': collection_id,
@@ -4545,6 +4572,29 @@ class Api(object):
                              count=200,
                              max_position=None,
                              min_position=None):
+        """Returns a Collection instance given by the collection_id param,
+        which is populated by the tweets in the Collection.
+
+        Not guaranteed that results will include all tweets. If not, the
+        `Collection().was_truncated` parameter will be True.
+
+        You can page backward through the collection by setting the
+        `min_position` of the first call as the `max_position` of the next.
+
+        Args:
+          collection_id (str):
+            ID of the Collection you want to retrieve.
+          count (int, optional):
+            Maximum number of tweets to return within the collection.
+          max_position (int, optional):
+            Similar to `cursor` param. Used for navigating through collection.
+          min_position (int, optional):
+            Similar to `cursor` param. Used for navigating through collection.
+
+        Returns:
+          (twitter.models.Collection) twitter.models.Collections instance
+          given by collection_id.
+        """
         url = "%s/collections/entries.json" % self.base_url
 
         parameters = {
@@ -4571,7 +4621,7 @@ class Api(object):
             status_user = User.NewFromJsonDict(data['objects']['users'][status_data['user']['id_str']])
             statuses.append(Status.NewFromJsonDict(status_data, user=status_user))
 
-        return Collection.NewFromJsonDict(collection_data,
+        return Collection.NewFromJsonDict(data,
                                           id=collection_id,
                                           user=user,
                                           statuses=statuses,

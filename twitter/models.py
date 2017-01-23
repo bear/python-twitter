@@ -512,15 +512,17 @@ class Collection(TwitterModel):
             'custom_timeline_url': None,
             'description': None,
             'entries': None,
+            'max_position': None,
+            'min_position': None,
             'name': None,
             'name_entities': None,
             'statuses': None,
             'timeline': None,
             'timeline_order': None,
-            'truncated': None,
             'user': None,
             'user_id': None,
             'visibility': None,
+            'was_truncated': None,
         }
 
         for (param, default) in self.param_defaults.items():
@@ -541,8 +543,13 @@ class Collection(TwitterModel):
         Returns:
             A twitter.Collection instance
         """
+        position = data.get('response', {}).get('position', {})
         if not kwargs.get('was_truncated'):
-            data['was_truncated'] = data.get('response', {}).get('position', {}).get('was_truncated', False)
+            data['was_truncated'] = position.get('was_truncated', False)
+        if not kwargs.get('min_position'):
+            data['min_position'] = int(position.get('min_position', 0))
+        if not kwargs.get('min_position'):
+            data['max_position'] = int(position.get('max_position', 0))
         if not kwargs.get('timeline'):
             data['timeline'] = data.get('response', {}).get('timeline', None)
         return super(cls, cls).NewFromJsonDict(data=data, **kwargs)

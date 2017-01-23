@@ -54,6 +54,8 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(len(resp.statuses), 12)
         self.assertEqual(resp.statuses[0].id, 609497036921044993)
         self.assertTrue(resp.timeline)
+        self.assertEqual(resp.min_position, 376108874976157696)
+        self.assertEqual(resp.max_position, 376132087884025856)
 
     @responses.activate
     def testGetCollection(self):
@@ -65,6 +67,8 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(resp)
         self.assertEqual(resp.id, 'custom-611975872132689921')
         self.assertEqual(resp.user.screen_name, 'TwitterMusic')
+        self.assertEqual(resp.min_position, 0)
+        self.assertEqual(resp.max_position, 0)
 
     @responses.activate
     def testGetCollectionList(self):
