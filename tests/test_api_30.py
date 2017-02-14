@@ -2,9 +2,15 @@
 from __future__ import unicode_literals, print_function
 
 import json
+import os
 import re
 import sys
+from tempfile import NamedTemporaryFile
 import unittest
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
 import warnings
 
 import twitter
@@ -1713,3 +1719,16 @@ class ApiTest(unittest.TestCase):
         with warnings.catch_warnings(record=True) as w:
             resp = self.api.UpdateBackgroundImage(image='testdata/168NQ.jpg')
             self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+
+    @responses.activate
+    @patch('twitter.api.Api.UploadMediaChunked')
+    def test_UploadSmallVideoUsesChunkedData(self, mocker):
+        responses.add(POST, DEFAULT_URL, body='{}')
+        video = NamedTemporaryFile(suffix='.mp4')
+        video.write(b'10' * 1024)
+        video.seek(0, 0)
+
+        resp = self.api.PostUpdate('test', media=video)
+        assert os.path.getsize(video.name) <= 1024 * 1024
+        assert isinstance(resp, twitter.Status)
+        assert twitter.api.Api.UploadMediaChunked.called

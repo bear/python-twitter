@@ -1026,6 +1026,7 @@ class Api(object):
             parameters['attachment_url'] = attachment_url
 
         if media:
+            chunked_types = ['video/mp4', 'video/quicktime', 'image/gif']
             media_ids = []
             if isinstance(media, int):
                 media_ids.append(media)
@@ -1041,9 +1042,8 @@ class Api(object):
                     _, _, file_size, media_type = parse_media_file(media_file)
                     if media_type == 'image/gif' or media_type == 'video/mp4':
                         raise TwitterError(
-                            'You cannot post more than 1 GIF or 1 video in a '
-                            'single status.')
-                    if file_size > self.chunk_size:
+                            'You cannot post more than 1 GIF or 1 video in a single status.')
+                    if file_size > self.chunk_size or media_type in chunked_types:
                         media_id = self.UploadMediaChunked(
                             media=media_file,
                             additional_owners=media_additional_owners,
@@ -1055,13 +1055,11 @@ class Api(object):
                             media_category=media_category)
                     media_ids.append(media_id)
             else:
-                _, _, file_size, _ = parse_media_file(media)
-                if file_size > self.chunk_size:
-                    media_ids.append(
-                        self.UploadMediaChunked(media, media_additional_owners))
+                _, _, file_size, media_type = parse_media_file(media)
+                if file_size > self.chunk_size or media_type in chunked_types:
+                    media_ids.append(self.UploadMediaChunked(media, media_additional_owners))
                 else:
-                    media_ids.append(
-                        self.UploadMediaSimple(media, media_additional_owners))
+                    media_ids.append(self.UploadMediaSimple(media, media_additional_owners))
             parameters['media_ids'] = ','.join([str(mid) for mid in media_ids])
 
         if latitude is not None and longitude is not None:
@@ -1263,7 +1261,7 @@ class Api(object):
 
         try:
             media_fp.close()
-        except:
+        except Exception as e:
             pass
 
         return True
