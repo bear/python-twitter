@@ -3592,8 +3592,8 @@ class Api(object):
         return List.NewFromJsonDict(data)
 
     def DestroyList(self,
-                    owner_screen_name=False,
-                    owner_id=False,
+                    owner_screen_name=None,
+                    owner_id=None,
                     list_id=None,
                     slug=None):
         """Destroys the list identified by list_id or slug and one of
@@ -3631,8 +3631,8 @@ class Api(object):
         return List.NewFromJsonDict(data)
 
     def CreateSubscription(self,
-                           owner_screen_name=False,
-                           owner_id=False,
+                           owner_screen_name=None,
+                           owner_id=None,
                            list_id=None,
                            slug=None):
         """Creates a subscription to a list by the authenticated user.
@@ -3668,8 +3668,8 @@ class Api(object):
         return User.NewFromJsonDict(data)
 
     def DestroySubscription(self,
-                            owner_screen_name=False,
-                            owner_id=False,
+                            owner_screen_name=None,
+                            owner_id=None,
                             list_id=None,
                             slug=None):
         """Destroys the subscription to a list for the authenticated user.
@@ -3706,8 +3706,8 @@ class Api(object):
         return List.NewFromJsonDict(data)
 
     def ShowSubscription(self,
-                         owner_screen_name=False,
-                         owner_id=False,
+                         owner_screen_name=None,
+                         owner_id=None,
                          list_id=None,
                          slug=None,
                          user_id=None,
@@ -4171,8 +4171,8 @@ class Api(object):
     def DestroyListsMember(self,
                            list_id=None,
                            slug=None,
-                           owner_screen_name=False,
-                           owner_id=False,
+                           owner_screen_name=None,
+                           owner_id=None,
                            user_id=None,
                            screen_name=None):
         """Destroys the subscription to a list for the authenticated user.
