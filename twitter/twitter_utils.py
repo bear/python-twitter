@@ -223,8 +223,8 @@ def parse_media_file(passed_media):
     # Otherwise, if a file object was passed in the first place,
     # create the standard reference to media_file (i.e., rename it to fp).
     else:
-        if passed_media.mode != 'rb':
-            raise TwitterError({'message': 'File mode must be "rb".'})
+        if passed_media.mode not in ['rb', 'rb+', 'w+b']:
+            raise TwitterError('File mode must be "rb" or "rb+"')
         filename = os.path.basename(passed_media.name)
         data_file = passed_media
 
