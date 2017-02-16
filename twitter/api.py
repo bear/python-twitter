@@ -70,8 +70,6 @@ from twitter.error import (
 )
 
 
-warnings.simplefilter('always', DeprecationWarning)
-
 CHARACTER_LIMIT = 140
 
 # A singleton representing a lazily instantiated FileCache.
