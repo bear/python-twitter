@@ -233,7 +233,7 @@ def parse_media_file(passed_media):
 
     try:
         data_file.seek(0)
-    except:
+    except Exception as e:
         pass
 
     media_type = mimetypes.guess_type(os.path.basename(filename))[0]

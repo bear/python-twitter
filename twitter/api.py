@@ -1263,7 +1263,7 @@ class Api(object):
 
         try:
             media_fp.close()
-        except:
+        except Exception as e:
             pass
 
         return True
