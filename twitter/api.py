@@ -4186,10 +4186,10 @@ class Api(object):
           owner_id (int, optional):
             The user ID of the user who owns the list being requested by a slug.
           user_id (int, optional):
-            The user_id or a list of user_id's to add to the list.
+            The user_id or a list of user_id's to remove from the list.
             If not given, then screen_name is required.
           screen_name (str, optional):
-            The screen_name or a list of Screen_name's to add to the list.
+            The screen_name or a list of Screen_name's to remove from the list.
             If not given, then user_id is required.
 
         Returns:
