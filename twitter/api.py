@@ -2825,47 +2825,38 @@ class Api(object):
         are queried is the union of all specified parameters.
 
         Args:
-          user_id:
-            A list of user_ids to retrieve extended information. [Optional]
-          screen_name:
-            A list of screen_names to retrieve extended information. [Optional]
-          users:
+          user_id (int, list, optional):
+            A list of user_ids to retrieve extended information.
+          screen_name (str, optional):
+            A list of screen_names to retrieve extended information.
+          users (list, optional):
             A list of twitter.User objects to retrieve extended information.
-            [Optional]
-          include_entities:
+          include_entities (bool, optional):
             The entities node that may appear within embedded statuses will be
-            disincluded when set to False. [Optional]
+            excluded when set to False.
 
         Returns:
           A list of twitter.User objects for the requested users
         """
-        if not user_id and not screen_name and not users:
-            raise TwitterError({'message': "Specify at least one of user_id, screen_name, or users."})
+        if not any([user_id, screen_name, users]):
+            raise TwitterError("Specify at least one of user_id, screen_name, or users.")
 
         url = '%s/users/lookup.json' % self.base_url
-        parameters = {}
+        parameters = {
+            'include_entities': include_entities
+        }
         uids = list()
         if user_id:
             uids.extend(user_id)
         if users:
             uids.extend([u.id for u in users])
         if len(uids):
-            parameters['user_id'] = ','.join(["%s" % u for u in uids])
+            parameters['user_id'] = ','.join([str(u) for u in uids])
         if screen_name:
             parameters['screen_name'] = ','.join(screen_name)
-        if not include_entities:
-            parameters['include_entities'] = 'false'
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
-        try:
-            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        except TwitterError as e:
-            _, e, _ = sys.exc_info()
-            t = e.args[0]
-            if len(t) == 1 and ('code' in t[0]) and (t[0]['code'] == 34):
-                data = []
-            else:
-                raise
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
         return [User.NewFromJsonDict(u) for u in data]
 
     def GetUser(self,
@@ -2875,29 +2866,27 @@ class Api(object):
         """Returns a single user.
 
         Args:
-          user_id:
-            The id of the user to retrieve. [Optional]
-          screen_name:
+          user_id (int, optional):
+            The id of the user to retrieve.
+          screen_name (str, optional):
             The screen name of the user for whom to return results for.
             Either a user_id or screen_name is required for this method.
-            [Optional]
-          include_entities:
+          include_entities (bool, optional):
             The entities node will be omitted when set to False.
-            [Optional]
 
         Returns:
           A twitter.User instance representing that user
         """
         url = '%s/users/show.json' % (self.base_url)
-        parameters = {}
+        parameters = {
+            'include_entities': include_entities
+        }
         if user_id:
             parameters['user_id'] = user_id
         elif screen_name:
             parameters['screen_name'] = screen_name
         else:
-            raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
-        if not include_entities:
-            parameters['include_entities'] = 'false'
+            raise TwitterError("Specify at least one of user_id or screen_name.")
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
