@@ -260,9 +260,8 @@ class Api(object):
                 "strongly advised to increase it above 16384"
             ))
 
-        if consumer_key is None or consumer_secret is None or (
-            not application_only_auth
-            and (access_token_key is None or access_token_secret is None)):
+        if not (all([consumer_key, consumer_secret])
+           and (application_only_auth or all([access_token_key, access_token_secret]))):
             raise TwitterError({'message': "Missing oAuth Consumer Key or Access Token"})
 
         self.SetCredentials(consumer_key, consumer_secret, access_token_key, access_token_secret,
@@ -281,25 +280,25 @@ class Api(object):
             requests_log.propagate = True
 
     def GetAppOnlyAuthToken(self, consumer_key, consumer_secret):
-      """
-      Generate a Bearer Token from consumer_key and consumer_secret
-      """
-      from urllib import quote_plus
-      import base64
+        """
+        Generate a Bearer Token from consumer_key and consumer_secret
+        """
+        from urllib import quote_plus
+        import base64
 
-      key = quote_plus(consumer_key)
-      secret = quote_plus(consumer_secret)
-      bearer_token = base64.b64encode('{}:{}'.format(key, secret) )
+        key = quote_plus(consumer_key)
+        secret = quote_plus(consumer_secret)
+        bearer_token = base64.b64encode('{}:{}'.format(key, secret) )
 
-      post_headers = {
-          'Authorization': 'Basic '+bearer_token,
-          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-      }
-      res = requests.post(url='https://api.twitter.com/oauth2/token',
-                          data={'grant_type':'client_credentials'},
-                          headers=post_headers)
-      bearer_creds = res.json()
-      return bearer_creds
+        post_headers = {
+            'Authorization': 'Basic '+bearer_token,
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        }
+        res = requests.post(url='https://api.twitter.com/oauth2/token',
+                            data={'grant_type':'client_credentials'},
+                            headers=post_headers)
+        bearer_creds = res.json()
+        return bearer_creds
 
     def SetCredentials(self,
                        consumer_key,
