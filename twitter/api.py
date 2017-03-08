@@ -260,8 +260,8 @@ class Api(object):
                 "strongly advised to increase it above 16384"
             ))
 
-        if not (all([consumer_key, consumer_secret])
-           and (application_only_auth or all([access_token_key, access_token_secret]))):
+        if (consumer_key and not
+           (application_only_auth or all([access_token_key, access_token_secret]))):
             raise TwitterError({'message': "Missing oAuth Consumer Key or Access Token"})
 
         self.SetCredentials(consumer_key, consumer_secret, access_token_key, access_token_secret,
