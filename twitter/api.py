@@ -1708,7 +1708,7 @@ class Api(object):
         while True:
             if cursor:
                 try:
-                    parameters['count'] = int(cursor)
+                    parameters['cursor'] = int(cursor)
                 except ValueError:
                     raise TwitterError({'message': "cursor must be an integer"})
             resp = self._RequestUrl(url, 'GET', data=parameters)
