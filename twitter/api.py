@@ -204,6 +204,9 @@ class Api(object):
           tweet_mode (str, optional):
             Whether to use the new (as of Sept. 2016) extended tweet mode. See docs for
             details. Choices are ['compatibility', 'extended'].
+     	  proxies (dict, optional):
+     	  	A dictionary of proxies for the request to pass through, if not specified
+     	  	allows requests lib to use environmental variables for proxy if any.
         """
 
         # check to see if the library is running on a Google App Engine instance
