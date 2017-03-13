@@ -155,7 +155,8 @@ class Api(object):
                  debugHTTP=False,
                  timeout=None,
                  sleep_on_rate_limit=False,
-                 tweet_mode='compat'):
+                 tweet_mode='compat',
+                 proxies=None):
         """Instantiate a new twitter.Api object.
 
         Args:
@@ -203,6 +204,9 @@ class Api(object):
           tweet_mode (str, optional):
             Whether to use the new (as of Sept. 2016) extended tweet mode. See docs for
             details. Choices are ['compatibility', 'extended'].
+          proxies (dict, optional):
+            A dictionary of proxies for the request to pass through, if not specified
+            allows requests lib to use environmental variables for proxy if any.
         """
 
         # check to see if the library is running on a Google App Engine instance
@@ -229,6 +233,7 @@ class Api(object):
         self.rate_limit = RateLimit()
         self.sleep_on_rate_limit = sleep_on_rate_limit
         self.tweet_mode = tweet_mode
+        self.proxies = proxies
 
         if base_url is None:
             self.base_url = 'https://api.twitter.com/1.1'
@@ -4872,7 +4877,8 @@ class Api(object):
                 headers=headers,
                 data=data,
                 auth=self.__auth,
-                timeout=self._timeout
+                timeout=self._timeout,
+                proxies=self.proxies
             )
         except requests.RequestException as e:
             raise TwitterError(str(e))
@@ -4909,20 +4915,20 @@ class Api(object):
             if data:
                 if 'media_ids' in data:
                     url = self._BuildUrl(url, extra_params={'media_ids': data['media_ids']})
-                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout)
+                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
                 elif 'media' in data:
-                    resp = requests.post(url, files=data, auth=self.__auth, timeout=self._timeout)
+                    resp = requests.post(url, files=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
                 else:
-                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout)
+                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
             elif json:
-                resp = requests.post(url, json=json, auth=self.__auth, timeout=self._timeout)
+                resp = requests.post(url, json=json, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
             else:
                 resp = 0  # POST request, but without data or json
 
         elif verb == 'GET':
             data['tweet_mode'] = self.tweet_mode
             url = self._BuildUrl(url, extra_params=data)
-            resp = requests.get(url, auth=self.__auth, timeout=self._timeout)
+            resp = requests.get(url, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
 
         else:
             resp = 0  # if not a POST or GET request
@@ -4954,14 +4960,15 @@ class Api(object):
             try:
                 return requests.post(url, data=data, stream=True,
                                      auth=self.__auth,
-                                     timeout=self._timeout)
+                                     timeout=self._timeout,
+                                     proxies=self.proxies)
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         if verb == 'GET':
             url = self._BuildUrl(url, extra_params=data)
             try:
                 return requests.get(url, stream=True, auth=self.__auth,
-                                    timeout=self._timeout)
+                                    timeout=self._timeout, proxies=self.proxies)
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         return 0  # if not a POST or GET request
