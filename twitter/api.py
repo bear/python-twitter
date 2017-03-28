@@ -122,6 +122,7 @@ class Api(object):
         >>> api.GetUserTimeline(user)
         >>> api.GetHomeTimeline()
         >>> api.GetStatus(status_id)
+        >>> def GetStatuses(ids)
         >>> api.DestroyStatus(status_id)
         >>> api.GetFriends(user)
         >>> api.GetFollowers()
@@ -811,6 +812,39 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
+
+    def GetStatuses(self,
+                    ids,
+                    trim_user=False,
+                    include_entities=True):
+        """Returns a list of status messages, specified by the ids parameter.
+
+        Args:
+          ids:
+            A list of the numeric ID of the statuses you are trying to retrieve.
+          trim_user:
+            When set to True, each tweet returned in a timeline will include
+            a user object including only the status authors numerical ID.
+            Omit this parameter to receive the complete user object. [Optional]
+          include_entities:
+            If False, the entities node will be disincluded.
+            This node offers a variety of metadata about the tweet in a
+            discreet structure, including: user_mentions, urls, and
+            hashtags. [Optional]
+        Returns:
+          A list of twitter.Status instances representing that status messages.
+          The returned list may not be in the same order as the argument ids.
+        """
+        url = '%s/statuses/lookup.json' % (self.base_url)
+
+        parameters = {
+            'id': ','.join([str(enf_type('id', int, id)) for id in ids]),
+            'trim_user': enf_type('trim_user', bool, trim_user),
+            'include_entities': enf_type('include_entities', bool, include_entities)
+        }
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        return([Status.NewFromJsonDict(dataitem) for dataitem in data])
 
     def GetStatusOembed(self,
                         status_id=None,
