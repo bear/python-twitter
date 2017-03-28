@@ -816,7 +816,8 @@ class Api(object):
     def GetStatuses(self,
                     ids,
                     trim_user=False,
-                    include_entities=True):
+                    include_entities=True,
+                    respect_order=False):
         """Returns a list of status messages, specified by the ids parameter.
 
         Args:
@@ -831,6 +832,10 @@ class Api(object):
             This node offers a variety of metadata about the tweet in a
             discreet structure, including: user_mentions, urls, and
             hashtags. [Optional]
+          respect_order:
+            If True, the returned list of results will be in the same order as
+            the list of ids, with None in the place of ids that could not be
+            retrieved. [Optional]
         Returns:
           A list of twitter.Status instances representing that status messages.
           The returned list may not be in the same order as the argument ids.
@@ -845,11 +850,19 @@ class Api(object):
         }
         while offset < len(ids):
             parameters['id'] = ','.join([str(enf_type('id', int, id)) for id in ids[offset:offset+100]])
-            offset += 100
 
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-            result += [Status.NewFromJsonDict(dataitem) for dataitem in data]
+            batch = [Status.NewFromJsonDict(dataitem) for dataitem in data]
+            if respect_order:
+                batchdict = {status.id:status for status in batch}
+
+                batch = []
+                for id in ids[offset:offset+100]:
+                    batch.append(batchdict.get(id, None))
+
+            result += batch
+            offset += 100
 
         return result
 
