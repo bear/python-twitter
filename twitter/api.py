@@ -70,8 +70,6 @@ from twitter.error import (
 )
 
 
-warnings.simplefilter('always', DeprecationWarning)
-
 CHARACTER_LIMIT = 140
 
 # A singleton representing a lazily instantiated FileCache.
@@ -158,7 +156,8 @@ class Api(object):
                  debugHTTP=False,
                  timeout=None,
                  sleep_on_rate_limit=False,
-                 tweet_mode='compat'):
+                 tweet_mode='compat',
+                 proxies=None):
         """Instantiate a new twitter.Api object.
 
         Args:
@@ -209,12 +208,15 @@ class Api(object):
           tweet_mode (str, optional):
             Whether to use the new (as of Sept. 2016) extended tweet mode. See docs for
             details. Choices are ['compatibility', 'extended'].
+          proxies (dict, optional):
+            A dictionary of proxies for the request to pass through, if not specified
+            allows requests lib to use environmental variables for proxy if any.
         """
 
         # check to see if the library is running on a Google App Engine instance
         # see GAE.rst for more information
         if os.environ:
-            if 'Google App Engine' in os.environ.get('SERVER_SOFTWARE', ''):
+            if 'APPENGINE_RUNTIME' in os.environ.keys():
                 import requests_toolbelt.adapters.appengine  # Adapter ensures requests use app engine's urlfetch
                 requests_toolbelt.adapters.appengine.monkeypatch()
                 cache = None  # App Engine does not like this caching strategy, disable caching
@@ -235,6 +237,7 @@ class Api(object):
         self.rate_limit = RateLimit()
         self.sleep_on_rate_limit = sleep_on_rate_limit
         self.tweet_mode = tweet_mode
+        self.proxies = proxies
 
         if base_url is None:
             self.base_url = 'https://api.twitter.com/1.1'
@@ -1055,6 +1058,7 @@ class Api(object):
             parameters['attachment_url'] = attachment_url
 
         if media:
+            chunked_types = ['video/mp4', 'video/quicktime', 'image/gif']
             media_ids = []
             if isinstance(media, int):
                 media_ids.append(media)
@@ -1070,9 +1074,8 @@ class Api(object):
                     _, _, file_size, media_type = parse_media_file(media_file)
                     if media_type == 'image/gif' or media_type == 'video/mp4':
                         raise TwitterError(
-                            'You cannot post more than 1 GIF or 1 video in a '
-                            'single status.')
-                    if file_size > self.chunk_size:
+                            'You cannot post more than 1 GIF or 1 video in a single status.')
+                    if file_size > self.chunk_size or media_type in chunked_types:
                         media_id = self.UploadMediaChunked(
                             media=media_file,
                             additional_owners=media_additional_owners,
@@ -1084,13 +1087,11 @@ class Api(object):
                             media_category=media_category)
                     media_ids.append(media_id)
             else:
-                _, _, file_size, _ = parse_media_file(media)
-                if file_size > self.chunk_size:
-                    media_ids.append(
-                        self.UploadMediaChunked(media, media_additional_owners))
+                _, _, file_size, media_type = parse_media_file(media)
+                if file_size > self.chunk_size or media_type in chunked_types:
+                    media_ids.append(self.UploadMediaChunked(media, media_additional_owners))
                 else:
-                    media_ids.append(
-                        self.UploadMediaSimple(media, media_additional_owners))
+                    media_ids.append(self.UploadMediaSimple(media, media_additional_owners))
             parameters['media_ids'] = ','.join([str(mid) for mid in media_ids])
 
         if latitude is not None and longitude is not None:
@@ -1292,7 +1293,7 @@ class Api(object):
 
         try:
             media_fp.close()
-        except:
+        except Exception as e:
             pass
 
         return True
@@ -1731,7 +1732,7 @@ class Api(object):
         """
         url = '%s/statuses/retweeters/ids.json' % (self.base_url)
         parameters = {
-            'status_id': enf_type('status_id', int, status_id),
+            'id': enf_type('id', int, status_id),
             'stringify_ids': enf_type('stringify_ids', bool, stringify_ids)
         }
 
@@ -1741,7 +1742,7 @@ class Api(object):
         while True:
             if cursor:
                 try:
-                    parameters['count'] = int(cursor)
+                    parameters['cursor'] = int(cursor)
                 except ValueError:
                     raise TwitterError({'message': "cursor must be an integer"})
             resp = self._RequestUrl(url, 'GET', data=parameters)
@@ -2858,47 +2859,38 @@ class Api(object):
         are queried is the union of all specified parameters.
 
         Args:
-          user_id:
-            A list of user_ids to retrieve extended information. [Optional]
-          screen_name:
-            A list of screen_names to retrieve extended information. [Optional]
-          users:
+          user_id (int, list, optional):
+            A list of user_ids to retrieve extended information.
+          screen_name (str, optional):
+            A list of screen_names to retrieve extended information.
+          users (list, optional):
             A list of twitter.User objects to retrieve extended information.
-            [Optional]
-          include_entities:
+          include_entities (bool, optional):
             The entities node that may appear within embedded statuses will be
-            disincluded when set to False. [Optional]
+            excluded when set to False.
 
         Returns:
           A list of twitter.User objects for the requested users
         """
-        if not user_id and not screen_name and not users:
-            raise TwitterError({'message': "Specify at least one of user_id, screen_name, or users."})
+        if not any([user_id, screen_name, users]):
+            raise TwitterError("Specify at least one of user_id, screen_name, or users.")
 
         url = '%s/users/lookup.json' % self.base_url
-        parameters = {}
+        parameters = {
+            'include_entities': include_entities
+        }
         uids = list()
         if user_id:
             uids.extend(user_id)
         if users:
             uids.extend([u.id for u in users])
         if len(uids):
-            parameters['user_id'] = ','.join(["%s" % u for u in uids])
+            parameters['user_id'] = ','.join([str(u) for u in uids])
         if screen_name:
             parameters['screen_name'] = ','.join(screen_name)
-        if not include_entities:
-            parameters['include_entities'] = 'false'
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
-        try:
-            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        except TwitterError as e:
-            _, e, _ = sys.exc_info()
-            t = e.args[0]
-            if len(t) == 1 and ('code' in t[0]) and (t[0]['code'] == 34):
-                data = []
-            else:
-                raise
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
         return [User.NewFromJsonDict(u) for u in data]
 
     def GetUser(self,
@@ -2908,29 +2900,27 @@ class Api(object):
         """Returns a single user.
 
         Args:
-          user_id:
-            The id of the user to retrieve. [Optional]
-          screen_name:
+          user_id (int, optional):
+            The id of the user to retrieve.
+          screen_name (str, optional):
             The screen name of the user for whom to return results for.
             Either a user_id or screen_name is required for this method.
-            [Optional]
-          include_entities:
+          include_entities (bool, optional):
             The entities node will be omitted when set to False.
-            [Optional]
 
         Returns:
           A twitter.User instance representing that user
         """
         url = '%s/users/show.json' % (self.base_url)
-        parameters = {}
+        parameters = {
+            'include_entities': include_entities
+        }
         if user_id:
             parameters['user_id'] = user_id
         elif screen_name:
             parameters['screen_name'] = screen_name
         else:
-            raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
-        if not include_entities:
-            parameters['include_entities'] = 'false'
+            raise TwitterError("Specify at least one of user_id or screen_name.")
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -3621,8 +3611,8 @@ class Api(object):
         return List.NewFromJsonDict(data)
 
     def DestroyList(self,
-                    owner_screen_name=False,
-                    owner_id=False,
+                    owner_screen_name=None,
+                    owner_id=None,
                     list_id=None,
                     slug=None):
         """Destroys the list identified by list_id or slug and one of
@@ -3660,8 +3650,8 @@ class Api(object):
         return List.NewFromJsonDict(data)
 
     def CreateSubscription(self,
-                           owner_screen_name=False,
-                           owner_id=False,
+                           owner_screen_name=None,
+                           owner_id=None,
                            list_id=None,
                            slug=None):
         """Creates a subscription to a list by the authenticated user.
@@ -3697,8 +3687,8 @@ class Api(object):
         return User.NewFromJsonDict(data)
 
     def DestroySubscription(self,
-                            owner_screen_name=False,
-                            owner_id=False,
+                            owner_screen_name=None,
+                            owner_id=None,
                             list_id=None,
                             slug=None):
         """Destroys the subscription to a list for the authenticated user.
@@ -3735,8 +3725,8 @@ class Api(object):
         return List.NewFromJsonDict(data)
 
     def ShowSubscription(self,
-                         owner_screen_name=False,
-                         owner_id=False,
+                         owner_screen_name=None,
+                         owner_id=None,
                          list_id=None,
                          slug=None,
                          user_id=None,
@@ -4200,8 +4190,8 @@ class Api(object):
     def DestroyListsMember(self,
                            list_id=None,
                            slug=None,
-                           owner_screen_name=False,
-                           owner_id=False,
+                           owner_screen_name=None,
+                           owner_id=None,
                            user_id=None,
                            screen_name=None):
         """Destroys the subscription to a list for the authenticated user.
@@ -4219,10 +4209,10 @@ class Api(object):
           owner_id (int, optional):
             The user ID of the user who owns the list being requested by a slug.
           user_id (int, optional):
-            The user_id or a list of user_id's to add to the list.
+            The user_id or a list of user_id's to remove from the list.
             If not given, then screen_name is required.
           screen_name (str, optional):
-            The screen_name or a list of Screen_name's to add to the list.
+            The screen_name or a list of Screen_name's to remove from the list.
             If not given, then user_id is required.
 
         Returns:
@@ -4916,7 +4906,8 @@ class Api(object):
                 headers=headers,
                 data=data,
                 auth=self.__auth,
-                timeout=self._timeout
+                timeout=self._timeout,
+                proxies=self.proxies
             )
         except requests.RequestException as e:
             raise TwitterError(str(e))
@@ -4953,20 +4944,20 @@ class Api(object):
             if data:
                 if 'media_ids' in data:
                     url = self._BuildUrl(url, extra_params={'media_ids': data['media_ids']})
-                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout)
+                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
                 elif 'media' in data:
-                    resp = requests.post(url, files=data, auth=self.__auth, timeout=self._timeout)
+                    resp = requests.post(url, files=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
                 else:
-                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout)
+                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
             elif json:
-                resp = requests.post(url, json=json, auth=self.__auth, timeout=self._timeout)
+                resp = requests.post(url, json=json, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
             else:
                 resp = 0  # POST request, but without data or json
 
         elif verb == 'GET':
             data['tweet_mode'] = self.tweet_mode
             url = self._BuildUrl(url, extra_params=data)
-            resp = requests.get(url, auth=self.__auth, timeout=self._timeout)
+            resp = requests.get(url, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
 
         else:
             resp = 0  # if not a POST or GET request
@@ -4998,14 +4989,15 @@ class Api(object):
             try:
                 return requests.post(url, data=data, stream=True,
                                      auth=self.__auth,
-                                     timeout=self._timeout)
+                                     timeout=self._timeout,
+                                     proxies=self.proxies)
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         if verb == 'GET':
             url = self._BuildUrl(url, extra_params=data)
             try:
                 return requests.get(url, stream=True, auth=self.__auth,
-                                    timeout=self._timeout)
+                                    timeout=self._timeout, proxies=self.proxies)
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         return 0  # if not a POST or GET request
