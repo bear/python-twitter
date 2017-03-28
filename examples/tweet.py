@@ -4,7 +4,7 @@
 
 __author__ = 'dewitt@google.com'
 
-import ConfigParser
+import configparser
 import getopt
 import os
 import sys
