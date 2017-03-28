@@ -837,14 +837,21 @@ class Api(object):
         """
         url = '%s/statuses/lookup.json' % (self.base_url)
 
+        result = []
+        offset = 0
         parameters = {
-            'id': ','.join([str(enf_type('id', int, id)) for id in ids]),
             'trim_user': enf_type('trim_user', bool, trim_user),
             'include_entities': enf_type('include_entities', bool, include_entities)
         }
-        resp = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        return([Status.NewFromJsonDict(dataitem) for dataitem in data])
+        while offset < len(ids):
+            parameters['id'] = ','.join([str(enf_type('id', int, id)) for id in ids[offset:offset+100]])
+            offset += 100
+
+            resp = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+            result += [Status.NewFromJsonDict(dataitem) for dataitem in data]
+
+        return result
 
     def GetStatusOembed(self,
                         status_id=None,
