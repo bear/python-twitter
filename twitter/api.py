@@ -4544,7 +4544,8 @@ class Api(object):
                         locations=None,
                         languages=None,
                         delimited=None,
-                        stall_warnings=None):
+                        stall_warnings=None,
+                        filter_level=None):
         """Returns a filtered view of public statuses.
 
         Args:
@@ -4563,6 +4564,9 @@ class Api(object):
             A list of Languages.
             Will only return Tweets that have been detected as being
             written in the specified languages. [Optional]
+          filter_level:
+            Specifies level of filtering applied to stream.
+            Set to None, 'low' or 'medium'. [Optional]
 
         Returns:
           A twitter stream
@@ -4583,6 +4587,8 @@ class Api(object):
             data['stall_warnings'] = str(stall_warnings)
         if languages is not None:
             data['language'] = ','.join(languages)
+        if filter_level is not None:
+            data['filter_level'] = filter_level
 
         resp = self._RequestStream(url, 'POST', data=data)
         for line in resp.iter_lines():
@@ -4597,7 +4603,8 @@ class Api(object):
                       locations=None,
                       delimited=None,
                       stall_warnings=None,
-                      stringify_friend_ids=False):
+                      stringify_friend_ids=False,
+                      filter_level=None):
         """Returns the data from the user stream.
 
         Args:
@@ -4619,6 +4626,9 @@ class Api(object):
           stringify_friend_ids:
             Specifies whether to send the friends list preamble as an array of
             integers or an array of strings. [Optional]
+          filter_level:
+            Specifies level of filtering applied to stream.
+            Set to None, low or medium. [Optional]
 
         Returns:
           A twitter stream
@@ -4639,6 +4649,8 @@ class Api(object):
             data['delimited'] = str(delimited)
         if stall_warnings is not None:
             data['stall_warnings'] = str(stall_warnings)
+        if filter_level is not None:
+            data['filter_level'] = filter_level
 
         resp = self._RequestStream(url, 'POST', data=data)
         for line in resp.iter_lines():
