@@ -69,6 +69,8 @@ from twitter.error import (
     PythonTwitterDeprecationWarning330,
 )
 
+if sys.version_info > (3,):
+    long = int
 
 CHARACTER_LIMIT = 140
 
@@ -1060,14 +1062,14 @@ class Api(object):
         if media:
             chunked_types = ['video/mp4', 'video/quicktime', 'image/gif']
             media_ids = []
-            if isinstance(media, int):
+            if isinstance(media, (int, long)):
                 media_ids.append(media)
 
             elif isinstance(media, list):
                 for media_file in media:
 
                     # If you want to pass just a media ID, it should be an int
-                    if isinstance(media_file, int):
+                    if isinstance(media_file, (int, long)):
                         media_ids.append(media_file)
                         continue
 
