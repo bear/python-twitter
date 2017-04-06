@@ -291,14 +291,14 @@ class Api(object):
 
         key = quote_plus(consumer_key)
         secret = quote_plus(consumer_secret)
-        bearer_token = base64.b64encode('{}:{}'.format(key, secret) )
+        bearer_token = base64.b64encode('{}:{}'.format(key, secret))
 
         post_headers = {
-            'Authorization': 'Basic '+bearer_token,
+            'Authorization': 'Basic ' + bearer_token,
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
         }
         res = requests.post(url='https://api.twitter.com/oauth2/token',
-                            data={'grant_type':'client_credentials'},
+                            data={'grant_type': 'client_credentials'},
                             headers=post_headers)
         bearer_creds = res.json()
         return bearer_creds
