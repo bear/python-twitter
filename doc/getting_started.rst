@@ -44,6 +44,8 @@ At this point, you can test out your application using the keys under "Your Appl
                       access_token_key=[access token],
                       access_token_secret=[access token secret])
 
+Note: Make sure to enclose your keys in quotes (ie, api = twitter.Api(consumer_key='1234567', ...) and so on) or you will receive a NameError.
+
 If you are creating an application for end users/consumers, then you will want them to authorize you application, but that is outside the scope of this document.
 
 And that should be it! If you need a little more help, check out the `examples on Github <https://github.com/bear/python-twitter/tree/master/examples>`_. If you have an open source application using python-twitter, send us a link and we'll add a link to it here.
