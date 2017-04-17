@@ -4,12 +4,13 @@
 
 __author__ = 'dewitt@google.com'
 
+from __future__ import print_function
 import configparser
 import getopt
 import os
 import sys
 import twitter
-from __future__ import print_function
+
 
 
 USAGE = '''Usage: tweet [options] message
