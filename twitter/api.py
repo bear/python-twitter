@@ -122,7 +122,7 @@ class Api(object):
         >>> api.GetUserTimeline(user)
         >>> api.GetHomeTimeline()
         >>> api.GetStatus(status_id)
-        >>> def GetStatuses(ids)
+        >>> def GetStatuses(status_ids)
         >>> api.DestroyStatus(status_id)
         >>> api.GetFriends(user)
         >>> api.GetFollowers()
@@ -843,14 +843,14 @@ class Api(object):
         return Status.NewFromJsonDict(data)
 
     def GetStatuses(self,
-                    ids,
+                    status_ids,
                     trim_user=False,
                     include_entities=True,
                     respect_order=False):
-        """Returns a list of status messages, specified by the ids parameter.
+        """Returns a list of status messages, specified by the status_ids parameter.
 
         Args:
-          ids:
+          status_ids:
             A list of the numeric ID of the statuses you are trying to retrieve.
           trim_user:
             When set to True, each tweet returned in a timeline will include
@@ -863,11 +863,11 @@ class Api(object):
             hashtags. [Optional]
           respect_order:
             If True, the returned list of results will be in the same order as
-            the list of ids, with None in the place of ids that could not be
+            the list of status_ids, with None in the place of status_ids that could not be
             retrieved. [Optional]
         Returns:
           A list of twitter.Status instances representing that status messages.
-          The returned list may not be in the same order as the argument ids.
+          The returned list may not be in the same order as the argument status_ids.
         """
         url = '%s/statuses/lookup.json' % (self.base_url)
 
@@ -877,8 +877,8 @@ class Api(object):
             'trim_user': enf_type('trim_user', bool, trim_user),
             'include_entities': enf_type('include_entities', bool, include_entities)
         }
-        while offset < len(ids):
-            parameters['id'] = ','.join([str(enf_type('id', int, id)) for id in ids[offset:offset+100]])
+        while offset < len(status_ids):
+            parameters['id'] = ','.join([str(enf_type('status_id', int, status_id)) for status_id in status_ids[offset:offset+100]])
 
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -887,8 +887,8 @@ class Api(object):
                 batchdict = {status.id:status for status in batch}
 
                 batch = []
-                for id in ids[offset:offset+100]:
-                    batch.append(batchdict.get(id, None))
+                for status_id in status_ids[offset:offset+100]:
+                    batch.append(batchdict.get(status_id, None))
 
             result += batch
             offset += 100
