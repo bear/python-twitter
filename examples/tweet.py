@@ -92,7 +92,7 @@ class TweetRc(object):
 
     def _GetConfig(self):
         if not self._config:
-            self._config = ConfigParser.ConfigParser()
+            self._config = configparser.ConfigParser()
             self._config.read(os.path.expanduser('~/.tweetrc'))
         return self._config
 
