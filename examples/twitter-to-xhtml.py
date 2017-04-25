@@ -1,69 +1,75 @@
 #!/usr/bin/env python
 
-'''Load the latest update for a Twitter user and leave it in an XHTML fragment'''
+# Copyright 2007-2016 The Python-Twitter Developers
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# ------------------------------------------------------------------------
+# Load the latest update for a Twitter user and output it as an HTML fragment
+#
+
+from __future__ import print_function
+import codecs
+import sys
+import argparse
+
+import twitter
+
+from t import *
 
 __author__ = 'dewitt@google.com'
 
-import codecs
-import getopt
-import sys
-import twitter
-
 TEMPLATE = """
-<div class="twitter">
-  <span class="twitter-user"><a href="http://twitter.com/%s">Twitter</a>: </span>
-  <span class="twitter-text">%s</span>
-  <span class="twitter-relative-created-at"><a href="http://twitter.com/%s/statuses/%s">Posted %s</a></span>
+<div>
+  <a href="http://twitter.com/{user}">Twitter</a>: {user}<br>
+  {tweet_text}<br>
+  <a href="http://twitter.com/{user}/statuses/{status_id}">Posted {tweet_created}</a>
 </div>
 """
 
-def Usage():
-  print 'Usage: %s [options] twitterid' % __file__
-  print
-  print '  This script fetches a users latest twitter update and stores'
-  print '  the result in a file as an XHTML fragment'
-  print
-  print '  Options:'
-  print '    --help -h : print this help'
-  print '    --output : the output file [default: stdout]'
 
+def main(**kwargs):
+    api = twitter.Api(CONSUMER_KEY,
+                      CONSUMER_SECRET,
+                      ACCESS_KEY,
+                      ACCESS_SECRET)
 
-def FetchTwitter(user, output):
-  assert user
-  statuses = twitter.Api().GetUserTimeline(id=user, count=1)
-  s = statuses[0]
-  xhtml = TEMPLATE % (s.user.screen_name, s.text, s.user.screen_name, s.id, s.relative_created_at)
-  if output:
-    Save(xhtml, output)
-  else:
-    print xhtml
+    if kwargs['user_id'] is not None:
+        statuses = api.GetUserTimeline(user_id=kwargs['user_id'])
+    elif kwargs['screenname'] is not None:
+        statuses = api.GetUserTimeline(screen_name=kwargs['screenname'])
 
+    if kwargs['output_file'] is not None:
+        with open(kwargs['output_file'], 'w+') as f:
+            for status in statuses:
+                f.write(status)
+    else:
+        for status in statuses:
+            print(TEMPLATE.format(user=status.user.screen_name,
+                                  tweet_text=status.text,
+                                  status_id=status.id,
+                                  tweet_created=status.created_at))
 
-def Save(xhtml, output):
-  out = codecs.open(output, mode='w', encoding='ascii',
-                    errors='xmlcharrefreplace')
-  out.write(xhtml)
-  out.close()
-
-def main():
-  try:
-    opts, args = getopt.gnu_getopt(sys.argv[1:], 'ho', ['help', 'output='])
-  except getopt.GetoptError:
-    Usage()
-    sys.exit(2)
-  try:
-    user = args[0]
-  except:
-    Usage()
-    sys.exit(2)
-  output = None
-  for o, a in opts:
-    if o in ("-h", "--help"):
-      Usage()
-      sys.exit(2)
-    if o in ("-o", "--output"):
-      output = a
-  FetchTwitter(user, output)
 
 if __name__ == "__main__":
-  main()
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--user-id', help='User id for which to return timeline')
+    group.add_argument('--screenname', help='Screenname for which to return timeline')
+    parser.add_argument('--output-file', help='Write to file instead of stdout')
+    args = parser.parse_args()
+    if not (args.user_id or args.screenname):
+        raise ValueError("You must specify one of user-id or screenname")
+    if not all([CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET]):
+        raise ValueError("You must define CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET in t.py")
+    main(user_id=args.user_id, screenname=args.screenname, output_file=args.output_file)

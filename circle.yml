@@ -1,0 +1,12 @@
+dependencies:
+  override:
+    - pip install -U pip
+    - make dev
+
+test:
+  pre:
+    - make info
+    - uname -a
+    - lsb_release -a
+  override:
+    - make ci

@@ -18,13 +18,21 @@ var
 sdist
 develop-eggs
 .installed.cfg
+.eggs
+.cache
 
 # Installer logs
 pip-log.txt
 
 # Unit test / coverage reports
 .coverage
+.codecov-token
 .tox
+htmlcov
+.tox
+nosetests.xml
+htmlcov
+coverage.xml
 
 # PyCharm data
 .idea
@@ -34,3 +42,12 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+#Environment
+env
+.python-version
+
+violations.flake8.txt
+
+# Built docs
+doc/_build/**
