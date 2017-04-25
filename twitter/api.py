@@ -1074,7 +1074,7 @@ class Api(object):
                         continue
 
                     _, _, file_size, media_type = parse_media_file(media_file)
-                    if (media_type == 'image/gif' or media_type == 'video/mp4') and len(media)>1:
+                    if (media_type == 'image/gif' or media_type == 'video/mp4') and len(media) > 1:
                         raise TwitterError(
                             'You cannot post more than 1 GIF or 1 video in a single status.')
                     if file_size > self.chunk_size or media_type in chunked_types:
