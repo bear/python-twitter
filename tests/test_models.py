@@ -17,8 +17,14 @@ class ModelsTest(unittest.TestCase):
         LIST_SAMPLE_JSON = json.loads(f.read().decode('utf8'))
     with open('testdata/models/models_media.json', 'rb') as f:
         MEDIA_SAMPLE_JSON = json.loads(f.read().decode('utf8'))
+
     with open('testdata/models/models_status.json', 'rb') as f:
         STATUS_SAMPLE_JSON = json.loads(f.read().decode('utf8'))
+    with open('testdata/models/status_quoted_tweet.json', 'rb') as f:
+        STATUS_QUOTED_TWEET_SAMPLE_JSON = json.loads(f.read().decode('utf8'))
+    with open('testdata/models/status_quoted_tweet_with_media.json', 'rb') as f:
+        STATUS_QUOTED_TWEET_WITH_MEDIA = json.loads(f.read().decode('utf8'))
+
     with open('testdata/models/models_status_no_user.json', 'rb') as f:
         STATUS_NO_USER_SAMPLE_JSON = json.loads(f.read().decode('utf8'))
     with open('testdata/models/models_trend.json', 'rb') as f:
@@ -118,6 +124,18 @@ class ModelsTest(unittest.TestCase):
         self.assertTrue(isinstance(status.AsDict()['media'][0], dict))
         self.assertEqual(status.id_str, "698657677329752065")
         self.assertTrue(isinstance(status.user, twitter.User))
+
+    def test_status_quoted_tweet(self):
+        """Test that quoted tweets are properly handled."""
+        status = twitter.Status.NewFromJsonDict(self.STATUS_QUOTED_TWEET_SAMPLE_JSON)
+        assert status.quoted_status_id == 849412806835351552
+        assert status.quoted_status.id == 849412806835351552
+        assert status.quoted_status.text == "hard to believe @mastodonmusic created its own open source alternative to twitter to promote its new album"
+
+    def test_status_quoted_tweet_with_media(self):
+        """Test that quoted tweet properly handles attached media."""
+        status = twitter.Status.NewFromJsonDict(self.STATUS_QUOTED_TWEET_WITH_MEDIA)
+        assert status.quoted_status.media is not None
 
     def test_status_no_user(self):
         """ Test twitter.Status object which does not contain a 'user' entity. """
