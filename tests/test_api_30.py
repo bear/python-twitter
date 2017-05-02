@@ -1359,6 +1359,53 @@ class ApiTest(unittest.TestCase):
         self.assertFalse(resp.user.screen_name)
 
     @responses.activate
+    def testGetStatuses(self):
+        with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
+            with open('testdata/get_statuses.1.json') as f:
+                resp_data = f.read()
+            rsps.add(GET, DEFAULT_URL, body=resp_data)
+            with open('testdata/get_statuses.2.json') as f:
+                resp_data = f.read()
+            rsps.add(GET, DEFAULT_URL, body=resp_data)
+
+            with open('testdata/get_statuses.ids.txt') as f:
+                status_ids = [int(l) for l in f]
+
+            resp = self.api.GetStatuses(status_ids)
+
+            self.assertTrue(type(resp) is list)
+            print(resp)
+            self.assertEqual(set(respitem.id for respitem in resp), set(status_ids))
+            self.assertFalse(resp != resp)
+
+            self.assertRaises(
+                twitter.TwitterError,
+                lambda: self.api.GetStatuses(['test']))
+
+    @responses.activate
+    def testGetStatusesMap(self):
+        with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
+            with open('testdata/get_statuses.map.1.json') as f:
+                resp_data = f.read()
+            rsps.add(GET, DEFAULT_URL, body=resp_data)
+            with open('testdata/get_statuses.map.2.json') as f:
+                resp_data = f.read()
+            rsps.add(GET, DEFAULT_URL, body=resp_data)
+
+            with open('testdata/get_statuses.ids.txt') as f:
+                status_ids = [int(l) for l in f]
+
+            resp = self.api.GetStatuses(status_ids, map=True)
+
+            self.assertTrue(type(resp) is dict)
+            self.assertTrue(all([resp.get(status_id) for status_id in status_ids]))
+            self.assertFalse(resp != resp)
+
+            self.assertRaises(
+                twitter.TwitterError,
+                lambda: self.api.GetStatuses(['test'], map=True))
+
+    @responses.activate
     def testGetStatusOembed(self):
         with open('testdata/get_status_oembed.json') as f:
             resp_data = f.read()
