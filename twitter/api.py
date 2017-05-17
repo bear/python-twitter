@@ -920,7 +920,7 @@ class Api(object):
                 raise TwitterError({'message': "'lang' should be string instance"})
             parameters['lang'] = lang
 
-        resp = self._RequestUrl(request_url, 'GET', data=parameters)
+        resp = self._RequestUrl(request_url, 'GET', data=parameters, enforce_auth=False)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return data
@@ -4926,7 +4926,7 @@ class Api(object):
         except requests.RequestException as e:
             raise TwitterError(str(e))
 
-    def _RequestUrl(self, url, verb, data=None, json=None):
+    def _RequestUrl(self, url, verb, data=None, json=None, enforce_auth=True):
         """Request a url.
 
         Args:
@@ -4940,17 +4940,19 @@ class Api(object):
         Returns:
             A JSON object.
         """
-        if not self.__auth:
-            raise TwitterError("The twitter.Api instance must be authenticated.")
+        if enforce_auth:
+            if not self.__auth:
+                raise TwitterError("The twitter.Api instance must be authenticated.")
 
-        if url and self.sleep_on_rate_limit:
-            limit = self.CheckRateLimit(url)
+            if url and self.sleep_on_rate_limit:
+                limit = self.CheckRateLimit(url)
 
-            if limit.remaining == 0:
-                try:
-                    time.sleep(max(int(limit.reset - time.time()) + 2, 0))
-                except ValueError:
-                    pass
+                if limit.remaining == 0:
+                    try:
+                        time.sleep(max(int(limit.reset - time.time()) + 2, 0))
+                    except ValueError:
+                        pass
+
         if not data:
             data = {}
 
