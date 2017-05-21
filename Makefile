@@ -50,8 +50,7 @@ coverage: clean
 	coverage html
 	coverage report
 
-ci: pyenv
-	tox
+ci: pyenv tox
 	CODECOV_TOKEN=`cat .codecov-token` codecov
 
 build: clean
