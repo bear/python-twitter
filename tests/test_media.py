@@ -101,6 +101,11 @@ class MediaTest(unittest.TestCase):
 
         self.assertEqual(media, self._GetSampleMedia())
 
+    def testHash(self):
+        '''Test the twitter.Media __hash__ method'''
+        media = self._GetSampleMedia()
+        self.assertEqual(hash(media), hash(media.id))
+
     def testNewFromJsonDict(self):
         '''Test the twitter.Media NewFromJsonDict method'''
         data = json.loads(MediaTest.RAW_JSON)

@@ -28,6 +28,13 @@ class TwitterModel(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __hash__(self):
+        if hasattr(self, 'id'):
+            return hash(self.id)
+        else:
+            raise TypeError('unhashable type: {} (no id attribute)'
+                            .format(type(self)))
+
     def AsJsonString(self):
         """ Returns the TwitterModel as a JSON string based on key/value
         pairs returned from the AsDict() method. """
