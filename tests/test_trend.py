@@ -40,3 +40,11 @@ class TrendTest(unittest.TestCase):
         trend.query = 'Kesuke Miyagi'
         trend.timestamp = 'Fri Jan 26 23:17:14 +0000 2007'
         self.assertEqual(trend, self._GetSampleTrend())
+
+    def testHash(self):
+        '''Test the twitter.Trent __hash__ method'''
+        trend = self._GetSampleTrend()
+        with self.assertRaises(TypeError) as context:
+            hash(trend)
+        self.assertIn('unhashable type: {} (no id attribute)'
+                      .format(type(trend)), str(context.exception))

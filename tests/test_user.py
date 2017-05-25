@@ -84,6 +84,11 @@ class UserTest(unittest.TestCase):
         user.status = self._GetSampleStatus()
         self.assertEqual(user, self._GetSampleUser())
 
+    def testHash(self):
+        '''Test the twitter.User __hash__ method'''
+        user = self._GetSampleUser()
+        self.assertEqual(hash(user), hash(user.id))
+
     def testNewFromJsonDict(self):
         '''Test the twitter.User NewFromJsonDict method'''
         data = json.loads(UserTest.SAMPLE_JSON)
