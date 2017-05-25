@@ -4683,9 +4683,9 @@ class Api(object):
         """
         url = '%s/account/verify_credentials.json' % self.base_url
         data = {
-            'include_entities': enf_type('include_entities', bool, include_entities),
-            'skip_status': enf_type('skip_status', bool, skip_status),
-            'include_email': enf_type('include_email', bool, include_email)
+            'include_entities': 'true' if enf_type('include_entities', bool, include_entities) else 'false',
+            'skip_status': 'true' if enf_type('skip_status', bool, skip_status) else 'false',
+            'include_email': 'true' if enf_type('include_email', bool, include_email) else 'false'
         }
 
         resp = self._RequestUrl(url, 'GET', data)
