@@ -4693,8 +4693,10 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
-    def RelayTo(self, status, in_reply_to_status_id, **kwargs):
-        """Relay to a status. Automatically add @username before the status for convenience.
+    def ReplyTo(self, status, in_reply_to_status_id, **kwargs):
+        """Relay to a status. Automatically add @username before the status for 
+        convenience.This method calls api.GetStatus to get username.
+        
 
         Args:
             status (str):
