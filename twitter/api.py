@@ -398,7 +398,8 @@ class Api(object):
                   lang=None,
                   locale=None,
                   result_type="mixed",
-                  include_entities=None):
+                  include_entities=None,
+                  return_json=False):
         """Return twitter search results for a given term. You must specify one
         of term, geocode, or raw_query.
 
@@ -458,7 +459,8 @@ class Api(object):
             This node offers a variety of metadata about the tweet in a
             discrete structure, including: user_mentions, urls, and
             hashtags.
-
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.Userret
         Returns:
           list: A sequence of twitter.Status instances, one for each message
           containing the term, within the bounds of the geocoded area, or
@@ -517,8 +519,10 @@ class Api(object):
             resp = self._RequestUrl(url, 'GET', data=parameters)
 
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-
-        return [Status.NewFromJsonDict(x) for x in data.get('statuses', '')]
+        if return_json:
+          return data
+        else:
+          return [Status.NewFromJsonDict(x) for x in data.get('statuses', '')]
 
     def GetUsersSearch(self,
                        term=None,
@@ -2853,7 +2857,8 @@ class Api(object):
                     user_id=None,
                     screen_name=None,
                     users=None,
-                    include_entities=True):
+                    include_entities=True,
+                    return_json=False):
         """Fetch extended information for the specified users.
 
         Users may be specified either as lists of either user_ids,
@@ -2870,6 +2875,8 @@ class Api(object):
           include_entities (bool, optional):
             The entities node that may appear within embedded statuses will be
             excluded when set to False.
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           A list of twitter.User objects for the requested users
@@ -2893,12 +2900,17 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        return [User.NewFromJsonDict(u) for u in data]
+        
+        if return_json:
+          return data
+        else:
+          return [User.NewFromJsonDict(u) for u in data]
 
     def GetUser(self,
                 user_id=None,
                 screen_name=None,
-                include_entities=True):
+                include_entities=True,
+                return_json=False):
         """Returns a single user.
 
         Args:
@@ -2909,6 +2921,8 @@ class Api(object):
             Either a user_id or screen_name is required for this method.
           include_entities (bool, optional):
             The entities node will be omitted when set to False.
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           A twitter.User instance representing that user
@@ -2926,8 +2940,11 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-
-        return User.NewFromJsonDict(data)
+        
+        if return_json:
+          return data
+        else:
+          return User.NewFromJsonDict(data)
 
     def GetDirectMessages(self,
                           since_id=None,
@@ -2936,7 +2953,8 @@ class Api(object):
                           include_entities=True,
                           skip_status=False,
                           full_text=False,
-                          page=None):
+                          page=None,
+                          return_json=False):
         """Returns a list of the direct messages sent to the authenticating user.
 
         Args:
@@ -2968,6 +2986,8 @@ class Api(object):
             each time. You must recall it and increment the page value until it
             return nothing. You can't use count option with it. First value is 1 and
             not 0.
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           A sequence of twitter.DirectMessage instances
@@ -2994,15 +3014,19 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-
-        return [DirectMessage.NewFromJsonDict(x) for x in data]
+        
+        if return_json:
+          return data
+        else:
+          return [DirectMessage.NewFromJsonDict(x) for x in data]
 
     def GetSentDirectMessages(self,
                               since_id=None,
                               max_id=None,
                               count=None,
                               page=None,
-                              include_entities=True):
+                              include_entities=True,
+                              return_json=False):
         """Returns a list of the direct messages sent by the authenticating user.
 
         Args:
@@ -3026,6 +3050,8 @@ class Api(object):
           include_entities:
             The entities node will be omitted when set to False.
             [Optional]
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           A sequence of twitter.DirectMessage instances
@@ -3048,13 +3074,17 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-
-        return [DirectMessage.NewFromJsonDict(x) for x in data]
+        
+        if return_json:
+          return data
+        else:
+          return [DirectMessage.NewFromJsonDict(x) for x in data]
 
     def PostDirectMessage(self,
                           text,
                           user_id=None,
-                          screen_name=None):
+                          screen_name=None,
+                          return_json=False):
         """Post a twitter direct message from the authenticated user.
 
         Args:
@@ -3063,7 +3093,8 @@ class Api(object):
             The ID of the user who should receive the direct message. [Optional]
           screen_name:
             The screen name of the user who should receive the direct message. [Optional]
-
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
         Returns:
           A twitter.DirectMessage instance representing the message posted
         """
@@ -3078,10 +3109,13 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'POST', data=data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        
+        if return_json:
+          return data
+        else:
+          return DirectMessage.NewFromJsonDict(data)
 
-        return DirectMessage.NewFromJsonDict(data)
-
-    def DestroyDirectMessage(self, message_id, include_entities=True):
+    def DestroyDirectMessage(self, message_id, include_entities=True, return_json=False):
         """Destroys the direct message specified in the required ID parameter.
 
         The twitter.Api instance must be authenticated, and the
@@ -3089,7 +3123,10 @@ class Api(object):
         message.
 
         Args:
-          message_id: The id of the direct message to be destroyed
+          message_id: 
+            The id of the direct message to be destroyed
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           A twitter.DirectMessage instance representing the message destroyed
@@ -3103,7 +3140,10 @@ class Api(object):
         resp = self._RequestUrl(url, 'POST', data=data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        return DirectMessage.NewFromJsonDict(data)
+        if return_json:
+          return data
+        else:
+          return DirectMessage.NewFromJsonDict(data)
 
     def CreateFriendship(self, user_id=None, screen_name=None, follow=True):
         """Befriends the user specified by the user_id or screen_name.
@@ -3230,7 +3270,8 @@ class Api(object):
 
     def LookupFriendship(self,
                          user_id=None,
-                         screen_name=None):
+                         screen_name=None,
+                         return_json=False):
         """Lookup friendship status for user to authed user.
 
         Users may be specified either as lists of either user_ids,
@@ -3244,6 +3285,8 @@ class Api(object):
             A list of user_ids to retrieve extended information.
           screen_name (string, User, or list of strings or Users, optional):
             A list of screen_names to retrieve extended information.
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           list: A list of twitter.UserStatus instance representing the
@@ -3287,8 +3330,11 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-
-        return [UserStatus.NewFromJsonDict(x) for x in data]
+        
+        if return_json:
+          return data
+        else:
+          return [UserStatus.NewFromJsonDict(x) for x in data]
 
     def IncomingFriendship(self,
                            cursor=None,
@@ -3453,7 +3499,8 @@ class Api(object):
                      count=None,
                      since_id=None,
                      max_id=None,
-                     include_entities=True):
+                     include_entities=True,
+                     return_json=False):
         """Return a list of Status objects representing favorited tweets.
 
         Returns up to 200 most recent tweets for the authenticated user.
@@ -3481,6 +3528,8 @@ class Api(object):
             greater than 200.
           include_entities (bool, optional):
             The entities node will be omitted when set to False.
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           A sequence of Status instances, one for each favorited tweet up to count
@@ -3501,8 +3550,11 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-
-        return [Status.NewFromJsonDict(x) for x in data]
+        
+        if return_json:
+          return data
+        else:
+          return [Status.NewFromJsonDict(x) for x in data]
 
     def GetMentions(self,
                     count=None,
@@ -3510,7 +3562,8 @@ class Api(object):
                     max_id=None,
                     trim_user=False,
                     contributor_details=False,
-                    include_entities=True):
+                    include_entities=True,
+                    return_json=False):
         """Returns the 20 most recent mentions (status containing @screen_name)
         for the authenticating user.
 
@@ -3539,6 +3592,8 @@ class Api(object):
             default only the user_id of the contributor is included. [Optional]
           include_entities:
             The entities node will be disincluded when set to False. [Optional]
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           A sequence of twitter.Status instances, one for each mention of the user.
@@ -3561,8 +3616,11 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-
-        return [Status.NewFromJsonDict(x) for x in data]
+        
+        if return_json:
+          return data
+        else:
+          return [Status.NewFromJsonDict(x) for x in data]
 
     @staticmethod
     def _IDList(list_id, slug, owner_id, owner_screen_name):
@@ -3734,7 +3792,8 @@ class Api(object):
                          user_id=None,
                          screen_name=None,
                          include_entities=False,
-                         skip_status=False):
+                         skip_status=False,
+                         return_json=False):
         """Check if the specified user is a subscriber of the specified list.
 
         Returns the user if they are subscriber.
@@ -3763,6 +3822,8 @@ class Api(object):
             Defaults to True.
           skip_status (bool, optional):
             If True the statuses will not be returned in the user items.
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           twitter.user.User: A twitter.User instance representing the user
@@ -3787,14 +3848,18 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-
-        return User.NewFromJsonDict(data)
+        
+        if return_json:
+          return data
+        else:
+          return User.NewFromJsonDict(data)
 
     def GetSubscriptions(self,
                          user_id=None,
                          screen_name=None,
                          count=20,
-                         cursor=-1):
+                         cursor=-1,
+                         return_json=False):
         """Obtain a collection of the lists the specified user is
         subscribed to. If neither user_id or screen_name is specified, the
         data returned will be for the authenticated user.
@@ -3817,6 +3882,8 @@ class Api(object):
             list sequence from. Use the value of -1 to start at the
             beginning. Twitter will return in the result the values for
             next_cursor and previous_cursor.
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           twitter.list.List: A sequence of twitter.List instances,
@@ -3834,14 +3901,18 @@ class Api(object):
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        return [List.NewFromJsonDict(x) for x in data['lists']]
+        if return_json:
+          return data
+        else:
+          return [List.NewFromJsonDict(x) for x in data['lists']]
 
     def GetMemberships(self,
                        user_id=None,
                        screen_name=None,
                        count=20,
                        cursor=-1,
-                       filter_to_owned_lists=False):
+                       filter_to_owned_lists=False,
+                       return_json=False):
         """Obtain the lists the specified user is a member of. If no user_id or
         screen_name is specified, the data returned will be for the
         authenticated user.
@@ -3867,6 +3938,8 @@ class Api(object):
             Set to True to return only the lists the authenticating user
             owns, and the user specified by user_id or screen_name is a
             member of. Default value is False.
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           list: A list of twitter.List instances, one for each list in which
@@ -3890,12 +3963,16 @@ class Api(object):
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        return [List.NewFromJsonDict(x) for x in data['lists']]
+        if return_json:
+          return data
+        else:
+          return [List.NewFromJsonDict(x) for x in data['lists']]
 
     def GetListsList(self,
                      screen_name=None,
                      user_id=None,
-                     reverse=False):
+                     reverse=False,
+                     return_json=False):
         """Returns all lists the user subscribes to, including their own.
         If no user_id or screen_name is specified, the data returned will be
         for the authenticated user.
@@ -3913,6 +3990,8 @@ class Api(object):
             If False, the owned lists will be returned first, othewise
             subscribed lists will be at the top. Returns a maximum of 100
             entries regardless. Defaults to False.
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           list: A sequence of twitter.List instances.
@@ -3929,7 +4008,10 @@ class Api(object):
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        return [List.NewFromJsonDict(x) for x in data]
+        if return_json:
+          return data
+        else:
+          return [List.NewFromJsonDict(x) for x in data]
 
     def GetListTimeline(self,
                         list_id=None,
@@ -3940,7 +4022,8 @@ class Api(object):
                         max_id=None,
                         count=None,
                         include_rts=True,
-                        include_entities=True):
+                        include_entities=True,
+                        return_json=False):
         """Fetch the sequence of Status messages for a given List ID.
 
         Args:
@@ -3976,6 +4059,8 @@ class Api(object):
           include_entities (bool, optional):
             If False, the timeline will not contain additional metadata.
             Defaults to True.
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
 
         Returns:
           list: A list of twitter.status.Status instances, one for each
@@ -4003,7 +4088,10 @@ class Api(object):
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
-        return [Status.NewFromJsonDict(x) for x in data]
+        if return_json:
+          return data
+        else:
+          return [Status.NewFromJsonDict(x) for x in data]
 
     def GetListMembersPaged(self,
                             list_id=None,
