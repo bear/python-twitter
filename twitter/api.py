@@ -3088,7 +3088,7 @@ class Api(object):
         """Post a twitter direct message from the authenticated user.
 
         Args:
-          text: The message text to be posted.  Must be less than 140 characters.
+          text: The message text to be posted.
           user_id:
             The ID of the user who should receive the direct message. [Optional]
           screen_name:
