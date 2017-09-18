@@ -229,6 +229,8 @@ class Api(object):
         self._use_gzip = use_gzip_compression
         self._debugHTTP = debugHTTP
         self._shortlink_size = 19
+        if timeout and timeout < 30:
+            print("Warning: The Twitter streaming API sends 30s keepalives, the given timeout is shorter!")
         self._timeout = timeout
         self.__auth = None
 
@@ -4694,7 +4696,9 @@ class Api(object):
                       delimited=None,
                       stall_warnings=None,
                       stringify_friend_ids=False,
-                      filter_level=None):
+                      filter_level=None,
+                      session=None,
+                      include_keepalive=False):
         """Returns the data from the user stream.
 
         Args:
@@ -4742,11 +4746,20 @@ class Api(object):
         if filter_level is not None:
             data['filter_level'] = filter_level
 
-        resp = self._RequestStream(url, 'POST', data=data)
+        resp = self._RequestStream(url, 'POST', data=data, session=session)
+        # The Twitter streaming API sends keep-alive newlines every 30s if there has not been other
+        # traffic, and specifies that streams should only be reset after three keep-alive ticks.
+        #
+        # The original implementation of this API didn't expose keep-alive signals to the user,
+        # making it difficult to determine whether the connection should be hung up or not.
+        #
+        # https://dev.twitter.com/streaming/overview/connecting
         for line in resp.iter_lines():
             if line:
                 data = self._ParseAndCheckTwitter(line.decode('utf-8'))
                 yield data
+            elif include_keepalive:
+              yield None
 
     def VerifyCredentials(self, include_entities=None, skip_status=None, include_email=None):
         """Returns a twitter.User instance if the authenticating user is valid.
@@ -5075,7 +5088,7 @@ class Api(object):
 
         return resp
 
-    def _RequestStream(self, url, verb, data=None):
+    def _RequestStream(self, url, verb, data=None, session=None):
         """Request a stream of data.
 
            Args:
@@ -5089,19 +5102,21 @@ class Api(object):
            Returns:
              A twitter stream.
         """
+        session = session or requests.Session()
+
         if verb == 'POST':
             try:
-                return requests.post(url, data=data, stream=True,
-                                     auth=self.__auth,
-                                     timeout=self._timeout,
-                                     proxies=self.proxies)
+                return session.post(url, data=data, stream=True,
+                                    auth=self.__auth,
+                                    timeout=self._timeout,
+                                    proxies=self.proxies)
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         if verb == 'GET':
             url = self._BuildUrl(url, extra_params=data)
             try:
-                return requests.get(url, stream=True, auth=self.__auth,
-                                    timeout=self._timeout, proxies=self.proxies)
+                return session.get(url, stream=True, auth=self.__auth,
+                                   timeout=self._timeout, proxies=self.proxies)
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         return 0  # if not a POST or GET request
