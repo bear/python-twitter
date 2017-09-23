@@ -89,6 +89,17 @@ class ApiTest(unittest.TestCase):
         self.assertRaises(twitter.TwitterError, lambda: api.GetFollowers())
 
     @responses.activate
+    def testAppOnlyAuth(self):
+        responses.add(method=POST,
+                      url='https://api.twitter.com/oauth2/token',
+                      body='{"token_type":"bearer","access_token":"testing"}')
+        api = twitter.Api(
+            consumer_key='test',
+            consumer_secret='test',
+            application_only_auth=True)
+        self.assertEqual(api._bearer_token['access_token'], "testing")
+
+    @responses.activate
     def testGetHelpConfiguration(self):
         with open('testdata/get_help_configuration.json') as f:
             resp_data = f.read()
