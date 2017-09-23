@@ -2900,7 +2900,7 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        
+
         if return_json:
           return data
         else:
@@ -2940,7 +2940,7 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        
+
         if return_json:
           return data
         else:
@@ -3014,7 +3014,7 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        
+
         if return_json:
           return data
         else:
@@ -3074,7 +3074,7 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        
+
         if return_json:
           return data
         else:
@@ -3109,7 +3109,7 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'POST', data=data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        
+
         if return_json:
           return data
         else:
@@ -3123,7 +3123,7 @@ class Api(object):
         message.
 
         Args:
-          message_id: 
+          message_id:
             The id of the direct message to be destroyed
           return_json (bool, optional):
             If True JSON data will be returned, instead of twitter.User
@@ -3330,7 +3330,7 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        
+
         if return_json:
           return data
         else:
@@ -3550,7 +3550,7 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        
+
         if return_json:
           return data
         else:
@@ -3616,7 +3616,7 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        
+
         if return_json:
           return data
         else:
@@ -3848,7 +3848,7 @@ class Api(object):
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-        
+
         if return_json:
           return data
         else:
