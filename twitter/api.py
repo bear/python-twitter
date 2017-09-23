@@ -35,13 +35,13 @@ import os
 
 try:
     # python 3
-    from urllib.parse import urlparse, urlunparse, urlencode
+    from urllib.parse import urlparse, urlunparse, urlencode, quote_plus
     from urllib.request import urlopen
     from urllib.request import __version__ as urllib_version
 except ImportError:
     from urlparse import urlparse, urlunparse
     from urllib2 import urlopen
-    from urllib import urlencode
+    from urllib import urlencode, quote_plus
     from urllib import __version__ as urllib_version
 
 from twitter import (
@@ -288,17 +288,15 @@ class Api(object):
         """
         Generate a Bearer Token from consumer_key and consumer_secret
         """
-        from urllib import quote_plus
-        import base64
-
         key = quote_plus(consumer_key)
         secret = quote_plus(consumer_secret)
-        bearer_token = base64.b64encode('{}:{}'.format(key, secret))
+        bearer_token = base64.b64encode('{}:{}'.format(key, secret).encode('utf8'))
 
         post_headers = {
-            'Authorization': 'Basic ' + bearer_token,
+            'Authorization': 'Basic {0}'.format(bearer_token.decode('utf8')),
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
         }
+
         res = requests.post(url='https://api.twitter.com/oauth2/token',
                             data={'grant_type': 'client_credentials'},
                             headers=post_headers)
