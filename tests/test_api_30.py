@@ -630,31 +630,6 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(resp.id, 718443)
 
     @responses.activate
-    def testGetDirectMessages(self):
-        with open('testdata/get_direct_messages.json') as f:
-            resp_data = f.read()
-        responses.add(GET, DEFAULT_URL, body=resp_data)
-
-        resp = self.api.GetDirectMessages()
-        self.assertTrue(type(resp) is list)
-        direct_message = resp[0]
-        self.assertTrue(type(direct_message) is twitter.DirectMessage)
-        self.assertEqual(direct_message.id, 678629245946433539)
-
-    @responses.activate
-    def testGetSentDirectMessages(self):
-        with open('testdata/get_sent_direct_messages.json') as f:
-            resp_data = f.read()
-        responses.add(GET, DEFAULT_URL, body=resp_data)
-
-        resp = self.api.GetSentDirectMessages()
-        self.assertTrue(type(resp) is list)
-        direct_message = resp[0]
-        self.assertTrue(type(direct_message) is twitter.DirectMessage)
-        self.assertEqual(direct_message.id, 678629283007303683)
-        self.assertTrue([dm.sender_screen_name == 'notinourselves' for dm in resp])
-
-    @responses.activate
     def testGetFavorites(self):
         with open('testdata/get_favorites.json') as f:
             resp_data = f.read()
