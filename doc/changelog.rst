@@ -1,6 +1,20 @@
 Changelog
 ---------
 
+Version 3.3
+=============
+
+* Adds application only authentication. See `Twitter's documentation for details <https://dev.twitter.com/oauth/application-only>`_. To use application only authentication, pass `application_only_auth` when creating the Api; the bearer token will be automatically retrieved.
+
+* Adds function :py:func:`twitter.api.GetAppOnlyAuthToken`
+
+* Adds `filter_level` keyword argument for :py:func:`twitter.api.GetStreamFilter`, :py:func:`twitter.api.GetUserStream`
+
+* Adds `proxies` keyword argument for creating an Api instance. Pass a dictionary of proxies for the request to pass through, if not specified allows requests lib to use environmental variables for proxy if any.
+
+* Adds support for `quoted_status` to the :py:class:`twitter.models.Status` model.
+
+
 Version 3.2.1
 =============
 
