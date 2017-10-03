@@ -4,7 +4,11 @@
 
 __author__ = 'dewitt@google.com'
 
-import configparser
+try:
+    import configparser
+except ImportError as _:
+    import ConfigParser as configparser
+
 import getopt
 import os
 import sys
