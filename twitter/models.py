@@ -321,7 +321,7 @@ class UserStatus(TwitterModel):
                 'muting': self.muting}
 
     def __repr__(self):
-        connections = [param for param in self._connections if getattr(self, param)]
+        connections = [param for param in self.connections if getattr(self, param)]
         return "UserStatus(ID={uid}, ScreenName={sn}, Connections=[{conn}])".format(
             uid=self.id,
             sn=self.screen_name,
