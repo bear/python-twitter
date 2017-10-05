@@ -845,6 +845,36 @@ class Api(object):
 
         return Status.NewFromJsonDict(data)
 
+    def LookupStatuses(self,
+                       status_ids,
+                       trim_user=False,
+                       include_entities=True,
+                       include_ext_alt_text=True,
+                       return_json=False):
+        """Fetches multiple tweets by ID using the statuses/lookup endpoint.
+        Args:
+          status_ids:
+            A list of the statuses you want to retrieve.  Must be non-empty.
+          return_json (bool, optional):
+            If True JSON data will be returned, instead of twitter.User
+        """
+        if len(status_ids) == 0:
+            raise ValueError('Expected a list of length 1 or greater of status IDs.')
+
+        url = '%s/statuses/lookup.json' % (self.base_url)
+
+        parameters = {
+            'id': ','.join(map(str, status_ids)),
+            'trim_user': enf_type('trim_user', bool, trim_user),
+            'include_entities': enf_type('include_entities', bool, include_entities),
+            'include_ext_alt_text': enf_type('include_ext_alt_text', bool, include_ext_alt_text)
+        }
+
+        resp = self._RequestUrl(url, 'GET', data=parameters)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return data if return_json else [Status.NewFromJsonDict(datum) for datum in data]
+
     def GetStatusOembed(self,
                         status_id=None,
                         url=None,
