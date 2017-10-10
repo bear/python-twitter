@@ -1197,7 +1197,7 @@ class Api(object):
         """
         url = '%s/media/upload.json' % self.upload_url
 
-        media_fp, filename, file_size, media_type = parse_media_file(media)
+        media_fp, filename, file_size, media_type = parse_media_file(media, async_upload=True)
 
         if not all([media_fp, filename, file_size, media_type]):
             raise TwitterError({'message': 'Could not process media file'})
