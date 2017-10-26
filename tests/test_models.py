@@ -190,3 +190,7 @@ class ModelsTest(unittest.TestCase):
             self.fail(e)
         self.assertTrue(user_status.AsJsonString())
         self.assertTrue(user_status.AsDict())
+
+        self.assertTrue(user_status.connections['blocking'])
+        self.assertTrue(user_status.connections['muting'])
+        self.assertFalse(user_status.connections['followed_by'])

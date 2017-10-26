@@ -282,12 +282,12 @@ class UserStatus(TwitterModel):
     """ A class representing the UserStatus structure. This is an abbreviated
     form of the twitter.User object. """
 
-    connections = {'following': False,
-                   'followed_by': False,
-                   'following_received': False,
-                   'following_requested': False,
-                   'blocking': False,
-                   'muting': False}
+    _connections = {'following': False,
+                    'followed_by': False,
+                    'following_received': False,
+                    'following_requested': False,
+                    'blocking': False,
+                    'muting': False}
 
     def __init__(self, **kwargs):
         self.param_defaults = {
@@ -307,9 +307,18 @@ class UserStatus(TwitterModel):
             setattr(self, param, kwargs.get(param, default))
 
         if 'connections' in kwargs:
-            for param in self.connections:
+            for param in self._connections:
                 if param in kwargs['connections']:
                     setattr(self, param, True)
+
+    @property
+    def connections(self):
+        return {'following': self.following,
+                'followed_by': self.followed_by,
+                'following_received': self.following_received,
+                'following_requested': self.following_requested,
+                'blocking': self.blocking,
+                'muting': self.muting}
 
     def __repr__(self):
         connections = [param for param in self.connections if getattr(self, param)]
