@@ -1,5 +1,10 @@
 Changelog
 ---------
+Version 3.3.1
+=============
+
+* Adds support for 280 character limit.
+
 
 Version 3.3
 =============
