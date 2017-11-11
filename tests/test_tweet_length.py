@@ -63,15 +63,12 @@ class TestTweetLength(unittest.TestCase):
         tweets = self.api._TweetTextWrap(test_tweet)
         self.assertEqual(
             tweets[0],
-            "Anatole went out of the room and returned a few minutes later wearing a fur coat girt with a silver belt, and a sable cap jauntily set on")
+            "Anatole went out of the room and returned a few minutes later wearing a fur coat girt with a silver belt, and a sable cap jauntily set on one side and very becoming to his handsome face. Having looked in a mirror, and standing before Dolokhov in the same pose he had assumed")
         self.assertEqual(
             tweets[1],
-            "one side and very becoming to his handsome face. Having looked in a mirror, and standing before Dolokhov in the same pose he had assumed")
-        self.assertEqual(
-            tweets[2],
             "before it, he lifted a glass of wine.")
 
-        test_tweet = "t.co went t.co of t.co room t.co returned t.co few minutes later"
+        test_tweet = "t.co went t.co of t.co room t.co returned t.co few minutes later and then t.co went to t.co restroom and t.co was sad because t.co did not have any t.co toilet paper"
         tweets = self.api._TweetTextWrap(test_tweet)
-        self.assertEqual(tweets[0], 't.co went t.co of t.co room t.co returned')
-        self.assertEqual(tweets[1], 't.co few minutes later')
+        self.assertEqual(tweets[0], 't.co went t.co of t.co room t.co returned t.co few minutes later and then t.co went to t.co restroom and t.co was sad because')
+        self.assertEqual(tweets[1], 't.co did not have any t.co toilet paper')
