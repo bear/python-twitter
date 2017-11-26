@@ -72,7 +72,7 @@ from twitter.error import (
 if sys.version_info > (3,):
     long = int
 
-CHARACTER_LIMIT = 140
+CHARACTER_LIMIT = 280
 
 # A singleton representing a lazily instantiated FileCache.
 DEFAULT_CACHE = object()
@@ -976,8 +976,8 @@ class Api(object):
 
         Args:
             status (str):
-                The message text to be posted. Must be less than or equal to 140
-                characters.
+                The message text to be posted. Must be less than or equal to
+                CHARACTER_LIMIT characters.
             media (int, str, fp, optional):
                 A URL, a local file, or a file-like object (something with a
                 read() method), or a list of any combination of the above.
@@ -1029,8 +1029,8 @@ class Api(object):
                 otherwise the payload will contain the full user data item.
             verify_status_length (bool, optional):
                 If True, api throws a hard error that the status is over
-                140 characters. If False, Api will attempt to post the
-                status.
+                CHARACTER_LIMIT characters. If False, Api will attempt to post
+                the status.
         Returns:
             (twitter.Status) A twitter.Status instance representing the
             message posted.
@@ -1042,8 +1042,8 @@ class Api(object):
         else:
             u_status = str(status, self._input_encoding)
 
-        if verify_status_length and calc_expected_status_length(u_status) > 140:
-            raise TwitterError("Text must be less than or equal to 140 characters.")
+        if verify_status_length and calc_expected_status_length(u_status) > CHARACTER_LIMIT:
+            raise TwitterError("Text must be less than or equal to CHARACTER_LIMIT characters.")
 
         if auto_populate_reply_metadata and not in_reply_to_status_id:
             raise TwitterError("If auto_populate_reply_metadata is True, you must set in_reply_to_status_id")
@@ -1514,7 +1514,7 @@ class Api(object):
 
     def _TweetTextWrap(self,
                        status,
-                       char_lim=140):
+                       char_lim=CHARACTER_LIMIT):
 
         if not self._config:
             self.GetHelpConfiguration()
@@ -1525,7 +1525,7 @@ class Api(object):
         words = re.split(r'\s', status)
 
         if len(words) == 1 and not is_url(words[0]):
-            if len(words[0]) > 140:
+            if len(words[0]) > CHARACTER_LIMIT:
                 raise TwitterError({"message": "Unable to split status into tweetable parts. Word was: {0}/{1}".format(len(words[0]), char_lim)})
             else:
                 tweets.append(words[0])
@@ -1541,7 +1541,7 @@ class Api(object):
             else:
                 new_len += len(word) + 1
 
-            if new_len > 140:
+            if new_len > CHARACTER_LIMIT:
                 tweets.append(' '.join(line))
                 line = [word]
                 line_length = new_len - line_length
@@ -1559,12 +1559,12 @@ class Api(object):
         """Post one or more twitter status messages from the authenticated user.
 
         Unlike api.PostUpdate, this method will post multiple status updates
-        if the message is longer than 140 characters.
+        if the message is longer than CHARACTER_LIMIT characters.
 
         Args:
           status:
             The message text to be posted.
-            May be longer than 140 characters.
+            May be longer than CHARACTER_LIMIT characters.
           continuation:
             The character string, if any, to be appended to all but the
             last message.  Note that Twitter strips trailing '...' strings
@@ -2978,7 +2978,7 @@ class Api(object):
             objects. [Optional]
           full_text:
             When set to True full message will be included in the returned message
-            object if message length is bigger than 140 characters. [Optional]
+            object if message length is bigger than CHARACTER_LIMIT characters. [Optional]
           page:
             If you want more than 200 messages, you can use this and get 20 messages
             each time. You must recall it and increment the page value until it

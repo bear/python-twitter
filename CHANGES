@@ -6,6 +6,7 @@
   See the messy details at https://github.com/bear/python-twitter/pull/251
 
   Pull Requests
+      #525 Adds support for 280 character limit for tweets by trevorprater
       #267 initialize Api.__auth fixes #119 by rbpasker
       #266 Add full_text and page options in GetDirectMessages function by mistersalmon
       #264 Updates Media object with new methods, adds id param, adds tests by jeremylow
@@ -23,6 +24,9 @@
       #239 Correct GetListsList docstring by tedmiston
 
   Probably a whole lot that I missed - ugh!
+
+2017-11-11
+  Added support for 280 character limit
 
 2015-10-05
   Added who to api.GetSearch
