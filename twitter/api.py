@@ -274,9 +274,12 @@ class Api(object):
 
         if debugHTTP:
             import logging
-            import http.client
+            try:
+                import http.client as http_client  # python3
+            except ImportError:
+                import httplib as http_client  # python2
 
-            http.client.HTTPConnection.debuglevel = 1
+            http_client.HTTPConnection.debuglevel = 1
 
             logging.basicConfig()  # you need to initialize logging, otherwise you will not see anything from requests
             logging.getLogger().setLevel(logging.DEBUG)
