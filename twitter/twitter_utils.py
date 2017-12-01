@@ -143,7 +143,7 @@ URL_REGEXP = re.compile((
     r'('
     r'^(?!(https?://|www\.)?\.|ftps?://|([0-9]+\.){{1,3}}\d+)'  # exclude urls that start with "."
     r'(?:https?://|www\.)*^(?!.*@)(?:[\w+-_]+[.])'              # beginning of url
-    r'(?:{0}\b|'                                                # all tlds
+    r'(?:{0}\b'                                                # all tlds
     r'(?:[:0-9]))'                                              # port numbers & close off TLDs
     r'(?:[\w+\/]?[a-z0-9!\*\'\(\);:&=\+\$/%#\[\]\-_\.,~?])*'    # path/query params
     r')').format(r'\b|'.join(TLDS)), re.U | re.I | re.X)
