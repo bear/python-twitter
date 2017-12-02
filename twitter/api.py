@@ -230,7 +230,7 @@ class Api(object):
         self._debugHTTP = debugHTTP
         self._shortlink_size = 19
         if timeout and timeout < 30:
-            print("Warning: The Twitter streaming API sends 30s keepalives, the given timeout is shorter!")
+            warn("Warning: The Twitter streaming API sends 30s keepalives, the given timeout is shorter!")
         self._timeout = timeout
         self.__auth = None
 
