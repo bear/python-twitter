@@ -6,6 +6,11 @@ import os
 import re
 from tempfile import NamedTemporaryFile
 
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+
 import requests
 from twitter import TwitterError
 
@@ -215,7 +220,7 @@ def parse_media_file(passed_media):
     if not hasattr(passed_media, 'read'):
         if passed_media.startswith('http'):
             data_file = http_to_file(passed_media)
-            filename = os.path.basename(passed_media)
+            filename = os.path.basename(urlparse(passed_media).path)
         else:
             data_file = open(os.path.realpath(passed_media), 'rb')
             filename = os.path.basename(passed_media)
