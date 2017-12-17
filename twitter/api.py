@@ -2998,27 +2998,36 @@ class Api(object):
         else:
           return DirectMessage.NewFromJsonDict(data)
 
-    def CreateFriendship(self, user_id=None, screen_name=None, follow=True):
+    def CreateFriendship(self, user_id=None, screen_name=None, follow=True, retweets=True, **kwargs):
         """Befriends the user specified by the user_id or screen_name.
 
         Args:
-          user_id:
-            A user_id to follow [Optional]
-          screen_name:
-            A screen_name to follow [Optional]
-          follow:
+          user_id (int, optional):
+            A user_id to follow
+          screen_name (str, optional)
+            A screen_name to follow
+          follow (bool, optional):
             Set to False to disable notifications for the target user
+          retweets (bool, optional):
+            Enable or disable retweets from the target user.
 
         Returns:
           A twitter.User instance representing the befriended user.
         """
-        return self._AddOrEditFriendship(user_id=user_id, screen_name=screen_name, follow=follow)
+        return self._AddOrEditFriendship(user_id=user_id,
+                                         screen_name=screen_name,
+                                         follow=follow,
+                                         retweets=retweets,
+                                         **kwargs)
 
-    def _AddOrEditFriendship(self, user_id=None, screen_name=None, uri_end='create', follow_key='follow', follow=True):
-        """
-        Shared method for Create/Update Friendship.
-
-        """
+    def _AddOrEditFriendship(self,
+                             user_id=None,
+                             screen_name=None,
+                             uri_end='create',
+                             follow_key='follow',
+                             follow=True,
+                             **kwargs):
+        """Shared method for Create/Update Friendship."""
         url = '%s/friendships/%s.json' % (self.base_url, uri_end)
         data = {}
         if user_id:
@@ -3026,34 +3035,47 @@ class Api(object):
         elif screen_name:
             data['screen_name'] = screen_name
         else:
-            raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
+            raise TwitterError("Specify at least one of user_id or screen_name.")
+
         follow_json = json.dumps(follow)
         data['{}'.format(follow_key)] = follow_json
+        data.update(**kwargs)
 
         resp = self._RequestUrl(url, 'POST', data=data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
 
-    def UpdateFriendship(self, user_id=None, screen_name=None, follow=True, **kwargs):  # api compat with Create
+    def UpdateFriendship(self,
+                         user_id=None,
+                         screen_name=None,
+                         follow=True,
+                         retweets=True,
+                         **kwargs):
         """Updates a friendship with the user specified by the user_id or screen_name.
 
         Args:
-          user_id:
-            A user_id to update [Optional]
-          screen_name:
-            A screen_name to update [Optional]
-          follow:
+          user_id (int, optional):
+            A user_id to update
+          screen_name (str, optional):
+            A screen_name to update
+          follow (bool, optional):
             Set to False to disable notifications for the target user
+          retweets (bool, optional):
+            Enable or disable retweets from the target user.
           device:
             Set to False to disable notifications for the target user
 
         Returns:
           A twitter.User instance representing the befriended user.
         """
-        follow = kwargs.get('device', follow)
-        return self._AddOrEditFriendship(user_id=user_id, screen_name=screen_name, follow=follow, follow_key='device',
-                                         uri_end='update')
+        return self._AddOrEditFriendship(user_id=user_id,
+                                         screen_name=screen_name,
+                                         follow=follow,
+                                         follow_key='device',
+                                         retweets=retweets,
+                                         uri_end='update',
+                                         **kwargs)
 
     def DestroyFriendship(self, user_id=None, screen_name=None):
         """Discontinues friendship with a user_id or screen_name.
@@ -3074,7 +3096,7 @@ class Api(object):
         elif screen_name:
             data['screen_name'] = screen_name
         else:
-            raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
+            raise TwitterError("Specify at least one of user_id or screen_name.")
 
         resp = self._RequestUrl(url, 'POST', data=data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
