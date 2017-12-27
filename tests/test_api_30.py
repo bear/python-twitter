@@ -1584,6 +1584,7 @@ class ApiTest(unittest.TestCase):
         self.assertRaises(
             twitter.TwitterError,
             lambda: self.api.DestroyFavorite(status=None, status_id=None))
+
     @responses.activate
     def testPostDirectMessage(self):
         with open('testdata/post_post_direct_message.json') as f:
