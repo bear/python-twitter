@@ -21,6 +21,7 @@ Now it's a full-on open source project with many contributors over time:
 * Pradeep Nayak,
 * Ian Ozsvald,
 * Nicolas Perriault,
+* Trevor Prater,
 * Glen Tregoning,
 * Lars Weiler,
 * Sebastian Wiesinger,

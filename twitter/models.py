@@ -282,12 +282,12 @@ class UserStatus(TwitterModel):
     """ A class representing the UserStatus structure. This is an abbreviated
     form of the twitter.User object. """
 
-    connections = {'following': False,
-                   'followed_by': False,
-                   'following_received': False,
-                   'following_requested': False,
-                   'blocking': False,
-                   'muting': False}
+    _connections = {'following': False,
+                    'followed_by': False,
+                    'following_received': False,
+                    'following_requested': False,
+                    'blocking': False,
+                    'muting': False}
 
     def __init__(self, **kwargs):
         self.param_defaults = {
@@ -307,9 +307,18 @@ class UserStatus(TwitterModel):
             setattr(self, param, kwargs.get(param, default))
 
         if 'connections' in kwargs:
-            for param in self.connections:
+            for param in self._connections:
                 if param in kwargs['connections']:
                     setattr(self, param, True)
+
+    @property
+    def connections(self):
+        return {'following': self.following,
+                'followed_by': self.followed_by,
+                'following_received': self.following_received,
+                'following_requested': self.following_requested,
+                'blocking': self.blocking,
+                'muting': self.muting}
 
     def __repr__(self):
         connections = [param for param in self.connections if getattr(self, param)]
@@ -337,6 +346,7 @@ class User(TwitterModel):
             'friends_count': None,
             'geo_enabled': None,
             'id': None,
+            'id_str': None,
             'lang': None,
             'listed_count': None,
             'location': None,
@@ -344,12 +354,16 @@ class User(TwitterModel):
             'notifications': None,
             'profile_background_color': None,
             'profile_background_image_url': None,
+            'profile_background_image_url_https': None,
             'profile_background_tile': None,
             'profile_banner_url': None,
             'profile_image_url': None,
+            'profile_image_url_https': None,
             'profile_link_color': None,
+            'profile_sidebar_border_color': None,
             'profile_sidebar_fill_color': None,
             'profile_text_color': None,
+            'profile_use_background_image': None,
             'protected': None,
             'screen_name': None,
             'status': None,
@@ -358,6 +372,8 @@ class User(TwitterModel):
             'url': None,
             'utc_offset': None,
             'verified': None,
+            'withheld_in_countries': None,
+            'withheld_scope': None,
         }
 
         for (param, default) in self.param_defaults.items():
