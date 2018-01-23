@@ -346,6 +346,7 @@ class User(TwitterModel):
             'friends_count': None,
             'geo_enabled': None,
             'id': None,
+            'id_str': None,
             'lang': None,
             'listed_count': None,
             'location': None,
@@ -353,12 +354,16 @@ class User(TwitterModel):
             'notifications': None,
             'profile_background_color': None,
             'profile_background_image_url': None,
+            'profile_background_image_url_https': None,
             'profile_background_tile': None,
             'profile_banner_url': None,
             'profile_image_url': None,
+            'profile_image_url_https': None,
             'profile_link_color': None,
+            'profile_sidebar_border_color': None,
             'profile_sidebar_fill_color': None,
             'profile_text_color': None,
+            'profile_use_background_image': None,
             'protected': None,
             'screen_name': None,
             'status': None,
@@ -367,6 +372,8 @@ class User(TwitterModel):
             'url': None,
             'utc_offset': None,
             'verified': None,
+            'withheld_in_countries': None,
+            'withheld_scope': None,
         }
 
         for (param, default) in self.param_defaults.items():
