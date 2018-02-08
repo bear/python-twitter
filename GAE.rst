@@ -13,7 +13,7 @@ Google App Engine uses virtual machines to do work and serve your application's 
 Prerequisites
 *************
 
-Follow the `third party vendor library install instructions <https://cloud.google.com/appengine/docs/python/tools/using-libraries-python-27#vendoring>`_ to include the two dependency libraries listed in ``requirements.txt``: ``requests`` and ``requests_oauthlib``, as well as this ``python-twitter`` library. Typically you can just place the three module folders into the same place as your app.yaml file; it might look something like this:
+Follow the `third party vendor library install instructions <https://cloud.google.com/appengine/docs/python/tools/using-libraries-python-27#vendoring>`_ to include the dependency libraries listed in ``requirements.txt``: ``requests``, ``requests_oauthlib`` and ``requests_toolbelt``, as well as ``python-twitter`` library. Typically you can just place the  module folders into the same place as your app.yaml file; it might look something like this:
 
 | myapp/
 | ├── twitter/
