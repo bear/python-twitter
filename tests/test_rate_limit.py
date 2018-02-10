@@ -231,3 +231,32 @@ class RateLimitMethodsTests(unittest.TestCase):
         self.assertEqual(api.rate_limit.get_limit('/search/tweets').limit, 63)
         self.assertEqual(api.rate_limit.get_limit('/search/tweets').remaining, 63)
         self.assertEqual(api.rate_limit.get_limit('/search/tweets').reset, 626672700)
+
+    @responses.activate
+    def testLimitsViaHeadersWithSleepLimitReached(self):
+        api = twitter.Api(
+            consumer_key='test',
+            consumer_secret='test',
+            access_token_key='test',
+            access_token_secret='test',
+            sleep_on_rate_limit=True)
+
+        # Add handler for ratelimit check - this forces the codepath which goes through the time.sleep call
+        url = '%s/application/rate_limit_status.json?tweet_mode=compat' % api.base_url
+        responses.add(
+            method=responses.GET, url=url,
+            body='{"resources": {"search": {"/search/tweets": {"limit": 1, "remaining": 0, "reset": 1}}}}',
+            match_querystring=True)
+
+        # Get initial rate limit data to populate api.rate_limit object
+        url = "https://api.twitter.com/1.1/search/tweets.json?tweet_mode=compat&q=test&count=15&result_type=mixed"
+        responses.add(
+            method=responses.GET,
+            url=url,
+            body='{}',
+            match_querystring=True,
+            adding_headers=HEADERS)
+
+        resp = api.GetSearch(term='test')
+        self.assertTrue(api.rate_limit)
+        self.assertEqual(resp, [])
