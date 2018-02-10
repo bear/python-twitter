@@ -26,6 +26,7 @@ import gzip
 import time
 import base64
 import re
+import logging
 import requests
 from requests_oauthlib import OAuth1, OAuth2
 import io
@@ -77,6 +78,7 @@ CHARACTER_LIMIT = 280
 # A singleton representing a lazily instantiated FileCache.
 DEFAULT_CACHE = object()
 
+logger = logging.getLogger(__name__)
 
 class Api(object):
     """A python interface into the Twitter API
@@ -275,7 +277,6 @@ class Api(object):
                             application_only_auth)
 
         if debugHTTP:
-            import logging
             try:
                 import http.client as http_client  # python3
             except ImportError:
@@ -5051,7 +5052,9 @@ class Api(object):
 
                 if limit.remaining == 0:
                     try:
-                        time.sleep(max(int(limit.reset - time.time()) + 2, 0))
+                        stime = max(int(limit.reset - time.time()) + 2, 0)
+                        logger.debug('Rate limited requesting [%s], sleeping for [%s]', url, stime)
+                        time.sleep(stime)
                     except ValueError:
                         pass
 
