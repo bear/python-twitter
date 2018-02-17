@@ -5052,7 +5052,7 @@ class Api(object):
 
                 if limit.remaining == 0:
                     try:
-                        stime = max(int(limit.reset - time.time()) + 2, 0)
+                        stime = max(int(limit.reset - time.time()) + 10, 0)
                         logger.debug('Rate limited requesting [%s], sleeping for [%s]', url, stime)
                         time.sleep(stime)
                     except ValueError:
