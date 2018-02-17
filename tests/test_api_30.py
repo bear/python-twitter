@@ -120,72 +120,6 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(resp, 23)
 
     @responses.activate
-    def testGetSearch(self):
-        with open('testdata/get_search.json') as f:
-            resp_data = f.read()
-        responses.add(GET, DEFAULT_URL, body=resp_data)
-
-        resp = self.api.GetSearch(term='python')
-        self.assertEqual(len(resp), 1)
-        self.assertTrue(type(resp[0]), twitter.Status)
-        self.assertEqual(resp[0].id, 674342688083283970)
-
-        self.assertRaises(
-            twitter.TwitterError,
-            lambda: self.api.GetSearch(since_id='test'))
-        self.assertRaises(
-            twitter.TwitterError,
-            lambda: self.api.GetSearch(max_id='test'))
-        self.assertRaises(
-            twitter.TwitterError,
-            lambda: self.api.GetSearch(term='test', count='test'))
-        self.assertFalse(self.api.GetSearch())
-
-    @responses.activate
-    def testGetSeachRawQuery(self):
-        with open('testdata/get_search_raw.json') as f:
-            resp_data = f.read()
-        responses.add(GET, DEFAULT_URL, body=resp_data)
-
-        resp = self.api.GetSearch(raw_query="q=twitter%20&result_type=recent&since=2014-07-19&count=100")
-        self.assertTrue([type(status) is twitter.Status for status in resp])
-        self.assertTrue(['twitter' in status.text for status in resp])
-
-    @responses.activate
-    def testGetSearchGeocode(self):
-        with open('testdata/get_search_geocode.json') as f:
-            resp_data = f.read()
-        responses.add(GET, DEFAULT_URL, body=resp_data)
-
-        resp = self.api.GetSearch(
-            term="python",
-            geocode=('37.781157', '-122.398720', '100mi'))
-        status = resp[0]
-        self.assertTrue(status, twitter.Status)
-        self.assertTrue(status.geo)
-        self.assertEqual(status.geo['type'], 'Point')
-        resp = self.api.GetSearch(
-            term="python",
-            geocode=('37.781157,-122.398720,100mi'))
-        status = resp[0]
-        self.assertTrue(status, twitter.Status)
-        self.assertTrue(status.geo)
-
-    @responses.activate
-    def testGetUsersSearch(self):
-        with open('testdata/get_users_search.json') as f:
-            resp_data = f.read()
-        responses.add(GET, DEFAULT_URL, body=resp_data)
-
-        resp = self.api.GetUsersSearch(term='python')
-        self.assertEqual(type(resp[0]), twitter.User)
-        self.assertEqual(len(resp), 20)
-        self.assertEqual(resp[0].id, 63873759)
-        self.assertRaises(twitter.TwitterError,
-                          lambda: self.api.GetUsersSearch(term='python',
-                                                          count='test'))
-
-    @responses.activate
     def testGetTrendsCurrent(self):
         with open('testdata/get_trends_current.json') as f:
             resp_data = f.read()
@@ -1631,6 +1565,10 @@ class ApiTest(unittest.TestCase):
         resp = self.api.CreateFavorite(status)
         self.assertEqual(resp.id, 757283981683412992)
 
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.CreateFavorite(status=None, status_id=None))
+
     @responses.activate
     def testDestroyFavorite(self):
         with open('testdata/post_destroy_favorite.json') as f:
@@ -1642,6 +1580,10 @@ class ApiTest(unittest.TestCase):
         status = twitter.models.Status(id=757283981683412992)
         resp = self.api.DestroyFavorite(status)
         self.assertEqual(resp.id, 757283981683412992)
+
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.DestroyFavorite(status=None, status_id=None))
 
     @responses.activate
     def testPostDirectMessage(self):
@@ -1697,14 +1639,6 @@ class ApiTest(unittest.TestCase):
             twitter.TwitterError,
             lambda: self.api.ShowFriendship(target_screen_name='__jcbl__')
         )
-
-    @responses.activate
-    def test_UpdateBackgroundImage_deprecation(self):
-        responses.add(POST, DEFAULT_URL, body='{}', status=200)
-        warnings.simplefilter("always")
-        with warnings.catch_warnings(record=True) as w:
-            resp = self.api.UpdateBackgroundImage(image='testdata/168NQ.jpg')
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
 
     @responses.activate
     @patch('twitter.api.Api.UploadMediaChunked')

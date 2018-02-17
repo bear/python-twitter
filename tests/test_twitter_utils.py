@@ -3,7 +3,6 @@
 import unittest
 
 import twitter
-
 from twitter.twitter_utils import (
     calc_expected_status_length,
     parse_media_file
@@ -24,6 +23,14 @@ class ApiTest(unittest.TestCase):
     def test_parse_media_file_http(self):
         data_file, filename, file_size, media_type = parse_media_file(
             'https://raw.githubusercontent.com/bear/python-twitter/master/testdata/168NQ.jpg')
+        self.assertTrue(hasattr(data_file, 'read'))
+        self.assertEqual(filename, '168NQ.jpg')
+        self.assertEqual(file_size, 44772)
+        self.assertEqual(media_type, 'image/jpeg')
+
+    def test_parse_media_file_http_with_query_strings(self):
+        data_file, filename, file_size, media_type = parse_media_file(
+            'https://raw.githubusercontent.com/bear/python-twitter/master/testdata/168NQ.jpg?query=true')
         self.assertTrue(hasattr(data_file, 'read'))
         self.assertEqual(filename, '168NQ.jpg')
         self.assertEqual(file_size, 44772)

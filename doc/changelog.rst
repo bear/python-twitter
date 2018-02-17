@@ -1,5 +1,19 @@
 Changelog
 ---------
+
+Version 3.4
+===========
+
+Deprecations
+------------
+
+* :py:func:`twitter.api.Api.UpdateBackgroundImage`. Please make sure that your code does not call this function as it will now return a hard error. There is no replacement function. This was deprecated by Twitter around July 2015.
+
+* :py:func:`twitter.api.Api.PostMedia` has been removed. Please use :py:func:`twitter.api.Api.PostUpdate` instead.
+
+* :py:func:`twitter.api.Api.PostMultipleMedia`. Please use :py:func:`twitter.api.Api.PostUpdate` instead.
+
+
 Version 3.3.1
 =============
 

@@ -6,6 +6,11 @@ import os
 import re
 from tempfile import NamedTemporaryFile
 
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+
 import requests
 from twitter import TwitterError
 
@@ -143,7 +148,7 @@ URL_REGEXP = re.compile((
     r'('
     r'^(?!(https?://|www\.)?\.|ftps?://|([0-9]+\.){{1,3}}\d+)'  # exclude urls that start with "."
     r'(?:https?://|www\.)*^(?!.*@)(?:[\w+-_]+[.])'              # beginning of url
-    r'(?:{0}\b|'                                                # all tlds
+    r'(?:{0}\b'                                                # all tlds
     r'(?:[:0-9]))'                                              # port numbers & close off TLDs
     r'(?:[\w+\/]?[a-z0-9!\*\'\(\);:&=\+\$/%#\[\]\-_\.,~?])*'    # path/query params
     r')').format(r'\b|'.join(TLDS)), re.U | re.I | re.X)
@@ -215,7 +220,7 @@ def parse_media_file(passed_media):
     if not hasattr(passed_media, 'read'):
         if passed_media.startswith('http'):
             data_file = http_to_file(passed_media)
-            filename = os.path.basename(passed_media)
+            filename = os.path.basename(urlparse(passed_media).path)
         else:
             data_file = open(os.path.realpath(passed_media), 'rb')
             filename = os.path.basename(passed_media)
