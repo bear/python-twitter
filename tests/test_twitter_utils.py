@@ -1,4 +1,5 @@
 # encoding: utf-8
+from __future__ import unicode_literals
 
 import unittest
 
@@ -81,3 +82,11 @@ class ApiTest(unittest.TestCase):
         status = 'hi a tweet          there               example.com'
         len_status = calc_expected_status_length(status)
         self.assertEqual(len_status, 63)
+
+    def test_calc_expected_status_length_with_wide_unicode(self):
+        status = "…"
+        len_status = calc_expected_status_length(status)
+        assert len_status == 2
+        status = "……"
+        len_status = calc_expected_status_length(status)
+        assert len_status == 4

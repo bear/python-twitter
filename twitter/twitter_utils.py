@@ -4,7 +4,9 @@ from __future__ import unicode_literals
 import mimetypes
 import os
 import re
+import sys
 from tempfile import NamedTemporaryFile
+from unicodedata import normalize
 
 try:
     from urllib.parse import urlparse
@@ -14,6 +16,14 @@ except ImportError:
 import requests
 from twitter import TwitterError
 
+if sys.version_info < (3,):
+    range = xrange
+
+CHAR_RANGES = [
+    range(0, 4351),
+    range(8192, 8205),
+    range(8208, 8223),
+    range(8242, 8247)]
 
 TLDS = [
     "ac", "ad", "ae", "af", "ag", "ai", "al", "am", "an", "ao", "aq", "ar",
@@ -171,7 +181,11 @@ def calc_expected_status_length(status, short_url_length=23):
         if is_url(word):
             status_length += short_url_length
         else:
-            status_length += len(word)
+            for character in word:
+                if any([ord(normalize("NFC", character)) in char_range for char_range in CHAR_RANGES]):
+                    status_length += 1
+                else:
+                    status_length += 2
     status_length += len(re.findall(r'\s', status))
     return status_length
 

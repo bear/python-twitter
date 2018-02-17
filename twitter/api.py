@@ -896,12 +896,12 @@ class Api(object):
             'map': map
         }
         while offset < len(status_ids):
-            parameters['id'] = ','.join([str(enf_type('status_id', int, status_id)) for status_id in status_ids[offset:offset+100]])
+            parameters['id'] = ','.join([str(enf_type('status_id', int, status_id)) for status_id in status_ids[offset:offset + 100]])
 
             resp = self._RequestUrl(url, 'GET', data=parameters)
             data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
             if map:
-                result.update({int(key):(Status.NewFromJsonDict(value) if value else None) for key,value in data['id'].items()})
+                result.update({int(key): (Status.NewFromJsonDict(value) if value else None) for key, value in data['id'].items()})
             else:
                 result += [Status.NewFromJsonDict(dataitem) for dataitem in data]
 
