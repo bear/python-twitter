@@ -127,6 +127,7 @@ class Api(object):
         >>> api.GetUserTimeline(user)
         >>> api.GetHomeTimeline()
         >>> api.GetStatus(status_id)
+        >>> def GetStatuses(status_ids)
         >>> api.DestroyStatus(status_id)
         >>> api.GetFriends(user)
         >>> api.GetFollowers()
@@ -851,6 +852,62 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return Status.NewFromJsonDict(data)
+
+    def GetStatuses(self,
+                    status_ids,
+                    trim_user=False,
+                    include_entities=True,
+                    map=False):
+        """Returns a list of status messages, specified by the status_ids parameter.
+
+        Args:
+          status_ids:
+            A list of the numeric ID of the statuses you are trying to retrieve.
+          trim_user:
+            When set to True, each tweet returned in a timeline will include
+            a user object including only the status authors numerical ID.
+            Omit this parameter to receive the complete user object. [Optional]
+          include_entities:
+            If False, the entities node will be disincluded.
+            This node offers a variety of metadata about the tweet in a
+            discreet structure, including: user_mentions, urls, and
+            hashtags. [Optional]
+          map:
+            If True, returns a dictionary with status id as key and returned
+            status data (or None if tweet does not exist or is inaccessible)
+            as value. Otherwise returns an unordered list of successfully
+            retrieved Tweets. [Optional]
+        Returns:
+          A dictionary or unordered list (depending on the parameter 'map') of
+          twitter Status instances representing the status messages.
+        """
+        url = '%s/statuses/lookup.json' % (self.base_url)
+
+        map = enf_type('map', bool, map)
+
+        if map:
+            result = {}
+        else:
+            result = []
+        offset = 0
+        parameters = {
+            'trim_user': enf_type('trim_user', bool, trim_user),
+            'include_entities': enf_type('include_entities', bool, include_entities),
+            'map': map
+        }
+        while offset < len(status_ids):
+            parameters['id'] = ','.join([str(enf_type('status_id', int, status_id)) for status_id in status_ids[offset:offset+100]])
+
+            resp = self._RequestUrl(url, 'GET', data=parameters)
+            data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+            if map:
+                result.update({int(key):(Status.NewFromJsonDict(value) if value else None) for key,value in data['id'].items()})
+            else:
+                result += [Status.NewFromJsonDict(dataitem) for dataitem in data]
+
+            offset += 100
+
+        return result
 
     def GetStatusOembed(self,
                         status_id=None,
