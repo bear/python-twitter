@@ -80,6 +80,7 @@ DEFAULT_CACHE = object()
 
 logger = logging.getLogger(__name__)
 
+
 class Api(object):
     """A python interface into the Twitter API
 
