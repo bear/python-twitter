@@ -219,7 +219,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/blocks/list.json?cursor=-1&tweet_mode=compat',
+            'https://api.twitter.com/1.1/blocks/list.json?cursor=-1&stringify_ids=False&include_entities=False&skip_status=False&tweet_mode=compat',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -227,7 +227,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/blocks/list.json?cursor=1524574483549312671&tweet_mode=compat',
+            'https://api.twitter.com/1.1/blocks/list.json?cursor=1524574483549312671&stringify_ids=False&include_entities=False&skip_status=False&tweet_mode=compat',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -278,7 +278,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/blocks/ids.json?cursor=-1&tweet_mode=compat',
+            'https://api.twitter.com/1.1/blocks/ids.json?cursor=-1&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=compat',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -286,7 +286,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/blocks/ids.json?cursor=1524566179872860311&tweet_mode=compat',
+            'https://api.twitter.com/1.1/blocks/ids.json?cursor=1524566179872860311&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=compat',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1367,7 +1367,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/mutes/users/list.json?cursor=-1&tweet_mode=compat&include_entities=True',
+            'https://api.twitter.com/1.1/mutes/users/list.json?cursor=-1&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=compat',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1377,7 +1377,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/mutes/users/list.json?cursor=1535206520056388207&include_entities=True&tweet_mode=compat',
+            'https://api.twitter.com/1.1/mutes/users/list.json?cursor=1535206520056388207&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=compat',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1392,7 +1392,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/mutes/users/ids.json?tweet_mode=compat&cursor=-1',
+            'https://api.twitter.com/1.1/mutes/users/ids.json?cursor=-1&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=compat',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1402,7 +1402,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/mutes/users/ids.json?tweet_mode=compat&cursor=1535206520056565155',
+            'https://api.twitter.com/1.1/mutes/users/ids.json?cursor=1535206520056565155&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=compat',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1416,7 +1416,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             POST,
-            'https://api.twitter.com/1.1/blocks/create.json',
+            DEFAULT_URL,
             body=resp_data,
             match_querystring=True,
             status=200)

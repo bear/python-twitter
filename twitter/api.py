@@ -1655,7 +1655,8 @@ class Api(object):
         url = '%s/statuses/retweeters/ids.json' % (self.base_url)
         parameters = {
             'id': enf_type('id', int, status_id),
-            'stringify_ids': enf_type('stringify_ids', bool, stringify_ids)
+            'stringify_ids': enf_type('stringify_ids', bool, stringify_ids),
+            'count': count,
         }
 
         result = []
@@ -1742,7 +1743,7 @@ class Api(object):
                              action,
                              cursor=-1,
                              skip_status=False,
-                             include_entities=False,
+                             include_entities=True,
                              stringify_ids=False):
         """ Fetch a page of the users (as twitter.User instances)
         blocked or muted by the currently authenticated user.
@@ -1779,12 +1780,12 @@ class Api(object):
         url = urls[endpoint][action]
 
         result = []
-        parameters = {}
-        if skip_status:
-            parameters['skip_status'] = True
-        if include_entities:
-            parameters['include_entities'] = True
-        parameters['cursor'] = cursor
+        parameters = {
+            'skip_status': bool(skip_status),
+            'include_entities': bool(include_entities),
+            'stringify_ids': bool(stringify_ids),
+            'cursor': cursor,
+        }
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -1901,7 +1902,7 @@ class Api(object):
         return self._GetBlocksMutesPaged(endpoint='block',
                                          action='ids',
                                          cursor=cursor,
-                                         stringify_ids=False)
+                                         stringify_ids=stringify_ids)
 
     def GetMutes(self,
                  skip_status=False,
