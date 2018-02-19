@@ -2779,6 +2779,8 @@ class Api(object):
         screen_names, or twitter.User objects. The list of users that
         are queried is the union of all specified parameters.
 
+        No more than 100 users may be given per request.
+
         Args:
           user_id (int, list, optional):
             A list of user_ids to retrieve extended information.
@@ -2811,6 +2813,9 @@ class Api(object):
             parameters['user_id'] = ','.join([str(u) for u in uids])
         if screen_name:
             parameters['screen_name'] = ','.join(screen_name)
+
+        if len(uids) > 100:
+            raise TwitterError("No more than 100 users may be requested per request.")
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
