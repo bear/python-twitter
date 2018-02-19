@@ -71,7 +71,7 @@ from twitter.error import (
 )
 
 if sys.version_info > (3,):
-    long = int
+    long = int  # pylint: disable=invalid-name,redefined-builtin
 
 CHARACTER_LIMIT = 280
 
@@ -223,9 +223,11 @@ class Api(object):
         # see GAE.rst for more information
         if os.environ:
             if 'APPENGINE_RUNTIME' in os.environ.keys():
-                import requests_toolbelt.adapters.appengine  # Adapter ensures requests use app engine's urlfetch
+                # Adapter ensures requests use app engine's urlfetch
+                import requests_toolbelt.adapters.appengine
                 requests_toolbelt.adapters.appengine.monkeypatch()
-                cache = None  # App Engine does not like this caching strategy, disable caching
+                # App Engine does not like this caching strategy, disable caching
+                cache = None
 
         self.SetCache(cache)
         self._cache_timeout = Api.DEFAULT_CACHE_TIMEOUT
@@ -268,8 +270,7 @@ class Api(object):
             warnings.warn((
                 "A chunk size lower than 16384 may result in too many "
                 "requests to the Twitter API when uploading videos. You are "
-                "strongly advised to increase it above 16384"
-            ))
+                "strongly advised to increase it above 16384"))
 
         if (consumer_key and not
            (application_only_auth or all([access_token_key, access_token_secret]))):
@@ -292,7 +293,8 @@ class Api(object):
             requests_log.setLevel(logging.DEBUG)
             requests_log.propagate = True
 
-    def GetAppOnlyAuthToken(self, consumer_key, consumer_secret):
+    @staticmethod
+    def GetAppOnlyAuthToken(consumer_key, consumer_secret):
         """
         Generate a Bearer Token from consumer_key and consumer_secret
         """
@@ -526,9 +528,9 @@ class Api(object):
 
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
         if return_json:
-          return data
+            return data
         else:
-          return [Status.NewFromJsonDict(x) for x in data.get('statuses', '')]
+            return [Status.NewFromJsonDict(x) for x in data.get('statuses', '')]
 
     def GetUsersSearch(self,
                        term=None,
@@ -2821,9 +2823,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return [User.NewFromJsonDict(u) for u in data]
+            return [User.NewFromJsonDict(u) for u in data]
 
     def GetUser(self,
                 user_id=None,
@@ -2861,9 +2863,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return User.NewFromJsonDict(data)
+            return User.NewFromJsonDict(data)
 
     def GetDirectMessages(self,
                           since_id=None,
@@ -2935,9 +2937,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return [DirectMessage.NewFromJsonDict(x) for x in data]
+            return [DirectMessage.NewFromJsonDict(x) for x in data]
 
     def GetSentDirectMessages(self,
                               since_id=None,
@@ -2995,9 +2997,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return [DirectMessage.NewFromJsonDict(x) for x in data]
+            return [DirectMessage.NewFromJsonDict(x) for x in data]
 
     def PostDirectMessage(self,
                           text,
@@ -3030,9 +3032,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return DirectMessage.NewFromJsonDict(data)
+            return DirectMessage.NewFromJsonDict(data)
 
     def DestroyDirectMessage(self, message_id, include_entities=True, return_json=False):
         """Destroys the direct message specified in the required ID parameter.
@@ -3060,9 +3062,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return DirectMessage.NewFromJsonDict(data)
+            return DirectMessage.NewFromJsonDict(data)
 
     def CreateFriendship(self, user_id=None, screen_name=None, follow=True, retweets=True, **kwargs):
         """Befriends the user specified by the user_id or screen_name.
@@ -3273,9 +3275,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return [UserStatus.NewFromJsonDict(x) for x in data]
+            return [UserStatus.NewFromJsonDict(x) for x in data]
 
     def IncomingFriendship(self,
                            cursor=None,
@@ -3493,9 +3495,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return [Status.NewFromJsonDict(x) for x in data]
+            return [Status.NewFromJsonDict(x) for x in data]
 
     def GetMentions(self,
                     count=None,
@@ -3559,9 +3561,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return [Status.NewFromJsonDict(x) for x in data]
+            return [Status.NewFromJsonDict(x) for x in data]
 
     @staticmethod
     def _IDList(list_id, slug, owner_id, owner_screen_name):
@@ -3791,9 +3793,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return User.NewFromJsonDict(data)
+            return User.NewFromJsonDict(data)
 
     def GetSubscriptions(self,
                          user_id=None,
@@ -3843,9 +3845,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return [List.NewFromJsonDict(x) for x in data['lists']]
+            return [List.NewFromJsonDict(x) for x in data['lists']]
 
     def GetMemberships(self,
                        user_id=None,
@@ -3905,9 +3907,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return [List.NewFromJsonDict(x) for x in data['lists']]
+            return [List.NewFromJsonDict(x) for x in data['lists']]
 
     def GetListsList(self,
                      screen_name=None,
@@ -3950,9 +3952,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return [List.NewFromJsonDict(x) for x in data]
+            return [List.NewFromJsonDict(x) for x in data]
 
     def GetListTimeline(self,
                         list_id=None,
@@ -4030,9 +4032,9 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
-          return data
+            return data
         else:
-          return [Status.NewFromJsonDict(x) for x in data]
+            return [Status.NewFromJsonDict(x) for x in data]
 
     def GetListMembersPaged(self,
                             list_id=None,
@@ -4666,7 +4668,7 @@ class Api(object):
                 data = self._ParseAndCheckTwitter(line.decode('utf-8'))
                 yield data
             elif include_keepalive:
-              yield None
+                yield None
 
     def VerifyCredentials(self, include_entities=None, skip_status=None, include_email=None):
         """Returns a twitter.User instance if the authenticating user is valid.
