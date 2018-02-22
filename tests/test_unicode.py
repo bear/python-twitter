@@ -97,6 +97,11 @@ class ApiTest(unittest.TestCase):
         except Exception as e:
             self.fail(e)
 
+    def test_post_with_bytes_string(self):
+        status = 'x'
+        length = twitter.twitter_utils.calc_expected_status_length(status)
+        assert length == 1
+
 
 if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(ApiTest)

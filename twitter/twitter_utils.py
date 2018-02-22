@@ -177,6 +177,8 @@ def calc_expected_status_length(status, short_url_length=23):
 
     """
     status_length = 0
+    if isinstance(status, bytes):
+        status = unicode(status)
     for word in re.split(r'\s', status):
         if is_url(word):
             status_length += short_url_length
