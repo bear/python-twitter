@@ -9,6 +9,8 @@ from twitter.twitter_utils import (
     parse_media_file
 )
 
+from twitter import twitter_utils as utils
+
 
 class ApiTest(unittest.TestCase):
 
@@ -90,3 +92,24 @@ class ApiTest(unittest.TestCase):
         status = "……"
         len_status = calc_expected_status_length(status)
         assert len_status == 4
+
+    def test_parse_args(self):
+        user = twitter.User(screen_name='__jcbl__')
+        out = utils.parse_arg_list(user, 'screen_name')
+        assert isinstance(out, (str, unicode))
+        assert out == '__jcbl__'
+
+        users = ['__jcbl__', 'notinourselves']
+        out = utils.parse_arg_list(users, 'screen_name')
+        assert isinstance(out, (str, unicode))
+        assert out == '__jcbl__,notinourselves'
+
+        users2 = [user] + users
+        out = utils.parse_arg_list(users2, 'screen_name')
+        assert isinstance(out, (str, unicode))
+        assert out == '__jcbl__,__jcbl__,notinourselves'
+
+        users = '__jcbl__'
+        out = utils.parse_arg_list(users, 'screen_name')
+        assert isinstance(out, (str, unicode))
+        assert out == '__jcbl__'

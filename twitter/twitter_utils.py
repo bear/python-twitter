@@ -15,6 +15,7 @@ except ImportError:
 
 import requests
 from twitter import TwitterError
+import twitter
 
 if sys.version_info < (3,):
     range = xrange
@@ -292,3 +293,18 @@ def enf_type(field, _type, val):
         raise TwitterError({
             'message': '"{0}" must be type {1}'.format(field, _type.__name__)
         })
+
+
+def parse_arg_list(args, attr):
+    out = []
+    if isinstance(args, (str, unicode)):
+        out.append(args)
+    elif isinstance(args, twitter.User):
+        out.append(getattr(args, attr))
+    elif isinstance(args, (list, tuple)):
+        for item in args:
+            if isinstance(item, (str, unicode)):
+                out.append(item)
+            elif isinstance(item, twitter.User):
+                out.append(getattr(item, attr))
+    return ",".join([str(item) for item in out])

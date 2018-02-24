@@ -592,7 +592,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(GET, DEFAULT_URL, body=resp_data)
 
-        resp = self.api.GetMentions()
+        resp = self.api.GetMentions(count=1)
         self.assertTrue(type(resp) is list)
         self.assertTrue([type(mention) is twitter.Status for mention in resp])
         self.assertEqual(resp[0].id, 676148312349609985)
@@ -1699,3 +1699,40 @@ class ApiTest(unittest.TestCase):
         assert os.path.getsize(video.name) <= 1024 * 1024
         assert isinstance(resp, twitter.Status)
         assert twitter.api.Api.UploadMediaChunked.called
+
+    @responses.activate
+    def test_post_retweet(self):
+        with open('testdata/post_retweet.json') as f:
+            resp_data = f.read()
+        responses.add(POST, DEFAULT_URL, body=resp_data)
+        resp = self.api.PostRetweet(status_id=967413349473574913, trim_user=True)
+        assert resp
+        assert resp.id == 967465567773839360
+
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.PostRetweet(status_id=0))
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.PostRetweet(status_id='asdf'))
+
+    @responses.activate
+    def test_get_retweets_of_me(self):
+        with open('testdata/get_retweets_of_me.json') as f:
+            resp_data = f.read()
+        responses.add(GET, DEFAULT_URL, body=resp_data)
+        resp = self.api.GetRetweetsOfMe(
+            count=1,
+            since_id=0,
+            max_id=100,
+            trim_user=True,
+            include_entities=True,
+            include_user_entities=True)
+        assert resp
+
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.GetRetweetsOfMe(count=200))
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.GetRetweetsOfMe(count='asdf'))

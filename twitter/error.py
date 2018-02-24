@@ -18,3 +18,8 @@ class PythonTwitterDeprecationWarning(DeprecationWarning):
 class PythonTwitterDeprecationWarning330(PythonTwitterDeprecationWarning):
     """Warning for features to be removed in version 3.3.0"""
     pass
+
+
+class PythonTwitterDeprecationWarning340(PythonTwitterDeprecationWarning):
+    """Warning for features to be removed in version 3.4.0"""
+    pass

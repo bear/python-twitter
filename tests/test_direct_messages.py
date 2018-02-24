@@ -32,11 +32,17 @@ def test_get_direct_messages():
         resp_data = f.read()
     responses.add(GET, DEFAULT_URL, body=resp_data)
 
-    resp = api.GetDirectMessages()
+    resp = api.GetDirectMessages(count=1, page=1)
     direct_message = resp[0]
     assert isinstance(resp, list)
     assert isinstance(direct_message, twitter.DirectMessage)
     assert direct_message.id == 678629245946433539
+
+    try:
+        resp = api.GetDirectMessages(count='asdf')
+        assert 0
+    except twitter.TwitterError as e:
+        assert True
 
 
 @responses.activate
@@ -45,7 +51,7 @@ def test_get_sent_direct_messages():
         resp_data = f.read()
     responses.add(GET, DEFAULT_URL, body=resp_data)
 
-    resp = api.GetSentDirectMessages()
+    resp = api.GetSentDirectMessages(count=1, page=1)
     direct_message = resp[0]
     assert isinstance(resp, list)
     assert isinstance(direct_message, twitter.DirectMessage)
