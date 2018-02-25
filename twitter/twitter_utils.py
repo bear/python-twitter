@@ -20,6 +20,9 @@ import twitter
 if sys.version_info < (3,):
     range = xrange
 
+if sys.version_info > (3,):
+    unicode = str
+
 CHAR_RANGES = [
     range(0, 4351),
     range(8192, 8205),

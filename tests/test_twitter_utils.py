@@ -1,6 +1,7 @@
 # encoding: utf-8
 from __future__ import unicode_literals
 
+import sys
 import unittest
 
 import twitter
@@ -10,6 +11,9 @@ from twitter.twitter_utils import (
 )
 
 from twitter import twitter_utils as utils
+
+if sys.version_info > (3,):
+    unicode = str
 
 
 class ApiTest(unittest.TestCase):
