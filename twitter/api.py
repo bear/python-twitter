@@ -37,11 +37,9 @@ import os
 try:
     # python 3
     from urllib.parse import urlparse, urlunparse, urlencode, quote_plus
-    from urllib.request import urlopen
     from urllib.request import __version__ as urllib_version
 except ImportError:
     from urlparse import urlparse, urlunparse
-    from urllib2 import urlopen
     from urllib import urlencode, quote_plus
     from urllib import __version__ as urllib_version
 
@@ -1445,14 +1443,14 @@ class Api(object):
 
         if len(words) == 1 and not is_url(words[0]):
             if len(words[0]) > CHARACTER_LIMIT:
-                raise TwitterError({"message": "Unable to split status into tweetable parts. Word was: {0}/{1}".format(len(words[0]), char_lim)})
+                raise TwitterError("Unable to split status into tweetable parts. Word was: {0}/{1}".format(len(words[0]), char_lim))
             else:
                 tweets.append(words[0])
                 return tweets
 
         for word in words:
             if len(word) > char_lim:
-                raise TwitterError({"message": "Unable to split status into tweetable parts. Word was: {0}/{1}".format(len(word), char_lim)})
+                raise TwitterError("Unable to split status into tweetable parts. Word was: {0}/{1}".format(len(word), char_lim))
             new_len = line_length
 
             if is_url(word):
@@ -1569,8 +1567,13 @@ class Api(object):
         Returns:
           A sequence of twitter.Status instances, one for each message up to count
         """
-        return self.GetUserTimeline(since_id=since_id, count=count, max_id=max_id, trim_user=trim_user,
-                                    exclude_replies=True, include_rts=True)
+        return self.GetUserTimeline(
+            since_id=since_id,
+            count=count,
+            max_id=max_id,
+            trim_user=trim_user,
+            exclude_replies=True,
+            include_rts=True)
 
     def GetReplies(self,
                    since_id=None,
@@ -4808,10 +4811,10 @@ class Api(object):
         # Add any additional path elements to the path
         if path_elements:
             # Filter out the path elements that have a value of None
-            p = [i for i in path_elements if i]
+            filtered_elements = [i for i in path_elements if i]
             if not path.endswith('/'):
                 path += '/'
-            path += '/'.join(p)
+            path += '/'.join(filtered_elements)
 
         # Add any additional query parameters to the query string
         if extra_params and len(extra_params) > 0:
