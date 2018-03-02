@@ -2786,7 +2786,7 @@ class Api(object):
         Args:
           user_id (int, list, optional):
             A list of user_ids to retrieve extended information.
-          screen_name (str, optional):
+          screen_name (str, list, optional):
             A list of screen_names to retrieve extended information.
           users (list, optional):
             A list of twitter.User objects to retrieve extended information.
@@ -3232,7 +3232,7 @@ class Api(object):
         parameters = {}
 
         if user_id:
-            if isinstance(user_id, list) or isinstance(user_id, tuple):
+            if isinstance(user_id, (list, tuple)):
                 uids = list()
                 for user in user_id:
                     if isinstance(user, User):
@@ -3246,7 +3246,7 @@ class Api(object):
                 else:
                     parameters['user_id'] = enf_type('user_id', int, user_id)
         if screen_name:
-            if isinstance(screen_name, list) or isinstance(screen_name, tuple):
+            if isinstance(screen_name, (list, tuple)):
                 sn_list = list()
                 for user in screen_name:
                     if isinstance(user, User):
@@ -3260,8 +3260,7 @@ class Api(object):
                 else:
                     parameters['screen_name'] = enf_type('screen_name', str, screen_name)
         if not user_id and not screen_name:
-            raise TwitterError(
-                "Specify at least one of user_id or screen_name.")
+            raise TwitterError("Specify at least one of user_id or screen_name.")
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
