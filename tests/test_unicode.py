@@ -8,6 +8,10 @@ import unittest
 import warnings
 
 import responses
+
+from hypothesis import given, example
+from hypothesis import strategies as st
+
 import twitter
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
@@ -41,9 +45,11 @@ class ApiTest(unittest.TestCase):
         sys.stderr = self._stderr
         pass
 
-    def test_trend_repr1(self):
+    @given(text=st.text())
+    @example(text="#نفسك_تبيع_ايه_للسعوديه")
+    def test_trend_repr1(self, text):
         trend = twitter.Trend(
-            name="#نفسك_تبيع_ايه_للسعوديه",
+            name=text,
             url="http://twitter.com/search?q=%23ChangeAConsonantSpoilAMovie",
             timestamp='whatever')
         try:
@@ -51,9 +57,10 @@ class ApiTest(unittest.TestCase):
         except Exception as e:
             self.fail(e)
 
-    def test_trend_repr2(self):
+    @given(text=st.text())
+    @example(text="#N\u00e3oD\u00eaUnfTagueirosSdv")
+    def test_trend_repr2(self, text):
         trend = twitter.Trend(
-            name="#N\u00e3oD\u00eaUnfTagueirosSdv",
             url='http://twitter.com/search?q=%23ChangeAConsonantSpoilAMovie',
             timestamp='whatever')
 
@@ -72,23 +79,25 @@ class ApiTest(unittest.TestCase):
 
         resp = self.api.GetTrendsCurrent()
         for r in resp:
-            print(r.__str__())
             try:
                 r.__repr__()
             except Exception as e:
                 self.fail(e)
 
+    @given(text=st.text())
     @responses.activate
-    def test_unicode_get_search(self):
+    def test_unicode_get_search(self, text):
         responses.add(responses.GET, DEFAULT_URL, body=b'{}', status=200)
         try:
-            self.api.GetSearch(term="#ابشري_قابوس_جاء")
+            self.api.GetSearch(term=text)
         except Exception as e:
             self.fail(e)
 
-    def test_constructed_status(self):
+    @given(text=st.text())
+    @example(text='可以倒着飞的飞机')
+    def test_constructed_status(self, text):
         s = twitter.Status()
-        s.text = "可以倒着飞的飞机"
+        s.text = text
         s.created_at = "016-02-13T23:00:00"
         s.screen_name = "himawari8bot"
         s.id = 1
@@ -101,8 +110,3 @@ class ApiTest(unittest.TestCase):
         status = 'x'
         length = twitter.twitter_utils.calc_expected_status_length(status)
         assert length == 1
-
-
-if __name__ == "__main__":
-    suite = unittest.TestLoader().loadTestsFromTestCase(ApiTest)
-    unittest.TextTestRunner(verbosity=2).run(suite)

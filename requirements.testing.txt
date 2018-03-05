@@ -16,3 +16,5 @@ check-manifest
 tox
 tox-pyenv
 pycodestyle
+
+hypothesis

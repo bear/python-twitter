@@ -580,7 +580,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(GET, DEFAULT_URL, body=resp_data)
 
-        resp = self.api.GetFavorites()
+        resp = self.api.GetFavorites(user_id=12, count=1, since_id=10, max_id=200)
         self.assertTrue(type(resp) is list)
         fav = resp[0]
         self.assertEqual(fav.id, 677180133447372800)
@@ -1294,7 +1294,6 @@ class ApiTest(unittest.TestCase):
             resp = self.api.GetStatuses(status_ids)
 
             self.assertTrue(type(resp) is list)
-            print(resp)
             self.assertEqual(set(respitem.id for respitem in resp), set(status_ids))
             self.assertFalse(resp != resp)
 
@@ -1736,3 +1735,21 @@ class ApiTest(unittest.TestCase):
         self.assertRaises(
             twitter.TwitterError,
             lambda: self.api.GetRetweetsOfMe(count='asdf'))
+
+    @responses.activate
+    def test_incoming_friendships(self):
+        with open('testdata/get_incoming_friendships.json') as f:
+            responses.add(GET, DEFAULT_URL, f.read())
+        resp = self.api.IncomingFriendship(cursor=1, stringify_ids=True)
+        assert resp
+        assert isinstance(resp, list)
+        assert resp[0] == 12
+
+    @responses.activate
+    def test_outgoing_friendships(self):
+        with open('testdata/get_outgoing_friendships.json') as f:
+            responses.add(GET, DEFAULT_URL, f.read())
+        resp = self.api.OutgoingFriendship(cursor=1, stringify_ids=True)
+        assert resp
+        assert isinstance(resp, list)
+        assert resp[0] == 12
