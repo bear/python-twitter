@@ -4373,49 +4373,37 @@ class Api(object):
         """Update's the authenticated user's profile data.
 
         Args:
-          name:
+          name (str, optional):
             Full name associated with the profile.
-            Maximum of 20 characters. [Optional]
-          profileURL:
+          profileURL (str, optional):
             URL associated with the profile.
             Will be prepended with "http://" if not present.
-            Maximum of 100 characters. [Optional]
-          location:
+          location (str, optional):
             The city or country describing where the user of the account is located.
             The contents are not normalized or geocoded in any way.
-            Maximum of 30 characters. [Optional]
-          description:
+          description (str, optional):
             A description of the user owning the account.
-            Maximum of 160 characters. [Optional]
-          profile_link_color:
+          profile_link_color (str, optional):
             hex value of profile color theme. formated without '#' or '0x'. Ex:  FF00FF
-            [Optional]
-          include_entities:
+          include_entities (bool, optional):
             The entities node will be omitted when set to False.
-            [Optional]
-          skip_status:
+          skip_status (bool, optional):
             When set to either True, t or 1 then statuses will not be included
-            in the returned user objects. [Optional]
+            in the returned user objects.
 
         Returns:
           A twitter.User instance representing the modified user.
         """
         url = '%s/account/update_profile.json' % (self.base_url)
-        data = {}
-        if name:
-            data['name'] = name
-        if profileURL:
-            data['url'] = profileURL
-        if location:
-            data['location'] = location
-        if description:
-            data['description'] = description
-        if profile_link_color:
-            data['profile_link_color'] = profile_link_color
-        if include_entities:
-            data['include_entities'] = include_entities
-        if skip_status:
-            data['skip_status'] = skip_status
+        data = {
+            'name': name,
+            'url': profileURL,
+            'location': location,
+            'description': description,
+            'profile_link_color': profile_link_color,
+            'include_entities': include_entities,
+            'skip_status': skip_status,
+        }
 
         resp = self._RequestUrl(url, 'POST', data=data)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))

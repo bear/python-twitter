@@ -1753,3 +1753,18 @@ class ApiTest(unittest.TestCase):
         assert resp
         assert isinstance(resp, list)
         assert resp[0] == 12
+
+    @responses.activate
+    def test_update_profile(self):
+        with open('testdata/update_profile.json') as f:
+            responses.add(POST, DEFAULT_URL, f.read())
+        resp = self.api.UpdateProfile(
+            name='jeremy',
+            location='philly',
+            profileURL='example.com',
+            description='test',
+            profile_link_color='#e35',
+            include_entities=True,
+            skip_status=True)
+        assert resp
+        assert isinstance(resp, twitter.User)
