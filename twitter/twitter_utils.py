@@ -211,7 +211,8 @@ def is_url(text):
 def http_to_file(http):
     data_file = NamedTemporaryFile()
     req = requests.get(http, stream=True)
-    data_file.write(req.raw.data)
+    for chunk in req.iter_content(chunk_size=1024 * 1024):
+        data_file.write(chunk)
     return data_file
 
 
