@@ -1,6 +1,19 @@
 Changelog
 ---------
 
+Version 3.4.1
+=============
+
+Bugfixes:
+
+* Fix an issue where :py:func:`calc_expected_status_length` was failing for python 2 due to a failure to convert a bytes string to unicode. `Github issue #546 <https://github.com/bear/python-twitter/issues/546>`_.
+
+* Documentation fix for :py:func:`twitter.api.Api.UsersLookup`. UsersLookup can take a string or a list and properly parses both of them now. Github issues `#535 <https://github.com/bear/python-twitter/issues/535>`_ and `#549 <https://github.com/bear/python-twitter/issues/549>`_.
+
+* Properly decode response content for :py:func:`twitter.twitter_utils.http_to_file`. `Github issue #521 <https://github.com/bear/python-twitter/issues/521>`_.
+
+* Fix an issue with loading extended_tweet entities from Streaming API where tweets would be truncated when converting to a :py:class:`twitter.models.Status`. Github issues `#491 <https://github.com/bear/python-twitter/issues/491>`_ and `#506 <https://github.com/bear/python-twitter/issues/506>`_.
+
 Version 3.4
 ===========
 
