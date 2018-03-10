@@ -499,6 +499,11 @@ class Status(TwitterModel):
         user = None
         user_mentions = None
 
+        # for loading extended tweets from the streaming API.
+        if 'extended_tweet' in data:
+            for k, v in data['extended_tweet'].items():
+                data[k] = v
+
         if 'user' in data:
             user = User.NewFromJsonDict(data['user'])
         if 'retweeted_status' in data:
