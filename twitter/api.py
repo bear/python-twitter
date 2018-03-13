@@ -126,7 +126,7 @@ class Api(object):
         >>> api.GetUserTimeline(user)
         >>> api.GetHomeTimeline()
         >>> api.GetStatus(status_id)
-        >>> def GetStatuses(status_ids)
+        >>> api.GetStatuses(status_ids)
         >>> api.DestroyStatus(status_id)
         >>> api.GetFriends(user)
         >>> api.GetFollowers()
