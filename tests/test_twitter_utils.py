@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 import sys
 import unittest
 
+import responses
+
 import twitter
 from twitter.twitter_utils import (
     calc_expected_status_length,
@@ -27,7 +29,14 @@ class ApiTest(unittest.TestCase):
             sleep_on_rate_limit=False)
         self.base_url = 'https://api.twitter.com/1.1'
 
+    @responses.activate
     def test_parse_media_file_http(self):
+        with open('testdata/168NQ.jpg', 'rb') as f:
+            img_data = f.read()
+        responses.add(
+            responses.GET,
+            url='https://raw.githubusercontent.com/bear/python-twitter/master/testdata/168NQ.jpg',
+            body=img_data)
         data_file, filename, file_size, media_type = parse_media_file(
             'https://raw.githubusercontent.com/bear/python-twitter/master/testdata/168NQ.jpg')
         self.assertTrue(hasattr(data_file, 'read'))
@@ -35,7 +44,14 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(file_size, 44772)
         self.assertEqual(media_type, 'image/jpeg')
 
+    @responses.activate
     def test_parse_media_file_http_with_query_strings(self):
+        with open('testdata/168NQ.jpg', 'rb') as f:
+            img_data = f.read()
+        responses.add(
+            responses.GET,
+            url='https://raw.githubusercontent.com/bear/python-twitter/master/testdata/168NQ.jpg',
+            body=img_data)
         data_file, filename, file_size, media_type = parse_media_file(
             'https://raw.githubusercontent.com/bear/python-twitter/master/testdata/168NQ.jpg?query=true')
         self.assertTrue(hasattr(data_file, 'read'))
