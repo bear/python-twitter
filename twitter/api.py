@@ -163,8 +163,8 @@ class Api(object):
                  sleep_on_rate_limit=False,
                  tweet_mode='compat',
                  proxies=None,
-				 verify_ssl=None,
-				 cert_ssl=None):
+                 verify_ssl=None,
+                 cert_ssl=None):
         """Instantiate a new twitter.Api object.
 
         Args:
@@ -218,8 +218,8 @@ class Api(object):
           proxies (dict, optional):
             A dictionary of proxies for the request to pass through, if not specified
             allows requests lib to use environmental variables for proxy if any.
-		  verify_ssl (optional):
-		    Either a boolean, in which case it controls whether we verify
+          verify_ssl (optional):
+            Either a boolean, in which case it controls whether we verify
             the server's TLS certificate, or a string, in which case it must be a path
             to a CA bundle to use. Defaults to ``True``.
           cert_ssl (optional):
@@ -4926,7 +4926,7 @@ class Api(object):
                 timeout=self._timeout,
                 proxies=self.proxies,
                 verify=self.verify_ssl,
-				cert=self.cert_ssl
+                cert=self.cert_ssl
             )
         except requests.RequestException as e:
             raise TwitterError(str(e))
