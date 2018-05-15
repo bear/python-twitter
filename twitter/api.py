@@ -518,7 +518,7 @@ class Api(object):
             parameters['result_type'] = result_type
 
         if raw_query is not None:
-            url = "{url}?{raw_query}".format(
+            url = "{url}?q={raw_query}".format(
                 url=url,
                 raw_query=raw_query)
             resp = self._RequestUrl(url, 'GET')
