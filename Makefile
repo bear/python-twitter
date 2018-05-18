@@ -13,6 +13,7 @@ env:
 	pip install -Ur requirements.txt
 
 pyenv:
+	pyenv update
 	for version in $(SUPPORTED_VERSIONS) ; do \
 		pyenv install -s $$version; \
 	done
@@ -50,7 +51,10 @@ coverage: clean
 	coverage html
 	coverage report
 
-ci: pyenv tox
+update-pyenv:
+	cd /opt/circleci/.pyenv/plugins/python-build/../.. && git pull && cd -
+
+ci: update-pyenv pyenv tox
 	CODECOV_TOKEN=`cat .codecov-token` codecov
 
 build: clean
@@ -59,9 +63,9 @@ build: clean
 	python setup.py bdist_wheel
 
 upload: clean
-	pyenv 2.7.11
+	pyenv 2.7.15
 	python setup.py sdist upload
 	python setup.py bdist_wheel upload
-	pyenv 3.6.1
+	pyenv 3.6.5
 	python setup.py bdist_wheel upload
-	pyenv local 2.7.11 3.6.1 pypy-5.3.1
+	pyenv local $(SUPPORTED_VERSIONS)
