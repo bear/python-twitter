@@ -13,7 +13,6 @@ env:
 	pip install -Ur requirements.txt
 
 pyenv:
-	pyenv update
 	for version in $(SUPPORTED_VERSIONS) ; do \
 		pyenv install -s $$version; \
 	done
@@ -54,7 +53,7 @@ coverage: clean
 update-pyenv:
 	cd /opt/circleci/.pyenv/plugins/python-build/../.. && git pull && cd -
 
-ci: update-pyenv pyenv tox
+ci: update-pyenv pyenv dev tox
 	CODECOV_TOKEN=`cat .codecov-token` codecov
 
 build: clean
