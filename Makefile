@@ -13,7 +13,6 @@ env:
 	pip install -Ur requirements.txt
 
 pyenv:
-	pyenv update
 	for version in $(SUPPORTED_VERSIONS) ; do \
 		pyenv install -s $$version; \
 	done
