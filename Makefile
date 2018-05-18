@@ -1,3 +1,4 @@
+SUPPORTED_VERSIONS = 2.7.15 3.6.5 pypy-5.7.1 pypy3.5-6.0.0
 
 help:
 	@echo "  env         install all production dependencies"
@@ -12,13 +13,12 @@ env:
 	pip install -Ur requirements.txt
 
 pyenv:
-	pyenv install -s 2.7.11
-	pyenv install -s 3.6.1
-	pyenv install -s pypy-5.3.1
-	# pyenv install -s pypy3-2.4.0
-	pyenv local 2.7.11 3.6.1 pypy-5.3.1 # pypy3-2.4.0
+	for version in $(SUPPORTED_VERSIONS) ; do \
+		pyenv install -s $$version; \
+	done
+	pyenv local $(SUPPORTED_VERSIONS)
 
-dev: env pyenv
+dev: pyenv env
 	pip install -Ur requirements.testing.txt
 
 info:
