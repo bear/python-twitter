@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2007-2013 The Python-Twitter Developers
+# Copyright 2007-2018 The Python-Twitter Developers
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Utility to get your access tokens."""
+
 from __future__ import print_function
 
 from requests_oauthlib import OAuth1Session
@@ -31,6 +33,17 @@ SIGNIN_URL = 'https://api.twitter.com/oauth/authenticate'
 
 
 def get_access_token(consumer_key, consumer_secret):
+    """Get an access token for a given consumer key and secret.
+
+    Args:
+        consumer_key (str):
+            Your application consumer key.
+        consumer_secret (str):
+            Your application consumer secret.
+
+    Returns:
+        (None) Prints to command line.
+    """
     oauth_client = OAuth1Session(consumer_key, client_secret=consumer_secret, callback_uri='oob')
 
     print('\nRequesting temp token from Twitter...\n')
@@ -71,6 +84,7 @@ def get_access_token(consumer_key, consumer_secret):
 
 
 def main():
+    """Run script to get access token and secret for given app."""
     consumer_key = input('Enter your consumer key: ')
     consumer_secret = input('Enter your consumer secret: ')
     get_access_token(consumer_key, consumer_secret)
