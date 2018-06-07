@@ -1158,9 +1158,13 @@ class Api(object):
             else:
                 _, _, file_size, media_type = parse_media_file(media)
                 if file_size > self.chunk_size or media_type in chunked_types:
-                    media_ids.append(self.UploadMediaChunked(media, media_additional_owners))
+                    media_ids.append(self.UploadMediaChunked(
+                        media, media_additional_owners, media_category=media_category
+                    ))
                 else:
-                    media_ids.append(self.UploadMediaSimple(media, media_additional_owners))
+                    media_ids.append(self.UploadMediaSimple(
+                        media, media_additional_owners, media_category=media_category
+                    ))
             parameters['media_ids'] = ','.join([str(mid) for mid in media_ids])
 
         if latitude is not None and longitude is not None:
@@ -1262,7 +1266,7 @@ class Api(object):
         """
         url = '%s/media/upload.json' % self.upload_url
 
-        media_fp, filename, file_size, media_type = parse_media_file(media)
+        media_fp, filename, file_size, media_type = parse_media_file(media, async_upload=True)
 
         if not all([media_fp, filename, file_size, media_type]):
             raise TwitterError({'message': 'Could not process media file'})
