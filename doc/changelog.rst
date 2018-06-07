@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+Version 3.4.2
+=============
+
+Bugfixes:
+
+* Allow upload of GIFs with size up to 15mb. See `#538 <https://github.com/bear/python-twitter/pull/538>`_
+
 Version 3.4.1
 =============
 
