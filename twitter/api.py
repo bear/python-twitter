@@ -2,7 +2,7 @@
 
 #
 #
-# Copyright 2007-2016 The Python-Twitter Developers
+# Copyright 2007-2016, 2018 The Python-Twitter Developers
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -4886,7 +4886,7 @@ class Api(object):
                 raise TwitterError({'message': "Exceeded connection limit for user"})
             if "Error 401 Unauthorized" in json_data:
                 raise TwitterError({'message': "Unauthorized"})
-            raise TwitterError({'Unknown error: {0}'.format(json_data)})
+            raise TwitterError({'Unknown error': '{0}'.format(json_data)})
         self._CheckForTwitterError(data)
         return data
 
