@@ -35,10 +35,10 @@ class TwitterModel(object):
             raise TypeError('unhashable type: {} (no id attribute)'
                             .format(type(self)))
 
-    def AsJsonString(self):
+    def AsJsonString(self, ensure_ascii=True):
         """ Returns the TwitterModel as a JSON string based on key/value
         pairs returned from the AsDict() method. """
-        return json.dumps(self.AsDict(), sort_keys=True)
+        return json.dumps(self.AsDict(), ensure_ascii=ensure_ascii, sort_keys=True)
 
     def AsDict(self):
         """ Create a dictionary representation of the object. Please see inline
