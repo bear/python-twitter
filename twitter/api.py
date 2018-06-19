@@ -2823,8 +2823,6 @@ class Api(object):
         if len(uids) > 100:
             raise TwitterError("No more than 100 users may be requested per request.")
 
-        print(parameters)
-
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
