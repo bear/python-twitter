@@ -537,3 +537,35 @@ class Status(TwitterModel):
                                                urls=urls,
                                                user=user,
                                                user_mentions=user_mentions)
+
+
+class Place(TwitterModel):
+    """A class representing the Place structure used by the twitter API."""
+
+    def __init__(self, **kwargs):
+        self.param_defaults = {
+            'id': None,
+            'url': None,
+            'place_type': None,
+            'name': None,
+            'full_name': None,
+            'country_code': None,
+            'country': None,
+            'bounding_box': None,
+            'attributes': None
+        }
+
+        for (param, default) in self.param_defaults.items():
+            setattr(self, param, kwargs.get(param, default))
+
+    def __repr__(self):
+        """ A string representation of this twitter.Place instance.
+        The return value is the ID of status, username and datetime.
+
+        Returns:
+            string: A string representation of this twitter.Placeinstance with
+            the ID of status, name, and country.
+        """
+        return "Place(ID={0}, Name={1}, Country={2})".format(self.id,
+                                                             self.name,
+                                                             self.country)

@@ -49,6 +49,7 @@ from twitter import (
     Category,
     DirectMessage,
     List,
+    Place,
     Status,
     Trend,
     User,
@@ -4647,6 +4648,12 @@ class Api(object):
                 yield data
             elif include_keepalive:
                 yield None
+
+    def GetPlace(self, id):
+        url = '{}/geo/id/{}.json'.format(self.base_url, id)
+        resp = self._RequestUrl(url, 'GET')
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        return Place.NewFromJsonDict(data)
 
     def VerifyCredentials(self, include_entities=None, skip_status=None, include_email=None):
         """Returns a twitter.User instance if the authenticating user is valid.
