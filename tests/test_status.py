@@ -26,6 +26,29 @@ class StatusTest(unittest.TestCase):
                               text=u'A légpárnás hajóm tele van angolnákkal.',
                               user=self._GetSampleUser())
 
+    def _GetSamplePlace(self):
+        return twitter.Place(
+            id='07d9db48bc083000',
+            url='https://api.twitter.com/1.1/geo/id/07d9db48bc083000.json',
+            place_type='poi',
+            name='McIntosh Lake',
+            full_name='McIntosh Lake',
+            country_code='US',
+            country='United States',
+            bounding_box=dict(
+                type='Polygon',
+                coordinates=[
+                    [
+                        [-105.14544, 40.192138],
+                        [-105.14544, 40.192138],
+                        [-105.14544, 40.192138],
+                        [-105.14544, 40.192138]
+                    ]
+                ]
+            ),
+            attributes={}
+        )
+
     def testInit(self):
         '''Test the twitter.Status constructor'''
         twitter.Status(created_at='Fri Jan 26 23:17:14 +0000 2007',
@@ -43,7 +66,9 @@ class StatusTest(unittest.TestCase):
         self.assertEqual('Fri Jan 26 23:17:14 +0000 2007', status.created_at)
         self.assertEqual(created_at, status.created_at_in_seconds)
         status.user = self._GetSampleUser()
+        status.place = self._GetSamplePlace()
         self.assertEqual(718443, status.user.id)
+        self.assertEqual('07d9db48bc083000', status.place.id)
 
     @unittest.skipIf(sys.version_info.major >= 3, "skipped until fix found for v3 python")
     def testAsJsonString(self):

@@ -498,6 +498,7 @@ class Status(TwitterModel):
         urls = None
         user = None
         user_mentions = None
+        place = None
 
         # for loading extended tweets from the streaming API.
         if 'extended_tweet' in data:
@@ -512,6 +513,8 @@ class Status(TwitterModel):
             current_user_retweet = data['current_user_retweet']['id']
         if 'quoted_status' in data:
             quoted_status = Status.NewFromJsonDict(data.get('quoted_status'))
+        if 'place' in data and data['place'] is not None:
+            place = Place.NewFromJsonDict(data['place'])
 
         if 'entities' in data:
             if 'urls' in data['entities']:
@@ -536,7 +539,8 @@ class Status(TwitterModel):
                                                retweeted_status=retweeted_status,
                                                urls=urls,
                                                user=user,
-                                               user_mentions=user_mentions)
+                                               user_mentions=user_mentions,
+                                               place=place)
 
 
 class Place(TwitterModel):
