@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Copyright 2007-2013 The Python-Twitter Developers
 #
@@ -18,6 +19,11 @@ from __future__ import print_function
 from requests_oauthlib import OAuth1Session
 import webbrowser
 
+import sys
+
+if sys.version_info.major < 3:
+    input = raw_input
+
 REQUEST_TOKEN_URL = 'https://api.twitter.com/oauth/request_token'
 ACCESS_TOKEN_URL = 'https://api.twitter.com/oauth/access_token'
 AUTHORIZATION_URL = 'https://api.twitter.com/oauth/authorize'
@@ -29,10 +35,7 @@ def get_access_token(consumer_key, consumer_secret):
 
     print('\nRequesting temp token from Twitter...\n')
 
-    try:
-        resp = oauth_client.fetch_request_token(REQUEST_TOKEN_URL)
-    except ValueError as e:
-        raise 'Invalid response from Twitter requesting temp token: {0}'.format(e)
+    resp = oauth_client.fetch_request_token(REQUEST_TOKEN_URL)
 
     url = oauth_client.authorization_url(AUTHORIZATION_URL)
 
