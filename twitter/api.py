@@ -2997,38 +2997,50 @@ class Api(object):
 
     def PostDirectMessage(self,
                           text,
-                          user_id=None,
-                          screen_name=None,
+                          user_id,
                           return_json=False):
         """Post a twitter direct message from the authenticated user.
 
         Args:
           text: The message text to be posted.
           user_id:
-            The ID of the user who should receive the direct message. [Optional]
-          screen_name:
-            The screen name of the user who should receive the direct message. [Optional]
+            The ID of the user who should receive the direct message.
           return_json (bool, optional):
-            If True JSON data will be returned, instead of twitter.User
+            If True JSON data will be returned, instead of twitter.DirectMessage
         Returns:
           A twitter.DirectMessage instance representing the message posted
         """
-        url = '%s/direct_messages/new.json' % self.base_url
-        data = {'text': text}
-        if user_id:
-            data['user_id'] = user_id
-        elif screen_name:
-            data['screen_name'] = screen_name
-        else:
-            raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
+        url = '%s/direct_messages/events/new.json' % self.base_url
 
-        resp = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        event = {
+            'event': {
+                'type': 'message_create',
+                'message_create': {
+                    'target': {
+                        'recipient_id': user_id,
+                    },
+                    'message_data': {
+                        'text': text
+                    }
+                }
+            }
+        }
+
+        resp = self._RequestUrl(url, 'POST', json=event)
+        data = resp.json()
 
         if return_json:
             return data
         else:
-            return DirectMessage.NewFromJsonDict(data)
+            dm = DirectMessage(
+                created_at=data['event']['created_timestamp'],
+                id=data['event']['id'],
+                recipient_id=data['event']['message_create']['target']['recipient_id'],
+                sender_id=data['event']['message_create']['sender_id'],
+                text=data['event']['message_create']['message_data']['text'],
+            )
+            dm._json = data
+            return dm
 
     def DestroyDirectMessage(self, message_id, include_entities=True, return_json=False):
         """Destroys the direct message specified in the required ID parameter.
