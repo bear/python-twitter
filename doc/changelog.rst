@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+Version 4.0dev
+==============
+
+Breaking changes:
+
+* New DirectMessage endpoint :py:func:`twitter.api.Api.PostDirectMessage`. Breaks old version.
+
+
 Version 3.4.2
 =============
 
