@@ -1643,15 +1643,9 @@ class ApiTest(unittest.TestCase):
             status=200)
         resp = self.api.PostDirectMessage(text="test message", user_id=372018022)
         self.assertEqual(resp.text, "test message")
-
-        resp = self.api.PostDirectMessage(text="test message", screen_name="__jcbl__")
-        self.assertEqual(resp.sender_id, 4012966701)
-        self.assertEqual(resp.recipient_id, 372018022)
+        self.assertEqual(resp.sender_id, "4012966701")
+        self.assertEqual(resp.recipient_id, "372018022")
         self.assertTrue(resp._json)
-
-        self.assertRaises(
-            twitter.TwitterError,
-            lambda: self.api.PostDirectMessage(text="test message"))
 
     @responses.activate
     def testDestroyDirectMessage(self):
