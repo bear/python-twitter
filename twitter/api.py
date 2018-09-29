@@ -2997,7 +2997,8 @@ class Api(object):
 
     def PostDirectMessage(self,
                           text,
-                          user_id,
+                          user_id=None,
+                          screen_name=None,
                           return_json=False):
         """Post a twitter direct message from the authenticated user.
 
@@ -3011,6 +3012,11 @@ class Api(object):
           A twitter.DirectMessage instance representing the message posted
         """
         url = '%s/direct_messages/events/new.json' % self.base_url
+
+        # Hack to allow some sort of backwards compatibility with older versions
+        # part of the fix for Issue #587
+        if user_id is None and screen_name is not None:
+            user_id = self.GetUser(screen_name=screen_name).id
 
         event = {
             'event': {
