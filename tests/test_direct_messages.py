@@ -56,14 +56,13 @@ def test_get_sent_direct_messages():
     assert isinstance(resp, list)
     assert isinstance(direct_message, twitter.DirectMessage)
     assert direct_message.id == 678629283007303683
-    assert [dm.sender_screen_name == 'notinourselves' for dm in resp]
 
 
 @responses.activate
 def test_post_direct_message():
     with open('testdata/direct_messages/post_post_direct_message.json', 'r') as f:
         responses.add(POST, DEFAULT_URL, body=f.read())
-    resp = api.PostDirectMessage(screen_name='TheGIFingBot',
+    resp = api.PostDirectMessage(user_id='372018022',
                                  text='https://t.co/L4MIplKUwR')
     assert isinstance(resp, twitter.DirectMessage)
     assert resp.text == 'https://t.co/L4MIplKUwR'
