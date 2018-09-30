@@ -65,7 +65,7 @@ api = Api(CONSUMER_KEY,
 
 
 def main():
-    with open('output.txt', 'a') as f:
+    with open('output.json', 'a') as f:
         # api.GetStreamFilter will return a generator that yields one status
         # message (i.e., Tweet) at a time as a JSON dictionary.
         for line in api.GetStreamFilter(track=USERS, languages=LANGUAGES):
