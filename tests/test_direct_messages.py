@@ -63,9 +63,9 @@ def test_post_direct_message():
     with open('testdata/direct_messages/post_post_direct_message.json', 'r') as f:
         responses.add(POST, DEFAULT_URL, body=f.read())
     resp = api.PostDirectMessage(user_id='372018022',
-                                 text='https://t.co/L4MIplKUwR')
+                                 text='hello')
     assert isinstance(resp, twitter.DirectMessage)
-    assert resp.text == 'https://t.co/L4MIplKUwR'
+    assert resp.text == 'hello'
 
 
 @responses.activate
