@@ -3,7 +3,7 @@ import re
 import sys
 import twitter
 import responses
-from responses import GET
+from responses import GET, POST
 
 DEFAULT_URL = re.compile(r'https?://.*\.twitter.com/1\.1/.*')
 
@@ -43,3 +43,12 @@ class ApiPlaceTest(unittest.TestCase):
         self.assertTrue(isinstance(resp, twitter.Status))
         self.assertTrue(isinstance(resp.place, twitter.Place))
         self.assertEqual(resp.id, 1051204790334746624)
+
+    @responses.activate
+    def testPostUpdateWithPlace(self):
+        with open('testdata/post_update_with_place.json') as f:
+            resp_data = f.read()
+        responses.add(POST, DEFAULT_URL, body=resp_data, status=200)
+
+        post = self.api.PostUpdate('test place', place_id='07d9db48bc083000')
+        self.assertEqual(post.place.id, '07d9db48bc083000')
