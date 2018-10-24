@@ -292,6 +292,8 @@ class Api(object):
             requests_log.setLevel(logging.DEBUG)
             requests_log.propagate = True
 
+        self._session = requests.Session()
+
     @staticmethod
     def GetAppOnlyAuthToken(consumer_key, consumer_secret):
         """
@@ -4974,20 +4976,20 @@ class Api(object):
             if data:
                 if 'media_ids' in data:
                     url = self._BuildUrl(url, extra_params={'media_ids': data['media_ids']})
-                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+                    resp = self._session.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
                 elif 'media' in data:
-                    resp = requests.post(url, files=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+                    resp = self._session.post(url, files=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
                 else:
-                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+                    resp = self._session.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
             elif json:
-                resp = requests.post(url, json=json, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+                resp = self._session.post(url, json=json, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
             else:
                 resp = 0  # POST request, but without data or json
 
         elif verb == 'GET':
             data['tweet_mode'] = self.tweet_mode
             url = self._BuildUrl(url, extra_params=data)
-            resp = requests.get(url, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+            resp = self._session.get(url, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
 
         else:
             resp = 0  # if not a POST or GET request
