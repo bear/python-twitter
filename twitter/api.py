@@ -4994,7 +4994,7 @@ class Api(object):
         else:
             resp = 0  # if not a POST or GET request
 
-        if url and self.rate_limit:
+        if url and self.rate_limit and resp:
             limit = resp.headers.get('x-rate-limit-limit', 0)
             remaining = resp.headers.get('x-rate-limit-remaining', 0)
             reset = resp.headers.get('x-rate-limit-reset', 0)
