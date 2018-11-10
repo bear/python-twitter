@@ -69,6 +69,18 @@ def test_post_direct_message():
 
 
 @responses.activate
+def test_post_direct_message_with_media():
+    with open('testdata/direct_messages/post_post_direct_message.json', 'r') as f:
+        responses.add(POST, DEFAULT_URL, body=f.read())
+    resp = api.PostDirectMessage(user_id='372018022',
+                                 text='hello',
+                                 media_file_path='testdata/media/happy.png',
+                                 media_type='dm_image')
+    assert isinstance(resp, twitter.DirectMessage)
+    assert resp.text == 'hello'
+
+
+@responses.activate
 def test_destroy_direct_message():
     with open('testdata/direct_messages/post_destroy_direct_message.json', 'r') as f:
         responses.add(POST, DEFAULT_URL, body=f.read())

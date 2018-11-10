@@ -3000,6 +3000,8 @@ class Api(object):
     def PostDirectMessage(self,
                           text,
                           user_id=None,
+                          media_file_path=None,
+                          media_type=None,
                           screen_name=None,
                           return_json=False):
         """Post a twitter direct message from the authenticated user.
@@ -3008,28 +3010,52 @@ class Api(object):
           text: The message text to be posted.
           user_id:
             The ID of the user who should receive the direct message.
+          media_file_path:
+            The file path to the media to be posted
+          media_type:
+            The media type. Accepted media types: dm_image, dm_gif or dm_video
           return_json (bool, optional):
             If True JSON data will be returned, instead of twitter.DirectMessage
         Returns:
           A twitter.DirectMessage instance representing the message posted
         """
         url = '%s/direct_messages/events/new.json' % self.base_url
-
         # Hack to allow some sort of backwards compatibility with older versions
         # part of the fix for Issue #587
         if user_id is None and screen_name is not None:
             user_id = self.GetUser(screen_name=screen_name).id
+
+        # Default
+        message_data_value = {
+            'text': text
+        }
+        if media_file_path is not None:
+            try:
+                image = open(media_file_path, 'rb')
+            except IOError:
+                raise TwitterError({'message': 'Image file could not be opened.'})
+
+            response_media_id = self.UploadMediaChunked(media=image, media_category=media_type)
+
+            # With media
+            message_data_value = {
+                'text': text,
+                "attachment": {
+                    "type": "media",
+                    "media": {
+                        "id": response_media_id
+                    }
+                }
+            }
 
         event = {
             'event': {
                 'type': 'message_create',
                 'message_create': {
                     'target': {
-                        'recipient_id': user_id,
+                        'recipient_id': user_id
                     },
-                    'message_data': {
-                        'text': text
-                    }
+                    'message_data': message_data_value
                 }
             }
         }
