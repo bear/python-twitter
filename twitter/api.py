@@ -3031,11 +3031,11 @@ class Api(object):
         }
         if media_file_path is not None:
             try:
-                image = open(media_file_path, 'rb')
+                media = open(media_file_path, 'rb')
             except IOError:
-                raise TwitterError({'message': 'Image file could not be opened.'})
+                raise TwitterError({'message': 'Media file could not be opened.'})
 
-            response_media_id = self.UploadMediaChunked(media=image, media_category=media_type)
+            response_media_id = self.UploadMediaChunked(media=media, media_category=media_type)
 
             # With media
             message_data_value = {
