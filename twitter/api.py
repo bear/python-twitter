@@ -1278,7 +1278,7 @@ class Api(object):
         if additional_owners and len(additional_owners) > 100:
             raise TwitterError({'message': 'Maximum of 100 additional owners may be specified for a Media object'})
         if additional_owners:
-            parameters['additional_owners'] = additional_owners
+            parameters['additional_owners'] = ','.join(map(str,additional_owners))
         if media_category:
             parameters['media_category'] = media_category
 
