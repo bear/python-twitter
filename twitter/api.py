@@ -3061,7 +3061,7 @@ class Api(object):
         }
 
         resp = self._RequestUrl(url, 'POST', json=event)
-        data = resp.json()
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
             return data
