@@ -2073,6 +2073,41 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
+    def ReportSpam(self,
+                   user_id=None,
+                   screen_name=None,
+                   perform_block=True):
+        """Report a user as spam on behalf of the authenticated user.
+
+        Args:
+          user_id (int, optional)
+            The numerical ID of the user to report.
+          screen_name (str, optional):
+            The screen name of the user to report.
+          perform_block (bool, optional):
+            Addionally perform a block of reported users. Defaults to True.
+        Returns:
+          twitter.User: twitter.User object representing the blocked/muted user.
+        """
+
+        url = '%s/users/report_spam.json' % (self.base_url)
+        post_data = {}
+
+        if user_id:
+            post_data['user_id'] = enf_type('user_id', int, user_id)
+        elif screen_name:
+            post_data['screen_name'] = screen_name
+        else:
+            raise TwitterError("You must specify either a user_id or screen_name")
+
+        if perform_block:
+            post_data['perform_block'] = enf_type('perform_block', bool, perform_block)
+
+        resp = self._RequestUrl(url, 'POST', data=post_data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return User.NewFromJsonDict(data)
+
     def CreateBlock(self,
                     user_id=None,
                     screen_name=None,
