@@ -143,7 +143,7 @@ API
 
 The API is exposed via the ``twitter.Api`` class.
 
-The python-twitter requires the use of OAuth keys for nearly all operations. As of Twitter's API v1.1, authentication is required for most, if not all, endpoints. Therefore, you will need to register an app with Twitter in order to use this library. Please see the "Getting Started" guide on https://python-twitter.readthedocs.io for a more information.
+The python-twitter requires the use of OAuth keys for nearly all operations. As of Twitter's API v1.1, authentication is required for most, if not all, endpoints. Therefore, you will need to register an app with Twitter in order to use this library. Please see the "Getting Started" guide on https://python-twitter.readthedocs.io for more information.
 
 To generate an Access Token you have to pick what type of access your application requires and then do one of the following:
 
@@ -173,7 +173,7 @@ To fetch a single user's public status messages, where ``user`` is a Twitter use
     >>> statuses = api.GetUserTimeline(screen_name=user)
     >>> print([s.text for s in statuses])
 
-To fetch a list a user's friends::
+To fetch a list of a user's friends::
 
     >>> users = api.GetFriends()
     >>> print([u.name for u in users])
@@ -220,7 +220,7 @@ Please visit `the google group <http://groups.google.com/group/python-twitter>`_
 Contributors
 ------------
 
-Originally two libraries by DeWitt Clinton and Mike Taylor which was then merged into python-twitter.
+Originally two libraries by DeWitt Clinton and Mike Taylor which were then merged into python-twitter.
 
 Now it's a full-on open source project with many contributors over time. See AUTHORS.rst for the complete list.
 
