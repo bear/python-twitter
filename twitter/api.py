@@ -4965,7 +4965,7 @@ class Api(object):
                 raise TwitterError({'message': "Exceeded connection limit for user"})
             if "Error 401 Unauthorized" in json_data:
                 raise TwitterError({'message': "Unauthorized"})
-            raise TwitterError({'Unknown error': '{0}'.format(json_data)})
+            raise TwitterError({'message': 'Unknown error': '{0}'.format(json_data)})
         self._CheckForTwitterError(data)
         return data
 
