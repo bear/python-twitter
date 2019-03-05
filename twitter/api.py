@@ -451,7 +451,7 @@ class Api(object):
               >>> # or:
               >>> api.GetSearch(geocode=("37.781157", "-122.398720", "1mi"))
           count (int, optional):
-            Number of results to return.  Default is 15 and maxmimum that
+            Number of results to return.  Default is 15 and maximum that
             Twitter returns is 100 irrespective of what you type in.
           lang (str, optional):
             Language for results as ISO 639-1 code.  Default is None
@@ -523,7 +523,7 @@ class Api(object):
             url = "{url}?{raw_query}".format(
                 url=url,
                 raw_query=raw_query)
-            resp = self._RequestUrl(url, 'GET')
+            resp = self._RequestUrl(url, 'GET', data=parameters)
         else:
             resp = self._RequestUrl(url, 'GET', data=parameters)
 
