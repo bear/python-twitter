@@ -161,7 +161,7 @@ class Api(object):
                  debugHTTP=False,
                  timeout=None,
                  sleep_on_rate_limit=False,
-                 tweet_mode='compat',
+                 tweet_mode='extended',
                  proxies=None):
         """Instantiate a new twitter.Api object.
 
