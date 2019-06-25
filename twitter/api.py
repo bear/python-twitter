@@ -248,20 +248,9 @@ class Api(object):
         self.tweet_mode = tweet_mode
         self.proxies = proxies
 
-        if base_url is None:
-            self.base_url = 'https://api.twitter.com/1.1'
-        else:
-            self.base_url = base_url
-
-        if stream_url is None:
-            self.stream_url = 'https://stream.twitter.com/1.1'
-        else:
-            self.stream_url = stream_url
-
-        if upload_url is None:
-            self.upload_url = 'https://upload.twitter.com/1.1'
-        else:
-            self.upload_url = upload_url
+        self.base_url = base_url or 'https://api.twitter.com/1.1'
+        self.stream_url = stream_url or 'https://stream.twitter.com/1.1'
+        self.upload_url = upload_url or 'https://upload.twitter.com/1.1'
 
         self.chunk_size = chunk_size
 
