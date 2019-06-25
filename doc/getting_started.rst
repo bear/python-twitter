@@ -26,15 +26,21 @@ _________
 
 Once your app is created, you'll be directed to a new page showing you some information about it.
 
-.. image:: python-twitter-app-creation-part2.png
+.. image:: python-twitter-app-creation-part2-new.png
 
 Your Keys
 _________
 
-Click on the "Keys and Access Tokens" tab on the top there, just under the green notification in the image above.
+Click on the "Keys and Access Tokens" tab on the top.
 
 
-.. image:: python-twitter-app-creation-part3.png
+.. image:: python-twitter-app-creation-part3-new.png
+
+
+Under the "Access token & access token secret" option, click on the "create" button to generate a new access token and token secret.
+
+.. image:: python-twitter-app-creation-part3-1-new.png
+
 
 At this point, you can test out your application using the keys under "Your Application Tokens". The ``twitter.Api()`` object can be created as follows::
 
