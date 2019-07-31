@@ -4490,7 +4490,7 @@ class Api(object):
         reflected due to image processing on Twitter's side.
 
         Args:
-            image (str):
+            image (str, optional):
                 Location of local image file to use.
             include_entities (bool, optional):
                 Include the entities node in the return data.
@@ -4522,14 +4522,20 @@ class Api(object):
             raise TwitterError({'message': "The image could not be resized or is too large."})
 
     def UpdateBanner(self,
-                     image,
+                     image=False,
+                     external_image=False,
+                     encoded_image=False,
                      include_entities=False,
                      skip_status=False):
         """Updates the authenticated users profile banner.
 
         Args:
-          image:
-            Location of image in file system
+          image (str, optional):
+            Location of local image in file system
+          external_image (str, optional):
+            URL of image
+          encoded_image (str, optional):
+            base64 string of an image
           include_entities:
             If True, each tweet will include a node called "entities."
             This node offers a variety of metadata about the tweet in a
@@ -4540,8 +4546,12 @@ class Api(object):
           A twitter.List instance representing the list subscribed to
         """
         url = '%s/account/update_profile_banner.json' % (self.base_url)
-        with open(image, 'rb') as image_file:
-            encoded_image = base64.b64encode(image_file.read())
+        if image:
+            with open(image, 'rb') as image_file:
+                encoded_image = base64.b64encode(image_file.read())
+        if external_image:
+            content = self._RequestUrl(external_image, 'GET').content
+            encoded_image = base64.b64encode(content)
         data = {
             # When updated for API v1.1 use image, not banner
             # https://dev.twitter.com/docs/api/1.1/post/account/update_profile_banner
