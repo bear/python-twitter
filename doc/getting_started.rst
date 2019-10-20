@@ -45,10 +45,10 @@ Under the "Access token & access token secret" option, click on the "create" but
 At this point, you can test out your application using the keys under "Your Application Tokens". The ``twitter.Api()`` object can be created as follows::
 
     import twitter
-    api = twitter.Api(consumer_key=[consumer key],
-                      consumer_secret=[consumer secret],
-                      access_token_key=[access token],
-                      access_token_secret=[access token secret])
+    api = twitter.Api(consumer_key=<consumer key>,
+                      consumer_secret=<consumer secret>,
+                      access_token_key=<access token>,
+                      access_token_secret=<access token secret>)
 
 Note: Make sure to enclose your keys in quotes (ie, api = twitter.Api(consumer_key='1234567', ...) and so on) or you will receive a NameError.
 
