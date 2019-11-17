@@ -97,7 +97,7 @@ class RateLimitMethodsTests(unittest.TestCase):
         with open('testdata/ratelimit.json') as f:
             resp_data = f.read()
 
-        url = '%s/application/rate_limit_status.json?tweet_mode=compat' % self.api.base_url
+        url = '%s/application/rate_limit_status.json?tweet_mode=extended' % self.api.base_url
         responses.add(
             responses.GET,
             url,
@@ -213,12 +213,12 @@ class RateLimitMethodsTests(unittest.TestCase):
             sleep_on_rate_limit=True)
 
         # Add handler for ratelimit check
-        url = '%s/application/rate_limit_status.json?tweet_mode=compat' % api.base_url
+        url = '%s/application/rate_limit_status.json?tweet_mode=extended' % api.base_url
         responses.add(
             method=responses.GET, url=url, body='{}', match_querystring=True)
 
         # Get initial rate limit data to populate api.rate_limit object
-        url = "https://api.twitter.com/1.1/search/tweets.json?tweet_mode=compat&q=test&count=15&result_type=mixed"
+        url = "https://api.twitter.com/1.1/search/tweets.json?tweet_mode=extended&q=test&count=15&result_type=mixed"
         responses.add(
             method=responses.GET,
             url=url,
@@ -242,14 +242,14 @@ class RateLimitMethodsTests(unittest.TestCase):
             sleep_on_rate_limit=True)
 
         # Add handler for ratelimit check - this forces the codepath which goes through the time.sleep call
-        url = '%s/application/rate_limit_status.json?tweet_mode=compat' % api.base_url
+        url = '%s/application/rate_limit_status.json?tweet_mode=extended' % api.base_url
         responses.add(
             method=responses.GET, url=url,
             body='{"resources": {"search": {"/search/tweets": {"limit": 1, "remaining": 0, "reset": 1}}}}',
             match_querystring=True)
 
         # Get initial rate limit data to populate api.rate_limit object
-        url = "https://api.twitter.com/1.1/search/tweets.json?tweet_mode=compat&q=test&count=15&result_type=mixed"
+        url = "https://api.twitter.com/1.1/search/tweets.json?tweet_mode=extended&q=test&count=15&result_type=mixed"
         responses.add(
             method=responses.GET,
             url=url,
