@@ -1424,6 +1424,81 @@ class Api(object):
         except KeyError:
             raise TwitterError('Media could not be uploaded.')
 
+    def PostMediaSubtitlesCreate(self,
+                                 video_media_id,
+                                 subtitle_media_id,
+                                 language_code,
+                                 display_name):
+        """Associate uploaded subtitles to an uploaded video. You can associate
+        subtitles to a video before or after Tweeting.
+
+        Args:
+            video_media_id (int):
+                Media ID of the uploaded video to add the subtitles to. The
+                video must have been uploaded using the category 'TweetVideo'.
+            subtitle_media_id (int):
+                Media ID of the uploaded subtitle file. The subtitles myst have
+                been uploaded using the category 'Subtitles'.
+            language_code (str):
+                The language code that the subtitles are written in. The
+                language code should be a BCP47 code (e.g. 'en', 'sp')
+            display_name (str):
+                Language name (e.g. 'English', 'Spanish')
+
+        Returns:
+            True if successful. Raises otherwise.
+        """
+        url = '%s/media/subtitles/create.json' % self.upload_url
+
+        subtitle = {}
+        subtitle['media_id'] = str(subtitle_media_id)
+        subtitle['language_code'] = language_code
+        subtitle['display_name'] = display_name
+        parameters = {}
+        parameters['media_id'] = str(video_media_id)
+        parameters['media_category'] = 'TweetVideo'
+        parameters['subtitle_info'] = {}
+        parameters['subtitle_info']['subtitles'] = [subtitle]
+
+        resp = self._RequestUrl(url, 'POST', json=parameters)
+        # Response body should be blank, so only do error checking if the response is not blank.
+        if resp.content.decode('utf-8'):
+            self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return True
+
+    def PostMediaSubtitlesDelete(self,
+                                 video_media_id,
+                                 language_code):
+        """Remove subtitles from an uploaded video.
+
+        Args:
+            video_media_id (int):
+                Media ID of the video for which the subtitles will be removed.
+            language_code (str):
+                The language code of the subtitle file that should be deleted.
+                The language code should be a BCP47 code (e.g. 'en', 'sp')
+
+        Returns:
+            True if successful. Raises otherwise.
+        """
+        url = '%s/media/subtitles/delete.json' % self.upload_url
+
+        subtitle = {}
+        subtitle['language_code'] = language_code
+        parameters = {}
+        parameters['media_id'] = str(video_media_id)
+        parameters['media_category'] = 'TweetVideo'
+        parameters['subtitle_info'] = {}
+        parameters['subtitle_info']['subtitles'] = [subtitle]
+
+        resp = self._RequestUrl(url, 'POST', json=parameters)
+        # Response body should be blank, so only do error checking if the response is not blank.
+        if resp.content.decode('utf-8'):
+            self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return True
+
     def _TweetTextWrap(self,
                        status,
                        char_lim=CHARACTER_LIMIT):
