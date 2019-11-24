@@ -1028,15 +1028,15 @@ class Api(object):
                    attachment_url=None):
         """Post a twitter status message from the authenticated user.
 
-        https://dev.twitter.com/docs/api/1.1/post/statuses/update
+        https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-update
 
         Args:
             status (str):
                 The message text to be posted. Must be less than or equal to
                 CHARACTER_LIMIT characters.
             media (int, str, fp, optional):
-                A URL, a local file, or a file-like object (something with a
-                read() method), or a list of any combination of the above.
+                A media ID, URL, local file, or file-like object (something with
+                a read() method), or a list of any combination of the above.
             media_additional_owners (list, optional):
                 A list of user ids representing Twitter users that should be able
                 to use the uploaded media in their tweets. If you pass a list of
@@ -1398,7 +1398,7 @@ class Api(object):
                 number of additional owners is capped at 100 by Twitter.
             media_category:
                 Category with which to identify media upload. Only use with Ads
-                API & video files.
+                API, video files and subtitles.
 
         Returns:
             media_id:
