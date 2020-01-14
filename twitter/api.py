@@ -4470,7 +4470,8 @@ class Api(object):
 
     def GetLists(self,
                  user_id=None,
-                 screen_name=None):
+                 screen_name=None,
+                 count=20):
         """Fetch the sequence of lists for a user. If no user_id or screen_name
         is passed, the data returned will be for the authenticated user.
 
@@ -4482,6 +4483,8 @@ class Api(object):
             for. [Optional]
           count:
             The amount of results to return per page.
+            Consider bumping this up if you are getting rate limit issues
+            with GetLists(), generally at > 15 * 20 = 300 lists.
             No more than 1000 results will ever be returned in a single page.
             Defaults to 20. [Optional]
           cursor:
@@ -4500,7 +4503,8 @@ class Api(object):
             next_cursor, prev_cursor, lists = self.GetListsPaged(
                 user_id=user_id,
                 screen_name=screen_name,
-                cursor=cursor)
+                cursor=cursor,
+                count=count)
             result += lists
             if next_cursor == 0 or next_cursor == prev_cursor:
                 break
