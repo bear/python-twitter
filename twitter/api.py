@@ -1676,14 +1676,14 @@ class Api(object):
                                     exclude_replies=False, include_rts=False)
 
     def GetRetweets(self,
-                    statusid,
+                    status_id,
                     count=None,
                     trim_user=False):
         """Returns up to 100 of the first retweets of the tweet identified
-        by statusid
+        by status_id
 
         Args:
-          statusid (int):
+          status_id (int):
             The ID of the tweet for which retweets should be searched for
           count (int, optional):
             The number of status messages to retrieve.
@@ -1692,9 +1692,9 @@ class Api(object):
             otherwise the payload will contain the full user data item.
 
         Returns:
-          A list of twitter.Status instances, which are retweets of statusid
+          A list of twitter.Status instances, which are retweets of status_id
         """
-        url = '%s/statuses/retweets/%s.json' % (self.base_url, statusid)
+        url = '%s/statuses/retweets/%s.json' % (self.base_url, status_id)
         parameters = {
             'trim_user': enf_type('trim_user', bool, trim_user),
         }
