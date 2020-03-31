@@ -1,0 +1,12 @@
+import tweepy
+from tweepy import Cursor
+from t import ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_SECRET
+consumer_key=CONSUMER_KEY
+consumer_secret=CONSUMER_SECRET
+access_token=ACCESS_TOKEN_KEY
+access_token_secret=ACCESS_TOKEN_SECRET
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+api = tweepy.API(auth)
+# Create a tweet
+api.update_status("Hello Twitter")
