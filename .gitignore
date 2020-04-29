@@ -53,3 +53,9 @@ violations.flake8.txt
 
 # Built docs
 doc/_build/**
+
+# Mypy cache
+**/.mypy_cache
+
+# VS Code
+**/.vscode
