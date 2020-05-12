@@ -1277,6 +1277,10 @@ class Api(object):
         parameters['media_type'] = media_type
         parameters['total_bytes'] = file_size
 
+        # Without this GIF files over 5MB but less than 15MB will fail uploading.
+        if media_type == 'image/gif' and file_size > 5242880:
+          parameters['media_category'] = 'tweet_gif'
+
         resp = self._RequestUrl(url, 'POST', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
