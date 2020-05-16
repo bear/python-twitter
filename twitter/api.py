@@ -67,6 +67,7 @@ from twitter.twitter_utils import (
 from twitter.error import (
     TwitterError,
     PythonTwitterDeprecationWarning330,
+    PythonTwitterDeprecationWarning
 )
 
 if sys.version_info > (3,):
@@ -120,7 +121,6 @@ class Api(object):
       There are many other methods, including:
 
         >>> api.PostUpdates(status)
-        >>> api.PostDirectMessage(user, text)
         >>> api.GetUser(user)
         >>> api.GetReplies()
         >>> api.GetUserTimeline(user)
@@ -2973,64 +2973,35 @@ class Api(object):
             return User.NewFromJsonDict(data)
 
     def GetDirectMessages(self,
-                          since_id=None,
-                          max_id=None,
                           count=None,
-                          include_entities=True,
-                          skip_status=False,
-                          full_text=False,
-                          page=None,
+                          cursor=None,
                           return_json=False):
-        """Returns a list of the direct messages sent to the authenticating user.
+        """Returns a list of the direct messages sent by the authenticating user.
 
         Args:
-          since_id:
-            Returns results with an ID greater than (that is, more recent
-            than) the specified ID. There are limits to the number of
-            Tweets which can be accessed through the API. If the limit of
-            Tweets has occurred since the since_id, the since_id will be
-            forced to the oldest ID available. [Optional]
-          max_id:
-            Returns results with an ID less than (that is, older than) or
-            equal to the specified ID. [Optional]
-          count:
+          count (int, optional):
             Specifies the number of direct messages to try and retrieve, up to a
-            maximum of 200. The value of count is best thought of as a limit to the
-            number of Tweets to return because suspended or deleted content is
-            removed after the count has been applied. [Optional]
-          include_entities:
-            The entities node will be omitted when set to False.
-            [Optional]
-          skip_status:
-            When set to True statuses will not be included in the returned user
-            objects. [Optional]
-          full_text:
-            When set to True full message will be included in the returned message
-            object if message length is bigger than CHARACTER_LIMIT characters. [Optional]
-          page:
-            If you want more than 200 messages, you can use this and get 20 messages
-            each time. You must recall it and increment the page value until it
-            return nothing. You can't use count option with it. First value is 1 and
-            not 0.
+            maximum of 50(default is 20). The value of count is best thought of as a
+            limit to the number of Tweets to return because suspended or deleted content
+            is removed after the count has been applied.
+          cursor (str, optional):
+            For paging through result sets greater than 1 page.
+            Is provided by previous GetDirectMessages request
+            Note: there are pagination limits. [Optional]
           return_json (bool, optional):
-            If True JSON data will be returned, instead of twitter.User
+            If True JSON data will be returned, instead of twitter.DirectMessage
 
         Returns:
           A sequence of twitter.DirectMessage instances
         """
-        url = '%s/direct_messages.json' % self.base_url
-        parameters = {
-            'full_text': bool(full_text),
-            'include_entities': bool(include_entities),
-            'max_id': max_id,
-            'since_id': since_id,
-            'skip_status': bool(skip_status),
-        }
+        url = '%s/direct_messages/events/list.json' % self.base_url
+
+        parameters = {}
 
         if count:
             parameters['count'] = enf_type('count', int, count)
-        if page:
-            parameters['page'] = enf_type('page', int, page)
+        if cursor:
+            parameters['cursor'] = enf_type('cursor', str, cursor)
 
         resp = self._RequestUrl(url, 'GET', data=parameters)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
@@ -3038,63 +3009,33 @@ class Api(object):
         if return_json:
             return data
         else:
-            return [DirectMessage.NewFromJsonDict(x) for x in data]
+            return [DirectMessage.NewFromJsonDict(x) for x in data['events']]
 
     def GetSentDirectMessages(self,
-                              since_id=None,
-                              max_id=None,
                               count=None,
-                              page=None,
-                              include_entities=True,
+                              cursor=None,
                               return_json=False):
         """Returns a list of the direct messages sent by the authenticating user.
 
         Args:
-          since_id (int, optional):
-            Returns results with an ID greater than (that is, more recent
-            than) the specified ID. There are limits to the number of
-            Tweets which can be accessed through the API. If the limit of
-            Tweets has occured since the since_id, the since_id will be
-            forced to the oldest ID available.
-          max_id (int, optional):
-            Returns results with an ID less than (that is, older than) or
-            equal to the specified ID.
           count (int, optional):
             Specifies the number of direct messages to try and retrieve, up to a
-            maximum of 200. The value of count is best thought of as a limit to the
-            number of Tweets to return because suspended or deleted content is
-            removed after the count has been applied.
-          page (int, optional):
-            Specifies the page of results to retrieve.
+            maximum of 50(default is 20). The value of count is best thought of as a
+            limit to the number of Tweets to return because suspended or deleted content
+            is removed after the count has been applied.
+          cursor (str, optional):
+            For paging through result sets greater than 1 page.
+            Is provided by previous GetDirectMessages request
             Note: there are pagination limits. [Optional]
-          include_entities (bool, optional):
-            The entities node will be omitted when set to False.
           return_json (bool, optional):
             If True JSON data will be returned, instead of twitter.User
 
         Returns:
           A sequence of twitter.DirectMessage instances
         """
-        url = '%s/direct_messages/sent.json' % self.base_url
-
-        parameters = {
-            'include_entities': bool(include_entities),
-            'max_id': max_id,
-            'since_id': since_id,
-        }
-
-        if count:
-            parameters['count'] = enf_type('count', int, count)
-        if page:
-            parameters['page'] = enf_type('page', int, page)
-
-        resp = self._RequestUrl(url, 'GET', data=parameters)
-        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-
-        if return_json:
-            return data
-        else:
-            return [DirectMessage.NewFromJsonDict(x) for x in data]
+        warnings.warn("This function is deprecated and will return ALL Direct Messages, both sent and recieved",
+                      DeprecationWarning)
+        return self.GetDirectMessages(count=count, cursor=cursor, return_json=return_json)
 
     def PostDirectMessage(self,
                           text,
@@ -3175,7 +3116,7 @@ class Api(object):
             dm._json = data
             return dm
 
-    def DestroyDirectMessage(self, message_id, include_entities=True, return_json=False):
+    def DestroyDirectMessage(self, message_id, return_json=False):
         """Destroys the direct message specified in the required ID parameter.
 
         The twitter.Api instance must be authenticated, and the
@@ -3191,10 +3132,9 @@ class Api(object):
         Returns:
           A twitter.DirectMessage instance representing the message destroyed
         """
-        url = '%s/direct_messages/destroy.json' % self.base_url
+        url = '%s/direct_messages/events/destroy.json' % self.base_url
         data = {
-            'id': enf_type('message_id', int, message_id),
-            'include_entities': enf_type('include_entities', bool, include_entities)
+            'id': enf_type('message_id', int, message_id)
         }
 
         resp = self._RequestUrl(url, 'POST', data=data)
