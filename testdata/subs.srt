@@ -1,0 +1,8 @@
+1
+00:00:00,000 --> 00:00:03,251
+Lorem ipsum dolor sit amet,
+consectetur adipiscing elit.
+
+2
+00:00:03,251 --> 00:00:06,502
+Maecenas rutrum suscipit accumsan.

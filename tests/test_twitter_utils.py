@@ -75,6 +75,13 @@ class ApiTest(unittest.TestCase):
             self.assertEqual(file_size, 44772)
             self.assertEqual(media_type, 'image/jpeg')
 
+    def test_parse_media_file_subtitle(self):
+        data_file, filename, file_size, media_type = parse_media_file('testdata/subs.srt')
+        self.assertTrue(hasattr(data_file, 'read'))
+        self.assertEqual(filename, 'subs.srt')
+        self.assertEqual(file_size, 157)
+        self.assertEqual(media_type, 'text/srt')
+
     def test_utils_error_checking(self):
         with open('testdata/168NQ.jpg', 'r') as f:
             self.assertRaises(

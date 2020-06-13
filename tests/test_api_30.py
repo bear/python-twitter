@@ -1549,6 +1549,87 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(resp)
 
     @responses.activate
+    def testPostMediaSubtitlesCreateSuccess(self):
+        responses.add(
+            POST,
+            'https://upload.twitter.com/1.1/media/subtitles/create.json',
+            body=b'',
+            status=200)
+        expected_body = {
+            'media_id': '1234',
+            'media_category': 'TweetVideo',
+            'subtitle_info': {
+                'subtitles': [{
+                    'media_id': '5678',
+                    'language_code': 'en',
+                    'display_name': 'English'
+                }]
+            }
+        }
+        resp = self.api.PostMediaSubtitlesCreate(video_media_id=1234,
+                                                 subtitle_media_id=5678,
+                                                 language_code='en',
+                                                 display_name='English')
+
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(responses.calls[0].request.url,
+                         'https://upload.twitter.com/1.1/media/subtitles/create.json')
+        request_body = json.loads(responses.calls[0].request.body.decode('utf-8'))
+        self.assertTrue(resp)
+        self.assertDictEqual(expected_body, request_body)
+
+    @responses.activate
+    def testPostMediaSubtitlesCreateFailure(self):
+        responses.add(
+            POST,
+            'https://upload.twitter.com/1.1/media/subtitles/create.json',
+            body=b'{"error":"Some error happened"}',
+            status=400)
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.PostMediaSubtitlesCreate(video_media_id=1234,
+                                                      subtitle_media_id=5678,
+                                                      language_code='en',
+                                                      display_name='English'))
+
+    @responses.activate
+    def testPostMediaSubtitlesDeleteSuccess(self):
+        responses.add(
+            POST,
+            'https://upload.twitter.com/1.1/media/subtitles/delete.json',
+            body=b'',
+            status=200)
+        expected_body = {
+            'media_id': '1234',
+            'media_category': 'TweetVideo',
+            'subtitle_info': {
+                'subtitles': [{
+                    'language_code': 'en'
+                }]
+            }
+        }
+        resp = self.api.PostMediaSubtitlesDelete(video_media_id=1234, language_code='en')
+
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(responses.calls[0].request.url,
+                         'https://upload.twitter.com/1.1/media/subtitles/delete.json')
+        request_body = json.loads(responses.calls[0].request.body.decode('utf-8'))
+        self.assertTrue(resp)
+        self.assertDictEqual(expected_body, request_body)
+
+    @responses.activate
+    def testPostMediaSubtitlesDeleteFailure(self):
+        responses.add(
+            POST,
+            'https://upload.twitter.com/1.1/media/subtitles/delete.json',
+            body=b'{"error":"Some error happened"}',
+            status=400)
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.PostMediaSubtitlesDelete(video_media_id=1234,
+                                                      language_code='en'))
+
+    @responses.activate
     def testGetUserSuggestionCategories(self):
         with open('testdata/get_user_suggestion_categories.json') as f:
             resp_data = f.read()

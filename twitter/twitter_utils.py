@@ -243,6 +243,7 @@ def parse_media_file(passed_media, async_upload=False):
     long_img_formats = [
         'image/gif'
     ]
+    subtitle_formats = ['text/srt']
     video_formats = ['video/mp4',
                      'video/quicktime']
 
@@ -274,6 +275,9 @@ def parse_media_file(passed_media, async_upload=False):
         pass
 
     media_type = mimetypes.guess_type(os.path.basename(filename))[0]
+    # The .srt extension is not recognised by the mimetypes module.
+    if os.path.basename(filename).endswith('.srt'):
+        media_type = 'text/srt'
     if media_type is not None:
         if media_type in img_formats and file_size > 5 * 1048576:
             raise TwitterError({'message': 'Images must be less than 5MB.'})
@@ -283,7 +287,7 @@ def parse_media_file(passed_media, async_upload=False):
             raise TwitterError({'message': 'Videos must be less than 15MB.'})
         elif media_type in video_formats and async_upload and file_size > 512 * 1048576:
             raise TwitterError({'message': 'Videos must be less than 512MB.'})
-        elif media_type not in img_formats and media_type not in video_formats and media_type not in long_img_formats:
+        elif media_type not in img_formats + long_img_formats + subtitle_formats + video_formats:
             raise TwitterError({'message': 'Media type could not be determined.'})
 
     return data_file, filename, file_size, media_type
