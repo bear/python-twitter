@@ -6,7 +6,7 @@ from __future__ import unicode_literals, print_function
 import json
 import unittest
 
-import twitter
+import twitter_api as twitter
 
 
 def test_streaming_extended_tweet():

@@ -13,7 +13,7 @@ except ImportError:
     from mock import patch
 import warnings
 
-import twitter
+import twitter_api as twitter
 
 import responses
 from responses import GET, POST

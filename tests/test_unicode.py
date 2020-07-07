@@ -12,7 +12,7 @@ import responses
 from hypothesis import given, example
 from hypothesis import strategies as st
 
-import twitter
+import twitter_api as twitter
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 

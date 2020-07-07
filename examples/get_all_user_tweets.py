@@ -16,7 +16,7 @@ from __future__ import print_function
 import json
 import sys
 
-import twitter
+import twitter_api as twitter
 from t import ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_SECRET
 
 

@@ -23,7 +23,7 @@ import codecs
 import sys
 import argparse
 
-import twitter
+import twitter_api as twitter
 
 from t import *
 

@@ -5,7 +5,7 @@ from __future__ import unicode_literals, print_function
 
 import re
 
-import twitter
+import twitter_api as twitter
 
 import responses
 from responses import GET, POST

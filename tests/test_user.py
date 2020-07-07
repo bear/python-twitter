@@ -1,4 +1,4 @@
-import twitter
+import twitter_api as twitter
 import json
 import unittest
 

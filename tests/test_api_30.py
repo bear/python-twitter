@@ -13,7 +13,7 @@ except ImportError:
     from mock import patch
 import warnings
 
-import twitter
+import twitter_api as twitter
 
 import responses
 from responses import GET, POST
@@ -1762,7 +1762,7 @@ class ApiTest(unittest.TestCase):
         )
 
     @responses.activate
-    @patch('twitter.api.Api.UploadMediaChunked')
+    @patch('twitter_api.api.Api.UploadMediaChunked')
     def test_UploadSmallVideoUsesChunkedData(self, mocker):
         responses.add(POST, DEFAULT_URL, body='{}')
         video = NamedTemporaryFile(suffix='.mp4')

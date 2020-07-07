@@ -6,13 +6,13 @@ import unittest
 
 import responses
 
-import twitter
-from twitter.twitter_utils import (
+import twitter_api as twitter
+from twitter_api.twitter_utils import (
     calc_expected_status_length,
     parse_media_file
 )
 
-from twitter import twitter_utils as utils
+from twitter_api import twitter_utils as utils
 
 if sys.version_info > (3,):
     unicode = str

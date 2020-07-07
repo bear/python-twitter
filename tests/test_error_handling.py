@@ -7,7 +7,7 @@ import sys
 import unittest
 import warnings
 
-import twitter
+import twitter_api as twitter
 import responses
 from responses import GET, POST
 

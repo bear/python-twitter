@@ -27,7 +27,7 @@
 #
 
 from __future__ import print_function
-import twitter
+import twitter_api as twitter
 
 CONSUMER_KEY = 'WWWWWWWW'
 CONSUMER_SECRET = 'XXXXXXXX'

@@ -37,11 +37,11 @@ docs:
 	$(MAKE) -C doc html
 
 lint:
-	pycodestyle --config={toxinidir}/setup.cfg twitter tests
+	pycodestyle --config={toxinidir}/setup.cfg twitter_api tests
 
 test: lint
-	pytest -s
-	#python setup.py test
+	# pytest -s
+	python3 setup.py test
 
 tox: clean
 	tox

@@ -378,7 +378,7 @@ class User(TwitterModel):
 
     @classmethod
     def NewFromJsonDict(cls, data, **kwargs):
-        from twitter import Status
+        from twitter_api import Status
         if data.get('status', None):
             status = Status.NewFromJsonDict(data.get('status'))
             return super(cls, cls).NewFromJsonDict(data=data, status=status)

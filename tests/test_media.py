@@ -3,7 +3,7 @@
 import json
 import unittest
 
-import twitter
+import twitter_api as twitter
 
 
 class MediaTest(unittest.TestCase):

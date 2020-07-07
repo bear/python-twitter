@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 import unittest
-import twitter
+import twitter_api as twitter
 
 
 class ParseTest(unittest.TestCase):

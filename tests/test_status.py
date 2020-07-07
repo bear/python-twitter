@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 import sys
-import twitter
+import twitter_api as twitter
 import calendar
 import time
 import json

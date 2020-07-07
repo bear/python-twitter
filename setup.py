@@ -30,7 +30,7 @@ def read(filename):
     with codecs.open(os.path.join(cwd, filename), 'rb', 'utf-8') as h:
         return h.read()
 
-metadata = read(os.path.join(cwd, 'twitter', '__init__.py'))
+metadata = read(os.path.join(cwd, 'twitter_api', '__init__.py'))
 
 def extract_metaitem(meta):
     # swiped from https://hynek.me 's attr package
@@ -70,8 +70,8 @@ setup(
         'Topic :: Internet',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
+        # 'Programming Language :: Python :: 2.7',
+        # 'Programming Language :: Python :: 3',
+        # 'Programming Language :: Python :: 3.6',
     ],
 )
