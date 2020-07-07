@@ -15,8 +15,8 @@ except ImportError:
     from urlparse import urlparse
 
 import requests
-from twitter import TwitterError
-import twitter
+from twitter_api import TwitterError
+import twitter_api
 
 if sys.version_info < (3,):
     range = xrange  # noqa
@@ -336,12 +336,12 @@ def parse_arg_list(args, attr):
     out = []
     if isinstance(args, (str, unicode)):
         out.append(args)
-    elif isinstance(args, twitter.User):
+    elif isinstance(args, twitter_api.User):
         out.append(getattr(args, attr))
     elif isinstance(args, (list, tuple)):
         for item in args:
             if isinstance(item, (str, unicode)):
                 out.append(item)
-            elif isinstance(item, twitter.User):
+            elif isinstance(item, twitter_api.User):
                 out.append(getattr(item, attr))
     return ",".join([str(item) for item in out])

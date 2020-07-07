@@ -43,7 +43,7 @@ except ImportError:
     from urllib import urlencode, quote_plus
     from urllib import __version__ as urllib_version
 
-from twitter import (
+from twitter_api import (
     __version__,
     _FileCache,
     Category,
@@ -55,16 +55,16 @@ from twitter import (
     UserStatus,
 )
 
-from twitter.ratelimit import RateLimit
+from twitter_api.ratelimit import RateLimit
 
-from twitter.twitter_utils import (
+from twitter_api.twitter_utils import (
     calc_expected_status_length,
     is_url,
     parse_media_file,
     enf_type,
     parse_arg_list)
 
-from twitter.error import (
+from twitter_api.error import (
     TwitterError,
     PythonTwitterDeprecationWarning330,
 )

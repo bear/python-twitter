@@ -5,7 +5,7 @@ try:
 except ImportError:
     from urlparse import urlparse
 
-from twitter.twitter_utils import enf_type
+from twitter_api.twitter_utils import enf_type
 
 EndpointRateLimit = namedtuple('EndpointRateLimit',
                                ['limit', 'remaining', 'reset'])
