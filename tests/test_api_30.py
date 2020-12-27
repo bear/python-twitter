@@ -1017,7 +1017,7 @@ class ApiTest(unittest.TestCase):
 
         resp = self.api.GetSubscriptions(screen_name='inky')
         self.assertEqual(len(resp), 20)
-        self.assertTrue([isinstance(l, twitter.List) for l in resp])
+        self.assertTrue([isinstance(lst, twitter.List) for lst in resp])
 
     @responses.activate
     def testGetMemberships(self):
@@ -1289,7 +1289,7 @@ class ApiTest(unittest.TestCase):
             rsps.add(GET, DEFAULT_URL, body=resp_data)
 
             with open('testdata/get_statuses.ids.txt') as f:
-                status_ids = [int(l) for l in f]
+                status_ids = [int(line) for line in f]
 
             resp = self.api.GetStatuses(status_ids)
 
@@ -1312,7 +1312,7 @@ class ApiTest(unittest.TestCase):
             rsps.add(GET, DEFAULT_URL, body=resp_data)
 
             with open('testdata/get_statuses.ids.txt') as f:
-                status_ids = [int(l) for l in f]
+                status_ids = [int(line) for line in f]
 
             resp = self.api.GetStatuses(status_ids, map=True)
 
