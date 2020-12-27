@@ -4283,7 +4283,7 @@ class Api(object):
                 include_entities=include_entities)
             result += users
 
-            if next_cursor == 0 or next_cursor == previous_cursor:
+            if next_cursor == 0:
                 break
             else:
                 cursor = next_cursor
