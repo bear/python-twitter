@@ -3515,9 +3515,9 @@ class Api(object):
 
         Args:
           status_id (int, optional):
-            The id of the twitter status to unmark as a favorite.
+            The id of the twitter status to mark as a favorite.
           status (twitter.Status, optional):
-            The twitter.Status object to unmark as a favorite.
+            The twitter.Status object to mark as a favorite.
           include_entities (bool, optional):
             The entities node will be omitted when set to False.
 
