@@ -18,7 +18,6 @@ from __future__ import absolute_import, print_function
 # limitations under the License.
 
 import os
-from pdb import set_trace
 import re
 import codecs
 
