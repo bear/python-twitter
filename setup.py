@@ -18,6 +18,7 @@ from __future__ import absolute_import, print_function
 # limitations under the License.
 
 import os
+from pdb import set_trace
 import re
 import codecs
 
@@ -30,6 +31,19 @@ def read(filename):
     with codecs.open(os.path.join(cwd, filename), 'rb', 'utf-8') as h:
         return h.read()
 
+def convert_txt(txt):
+    lst_txt = txt.split('\n')
+    for i in range(len(lst_txt)):
+        line = lst_txt[i]
+        match = re.match(r' +(\S.+)', line)
+        if match is not None:
+            lst_txt[i] = '\n| {}'.format(match.group(1))
+        else:
+            match_date = re.match(r'(\d+-\d+-\d+)', line)
+            if match_date is not None:
+                lst_txt[i] = '\n**{}**'.format(match_date.group(1))
+    return '\n'.join(lst_txt)
+
 metadata = read(os.path.join(cwd, 'twitter', '__init__.py'))
 
 def extract_metaitem(meta):
@@ -41,13 +55,13 @@ def extract_metaitem(meta):
     raise RuntimeError('Unable to find __{meta}__ string.'.format(meta=meta))
 
 setup(
-    name='python-twitter_test',
+    name='python-twitter',
     version=extract_metaitem('version'),
     license=extract_metaitem('license'),
     description=extract_metaitem('description'),
     long_description=(read('README.rst') + '\n\n' +
                       read('AUTHORS.rst') + '\n\n' +
-                      read('CHANGES')),
+                      convert_txt(read('CHANGES'))),
     long_description_content_type = 'text/x-rst',
     author=extract_metaitem('author'),
     author_email=extract_metaitem('email'),
