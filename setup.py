@@ -48,6 +48,7 @@ setup(
     long_description=(read('README.rst') + '\n\n' +
                       read('AUTHORS.rst') + '\n\n' +
                       read('CHANGES')),
+    long_description_content_type = 'text/x-rst',
     author=extract_metaitem('author'),
     author_email=extract_metaitem('email'),
     maintainer=extract_metaitem('author'),
