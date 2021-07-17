@@ -2209,17 +2209,17 @@ class Api(object):
 
         Args:
           user_id (int, optional)
-            The numerical ID of the user to block.
+            The numerical ID of the user to unblock.
           screen_name (str, optional):
-            The screen name of the user to block.
+            The screen name of the user to unblock.
           include_entities (bool, optional):
             The entities node will not be included if set to False.
           skip_status (bool, optional):
-            When set to False, the blocked User's statuses will not be included
+            When set to False, the unblocked User's statuses will not be included
             with the returned User object.
 
         Returns:
-          A twitter.User instance representing the blocked user.
+          A twitter.User instance representing the unblocked user.
         """
         return self._BlockMute(action='destroy',
                                endpoint='block',
@@ -2265,13 +2265,13 @@ class Api(object):
 
         Args:
           user_id (int, optional)
-            The numerical ID of the user to mute.
+            The numerical ID of the user to unmute.
           screen_name (str, optional):
-            The screen name of the user to mute.
+            The screen name of the user to unmute.
           include_entities (bool, optional):
             The entities node will not be included if set to False.
           skip_status (bool, optional):
-            When set to False, the muted User's statuses will not be included
+            When set to False, the unmuted User's statuses will not be included
             with the returned User object.
 
         Returns:
@@ -3549,9 +3549,9 @@ class Api(object):
 
         Args:
           status_id (int, optional):
-            The id of the twitter status to mark as a favorite.
+            The id of the twitter status to unmark as a favorite.
           status (twitter.Status, optional):
-            The twitter.Status object to mark as a favorite.
+            The twitter.Status object to unmark as a favorite.
           include_entities (bool, optional):
             The entities node will be omitted when set to False.
 
