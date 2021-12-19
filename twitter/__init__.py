@@ -45,6 +45,7 @@ from .models import (                       # noqa
     Hashtag,                                # noqa
     List,                                   # noqa
     Media,                                  # noqa
+    Place,                                  # noga
     Trend,                                  # noqa
     Url,                                    # noqa
     User,                                   # noqa

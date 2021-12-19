@@ -1,0 +1,59 @@
+{
+  "created_at": "Sun Oct 14 20:44:37 +0000 2018",
+  "hashtags": [],
+  "id": 1051574521818435584,
+  "id_str": "1051574521818435584",
+  "lang": "en",
+  "place": {
+    "bounding_box": {
+      "coordinates": [
+        [
+          [
+            -105.14544044849526,
+            40.19213775503984
+          ],
+          [
+            -105.14544044849526,
+            40.19213775503984
+          ],
+          [
+            -105.14544044849526,
+            40.19213775503984
+          ],
+          [
+            -105.14544044849526,
+            40.19213775503984
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "full_name": "McIntosh Lake",
+    "id": "07d9db48bc083000",
+    "name": "McIntosh Lake",
+    "place_type": "poi",
+    "url": "https://api.twitter.com/1.1/geo/id/07d9db48bc083000.json"
+  },
+  "urls": [],
+  "user": {
+    "created_at": "Sat May 26 17:34:57 +0000 2018",
+    "default_profile": true,
+    "default_profile_image": true,
+    "geo_enabled": true,
+    "id": 1000430098892378113,
+    "id_str": "1000430098892378113",
+    "lang": "en",
+    "name": "DECKSET",
+    "profile_background_color": "F5F8FA",
+    "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png",
+    "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png",
+    "profile_link_color": "1DA1F2",
+    "profile_sidebar_border_color": "C0DEED",
+    "profile_sidebar_fill_color": "DDEEF6",
+    "profile_text_color": "333333",
+    "profile_use_background_image": true,
+    "screen_name": "DECKSET1",
+    "statuses_count": 1
+  },
+  "user_mentions": []
+}

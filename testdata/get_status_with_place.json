@@ -1,0 +1,185 @@
+{
+  "created_at": "Sat Oct 13 20:15:27 +0000 2018",
+  "hashtags": [],
+  "id": 1051204790334746624,
+  "id_str": "1051204790334746624",
+  "lang": "en",
+  "place": {
+    "attributes": {},
+    "bounding_box": {
+      "coordinates": [
+        [
+          [
+            -87.940033,
+            41.644102
+          ],
+          [
+            -87.523993,
+            41.644102
+          ],
+          [
+            -87.523993,
+            42.0230669
+          ],
+          [
+            -87.940033,
+            42.0230669
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "contained_within": [],
+    "country": "United States",
+    "country_code": "US",
+    "full_name": "Chicago, IL",
+    "id": "1d9a5370a355ab0c",
+    "name": "Chicago",
+    "place_type": "city",
+    "url": "https://api.twitter.com/1.1/geo/id/1d9a5370a355ab0c.json"
+  },
+  "quoted_status": {
+    "created_at": "Fri Oct 12 20:38:11 +0000 2018",
+    "favorite_count": 24161,
+    "hashtags": [],
+    "id": 1050848124036685824,
+    "id_str": "1050848124036685824",
+    "lang": "en",
+    "media": [
+      {
+        "display_url": "pic.twitter.com/7BhtdUPIQD",
+        "expanded_url": "https://twitter.com/fazopri/status/1049144383457677317/video/1",
+        "id": 1049144139172855808,
+        "media_url": "http://pbs.twimg.com/ext_tw_video_thumb/1049144139172855808/pu/img/WaU8axg3hOI425zK.jpg",
+        "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1049144139172855808/pu/img/WaU8axg3hOI425zK.jpg",
+        "sizes": {
+          "large": {
+            "h": 720,
+            "resize": "fit",
+            "w": 720
+          },
+          "medium": {
+            "h": 720,
+            "resize": "fit",
+            "w": 720
+          },
+          "small": {
+            "h": 680,
+            "resize": "fit",
+            "w": 680
+          },
+          "thumb": {
+            "h": 150,
+            "resize": "crop",
+            "w": 150
+          }
+        },
+        "type": "video",
+        "url": "https://t.co/7BhtdUPIQD",
+        "video_info": {
+          "aspect_ratio": [
+            1,
+            1
+          ],
+          "duration_millis": 26153,
+          "variants": [
+            {
+              "content_type": "application/x-mpegURL",
+              "url": "https://video.twimg.com/ext_tw_video/1049144139172855808/pu/pl/TQ2FvESC2EWTKpxR.m3u8?tag=5"
+            },
+            {
+              "bitrate": 256000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/ext_tw_video/1049144139172855808/pu/vid/240x240/7O7a4ritrh587trx.mp4?tag=5"
+            },
+            {
+              "bitrate": 832000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/ext_tw_video/1049144139172855808/pu/vid/480x480/BXTtsb-hW9DvNJFR.mp4?tag=5"
+            },
+            {
+              "bitrate": 1280000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/ext_tw_video/1049144139172855808/pu/vid/720x720/_Xb-Q1NmNlv-hY-x.mp4?tag=5"
+            }
+          ]
+        }
+      }
+    ],
+    "possibly_sensitive": true,
+    "retweet_count": 9042,
+    "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+    "text": "Swallowing when you have a sore throat then remembering how you used to swallow painlessly\n\n https://t.co/7BhtdUPIQD",
+    "urls": [],
+    "user": {
+      "created_at": "Wed Dec 01 19:30:08 +0000 2010",
+      "description": "Artist |bookings/beats: supermanage17@gmail.com",
+      "favourites_count": 15056,
+      "followers_count": 2680,
+      "friends_count": 1566,
+      "geo_enabled": true,
+      "id": 221843085,
+      "id_str": "221843085",
+      "lang": "en",
+      "listed_count": 40,
+      "location": "The Mountains",
+      "name": "O\u2019dack Black",
+      "profile_background_color": "C0DEED",
+      "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+      "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+      "profile_background_tile": true,
+      "profile_banner_url": "https://pbs.twimg.com/profile_banners/221843085/1530302259",
+      "profile_image_url": "http://pbs.twimg.com/profile_images/1036223132032483328/qu1sNzYk_normal.jpg",
+      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1036223132032483328/qu1sNzYk_normal.jpg",
+      "profile_link_color": "0084B4",
+      "profile_sidebar_border_color": "C0DEED",
+      "profile_sidebar_fill_color": "DDEEF6",
+      "profile_text_color": "D633D6",
+      "profile_use_background_image": true,
+      "screen_name": "iamodeal",
+      "statuses_count": 15429,
+      "url": "https://t.co/RWx3Olu79R"
+    },
+    "user_mentions": []
+  },
+  "quoted_status_id": 1050848124036685824,
+  "quoted_status_id_str": "1050848124036685824",
+  "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+  "text": "OXJKDS ME LAST NIGHT https://t.co/yyFEAn8ZM8",
+  "urls": [
+    {
+      "expanded_url": "https://twitter.com/iamodeal/status/1050848124036685824",
+      "url": "https://t.co/yyFEAn8ZM8"
+    }
+  ],
+  "user": {
+    "created_at": "Tue Feb 05 01:30:25 +0000 2013",
+    "description": "I wish everyone was a lil nicer to each other. photographer. 19 years old. business: haley.paolini@icloud.com",
+    "favourites_count": 86250,
+    "followers_count": 15571,
+    "friends_count": 707,
+    "geo_enabled": true,
+    "id": 1149579998,
+    "id_str": "1149579998",
+    "lang": "en",
+    "listed_count": 270,
+    "location": "Chicago, IL, USA",
+    "name": "haley",
+    "profile_background_color": "FFFFFF",
+    "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+    "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+    "profile_background_tile": true,
+    "profile_banner_url": "https://pbs.twimg.com/profile_banners/1149579998/1538861179",
+    "profile_image_url": "http://pbs.twimg.com/profile_images/1048685903886147591/LW8shQOq_normal.jpg",
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/1048685903886147591/LW8shQOq_normal.jpg",
+    "profile_link_color": "664479",
+    "profile_sidebar_border_color": "FFFFFF",
+    "profile_sidebar_fill_color": "DDEEF6",
+    "profile_text_color": "0084B4",
+    "profile_use_background_image": true,
+    "screen_name": "haleypaolini",
+    "statuses_count": 194551,
+    "url": "https://t.co/qlr16Jh9XJ"
+  },
+  "user_mentions": []
+}
