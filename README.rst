@@ -111,9 +111,9 @@ Using
 
 The library provides a Python wrapper around the Twitter API and the Twitter data model. To get started, check out the examples in the examples/ folder or read the documentation at https://python-twitter.readthedocs.io which contains information about getting your authentication keys from Twitter and using the library.
 
-----
+------------------
 Using with Django
-----
+------------------
 
 Additional template tags that expand tweet urls and urlize tweet text. See the django template tags available for use with python-twitter: https://github.com/radzhome/python-twitter-django-tags
 
@@ -195,9 +195,9 @@ or check out the inline documentation with::
 
     $ pydoc twitter.Api
 
-----
+------
 Todo
-----
+------
 
 Patches, pull requests, and bug reports are `welcome <https://github.com/bear/python-twitter/issues/new>`_, just please keep the style consistent with the original source.
 
