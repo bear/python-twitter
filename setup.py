@@ -56,8 +56,7 @@ setup(
     download_url=extract_metaitem('download_url'),
     packages=find_packages(exclude=('tests', 'docs')),
     platforms=['Any'],
-    install_requires=['requests', 'requests-oauthlib'],
-    setup_requires=['pytest-runner'],
+    install_requires=['future', 'requests', 'requests-oauthlib'],
     tests_require=['pytest'],
     keywords='twitter api',
     classifiers=[
