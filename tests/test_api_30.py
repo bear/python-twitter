@@ -809,6 +809,7 @@ class ApiTest(unittest.TestCase):
         resp = self.api.GetListMembers(list_id=93527328)
         self.assertTrue(type(resp[0]) is twitter.User)
         self.assertEqual(resp[0].id, 4048395140)
+        self.assertEqual(len(resp), 47)
 
     @responses.activate
     def testGetListMembersPaged(self):
@@ -820,8 +821,10 @@ class ApiTest(unittest.TestCase):
             body=resp_data,
             match_querystring=True,
             status=200)
-        resp = self.api.GetListMembersPaged(list_id=93527328, cursor=4611686020936348428)
+        _, _, resp = self.api.GetListMembersPaged(list_id=93527328,
+                                                  cursor=4611686020936348428)
         self.assertTrue([isinstance(u, twitter.User) for u in resp])
+        self.assertEqual(len(resp), 20)
 
         with open('testdata/get_list_members_extra_params.json') as f:
             resp_data = f.read()
@@ -837,6 +840,7 @@ class ApiTest(unittest.TestCase):
                                                   include_entities=False,
                                                   count=100)
         self.assertFalse(resp[0].status)
+        self.assertEqual(len(resp), 27)
 
     @responses.activate
     def testGetListTimeline(self):
@@ -1017,7 +1021,7 @@ class ApiTest(unittest.TestCase):
 
         resp = self.api.GetSubscriptions(screen_name='inky')
         self.assertEqual(len(resp), 20)
-        self.assertTrue([isinstance(l, twitter.List) for l in resp])
+        self.assertTrue([isinstance(lst, twitter.List) for lst in resp])
 
     @responses.activate
     def testGetMemberships(self):
@@ -1289,7 +1293,7 @@ class ApiTest(unittest.TestCase):
             rsps.add(GET, DEFAULT_URL, body=resp_data)
 
             with open('testdata/get_statuses.ids.txt') as f:
-                status_ids = [int(l) for l in f]
+                status_ids = [int(line) for line in f]
 
             resp = self.api.GetStatuses(status_ids)
 
@@ -1312,7 +1316,7 @@ class ApiTest(unittest.TestCase):
             rsps.add(GET, DEFAULT_URL, body=resp_data)
 
             with open('testdata/get_statuses.ids.txt') as f:
-                status_ids = [int(l) for l in f]
+                status_ids = [int(line) for line in f]
 
             resp = self.api.GetStatuses(status_ids, map=True)
 
