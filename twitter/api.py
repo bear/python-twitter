@@ -4836,6 +4836,32 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
+    def ReplyTo(self, status, in_reply_to_status_id, **kwargs):
+        """Relay to a status. Automatically add @username before the status for 
+        convenience.This method calls api.GetStatus to get username.
+        
+
+        Args:
+            status (str):
+                The message text to be replyed.Must be less than or equal to 140 characters.
+            in_reply_to_status_id (int):
+                The ID of an existing status that the status to be posted is in reply to.
+            **kwargs:
+                The other args api.PostUpadtes need.
+
+        Returns:
+            (twitter.Status) A twitter.Status instance representing the message replied.
+        """
+        reply_status = self.GetStatus(in_reply_to_status_id)
+        u_status = "@%s " % reply_status.user.screen_name
+        if isinstance(status, str) or self._input_encoding is None:
+            u_status = u_status + status
+        else:
+            u_status = u_status + str(u_status, self._input_encoding)
+
+        return self.PostUpdate(u_status, in_reply_to_status_id=in_reply_to_status_id, **kwargs)
+
+
     def SetCache(self, cache):
         """Override the default cache.  Set to None to prevent caching.
 
