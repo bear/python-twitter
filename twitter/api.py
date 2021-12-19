@@ -161,8 +161,10 @@ class Api(object):
                  debugHTTP=False,
                  timeout=None,
                  sleep_on_rate_limit=False,
-                 tweet_mode='extended',
-                 proxies=None):
+                 tweet_mode='compat',
+                 proxies=None,
+                 verify_ssl=None,
+                 cert_ssl=None):
         """Instantiate a new twitter.Api object.
 
         Args:
@@ -216,6 +218,13 @@ class Api(object):
           proxies (dict, optional):
             A dictionary of proxies for the request to pass through, if not specified
             allows requests lib to use environmental variables for proxy if any.
+          verify_ssl (optional):
+            Either a boolean, in which case it controls whether we verify
+            the server's TLS certificate, or a string, in which case it must be a path
+            to a CA bundle to use. Defaults to ``True``.
+          cert_ssl (optional):
+            If String, path to ssl client cert file (.pem).
+            If Tuple, ('cert', 'key') pair.
         """
 
         # check to see if the library is running on a Google App Engine instance
@@ -247,6 +256,8 @@ class Api(object):
         self.sleep_on_rate_limit = sleep_on_rate_limit
         self.tweet_mode = tweet_mode
         self.proxies = proxies
+        self.verify_ssl = verify_ssl
+        self.cert_ssl = cert_ssl
 
         self.base_url = base_url or 'https://api.twitter.com/1.1'
         self.stream_url = stream_url or 'https://stream.twitter.com/1.1'
@@ -5096,7 +5107,9 @@ class Api(object):
                 data=data,
                 auth=self.__auth,
                 timeout=self._timeout,
-                proxies=self.proxies
+                proxies=self.proxies,
+                verify=self.verify_ssl,
+                cert=self.cert_ssl
             )
         except requests.RequestException as e:
             raise TwitterError(str(e))
@@ -5137,20 +5150,20 @@ class Api(object):
             if data:
                 if 'media_ids' in data:
                     url = self._BuildUrl(url, extra_params={'media_ids': data['media_ids']})
-                    resp = self._session.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+                    resp = self._session.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies, verify=self.verify_ssl, cert=self.cert_ssl)
                 elif 'media' in data:
-                    resp = self._session.post(url, files=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+                    resp = self._session.post(url, files=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies, verify=self.verify_ssl, cert=self.cert_ssl)
                 else:
-                    resp = self._session.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+                    resp = self._session.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies, verify=self.verify_ssl, cert=self.cert_ssl)
             elif json:
-                resp = self._session.post(url, json=json, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+                resp = self._session.post(url, json=json, auth=self.__auth, timeout=self._timeout, proxies=self.proxies, verify=self.verify_ssl, cert=self.cert_ssl)
             else:
                 resp = 0  # POST request, but without data or json
 
         elif verb == 'GET':
             data['tweet_mode'] = self.tweet_mode
             url = self._BuildUrl(url, extra_params=data)
-            resp = self._session.get(url, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+            resp = self._session.get(url, auth=self.__auth, timeout=self._timeout, proxies=self.proxies, verify=self.verify_ssl, cert=self.cert_ssl)
 
         else:
             resp = 0  # if not a POST or GET request
@@ -5185,14 +5198,17 @@ class Api(object):
                 return session.post(url, data=data, stream=True,
                                     auth=self.__auth,
                                     timeout=self._timeout,
-                                    proxies=self.proxies)
+                                    proxies=self.proxies,
+                                    verify=self.verify_ssl,
+                                    cert=self.cert_ssl)
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         if verb == 'GET':
             url = self._BuildUrl(url, extra_params=data)
             try:
                 return session.get(url, stream=True, auth=self.__auth,
-                                   timeout=self._timeout, proxies=self.proxies)
+                                   timeout=self._timeout, proxies=self.proxies,
+                                   verify=self.verify_ssl, cert=self.cert_ssl)
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         return 0  # if not a POST or GET request
