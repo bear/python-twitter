@@ -1415,7 +1415,7 @@ class Api(object):
         Returns:
             media_id:
                 ID of the uploaded media returned by the Twitter API. Raises if
-                unsuccesful.
+                unsuccessful.
         """
 
         media_id, media_fp, filename = self._UploadMediaChunkedInit(media=media,
