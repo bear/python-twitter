@@ -3330,11 +3330,11 @@ class Api(object):
         """Returns information about the relationship between the two users.
 
         Args:
-          source_id:
+          source_user_id:
             The user_id of the subject user [Optional]
           source_screen_name:
             The screen_name of the subject user [Optional]
-          target_id:
+          target_user_id:
             The user_id of the target user [Optional]
           target_screen_name:
             The screen_name of the target user [Optional]
