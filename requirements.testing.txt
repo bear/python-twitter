@@ -1,6 +1,5 @@
-future
 requests
-requests_oauthlib
+requests-oauthlib
 responses
 
 pytest

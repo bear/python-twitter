@@ -133,7 +133,7 @@ class ApiTest(unittest.TestCase):
         with open('testdata/get_home_timeline.json') as f:
             resp_data = f.read()
         responses.add(
-            GET, 'https://api.twitter.com/1.1/statuses/home_timeline.json?tweet_mode=compat',
+            GET, 'https://api.twitter.com/1.1/statuses/home_timeline.json?tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -219,7 +219,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/blocks/list.json?cursor=-1&stringify_ids=False&include_entities=False&skip_status=False&tweet_mode=compat',
+            'https://api.twitter.com/1.1/blocks/list.json?cursor=-1&stringify_ids=False&include_entities=False&skip_status=False&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -227,7 +227,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/blocks/list.json?cursor=1524574483549312671&stringify_ids=False&include_entities=False&skip_status=False&tweet_mode=compat',
+            'https://api.twitter.com/1.1/blocks/list.json?cursor=1524574483549312671&stringify_ids=False&include_entities=False&skip_status=False&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -278,7 +278,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/blocks/ids.json?cursor=-1&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=compat',
+            'https://api.twitter.com/1.1/blocks/ids.json?cursor=-1&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -286,7 +286,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/blocks/ids.json?cursor=1524566179872860311&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=compat',
+            'https://api.twitter.com/1.1/blocks/ids.json?cursor=1524566179872860311&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -325,7 +325,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             GET,
-            'https://api.twitter.com/1.1/friends/ids.json?count=5000&cursor=-1&stringify_ids=False&screen_name=EricHolthaus&tweet_mode=compat',
+            'https://api.twitter.com/1.1/friends/ids.json?count=5000&cursor=-1&stringify_ids=False&screen_name=EricHolthaus&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -335,7 +335,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/friends/ids.json?stringify_ids=False&count=5000&cursor=1417903878302254556&screen_name=EricHolthaus&tweet_mode=compat',
+            'https://api.twitter.com/1.1/friends/ids.json?stringify_ids=False&count=5000&cursor=1417903878302254556&screen_name=EricHolthaus&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -413,7 +413,7 @@ class ApiTest(unittest.TestCase):
         for i in range(0, 5):
             with open('testdata/get_friends_{0}.json'.format(i)) as f:
                 resp_data = f.read()
-            endpoint = 'https://api.twitter.com/1.1/friends/list.json?count=200&tweet_mode=compat&include_user_entities=True&screen_name=codebear&skip_status=False&cursor={0}'.format(cursor)
+            endpoint = 'https://api.twitter.com/1.1/friends/list.json?count=200&tweet_mode=extended&include_user_entities=True&screen_name=codebear&skip_status=False&cursor={0}'.format(cursor)
             responses.add(GET, endpoint, body=resp_data, match_querystring=True)
             cursor = json.loads(resp_data)['next_cursor']
 
@@ -446,7 +446,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/followers/ids.json?tweet_mode=compat&cursor=-1&stringify_ids=False&count=5000&screen_name=GirlsMakeGames',
+            'https://api.twitter.com/1.1/followers/ids.json?tweet_mode=extended&cursor=-1&stringify_ids=False&count=5000&screen_name=GirlsMakeGames',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -456,7 +456,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/followers/ids.json?tweet_mode=compat&count=5000&screen_name=GirlsMakeGames&cursor=1482201362283529597&stringify_ids=False',
+            'https://api.twitter.com/1.1/followers/ids.json?tweet_mode=extended&count=5000&screen_name=GirlsMakeGames&cursor=1482201362283529597&stringify_ids=False',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -478,7 +478,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            '{base_url}/followers/list.json?tweet_mode=compat&include_user_entities=True&count=200&screen_name=himawari8bot&skip_status=False&cursor=-1'.format(
+            '{base_url}/followers/list.json?tweet_mode=extended&include_user_entities=True&count=200&screen_name=himawari8bot&skip_status=False&cursor=-1'.format(
                 base_url=self.api.base_url),
             body=resp_data,
             match_querystring=True,
@@ -489,7 +489,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            '{base_url}/followers/list.json?tweet_mode=compat&include_user_entities=True&skip_status=False&count=200&screen_name=himawari8bot&cursor=1516850034842747602'.format(
+            '{base_url}/followers/list.json?tweet_mode=extended&include_user_entities=True&skip_status=False&count=200&screen_name=himawari8bot&cursor=1516850034842747602'.format(
                 base_url=self.api.base_url),
             body=resp_data,
             match_querystring=True,
@@ -517,7 +517,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/followers/ids.json?tweet_mode=compat&count=5000&stringify_ids=False&cursor=-1&screen_name=himawari8bot',
+            'https://api.twitter.com/1.1/followers/ids.json?tweet_mode=extended&count=5000&stringify_ids=False&cursor=-1&screen_name=himawari8bot',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -533,7 +533,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/followers/ids.json?tweet_mode=compat&count=5000&stringify_ids=True&user_id=12&cursor=-1',
+            'https://api.twitter.com/1.1/followers/ids.json?tweet_mode=extended&count=5000&stringify_ids=True&user_id=12&cursor=-1',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -738,7 +738,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/list.json?tweet_mode=compat',
+            'https://api.twitter.com/1.1/lists/list.json?tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -751,7 +751,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/list.json?tweet_mode=compat&screen_name=inky',
+            'https://api.twitter.com/1.1/lists/list.json?tweet_mode=extended&screen_name=inky',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -764,7 +764,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/list.json?tweet_mode=compat&user_id=13148',
+            'https://api.twitter.com/1.1/lists/list.json?tweet_mode=extended&user_id=13148',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -793,7 +793,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/members.json?count=100&include_entities=False&skip_status=False&list_id=93527328&cursor=-1&tweet_mode=compat',
+            'https://api.twitter.com/1.1/lists/members.json?count=100&include_entities=False&skip_status=False&list_id=93527328&cursor=-1&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -802,7 +802,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/members.json?list_id=93527328&skip_status=False&include_entities=False&count=100&tweet_mode=compat&cursor=4611686020936348428',
+            'https://api.twitter.com/1.1/lists/members.json?list_id=93527328&skip_status=False&include_entities=False&count=100&tweet_mode=extended&cursor=4611686020936348428',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -816,7 +816,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/members.json?count=100&include_entities=True&cursor=4611686020936348428&list_id=93527328&skip_status=False&tweet_mode=compat',
+            'https://api.twitter.com/1.1/lists/members.json?count=100&include_entities=True&cursor=4611686020936348428&list_id=93527328&skip_status=False&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -827,7 +827,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/members.json?count=100&tweet_mode=compat&cursor=4611686020936348428&list_id=93527328&skip_status=True&include_entities=False',
+            'https://api.twitter.com/1.1/lists/members.json?count=100&tweet_mode=extended&cursor=4611686020936348428&list_id=93527328&skip_status=True&include_entities=False',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -844,7 +844,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/statuses.json?&list_id=229581524&tweet_mode=compat',
+            'https://api.twitter.com/1.1/lists/statuses.json?&list_id=229581524&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -855,7 +855,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/statuses.json?owner_screen_name=notinourselves&slug=test&max_id=692980243339071488&tweet_mode=compat&since_id=692829211019575296',
+            'https://api.twitter.com/1.1/lists/statuses.json?owner_screen_name=notinourselves&slug=test&max_id=692980243339071488&tweet_mode=extended&since_id=692829211019575296',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -880,7 +880,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/statuses.json?include_rts=False&count=13&tweet_mode=compat&include_entities=False&slug=test&owner_id=4012966701',
+            'https://api.twitter.com/1.1/lists/statuses.json?include_rts=False&count=13&tweet_mode=extended&include_entities=False&slug=test&owner_id=4012966701',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -958,7 +958,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/subscribers/show.json?tweet_mode=compat&user_id=4040207472&list_id=189643778',
+            'https://api.twitter.com/1.1/lists/subscribers/show.json?tweet_mode=extended&user_id=4040207472&list_id=189643778',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -974,7 +974,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/subscribers/show.json?list_id=189643778&tweet_mode=compat&screen_name=__jcbl__',
+            'https://api.twitter.com/1.1/lists/subscribers/show.json?list_id=189643778&tweet_mode=extended&screen_name=__jcbl__',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -989,7 +989,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/subscribers/show.json?include_entities=True&tweet_mode=compat&list_id=18964377&skip_status=True&screen_name=__jcbl__',
+            'https://api.twitter.com/1.1/lists/subscribers/show.json?include_entities=True&tweet_mode=extended&list_id=18964377&skip_status=True&screen_name=__jcbl__',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1025,7 +1025,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/memberships.json?count=20&cursor=-1&tweet_mode=compat',
+            'https://api.twitter.com/1.1/lists/memberships.json?count=20&cursor=-1&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1037,7 +1037,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/lists/memberships.json?count=20&cursor=-1&screen_name=himawari8bot&tweet_mode=compat',
+            'https://api.twitter.com/1.1/lists/memberships.json?count=20&cursor=-1&screen_name=himawari8bot&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1161,26 +1161,26 @@ class ApiTest(unittest.TestCase):
 
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/friendships/lookup.json?user_id=12&tweet_mode=compat',
+            'https://api.twitter.com/1.1/friendships/lookup.json?user_id=12&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
 
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/friendships/lookup.json?user_id=12,6385432&tweet_mode=compat',
+            'https://api.twitter.com/1.1/friendships/lookup.json?user_id=12,6385432&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/friendships/lookup.json?screen_name=jack&tweet_mode=compat',
+            'https://api.twitter.com/1.1/friendships/lookup.json?screen_name=jack&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/friendships/lookup.json?screen_name=jack,dickc&tweet_mode=compat',
+            'https://api.twitter.com/1.1/friendships/lookup.json?screen_name=jack,dickc&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1330,13 +1330,13 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/statuses/oembed.json?tweet_mode=compat&id=397',
+            'https://api.twitter.com/1.1/statuses/oembed.json?tweet_mode=extended&id=397',
             body=resp_data,
             match_querystring=True,
             status=200)
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/statuses/oembed.json?tweet_mode=compat&url=https://twitter.com/jack/statuses/397',
+            'https://api.twitter.com/1.1/statuses/oembed.json?tweet_mode=extended&url=https://twitter.com/jack/statuses/397',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1366,7 +1366,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/mutes/users/list.json?cursor=-1&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=compat',
+            'https://api.twitter.com/1.1/mutes/users/list.json?cursor=-1&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1376,7 +1376,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/mutes/users/list.json?cursor=1535206520056388207&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=compat',
+            'https://api.twitter.com/1.1/mutes/users/list.json?cursor=1535206520056388207&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1391,7 +1391,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/mutes/users/ids.json?cursor=-1&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=compat',
+            'https://api.twitter.com/1.1/mutes/users/ids.json?cursor=-1&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1401,7 +1401,7 @@ class ApiTest(unittest.TestCase):
             resp_data = f.read()
         responses.add(
             responses.GET,
-            'https://api.twitter.com/1.1/mutes/users/ids.json?cursor=1535206520056565155&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=compat',
+            'https://api.twitter.com/1.1/mutes/users/ids.json?cursor=1535206520056565155&stringify_ids=False&include_entities=True&skip_status=False&tweet_mode=extended',
             body=resp_data,
             match_querystring=True,
             status=200)
@@ -1549,6 +1549,87 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(resp)
 
     @responses.activate
+    def testPostMediaSubtitlesCreateSuccess(self):
+        responses.add(
+            POST,
+            'https://upload.twitter.com/1.1/media/subtitles/create.json',
+            body=b'',
+            status=200)
+        expected_body = {
+            'media_id': '1234',
+            'media_category': 'TweetVideo',
+            'subtitle_info': {
+                'subtitles': [{
+                    'media_id': '5678',
+                    'language_code': 'en',
+                    'display_name': 'English'
+                }]
+            }
+        }
+        resp = self.api.PostMediaSubtitlesCreate(video_media_id=1234,
+                                                 subtitle_media_id=5678,
+                                                 language_code='en',
+                                                 display_name='English')
+
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(responses.calls[0].request.url,
+                         'https://upload.twitter.com/1.1/media/subtitles/create.json')
+        request_body = json.loads(responses.calls[0].request.body.decode('utf-8'))
+        self.assertTrue(resp)
+        self.assertDictEqual(expected_body, request_body)
+
+    @responses.activate
+    def testPostMediaSubtitlesCreateFailure(self):
+        responses.add(
+            POST,
+            'https://upload.twitter.com/1.1/media/subtitles/create.json',
+            body=b'{"error":"Some error happened"}',
+            status=400)
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.PostMediaSubtitlesCreate(video_media_id=1234,
+                                                      subtitle_media_id=5678,
+                                                      language_code='en',
+                                                      display_name='English'))
+
+    @responses.activate
+    def testPostMediaSubtitlesDeleteSuccess(self):
+        responses.add(
+            POST,
+            'https://upload.twitter.com/1.1/media/subtitles/delete.json',
+            body=b'',
+            status=200)
+        expected_body = {
+            'media_id': '1234',
+            'media_category': 'TweetVideo',
+            'subtitle_info': {
+                'subtitles': [{
+                    'language_code': 'en'
+                }]
+            }
+        }
+        resp = self.api.PostMediaSubtitlesDelete(video_media_id=1234, language_code='en')
+
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(responses.calls[0].request.url,
+                         'https://upload.twitter.com/1.1/media/subtitles/delete.json')
+        request_body = json.loads(responses.calls[0].request.body.decode('utf-8'))
+        self.assertTrue(resp)
+        self.assertDictEqual(expected_body, request_body)
+
+    @responses.activate
+    def testPostMediaSubtitlesDeleteFailure(self):
+        responses.add(
+            POST,
+            'https://upload.twitter.com/1.1/media/subtitles/delete.json',
+            body=b'{"error":"Some error happened"}',
+            status=400)
+        self.assertRaises(
+            twitter.TwitterError,
+            lambda: self.api.PostMediaSubtitlesDelete(video_media_id=1234,
+                                                      language_code='en'))
+
+    @responses.activate
     def testGetUserSuggestionCategories(self):
         with open('testdata/get_user_suggestion_categories.json') as f:
             resp_data = f.read()
@@ -1643,15 +1724,9 @@ class ApiTest(unittest.TestCase):
             status=200)
         resp = self.api.PostDirectMessage(text="test message", user_id=372018022)
         self.assertEqual(resp.text, "test message")
-
-        resp = self.api.PostDirectMessage(text="test message", screen_name="__jcbl__")
-        self.assertEqual(resp.sender_id, 4012966701)
-        self.assertEqual(resp.recipient_id, 372018022)
+        self.assertEqual(resp.sender_id, "4012966701")
+        self.assertEqual(resp.recipient_id, "372018022")
         self.assertTrue(resp._json)
-
-        self.assertRaises(
-            twitter.TwitterError,
-            lambda: self.api.PostDirectMessage(text="test message"))
 
     @responses.activate
     def testDestroyDirectMessage(self):

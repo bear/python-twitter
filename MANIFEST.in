@@ -5,3 +5,4 @@ include NOTICE
 include *.rst
 include requirements.txt
 prune .DS_Store
+graft doc examples testdata tests

@@ -1,0 +1,20 @@
+version: 2
+jobs:
+    build:
+        working_directory: ~/repo
+        docker:
+            - image: jeremylow/python-twitter
+        steps:
+            - checkout
+            - run: sudo chown -R circleci:circleci ~/repo
+            - run:
+                name: set up pyenv
+                command: pyenv local 2.7.15 3.7.1 pypy-5.7.1 pypy3.5-6.0.0
+            - run:
+                name: install deps
+                command: pip install -r requirements.testing.txt
+            - run:
+                name: run tests
+                command: |
+                    export PATH=/home/circleci/.local/bin:$PATH
+                    make tox

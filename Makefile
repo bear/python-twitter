@@ -40,7 +40,8 @@ lint:
 	pycodestyle --config={toxinidir}/setup.cfg twitter tests
 
 test: lint
-	python setup.py test
+	pytest -s
+	#python setup.py test
 
 tox: clean
 	tox

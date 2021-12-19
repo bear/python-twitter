@@ -162,7 +162,9 @@ class Api(object):
                  timeout=None,
                  sleep_on_rate_limit=False,
                  tweet_mode='compat',
-                 proxies=None):
+                 proxies=None,
+                 verify_ssl=None,
+                 cert_ssl=None):
         """Instantiate a new twitter.Api object.
 
         Args:
@@ -216,6 +218,13 @@ class Api(object):
           proxies (dict, optional):
             A dictionary of proxies for the request to pass through, if not specified
             allows requests lib to use environmental variables for proxy if any.
+          verify_ssl (optional):
+            Either a boolean, in which case it controls whether we verify
+            the server's TLS certificate, or a string, in which case it must be a path
+            to a CA bundle to use. Defaults to ``True``.
+          cert_ssl (optional):
+            If String, path to ssl client cert file (.pem).
+            If Tuple, ('cert', 'key') pair.
         """
 
         # check to see if the library is running on a Google App Engine instance
@@ -247,21 +256,12 @@ class Api(object):
         self.sleep_on_rate_limit = sleep_on_rate_limit
         self.tweet_mode = tweet_mode
         self.proxies = proxies
+        self.verify_ssl = verify_ssl
+        self.cert_ssl = cert_ssl
 
-        if base_url is None:
-            self.base_url = 'https://api.twitter.com/1.1'
-        else:
-            self.base_url = base_url
-
-        if stream_url is None:
-            self.stream_url = 'https://stream.twitter.com/1.1'
-        else:
-            self.stream_url = stream_url
-
-        if upload_url is None:
-            self.upload_url = 'https://upload.twitter.com/1.1'
-        else:
-            self.upload_url = upload_url
+        self.base_url = base_url or 'https://api.twitter.com/1.1'
+        self.stream_url = stream_url or 'https://stream.twitter.com/1.1'
+        self.upload_url = upload_url or 'https://upload.twitter.com/1.1'
 
         self.chunk_size = chunk_size
 
@@ -291,6 +291,8 @@ class Api(object):
             requests_log = logging.getLogger("requests.packages.urllib3")
             requests_log.setLevel(logging.DEBUG)
             requests_log.propagate = True
+
+        self._session = requests.Session()
 
     @staticmethod
     def GetAppOnlyAuthToken(consumer_key, consumer_secret):
@@ -449,7 +451,7 @@ class Api(object):
               >>> # or:
               >>> api.GetSearch(geocode=("37.781157", "-122.398720", "1mi"))
           count (int, optional):
-            Number of results to return.  Default is 15 and maxmimum that
+            Number of results to return.  Default is 15 and maximum that
             Twitter returns is 100 irrespective of what you type in.
           lang (str, optional):
             Language for results as ISO 639-1 code.  Default is None
@@ -521,7 +523,7 @@ class Api(object):
             url = "{url}?{raw_query}".format(
                 url=url,
                 raw_query=raw_query)
-            resp = self._RequestUrl(url, 'GET')
+            resp = self._RequestUrl(url, 'GET', data=parameters)
         else:
             resp = self._RequestUrl(url, 'GET', data=parameters)
 
@@ -1037,15 +1039,15 @@ class Api(object):
                    attachment_url=None):
         """Post a twitter status message from the authenticated user.
 
-        https://dev.twitter.com/docs/api/1.1/post/statuses/update
+        https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-update
 
         Args:
             status (str):
                 The message text to be posted. Must be less than or equal to
                 CHARACTER_LIMIT characters.
             media (int, str, fp, optional):
-                A URL, a local file, or a file-like object (something with a
-                read() method), or a list of any combination of the above.
+                A media ID, URL, local file, or file-like object (something with
+                a read() method), or a list of any combination of the above.
             media_additional_owners (list, optional):
                 A list of user ids representing Twitter users that should be able
                 to use the uploaded media in their tweets. If you pass a list of
@@ -1276,7 +1278,7 @@ class Api(object):
         if additional_owners and len(additional_owners) > 100:
             raise TwitterError({'message': 'Maximum of 100 additional owners may be specified for a Media object'})
         if additional_owners:
-            parameters['additional_owners'] = additional_owners
+            parameters['additional_owners'] = ','.join(map(str, additional_owners))
         if media_category:
             parameters['media_category'] = media_category
 
@@ -1407,7 +1409,7 @@ class Api(object):
                 number of additional owners is capped at 100 by Twitter.
             media_category:
                 Category with which to identify media upload. Only use with Ads
-                API & video files.
+                API, video files and subtitles.
 
         Returns:
             media_id:
@@ -1432,6 +1434,81 @@ class Api(object):
             return data['media_id']
         except KeyError:
             raise TwitterError('Media could not be uploaded.')
+
+    def PostMediaSubtitlesCreate(self,
+                                 video_media_id,
+                                 subtitle_media_id,
+                                 language_code,
+                                 display_name):
+        """Associate uploaded subtitles to an uploaded video. You can associate
+        subtitles to a video before or after Tweeting.
+
+        Args:
+            video_media_id (int):
+                Media ID of the uploaded video to add the subtitles to. The
+                video must have been uploaded using the category 'TweetVideo'.
+            subtitle_media_id (int):
+                Media ID of the uploaded subtitle file. The subtitles myst have
+                been uploaded using the category 'Subtitles'.
+            language_code (str):
+                The language code that the subtitles are written in. The
+                language code should be a BCP47 code (e.g. 'en', 'sp')
+            display_name (str):
+                Language name (e.g. 'English', 'Spanish')
+
+        Returns:
+            True if successful. Raises otherwise.
+        """
+        url = '%s/media/subtitles/create.json' % self.upload_url
+
+        subtitle = {}
+        subtitle['media_id'] = str(subtitle_media_id)
+        subtitle['language_code'] = language_code
+        subtitle['display_name'] = display_name
+        parameters = {}
+        parameters['media_id'] = str(video_media_id)
+        parameters['media_category'] = 'TweetVideo'
+        parameters['subtitle_info'] = {}
+        parameters['subtitle_info']['subtitles'] = [subtitle]
+
+        resp = self._RequestUrl(url, 'POST', json=parameters)
+        # Response body should be blank, so only do error checking if the response is not blank.
+        if resp.content.decode('utf-8'):
+            self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return True
+
+    def PostMediaSubtitlesDelete(self,
+                                 video_media_id,
+                                 language_code):
+        """Remove subtitles from an uploaded video.
+
+        Args:
+            video_media_id (int):
+                Media ID of the video for which the subtitles will be removed.
+            language_code (str):
+                The language code of the subtitle file that should be deleted.
+                The language code should be a BCP47 code (e.g. 'en', 'sp')
+
+        Returns:
+            True if successful. Raises otherwise.
+        """
+        url = '%s/media/subtitles/delete.json' % self.upload_url
+
+        subtitle = {}
+        subtitle['language_code'] = language_code
+        parameters = {}
+        parameters['media_id'] = str(video_media_id)
+        parameters['media_category'] = 'TweetVideo'
+        parameters['subtitle_info'] = {}
+        parameters['subtitle_info']['subtitles'] = [subtitle]
+
+        resp = self._RequestUrl(url, 'POST', json=parameters)
+        # Response body should be blank, so only do error checking if the response is not blank.
+        if resp.content.decode('utf-8'):
+            self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return True
 
     def _TweetTextWrap(self,
                        status,
@@ -2071,6 +2148,41 @@ class Api(object):
 
         return User.NewFromJsonDict(data)
 
+    def ReportSpam(self,
+                   user_id=None,
+                   screen_name=None,
+                   perform_block=True):
+        """Report a user as spam on behalf of the authenticated user.
+
+        Args:
+          user_id (int, optional)
+            The numerical ID of the user to report.
+          screen_name (str, optional):
+            The screen name of the user to report.
+          perform_block (bool, optional):
+            Addionally perform a block of reported users. Defaults to True.
+        Returns:
+          twitter.User: twitter.User object representing the blocked/muted user.
+        """
+
+        url = '%s/users/report_spam.json' % (self.base_url)
+        post_data = {}
+
+        if user_id:
+            post_data['user_id'] = enf_type('user_id', int, user_id)
+        elif screen_name:
+            post_data['screen_name'] = screen_name
+        else:
+            raise TwitterError("You must specify either a user_id or screen_name")
+
+        if perform_block:
+            post_data['perform_block'] = enf_type('perform_block', bool, perform_block)
+
+        resp = self._RequestUrl(url, 'POST', data=post_data)
+        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+
+        return User.NewFromJsonDict(data)
+
     def CreateBlock(self,
                     user_id=None,
                     screen_name=None,
@@ -2108,17 +2220,17 @@ class Api(object):
 
         Args:
           user_id (int, optional)
-            The numerical ID of the user to block.
+            The numerical ID of the user to unblock.
           screen_name (str, optional):
-            The screen name of the user to block.
+            The screen name of the user to unblock.
           include_entities (bool, optional):
             The entities node will not be included if set to False.
           skip_status (bool, optional):
-            When set to False, the blocked User's statuses will not be included
+            When set to False, the unblocked User's statuses will not be included
             with the returned User object.
 
         Returns:
-          A twitter.User instance representing the blocked user.
+          A twitter.User instance representing the unblocked user.
         """
         return self._BlockMute(action='destroy',
                                endpoint='block',
@@ -2164,13 +2276,13 @@ class Api(object):
 
         Args:
           user_id (int, optional)
-            The numerical ID of the user to mute.
+            The numerical ID of the user to unmute.
           screen_name (str, optional):
-            The screen name of the user to mute.
+            The screen name of the user to unmute.
           include_entities (bool, optional):
             The entities node will not be included if set to False.
           skip_status (bool, optional):
-            When set to False, the muted User's statuses will not be included
+            When set to False, the unmuted User's statuses will not be included
             with the returned User object.
 
         Returns:
@@ -2998,6 +3110,8 @@ class Api(object):
     def PostDirectMessage(self,
                           text,
                           user_id=None,
+                          media_file_path=None,
+                          media_type=None,
                           screen_name=None,
                           return_json=False):
         """Post a twitter direct message from the authenticated user.
@@ -3005,30 +3119,72 @@ class Api(object):
         Args:
           text: The message text to be posted.
           user_id:
-            The ID of the user who should receive the direct message. [Optional]
-          screen_name:
-            The screen name of the user who should receive the direct message. [Optional]
+            The ID of the user who should receive the direct message.
+          media_file_path:
+            The file path to the media to be posted
+          media_type:
+            The media type. Accepted media types: dm_image, dm_gif or dm_video
           return_json (bool, optional):
-            If True JSON data will be returned, instead of twitter.User
+            If True JSON data will be returned, instead of twitter.DirectMessage
         Returns:
           A twitter.DirectMessage instance representing the message posted
         """
-        url = '%s/direct_messages/new.json' % self.base_url
-        data = {'text': text}
-        if user_id:
-            data['user_id'] = user_id
-        elif screen_name:
-            data['screen_name'] = screen_name
-        else:
-            raise TwitterError({'message': "Specify at least one of user_id or screen_name."})
+        url = '%s/direct_messages/events/new.json' % self.base_url
+        # Hack to allow some sort of backwards compatibility with older versions
+        # part of the fix for Issue #587
+        if user_id is None and screen_name is not None:
+            user_id = self.GetUser(screen_name=screen_name).id
 
-        resp = self._RequestUrl(url, 'POST', data=data)
+        # Default
+        message_data_value = {
+            'text': text
+        }
+        if media_file_path is not None:
+            try:
+                media = open(media_file_path, 'rb')
+            except IOError:
+                raise TwitterError({'message': 'Media file could not be opened.'})
+
+            response_media_id = self.UploadMediaChunked(media=media, media_category=media_type)
+
+            # With media
+            message_data_value = {
+                'text': text,
+                "attachment": {
+                    "type": "media",
+                    "media": {
+                        "id": response_media_id
+                    }
+                }
+            }
+
+        event = {
+            'event': {
+                'type': 'message_create',
+                'message_create': {
+                    'target': {
+                        'recipient_id': user_id
+                    },
+                    'message_data': message_data_value
+                }
+            }
+        }
+
+        resp = self._RequestUrl(url, 'POST', json=event)
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         if return_json:
             return data
         else:
-            return DirectMessage.NewFromJsonDict(data)
+            dm = DirectMessage(
+                created_at=data['event']['created_timestamp'],
+                id=data['event']['id'],
+                recipient_id=data['event']['message_create']['target']['recipient_id'],
+                sender_id=data['event']['message_create']['sender_id'],
+                text=data['event']['message_create']['message_data']['text'],
+            )
+            dm._json = data
+            return dm
 
     def DestroyDirectMessage(self, message_id, include_entities=True, return_json=False):
         """Destroys the direct message specified in the required ID parameter.
@@ -3404,9 +3560,9 @@ class Api(object):
 
         Args:
           status_id (int, optional):
-            The id of the twitter status to mark as a favorite.
+            The id of the twitter status to unmark as a favorite.
           status (twitter.Status, optional):
-            The twitter.Status object to mark as a favorite.
+            The twitter.Status object to unmark as a favorite.
           include_entities (bool, optional):
             The entities node will be omitted when set to False.
 
@@ -4420,7 +4576,7 @@ class Api(object):
         reflected due to image processing on Twitter's side.
 
         Args:
-            image (str):
+            image (str, optional):
                 Location of local image file to use.
             include_entities (bool, optional):
                 Include the entities node in the return data.
@@ -4452,14 +4608,20 @@ class Api(object):
             raise TwitterError({'message': "The image could not be resized or is too large."})
 
     def UpdateBanner(self,
-                     image,
+                     image=False,
+                     external_image=False,
+                     encoded_image=False,
                      include_entities=False,
                      skip_status=False):
         """Updates the authenticated users profile banner.
 
         Args:
-          image:
-            Location of image in file system
+          image (str, optional):
+            Location of local image in file system
+          external_image (str, optional):
+            URL of image
+          encoded_image (str, optional):
+            base64 string of an image
           include_entities:
             If True, each tweet will include a node called "entities."
             This node offers a variety of metadata about the tweet in a
@@ -4470,8 +4632,12 @@ class Api(object):
           A twitter.List instance representing the list subscribed to
         """
         url = '%s/account/update_profile_banner.json' % (self.base_url)
-        with open(image, 'rb') as image_file:
-            encoded_image = base64.b64encode(image_file.read())
+        if image:
+            with open(image, 'rb') as image_file:
+                encoded_image = base64.b64encode(image_file.read())
+        if external_image:
+            content = self._RequestUrl(external_image, 'GET').content
+            encoded_image = base64.b64encode(content)
         data = {
             # When updated for API v1.1 use image, not banner
             # https://dev.twitter.com/docs/api/1.1/post/account/update_profile_banner
@@ -4680,6 +4846,32 @@ class Api(object):
         data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
 
         return User.NewFromJsonDict(data)
+
+    def ReplyTo(self, status, in_reply_to_status_id, **kwargs):
+        """Relay to a status. Automatically add @username before the status for 
+        convenience.This method calls api.GetStatus to get username.
+        
+
+        Args:
+            status (str):
+                The message text to be replyed.Must be less than or equal to 140 characters.
+            in_reply_to_status_id (int):
+                The ID of an existing status that the status to be posted is in reply to.
+            **kwargs:
+                The other args api.PostUpadtes need.
+
+        Returns:
+            (twitter.Status) A twitter.Status instance representing the message replied.
+        """
+        reply_status = self.GetStatus(in_reply_to_status_id)
+        u_status = "@%s " % reply_status.user.screen_name
+        if isinstance(status, str) or self._input_encoding is None:
+            u_status = u_status + status
+        else:
+            u_status = u_status + str(u_status, self._input_encoding)
+
+        return self.PostUpdate(u_status, in_reply_to_status_id=in_reply_to_status_id, **kwargs)
+
 
     def SetCache(self, cache):
         """Override the default cache.  Set to None to prevent caching.
@@ -4915,7 +5107,9 @@ class Api(object):
                 data=data,
                 auth=self.__auth,
                 timeout=self._timeout,
-                proxies=self.proxies
+                proxies=self.proxies,
+                verify=self.verify_ssl,
+                cert=self.cert_ssl
             )
         except requests.RequestException as e:
             raise TwitterError(str(e))
@@ -4956,25 +5150,25 @@ class Api(object):
             if data:
                 if 'media_ids' in data:
                     url = self._BuildUrl(url, extra_params={'media_ids': data['media_ids']})
-                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+                    resp = self._session.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies, verify=self.verify_ssl, cert=self.cert_ssl)
                 elif 'media' in data:
-                    resp = requests.post(url, files=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+                    resp = self._session.post(url, files=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies, verify=self.verify_ssl, cert=self.cert_ssl)
                 else:
-                    resp = requests.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+                    resp = self._session.post(url, data=data, auth=self.__auth, timeout=self._timeout, proxies=self.proxies, verify=self.verify_ssl, cert=self.cert_ssl)
             elif json:
-                resp = requests.post(url, json=json, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+                resp = self._session.post(url, json=json, auth=self.__auth, timeout=self._timeout, proxies=self.proxies, verify=self.verify_ssl, cert=self.cert_ssl)
             else:
                 resp = 0  # POST request, but without data or json
 
         elif verb == 'GET':
             data['tweet_mode'] = self.tweet_mode
             url = self._BuildUrl(url, extra_params=data)
-            resp = requests.get(url, auth=self.__auth, timeout=self._timeout, proxies=self.proxies)
+            resp = self._session.get(url, auth=self.__auth, timeout=self._timeout, proxies=self.proxies, verify=self.verify_ssl, cert=self.cert_ssl)
 
         else:
             resp = 0  # if not a POST or GET request
 
-        if url and self.rate_limit:
+        if url and self.rate_limit and resp:
             limit = resp.headers.get('x-rate-limit-limit', 0)
             remaining = resp.headers.get('x-rate-limit-remaining', 0)
             reset = resp.headers.get('x-rate-limit-reset', 0)
@@ -5004,14 +5198,17 @@ class Api(object):
                 return session.post(url, data=data, stream=True,
                                     auth=self.__auth,
                                     timeout=self._timeout,
-                                    proxies=self.proxies)
+                                    proxies=self.proxies,
+                                    verify=self.verify_ssl,
+                                    cert=self.cert_ssl)
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         if verb == 'GET':
             url = self._BuildUrl(url, extra_params=data)
             try:
                 return session.get(url, stream=True, auth=self.__auth,
-                                   timeout=self._timeout, proxies=self.proxies)
+                                   timeout=self._timeout, proxies=self.proxies,
+                                   verify=self.verify_ssl, cert=self.cert_ssl)
             except requests.RequestException as e:
                 raise TwitterError(str(e))
         return 0  # if not a POST or GET request

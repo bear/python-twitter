@@ -7,7 +7,7 @@ class FileCacheTest(unittest.TestCase):
     def testInit(self):
         """Test the twitter._FileCache constructor"""
         cache = twitter._FileCache()
-        self.assert_(cache is not None, 'cache is None')
+        self.assertTrue(cache is not None, 'cache is None')
 
     def testSet(self):
         """Test the twitter._FileCache.Set method"""
@@ -38,6 +38,6 @@ class FileCacheTest(unittest.TestCase):
         cache.Set("foo", 'Hello World!')
         cached_time = cache.GetCachedTime("foo")
         delta = cached_time - now
-        self.assert_(delta <= 1,
-                     'Cached time differs from clock time by more than 1 second.')
+        self.assertTrue(delta <= 1,
+                        'Cached time differs from clock time by more than 1 second.')
         cache.Remove("foo")

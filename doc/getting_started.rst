@@ -26,26 +26,32 @@ _________
 
 Once your app is created, you'll be directed to a new page showing you some information about it.
 
-.. image:: python-twitter-app-creation-part2.png
+.. image:: python-twitter-app-creation-part2-new.png
 
 Your Keys
 _________
 
-Click on the "Keys and Access Tokens" tab on the top there, just under the green notification in the image above.
+Click on the "Keys and Access Tokens" tab on the top.
 
 
-.. image:: python-twitter-app-creation-part3.png
+.. image:: python-twitter-app-creation-part3-new.png
+
+
+Under the "Access token & access token secret" option, click on the "create" button to generate a new access token and token secret.
+
+.. image:: python-twitter-app-creation-part3-1-new.png
+
 
 At this point, you can test out your application using the keys under "Your Application Tokens". The ``twitter.Api()`` object can be created as follows::
 
     import twitter
-    api = twitter.Api(consumer_key=[consumer key],
-                      consumer_secret=[consumer secret],
-                      access_token_key=[access token],
-                      access_token_secret=[access token secret])
+    api = twitter.Api(consumer_key=<consumer key>,
+                      consumer_secret=<consumer secret>,
+                      access_token_key=<access token>,
+                      access_token_secret=<access token secret>)
 
 Note: Make sure to enclose your keys in quotes (ie, api = twitter.Api(consumer_key='1234567', ...) and so on) or you will receive a NameError.
 
-If you are creating an application for end users/consumers, then you will want them to authorize you application, but that is outside the scope of this document.
+If you are creating an application for end users/consumers, then you will want them to authorize your application, but that is outside the scope of this document.
 
 And that should be it! If you need a little more help, check out the `examples on Github <https://github.com/bear/python-twitter/tree/master/examples>`_. If you have an open source application using python-twitter, send us a link and we'll add a link to it here.

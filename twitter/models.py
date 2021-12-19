@@ -185,21 +185,13 @@ class DirectMessage(TwitterModel):
         self.param_defaults = {
             'created_at': None,
             'id': None,
-            'recipient': None,
             'recipient_id': None,
-            'recipient_screen_name': None,
-            'sender': None,
             'sender_id': None,
-            'sender_screen_name': None,
             'text': None,
         }
 
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
-        if 'sender' in kwargs:
-            self.sender = User.NewFromJsonDict(kwargs.get('sender', None))
-        if 'recipient' in kwargs:
-            self.recipient = User.NewFromJsonDict(kwargs.get('recipient', None))
 
     def __repr__(self):
         if self.text and len(self.text) > 140:
@@ -208,7 +200,7 @@ class DirectMessage(TwitterModel):
             text = self.text
         return "DirectMessage(ID={dm_id}, Sender={sender}, Created={time}, Text='{text!r}')".format(
             dm_id=self.id,
-            sender=self.sender_screen_name,
+            sender=self.sender_id,
             time=self.created_at,
             text=text)
 

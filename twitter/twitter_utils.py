@@ -1,4 +1,5 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
+"""Collection of utilities for use in API calls, functions."""
 from __future__ import unicode_literals
 
 import mimetypes
@@ -18,7 +19,7 @@ from twitter import TwitterError
 import twitter
 
 if sys.version_info < (3,):
-    range = xrange
+    range = xrange  # noqa
 
 if sys.version_info > (3,):
     unicode = str
@@ -169,8 +170,9 @@ URL_REGEXP = re.compile((
 
 
 def calc_expected_status_length(status, short_url_length=23):
-    """ Calculates the length of a tweet, taking into account Twitter's
-    replacement of URLs with https://t.co links.
+    """Calculate the length of a tweet.
+
+    Takes into account Twitter's replacement of URLs with https://t.co links.
 
     Args:
         status: text of the status message to be posted.
@@ -178,7 +180,6 @@ def calc_expected_status_length(status, short_url_length=23):
 
     Returns:
         Expected length of the status message as an integer.
-
     """
     status_length = 0
     if isinstance(status, bytes):
@@ -197,7 +198,7 @@ def calc_expected_status_length(status, short_url_length=23):
 
 
 def is_url(text):
-    """ Checks to see if a bit of text is a URL.
+    """Check to see if a bit of text is a URL.
 
     Args:
         text: text to check.
@@ -209,6 +210,14 @@ def is_url(text):
 
 
 def http_to_file(http):
+    """Turn a URL into a file-like object.
+
+    Args:
+        http (str): URL of the file to download.
+
+    Returns:
+        File-like object of downloaded URL.
+    """
     data_file = NamedTemporaryFile()
     req = requests.get(http, stream=True)
     for chunk in req.iter_content(chunk_size=1024 * 1024):
@@ -217,8 +226,7 @@ def http_to_file(http):
 
 
 def parse_media_file(passed_media, async_upload=False):
-    """ Parses a media file and attempts to return a file-like object and
-    information about the media file.
+    """Parse a media file and attempts to return a file-like object and information about the media file.
 
     Args:
         passed_media: media file which to parse.
@@ -235,6 +243,7 @@ def parse_media_file(passed_media, async_upload=False):
     long_img_formats = [
         'image/gif'
     ]
+    subtitle_formats = ['text/srt']
     video_formats = ['video/mp4',
                      'video/quicktime']
 
@@ -266,6 +275,9 @@ def parse_media_file(passed_media, async_upload=False):
         pass
 
     media_type = mimetypes.guess_type(os.path.basename(filename))[0]
+    # The .srt extension is not recognised by the mimetypes module.
+    if os.path.basename(filename).endswith('.srt'):
+        media_type = 'text/srt'
     if media_type is not None:
         if media_type in img_formats and file_size > 5 * 1048576:
             raise TwitterError({'message': 'Images must be less than 5MB.'})
@@ -275,16 +287,18 @@ def parse_media_file(passed_media, async_upload=False):
             raise TwitterError({'message': 'Videos must be less than 15MB.'})
         elif media_type in video_formats and async_upload and file_size > 512 * 1048576:
             raise TwitterError({'message': 'Videos must be less than 512MB.'})
-        elif media_type not in img_formats and media_type not in video_formats and media_type not in long_img_formats:
+        elif media_type not in img_formats + long_img_formats + subtitle_formats + video_formats:
             raise TwitterError({'message': 'Media type could not be determined.'})
 
     return data_file, filename, file_size, media_type
 
 
 def enf_type(field, _type, val):
-    """ Checks to see if a given val for a field (i.e., the name of the field)
-    is of the proper _type. If it is not, raises a TwitterError with a brief
-    explanation.
+    """Enforce type checking on variable.
+
+    Check to see if a given val for a field (i.e., the name
+    of the field) is of the proper _type. If it is not,
+    raise a TwitterError with a brief explanation.
 
     Args:
         field:
@@ -307,6 +321,18 @@ def enf_type(field, _type, val):
 
 
 def parse_arg_list(args, attr):
+    """Parse a set of args for list functions.
+
+    Convenience/DRY function.
+
+    Args:
+        args (str, twitter.User, list, tuple): set of arguments to
+            pass to API.
+        attr (str): The attribute to be extracted from each arg.
+
+    Returns:
+        (str) A string representing the concatenated arguments.
+    """
     out = []
     if isinstance(args, (str, unicode)):
         out.append(args)
