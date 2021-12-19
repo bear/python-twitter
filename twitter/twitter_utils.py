@@ -2,7 +2,7 @@
 """Collection of utilities for use in API calls, functions."""
 from __future__ import unicode_literals
 
-import mimetypes
+import filetype
 import os
 import re
 import sys
@@ -274,10 +274,7 @@ def parse_media_file(passed_media, async_upload=False):
     except Exception as e:
         pass
 
-    media_type = mimetypes.guess_type(os.path.basename(filename))[0]
-    # The .srt extension is not recognised by the mimetypes module.
-    if os.path.basename(filename).endswith('.srt'):
-        media_type = 'text/srt'
+    media_type = filetype.guess_mime(data_file.name)
     if media_type is not None:
         if media_type in img_formats and file_size > 5 * 1048576:
             raise TwitterError({'message': 'Images must be less than 5MB.'})
