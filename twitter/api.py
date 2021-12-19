@@ -121,7 +121,6 @@ class Api(object):
       There are many other methods, including:
 
         >>> api.PostUpdates(status)
-        >>> api.PostDirectMessage(user, text)
         >>> api.GetUser(user)
         >>> api.GetReplies()
         >>> api.GetUserTimeline(user)
