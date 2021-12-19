@@ -5160,6 +5160,8 @@ class Api(object):
         if not data:
             data = {}
 
+        data['tweet_mode'] = self.tweet_mode
+
         if verb == 'POST':
             if data:
                 if 'media_ids' in data:
@@ -5175,7 +5177,6 @@ class Api(object):
                 resp = 0  # POST request, but without data or json
 
         elif verb == 'GET':
-            data['tweet_mode'] = self.tweet_mode
             url = self._BuildUrl(url, extra_params=data)
             resp = self._session.get(url, auth=self.__auth, timeout=self._timeout, proxies=self.proxies, verify=self.verify_ssl, cert=self.cert_ssl)
 
