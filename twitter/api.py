@@ -4272,10 +4272,10 @@ class Api(object):
             user_timeline. Helpful for disambiguating when a valid screen
             name is also a user ID.
           skip_status (bool, optional):
-            If True the statuses will not be returned in the user items.
+            If True the statuses will not be returned in the user items. Defaults to False.
           include_entities (bool, optional):
             If False, the timeline will not contain additional metadata.
-            Defaults to True.
+            Defaults to False.
 
         Returns:
           list: A sequence of twitter.user.User instances, one for each
