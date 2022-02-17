@@ -3033,7 +3033,7 @@ class Api(object):
         Returns:
           A sequence of twitter.DirectMessage instances
         """
-        url = '%s/direct_messages.json' % self.base_url
+        url = '%s/direct_messages/events/list.json' % self.base_url
         parameters = {
             'full_text': bool(full_text),
             'include_entities': bool(include_entities),
@@ -3053,7 +3053,7 @@ class Api(object):
         if return_json:
             return data
         else:
-            return [DirectMessage.NewFromJsonDict(x) for x in data]
+            return [DirectMessage.NewFromJsonDict(x) for x in data['events']]
 
     def GetSentDirectMessages(self,
                               since_id=None,
@@ -3180,15 +3180,7 @@ class Api(object):
         if return_json:
             return data
         else:
-            dm = DirectMessage(
-                created_at=data['event']['created_timestamp'],
-                id=data['event']['id'],
-                recipient_id=data['event']['message_create']['target']['recipient_id'],
-                sender_id=data['event']['message_create']['sender_id'],
-                text=data['event']['message_create']['message_data']['text'],
-            )
-            dm._json = data
-            return dm
+            return [DirectMessage.NewFromJsonDict(x) for x in data]
 
     def DestroyDirectMessage(self, message_id, include_entities=True, return_json=False):
         """Destroys the direct message specified in the required ID parameter.
@@ -3206,19 +3198,13 @@ class Api(object):
         Returns:
           A twitter.DirectMessage instance representing the message destroyed
         """
-        url = '%s/direct_messages/destroy.json' % self.base_url
+        url = '%s/direct_messages/events/destroy.json' % self.base_url
         data = {
             'id': enf_type('message_id', int, message_id),
             'include_entities': enf_type('include_entities', bool, include_entities)
         }
 
-        resp = self._RequestUrl(url, 'POST', data=data)
-        data = self._ParseAndCheckTwitter(resp.content.decode('utf-8'))
-
-        if return_json:
-            return data
-        else:
-            return DirectMessage.NewFromJsonDict(data)
+        resp = self._RequestUrl(url, 'DELETE', data=data)
 
     def CreateFriendship(self, user_id=None, screen_name=None, follow=True, retweets=True, **kwargs):
         """Befriends the user specified by the user_id or screen_name.
@@ -5090,7 +5076,7 @@ class Api(object):
                 raise TwitterError({'message': "Exceeded connection limit for user"})
             if "Error 401 Unauthorized" in json_data:
                 raise TwitterError({'message': "Unauthorized"})
-            raise TwitterError({'message': 'Unknown error': '{0}'.format(json_data)})
+            raise TwitterError({'message': 'Unknown error: {0}'.format(json_data)})
         self._CheckForTwitterError(data)
         return data
 
