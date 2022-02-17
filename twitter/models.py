@@ -183,25 +183,26 @@ class DirectMessage(TwitterModel):
 
     def __init__(self, **kwargs):
         self.param_defaults = {
-            'created_at': None,
+            'created_timestamp': None,
             'id': None,
-            'recipient_id': None,
-            'sender_id': None,
-            'text': None,
+            'message_create': None,
+            # 'recipient_id': None,
+            # 'sender_id': None,
+            # 'text': None,
         }
 
         for (param, default) in self.param_defaults.items():
             setattr(self, param, kwargs.get(param, default))
 
     def __repr__(self):
-        if self.text and len(self.text) > 140:
-            text = "{text}[...]".format(text=self.text[:140])
-        else:
-            text = self.text
-        return "DirectMessage(ID={dm_id}, Sender={sender}, Created={time}, Text='{text!r}')".format(
+        recipient_id = self.message_create['target']['recipient_id']
+        sender_id = self.message_create['sender_id']
+        text = self.message_create['message_data']['text']
+        return "DirectMessage(ID={dm_id}, Sender={sender}, Recipient={recipient}, Created={timestamp}, Text='{text!r}')".format(
             dm_id=self.id,
-            sender=self.sender_id,
-            time=self.created_at,
+            recipient=recipient_id,
+            sender=sender_id,
+            timestamp=self.created_timestamp,
             text=text)
 
 
