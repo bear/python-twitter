@@ -3180,15 +3180,7 @@ class Api(object):
         if return_json:
             return data
         else:
-            dm = DirectMessage(
-                created_at=data['event']['created_timestamp'],
-                id=data['event']['id'],
-                recipient_id=data['event']['message_create']['target']['recipient_id'],
-                sender_id=data['event']['message_create']['sender_id'],
-                text=data['event']['message_create']['message_data']['text'],
-            )
-            dm._json = data
-            return dm
+            return [DirectMessage.NewFromJsonDict(x) for x in data]
 
     def DestroyDirectMessage(self, message_id, include_entities=True, return_json=False):
         """Destroys the direct message specified in the required ID parameter.
