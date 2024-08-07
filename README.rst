@@ -4,7 +4,7 @@ A Python wrapper around the Twitter API.
 
 By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
 
-============-
+============
 NOTICE
 ============
 I've archived this repo to mark that I'm not going to be maintaining it. It's open-source so anyone using it can fork or take it over.
