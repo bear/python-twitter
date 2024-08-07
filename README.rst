@@ -4,29 +4,11 @@ A Python wrapper around the Twitter API.
 
 By the `Python-Twitter Developers <python-twitter@googlegroups.com>`_
 
-.. image:: https://img.shields.io/pypi/v/python-twitter.svg
-    :target: https://pypi.python.org/pypi/python-twitter/
-    :alt: Downloads
-
-.. image:: https://readthedocs.org/projects/python-twitter/badge/?version=latest
-    :target: http://python-twitter.readthedocs.org/en/latest/?badge=latest
-    :alt: Documentation Status
-
-.. image:: https://circleci.com/gh/bear/python-twitter.svg?style=svg
-    :target: https://circleci.com/gh/bear/python-twitter
-    :alt: Circle CI
-
-.. image:: http://codecov.io/github/bear/python-twitter/coverage.svg?branch=master
-    :target: http://codecov.io/github/bear/python-twitter
-    :alt: Codecov
-
-.. image:: https://requires.io/github/bear/python-twitter/requirements.svg?branch=master
-     :target: https://requires.io/github/bear/python-twitter/requirements/?branch=master
-     :alt: Requirements Status
-
-.. image:: https://dependencyci.com/github/bear/python-twitter/badge
-     :target: https://dependencyci.com/github/bear/python-twitter
-     :alt: Dependency Status
+============-
+NOTICE
+============
+I've archived this repo to mark that I'm not going to be maintaining it. It's open-source so anyone using it can fork or take it over.
+Thank you to all the people that contributed to it in the past 
 
 ============
 Introduction
